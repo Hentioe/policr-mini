@@ -62,6 +62,8 @@ defmodule PolicrMini.Factory do
 
   def build(:verification) do
     %PolicrMini.Schema.Verification{
+      target_user_id: 491_837_624,
+      target_user_name: "小明",
       message_id: 1234,
       indices: [1, 3],
       seconds: 60,
