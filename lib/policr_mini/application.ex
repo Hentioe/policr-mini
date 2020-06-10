@@ -5,12 +5,18 @@ defmodule PolicrMini.Application do
 
   use Application
 
-  alias PolicrMini.Bot.{StartCommander, PingCommander}
+  alias PolicrMini.Bot.{
+    StartCommander,
+    PingCommander,
+    SelfJoinedHandler,
+    SelfLeftedHandler,
+    TextHandler
+  }
 
   def start(_type, _args) do
     filters = [
       commanders: [StartCommander, PingCommander],
-      handlers: [PolicrMini.Bot.TextHandler]
+      handlers: [SelfJoinedHandler, SelfLeftedHandler, TextHandler]
     ]
 
     children = [
@@ -21,7 +27,10 @@ defmodule PolicrMini.Application do
       # Start the PubSub system
       {Phoenix.PubSub, name: PolicrMini.PubSub},
       # Start the Endpoint (http/https)
-      PolicrMiniWeb.Endpoint,
+      PolicrMiniWeb.Endpoint
+    ]
+
+    bot_children = [
       # 启动机器人（拉取消息）
       PolicrMini.Bot,
       # 消费消息的动态主管
@@ -29,6 +38,11 @@ defmodule PolicrMini.Application do
       # 过滤器管理器
       {PolicrMini.Bot.FilterManager, filters}
     ]
+
+    children =
+      if Mix.env() == :test,
+        do: children,
+        else: children ++ bot_children
 
     # See https://hexdocs.pm/elixir/Supervisor.html
     # for other strategies and supported options

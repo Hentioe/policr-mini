@@ -13,19 +13,20 @@ defmodule PolicrMini.Bot.Consumer do
     DynamicSupervisor.init(strategy: :one_for_one)
   end
 
-  def receive(%Nadia.Model.Update{} = update, username) do
+  def receive(%Nadia.Model.Update{} = update) do
     message = update.message
 
     dispatch_msg = fn ->
       message
-      |> dispatch_commander(username)
+      |> dispatch_commander
       |> dispatch_handler
     end
 
     if message, do: DynamicSupervisor.start_child(__MODULE__, {Task, dispatch_msg})
   end
 
-  def dispatch_commander(message, username) do
+  def dispatch_commander(message) do
+    username = PolicrMini.Bot.username()
     text = message.text
 
     applying = fn commander, state ->
@@ -36,20 +37,21 @@ defmodule PolicrMini.Bot.Consumer do
       state
     end
 
-    chat_id = message.chat.id
-    from_user_id = message.from.id
+    %{chat: %{id: chat_id}, from: %{id: from_user_id, username: from_user_username}} = message
 
     takeovered =
       case ChatBusiness.get(chat_id) do
-        {:ok, chat} -> chat.takeovered || false
+        {:ok, chat} -> chat.is_take_over || false
         _ -> false
       end
 
     # TODO: 待优化：根据 chat_id 是否大于 0 识别私聊以直接返回 false
     from_admin = if PermissionBusiness.find(chat_id, from_user_id) != nil, do: true, else: false
+    from_self = from_user_username != nil && from_user_username == username
 
     init_state = %State{
       takeovered: takeovered,
+      from_self: from_self,
       from_admin: from_admin,
       deleted: false,
       done: false
