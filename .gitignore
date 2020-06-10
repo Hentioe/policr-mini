@@ -35,3 +35,6 @@ npm-debug.log
 
 # ElixirLS
 /.elixir_ls
+
+# Secret configuration
+/config/*.secret.exs
