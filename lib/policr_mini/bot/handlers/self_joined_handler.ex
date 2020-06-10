@@ -4,17 +4,11 @@ defmodule PolicrMini.Bot.SelfJoinedHandler do
   alias PolicrMini.Bot.SyncCommander
 
   @impl true
-  def match?(message, state) do
-    is_match =
-      if new_chat_member = message.new_chat_member do
-        %{id: joined_user_id} = new_chat_member
-        joined_user_id == PolicrMini.Bot.id()
-      else
-        false
-      end
+  def match?(%{new_chat_member: nil} = _message, state), do: {false, state}
 
-    {is_match, state}
-  end
+  @impl true
+  def match?(%{new_chat_member: %{id: joined_user_id}} = _message, state),
+    do: {joined_user_id == bot_id(), state}
 
   @impl true
   def handle(message, state) do

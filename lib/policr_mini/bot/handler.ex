@@ -3,6 +3,7 @@ defmodule PolicrMini.Bot.Handler do
     quote do
       alias PolicrMini.Bot.Handler
       import Handler
+      import PolicrMini.Bot.Helper
 
       @behaviour Handler
 

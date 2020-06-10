@@ -4,17 +4,11 @@ defmodule PolicrMini.Bot.SelfLeftedHandler do
   alias PolicrMini.ChatBusiness
 
   @impl true
-  def match?(message, state) do
-    is_match =
-      if left_chat_member = message.left_chat_member do
-        %{id: lefted_user_id} = left_chat_member
-        lefted_user_id == PolicrMini.Bot.id()
-      else
-        false
-      end
+  def match?(%{left_chat_member: nil} = _message, state), do: {false, state}
 
-    {is_match, state}
-  end
+  @impl true
+  def match?(%{left_chat_member: %{id: lefted_user_id}} = _message, state),
+    do: {lefted_user_id == bot_id(), state}
 
   @impl true
   def handle(message, state) do

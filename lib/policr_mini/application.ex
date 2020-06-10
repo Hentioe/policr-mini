@@ -11,13 +11,14 @@ defmodule PolicrMini.Application do
     SyncCommander,
     SelfJoinedHandler,
     SelfLeftedHandler,
+    UserJoinedHandler,
     TextHandler
   }
 
   def start(_type, _args) do
     filters = [
       commanders: [StartCommander, PingCommander, SyncCommander],
-      handlers: [SelfJoinedHandler, SelfLeftedHandler, TextHandler]
+      handlers: [SelfJoinedHandler, SelfLeftedHandler, UserJoinedHandler, TextHandler]
     ]
 
     children = [
