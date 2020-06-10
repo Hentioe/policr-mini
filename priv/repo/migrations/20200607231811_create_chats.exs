@@ -4,7 +4,7 @@ defmodule PolicrMini.Repo.Migrations.CreateChats do
 
   def change do
     create table(:chats, primary_key: false) do
-      add :id, :integer, comment: "聊天编号", primary_key: true
+      add :id, :bigint, comment: "聊天编号", primary_key: true
       add :type, ChatTypeEnum.type(), comment: "聊天类型"
       add :title, :string, comment: "标题"
       add :small_photo_id, :string, comment: "小尺寸聊天图片编号"

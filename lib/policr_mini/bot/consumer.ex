@@ -2,6 +2,7 @@ defmodule PolicrMini.Bot.Consumer do
   use DynamicSupervisor
 
   alias PolicrMini.Bot.{FilterManager, State}
+  alias PolicrMini.{ChatBusiness, PermissionBusiness}
 
   def start_link(default \\ []) when is_list(default) do
     DynamicSupervisor.start_link(__MODULE__, %{}, name: __MODULE__)
@@ -35,7 +36,24 @@ defmodule PolicrMini.Bot.Consumer do
       state
     end
 
-    init_state = %State{}
+    chat_id = message.chat.id
+    from_user_id = message.from.id
+
+    takeovered =
+      case ChatBusiness.get(chat_id) do
+        {:ok, chat} -> chat.takeovered || false
+        _ -> false
+      end
+
+    # TODO: 待优化：根据 chat_id 是否大于 0 识别私聊以直接返回 false
+    from_admin = if PermissionBusiness.find(chat_id, from_user_id) != nil, do: true, else: false
+
+    init_state = %State{
+      takeovered: takeovered,
+      from_admin: from_admin,
+      deleted: false,
+      done: false
+    }
 
     state =
       if text do
