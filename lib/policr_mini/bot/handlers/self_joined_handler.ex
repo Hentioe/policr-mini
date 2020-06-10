@@ -1,8 +1,7 @@
 defmodule PolicrMini.Bot.SelfJoinedHandler do
   use PolicrMini.Bot.Handler
 
-  alias PolicrMini.Schema.Permission
-  alias PolicrMini.{ChatBusiness, UserBusiness}
+  alias PolicrMini.Bot.SyncCommander
 
   @impl true
   def match?(message, state) do
@@ -19,70 +18,20 @@ defmodule PolicrMini.Bot.SelfJoinedHandler do
 
   @impl true
   def handle(message, state) do
-    chat = message.chat
+    chat_id = message.chat.id
 
-    %{id: chat_id, type: type, title: title, username: username} = chat
-
-    chat_params = %{
-      type: type,
-      title: title,
-      username: username,
-      is_take_over: false
-    }
-
-    chat_params =
-      case Nadia.get_chat(chat_id) do
-        {:ok, chat} ->
-          if photo = chat.photo do
-            chat_params
-            |> Map.put(:small_photo_id, photo.small_file_id)
-            |> Map.put(:big_photo_id, photo.big_file_id)
-          else
-            chat_params
-          end
-
-        {:error, _} ->
-          chat_params
-      end
-
-    # 添加群组信息
-    with {:ok, chat} = ChatBusiness.fetch(chat_id, chat_params),
-         {:ok, administrators} <- Nadia.get_chat_administrators(chat_id) do
-      # 更新用户列表
-      administrators
-      |> Enum.each(fn member ->
-        user = member.user
-
-        {:ok, _} =
-          UserBusiness.fetch(
-            user.id,
-            %{
-              id: user.id,
-              first_name: user[:first_name],
-              last_name: user[:last_name],
-              username: user[:username]
-            }
-          )
-      end)
-
-      # 更新管理员列表
-      permissions =
-        administrators
-        |> Enum.map(fn member ->
-          %Permission{
-            user_id: member.user.id,
-            tg_is_owner: member.status == "creator",
-            tg_can_promote_members: false,
-            tg_can_restrict_members: true
-          }
-        end)
-
-      {:ok, _} = chat |> ChatBusiness.reset_administrators(permissions)
-
-      Nadia.send_message(chat_id, "已成功登记本群信息，所有管理员皆可登入后台。将机器人提升为管理员将会开始工作。")
+    # 同步群组和管理员信息
+    with {:ok, chat} = SyncCommander.synchronize_chat(chat_id, init: true),
+         {:ok, _} <- SyncCommander.synchronize_administrators(chat) do
+      Nadia.send_message(
+        chat_id,
+        "已成功登记本群信息，所有管理员皆可登入后台。\n\n功能启用方法：\n1. 将本机器人提升为管理员\n2. 发送 /sync@#{
+          PolicrMini.Bot.username()
+        } 指令"
+      )
     else
       {:error, _} ->
-        Nadia.send_message(chat_id, "出现了一些问题，机器人没有获取到管理员信息，请联系作者。")
+        Nadia.send_message(chat_id, "出现了一些问题，群组登记失败。请联系作者。")
     end
 
     {:ok, %{state | done: true}}

@@ -8,6 +8,7 @@ defmodule PolicrMini.Application do
   alias PolicrMini.Bot.{
     StartCommander,
     PingCommander,
+    SyncCommander,
     SelfJoinedHandler,
     SelfLeftedHandler,
     TextHandler
@@ -15,7 +16,7 @@ defmodule PolicrMini.Application do
 
   def start(_type, _args) do
     filters = [
-      commanders: [StartCommander, PingCommander],
+      commanders: [StartCommander, PingCommander, SyncCommander],
       handlers: [SelfJoinedHandler, SelfLeftedHandler, TextHandler]
     ]
 
