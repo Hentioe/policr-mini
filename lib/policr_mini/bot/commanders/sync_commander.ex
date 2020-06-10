@@ -28,12 +28,15 @@ defmodule PolicrMini.Bot.SyncCommander do
       message_text = "同步完成。已更新群组和管理员数据。"
 
       message_text =
-        if is_admin,
-          do: message_text <> "因为本机器人具备权限，已接管新成员验证。",
-          else:
-            message_text <>
-              "因为本机器人不是管理员，" <>
-              if(last_is_take_over, do: "已取消对新成员验证的接管。", else: "没有接管新成员验证的能力。")
+        if is_admin do
+          message_text <>
+            "因为本机器人具备权限，" <>
+            if last_is_take_over, do: "新成员验证已处于接管状态。", else: "已接管新成员验证。"
+        else
+          message_text <>
+            "因为本机器人不是管理员，" <>
+            if(last_is_take_over, do: "已取消对新成员验证的接管。", else: "没有接管新成员验证的能力。")
+        end
 
       Nadia.send_message(chat_id, message_text)
     else
