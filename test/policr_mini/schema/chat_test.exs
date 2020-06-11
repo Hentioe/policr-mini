@@ -19,6 +19,14 @@ defmodule PolicrMini.Schema.ChatTest do
                  :description,
                  :invite_link,
                  :is_take_over,
+                 :tg_can_add_web_page_previews,
+                 :tg_can_change_info,
+                 :tg_can_invite_users,
+                 :tg_can_pin_messages,
+                 :tg_can_send_media_messages,
+                 :tg_can_send_messages,
+                 :tg_can_send_other_messages,
+                 :tg_can_send_polls,
                  :inserted_at,
                  :updated_at
                ]

@@ -53,14 +53,29 @@ defmodule PolicrMini.Bot.SyncCommander do
         {small_photo_id, big_photo_id} =
           if photo = chat.photo, do: {photo.small_file_id, photo.big_file_id}, else: {nil, nil}
 
-        %{type: type, title: title, username: username} = chat
+        %{
+          type: type,
+          title: title,
+          username: username,
+          description: description,
+          permissions: chat_permissions
+        } = chat
 
         params = %{
           type: type,
           title: title,
           small_photo_id: small_photo_id,
           big_photo_id: big_photo_id,
-          username: username
+          username: username,
+          description: description,
+          tg_can_add_web_page_previews: chat_permissions[:can_add_web_page_previews],
+          tg_can_change_info: chat_permissions[:can_change_info],
+          tg_can_invite_users: chat_permissions[:can_invite_users],
+          tg_can_pin_messages: chat_permissions[:can_pin_messages],
+          tg_can_send_media_messages: chat_permissions[:can_send_media_messages],
+          tg_can_send_messages: chat_permissions[:can_send_messages],
+          tg_can_send_other_messages: chat_permissions[:can_send_other_messages],
+          tg_can_send_polls: chat_permissions[:can_send_polls]
         }
 
         params =
@@ -72,6 +87,9 @@ defmodule PolicrMini.Bot.SyncCommander do
           {:error,
            %Ecto.Changeset{errors: [is_take_over: {"can't be blank", [validation: :required]}]}} ->
             ChatBusiness.fetch(chat_id, params |> Map.put(:is_take_over, false))
+
+          r ->
+            r
         end
 
       e ->
@@ -86,7 +104,7 @@ defmodule PolicrMini.Bot.SyncCommander do
         # 过滤自身
         administrators =
           administrators
-          |> Enum.filter(fn member -> member.user.id != PolicrMini.Bot.id() end)
+          |> Enum.filter(fn member -> !member.user.is_bot end)
 
         # 更新用户列表
         administrators
@@ -112,8 +130,8 @@ defmodule PolicrMini.Bot.SyncCommander do
             %Permission{
               user_id: member.user.id,
               tg_is_owner: member.status == "creator",
-              tg_can_promote_members: false,
-              tg_can_restrict_members: true
+              tg_can_restrict_members: member.can_restrict_members,
+              tg_can_promote_members: member.can_promote_members
             }
           end)
 

@@ -13,6 +13,14 @@ defmodule PolicrMini.Repo.Migrations.CreateChats do
       add :description, :text, comment: "说明"
       add :invite_link, :string, comment: "邀请链接"
       add :is_take_over, :boolean, comment: "是否被接管"
+      add :tg_can_add_web_page_previews, :boolean, comment: "是否能添加网页预览（同步 TG 权限）"
+      add :tg_can_change_info, :boolean, comment: "是否能修改信息（同步 TG 权限）"
+      add :tg_can_invite_users, :boolean, comment: "是否能邀请用户（同步 TG 权限）"
+      add :tg_can_pin_messages, :boolean, comment: "是否能置顶消息（同步 TG 权限）"
+      add :tg_can_send_media_messages, :boolean, comment: "是否能发送媒体消息（同步 TG 权限）"
+      add :tg_can_send_messages, :boolean, comment: "是否能发送消息（同步 TG 权限）"
+      add :tg_can_send_other_messages, :boolean, comment: "是否能发送其它消息（同步 TG 权限）"
+      add :tg_can_send_polls, :boolean, comment: "是否能发送调查（同步 TG 权限）"
 
       timestamps()
     end

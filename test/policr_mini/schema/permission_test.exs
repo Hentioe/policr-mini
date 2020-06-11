@@ -14,8 +14,8 @@ defmodule PolicrMini.Schema.PermissionTest do
                  :chat_id,
                  :user_id,
                  :tg_is_owner,
-                 :tg_can_promote_members,
                  :tg_can_restrict_members,
+                 :tg_can_promote_members,
                  :readable,
                  :writable,
                  :inserted_at,
@@ -60,9 +60,7 @@ defmodule PolicrMini.Schema.PermissionTest do
     assert changeset.required == [
              :chat_id,
              :user_id,
-             :tg_is_owner,
-             :tg_can_promote_members,
-             :tg_can_restrict_members
+             :tg_is_owner
            ]
 
     assert changeset.valid?
