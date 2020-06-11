@@ -3,6 +3,7 @@ defmodule PolicrMini.Bot.Commander do
     quote do
       alias PolicrMini.Bot.Commander
       import Commander
+      import PolicrMini.Bot.Helper
 
       @behaviour Commander
 
@@ -22,5 +23,5 @@ defmodule PolicrMini.Bot.Commander do
   end
 
   @callback handle(message :: Nadia.Model.Message.t(), state :: PolicrMini.Bot.State.t()) ::
-              {:ok | :ignored, PolicrMini.Bot.State.t()}
+              {:ok | :ignored | :error, PolicrMini.Bot.State.t()}
 end

@@ -6,7 +6,7 @@ defmodule PolicrMini.Bot.PingCommander do
   @impl true
   def handle(message, state) do
     %{chat: %{id: chat_id}} = message
-    Nadia.send_message(chat_id, "🏓")
+    send_message(chat_id, "🏓")
 
     {:ok, state}
   end

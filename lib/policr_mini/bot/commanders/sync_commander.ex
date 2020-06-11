@@ -38,10 +38,10 @@ defmodule PolicrMini.Bot.SyncCommander do
             if(last_is_take_over, do: "已取消对新成员验证的接管。", else: "没有接管新成员验证的能力。")
         end
 
-      Nadia.send_message(chat_id, message_text)
+      send_message(chat_id, message_text)
     else
       {:error, _} ->
-        Nadia.send_message(chat_id, "出现了一些问题，同步失败。请联系作者。")
+        send_message(chat_id, "出现了一些问题，同步失败。请联系作者。")
     end
 
     {:ok, state}
@@ -68,7 +68,11 @@ defmodule PolicrMini.Bot.SyncCommander do
             do: params |> Map.put(:is_take_over, false),
             else: params
 
-        ChatBusiness.fetch(chat_id, params)
+        case ChatBusiness.fetch(chat_id, params) do
+          {:error,
+           %Ecto.Changeset{errors: [is_take_over: {"can't be blank", [validation: :required]}]}} ->
+            ChatBusiness.fetch(chat_id, params |> Map.put(:is_take_over, false))
+        end
 
       e ->
         e

@@ -15,6 +15,7 @@ defmodule PolicrMini.Schema.VerificationTest do
                  :message_snapshot_id,
                  :target_user_id,
                  :target_user_name,
+                 :entrance,
                  :message_id,
                  :indices,
                  :seconds,
@@ -61,10 +62,8 @@ defmodule PolicrMini.Schema.VerificationTest do
 
     assert changeset.required == [
              :chat_id,
-             :message_snapshot_id,
              :target_user_id,
-             :message_id,
-             :indices,
+             :entrance,
              :seconds,
              :status
            ]

@@ -6,7 +6,7 @@ defmodule PolicrMini.Bot.StartCommander do
   @impl true
   def handle(message, state) do
     %{chat: %{id: chat_id}} = message
-    Nadia.send_message(chat_id, "抱歉，我还未成熟，揣测不出您想干嘛。")
+    send_message(chat_id, "抱歉，我还未成熟，揣测不出您想干嘛。")
 
     {:ok, state}
   end

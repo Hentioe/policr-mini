@@ -1,11 +1,11 @@
 defmodule PolicrMini.Schema.Verification do
   use PolicrMini.Schema
 
-  alias PolicrMini.EctoEnums.VerificationStatusEnum
+  alias PolicrMini.EctoEnums.{VerificationEntranceEnum, VerificationStatusEnum}
   alias PolicrMini.Schema.{Chat, MessageSnapshot}
 
-  @required_fields ~w(chat_id message_snapshot_id target_user_id message_id indices seconds status)a
-  @optional_fields ~w(target_user_name chosen)a
+  @required_fields ~w(chat_id target_user_id entrance seconds status)a
+  @optional_fields ~w(message_snapshot_id target_user_name message_id indices chosen)a
 
   schema "verifications" do
     belongs_to :chat, Chat
@@ -13,6 +13,7 @@ defmodule PolicrMini.Schema.Verification do
 
     field :target_user_id, :integer
     field :target_user_name, :string
+    field :entrance, VerificationEntranceEnum
     field :message_id, :integer
     field :indices, {:array, :integer}
     field :seconds, :integer
