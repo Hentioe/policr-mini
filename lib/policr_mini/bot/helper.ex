@@ -7,6 +7,7 @@ defmodule PolicrMini.Bot.Helper do
   def fullname(%{first_name: first_name, last_name: last_name}), do: "#{first_name} #{last_name}"
   def fullname(%{first_name: first_name}), do: first_name
   def fullname(%{last_name: last_name}), do: last_name
+  def fullname(%{fullname: fullname}), do: fullname
   def fullname(%{id: id}), do: Integer.to_string(id)
 
   def send_message(chat_id, text, options \\ []) do
@@ -68,4 +69,9 @@ defmodule PolicrMini.Bot.Helper do
       "Markdown" -> "[#{fullname(user)}](tg://user?id=#{user.id})"
     end
   end
+
+  def async(callback) when is_function(callback), do: TaskAfter.task_after(0, callback)
+
+  def async(callback, [{:seconds, seconds}]) when is_integer(seconds) and is_function(callback),
+    do: TaskAfter.task_after(seconds * 1000, callback)
 end

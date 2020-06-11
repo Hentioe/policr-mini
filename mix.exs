@@ -46,6 +46,7 @@ defmodule PolicrMini.MixProject do
       {:jason, "~> 1.0"},
       {:plug_cowboy, "~> 2.0"},
       {:ecto_enum, "~> 1.4"},
+      {:task_after, "~> 1.2"},
       {:nadia, path: "../nadia"}
     ]
   end

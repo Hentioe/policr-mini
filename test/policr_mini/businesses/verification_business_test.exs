@@ -72,4 +72,31 @@ defmodule PolicrMini.VerificationBusinessTest do
     assert verification2.status == :passed
     assert verification2.chosen == updated_chosen
   end
+
+  test "find_last_unity_waiting/1" do
+    verification_params = build_params()
+
+    {:ok, _verification1} =
+      VerificationBusiness.create(verification_params |> Map.put(:message_id, 100))
+
+    {:ok, verification2} =
+      VerificationBusiness.create(verification_params |> Map.put(:message_id, 9999))
+
+    {:ok, _verification3} =
+      VerificationBusiness.create(verification_params |> Map.put(:message_id, 101))
+
+    last = VerificationBusiness.find_last_unity_waiting(verification_params.chat_id)
+
+    assert last == verification2
+  end
+
+  test "get_unity_waiting_count/1" do
+    verification_params = build_params()
+    {:ok, _} = VerificationBusiness.create(verification_params)
+    {:ok, _} = VerificationBusiness.create(verification_params)
+    {:ok, _} = VerificationBusiness.create(verification_params)
+    {:ok, _} = VerificationBusiness.create(verification_params |> Map.put(:status, 1))
+
+    assert VerificationBusiness.get_unity_waiting_count(verification_params.chat_id) == 3
+  end
 end
