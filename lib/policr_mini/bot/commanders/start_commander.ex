@@ -1,17 +1,35 @@
 defmodule PolicrMini.Bot.StartCommander do
+  @moduledoc """
+  `/start` 命令的响应模块。
+  与其它命令不同，`/start` 命令不需要完整匹配，以 `/start` 开头的**私聊文本消息**都能进入处理函数。
+  这是因为 `/start` 是当前设计中唯一一个需要携带参数的命令。
+  """
   use PolicrMini.Bot.Commander, :start
 
   alias PolicrMini.VerificationBusiness
 
+  @doc """
+  重写后的 `match?/1` 函数，以 `/start` 开始即匹配。
+  """
   @impl true
   def match?(text), do: text |> String.starts_with?(@command)
 
+  @doc """
+  群组消息，忽略。
+  """
   @impl true
   def handle(%{chat: %{type: "group"}}, state), do: {:ignored, state}
 
+  @doc """
+  群组（超级群）消息，忽略。
+  """
   @impl true
   def handle(%{chat: %{type: "supergroup"}}, state), do: {:ignored, state}
 
+  @doc """
+  响应命令。
+  如果命令没有携带参数，则发送包含链接的项目介绍。否则将参数整体传递给 `dispatch/1` 函数进一步拆分和分发。
+  """
   @impl true
   def handle(message, state) do
     %{chat: %{id: chat_id}, text: text} = message
@@ -27,8 +45,15 @@ defmodule PolicrMini.Bot.StartCommander do
     {:ok, state}
   end
 
+  @doc """
+  分发命令参数。
+  以 `_` 分割成更多参数，转发给 `handle_args/1` 函数处理。
+  """
   def dispatch(arg, message), do: arg |> String.split("_") |> handle_args(message)
 
+  @doc """
+  处理 v1 版本的验证参数。
+  """
   def handle_args(["verification", "v1", chat_id], message) do
     %{chat: %{id: from_user_id}} = message
 
@@ -49,6 +74,9 @@ defmodule PolicrMini.Bot.StartCommander do
     end
   end
 
+  @doc """
+  响应未知参数。
+  """
   def handle_args(_, message) do
     %{chat: %{id: chat_id}} = message
 
