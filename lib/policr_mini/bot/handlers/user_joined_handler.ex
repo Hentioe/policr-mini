@@ -1,22 +1,42 @@
 defmodule PolicrMini.Bot.UserJoinedHandler do
+  @moduledoc """
+  新用户加入处理模块。
+  """
   use PolicrMini.Bot.Handler
 
   alias PolicrMini.{SchemeBusiness, VerificationBusiness}
 
+  @doc """
+  未接管状态，不匹配。
+  """
   @impl true
   def match?(_message, %{takeovered: false} = state), do: {false, state}
 
+  @doc """
+  消息中不包含新成员，不匹配。
+  """
   @impl true
   def match?(%{new_chat_member: nil} = _message, state), do: {false, state}
 
-  # 跳过机器人
+  @doc """
+  消息中的新成员类型是机器人，不匹配。
+  """
   @impl true
   def match?(%{new_chat_member: %{is_bot: true}} = _message, state), do: {false, state}
 
+  @doc """
+  其余情况皆匹配。
+  """
   @impl true
-  def match?(%{new_chat_member: %{id: joined_user_id}} = _message, state),
-    do: {joined_user_id != bot_id(), state}
+  def match?(_message, state), do: {true, state}
 
+  @doc """
+  新成员处理函数。
+  主要进行以下大致流程，按先后顺序：
+  1. 删除服务消息
+  1. 限制新成员权限
+  1. 读取验证方案，根据方案发送验证入口消息或验证消息
+  """
   @impl true
   def handle(message, state) do
     %{chat: %{id: chat_id}, from: %{id: from_user_id}} = message
@@ -42,7 +62,13 @@ defmodule PolicrMini.Bot.UserJoinedHandler do
     end
   end
 
-  # 统一入口，私聊（当前默认）
+  @doc """
+  统一入口 + 私聊（当前默认）方案的细节实现。
+  主要进行以下大致流程，按先后顺序：
+  1. 删除上一条统一验证入口消息
+  1. 读取等待验证的人，根据人数分别响应不同的文本内容
+  1. 启动定时任务，读取验证记录并根据结果实施操作
+  """
   def handle(:image, message, state, :unity, :private, seconds) do
     %{chat: %{id: chat_id}, new_chat_member: new_chat_member} = message
 
@@ -55,7 +81,7 @@ defmodule PolicrMini.Bot.UserJoinedHandler do
       status: :waiting
     }
 
-    # 异步删除上一条验证提示消息、
+    # 异步删除上一条验证提示消息
     last_verification_message = VerificationBusiness.find_last_unity_waiting(chat_id)
 
     if last_verification_message,
