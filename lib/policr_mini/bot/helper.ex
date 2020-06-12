@@ -45,13 +45,13 @@ defmodule PolicrMini.Bot.Helper do
   发送文本消息。
   如果 `options` 参数中不包含 `:disable_notification` 或 `:parse_mode` 配置，将为它们准备以下默认值：
   - `disable_notification`: `true`
-  - `parse_mode`: `"Markdown"`
+  - `parse_mode`: `"MarkdownV2"`
   """
   def send_message(chat_id, text, options \\ []) do
     options =
       options
       |> Keyword.put_new(:disable_notification, true)
-      |> Keyword.put_new(:parse_mode, "Markdown")
+      |> Keyword.put_new(:parse_mode, "MarkdownV2")
 
     Nadia.send_message(chat_id, text, options)
   end
