@@ -6,6 +6,14 @@ defmodule PolicrMini.Bot.UserJoinedHandler do
 
   alias PolicrMini.{SchemeBusiness, VerificationBusiness}
 
+  if Mix.env() == :dev do
+    @default_countdown 15
+    @allow_join_again_seconds 150
+  else
+    @allow_join_again_seconds 60 * 5
+    @default_countdown 120
+  end
+
   @doc """
   未接管状态，不匹配。
   """
@@ -51,7 +59,7 @@ defmodule PolicrMini.Bot.UserJoinedHandler do
         mode = scheme.verification_mode || :image
         entrance = scheme.verification_entrance || :unity
         occasion = scheme.verification_occasion || :private
-        seconds = scheme.seconds || 5
+        seconds = scheme.seconds || @default_countdown
 
         handle(mode, message, state, entrance, occasion, seconds)
 
@@ -124,11 +132,21 @@ defmodule PolicrMini.Bot.UserJoinedHandler do
           if latest_verification.status == :waiting do
             # 更新状态为超时
             latest_verification |> VerificationBusiness.update(%{status: :timeout})
-            # 踢出并解除限制以允许再次加入
+            # 实施操作（踢出）
             Nadia.kick_chat_member(chat_id, new_chat_member.id)
-            async(fn -> Nadia.unban_chat_member(chat_id, new_chat_member.id) end, seconds: 30)
+            # 解除限制以允许再次加入
+            async(fn -> Nadia.unban_chat_member(chat_id, new_chat_member.id) end,
+              seconds: @allow_join_again_seconds
+            )
 
-            text = "刚刚#{at(new_chat_member)}超时未验证，已经移出本群。\n\n过 5 分钟后可再次尝试加入。"
+            time_text =
+              if @allow_join_again_seconds < 60,
+                do: "#{seconds} 秒",
+                else: "#{to_string(seconds / 60) |> String.replace(".", "\\.")} 分钟"
+
+            text =
+              "刚刚#{at(new_chat_member)}超时未验证，已经移出本群。\n\n过 #{time_text}后可再次尝试加入。"
+              |> IO.inspect()
 
             case send_message(chat_id, text) do
               {:ok, sended_timeout_hint_message} ->
