@@ -78,7 +78,7 @@ defmodule PolicrMini.Bot.UserJoinedHandler do
         [
           %InlineKeyboardButton{
             text: "点此验证",
-            url: "https://t.me/#{bot_username()}?start=verification:v1:#{chat_id}"
+            url: "https://t.me/#{bot_username()}?start=verification_v1_#{chat_id}"
           }
         ]
       ]
@@ -117,30 +117,10 @@ defmodule PolicrMini.Bot.UserJoinedHandler do
             end
           end
 
-          # 更新验证提示
           waiting_count = VerificationBusiness.get_unity_waiting_count(chat_id)
-          # 已经没有验证，删除验证提示消息
+
           if waiting_count > 0 do
-            first_waiting_verification = VerificationBusiness.find_first_unity_waiting(chat_id)
-
-            target_user = %{
-              id: first_waiting_verification.target_user_id,
-              fullname: first_waiting_verification.target_user_name
-            }
-
-            text =
-              if waiting_count == 1,
-                do: "新成员#{at(target_user)}你好！\n您还未完成验证，验证有效时间只有 #{seconds} 秒。\n\n过期会被踢出或封禁，请尽快。",
-                else:
-                  "来了有一会儿的#{at(target_user)}和另外 #{waiting_count} 个还未验证的新成员，你们好！\n完成验证解除限制，验证有效时间不超过 #{
-                    seconds
-                  } 秒。\n\n过期会被踢出或封禁，请尽快。"
-
-            {:ok, sended_temp_hint_message} = send_message(chat_id, text, reply_markup: markup)
-
-            async(fn -> Nadia.delete_message(chat_id, sended_temp_hint_message.message_id) end,
-              seconds: 35
-            )
+            # 发送新的验证提醒消息
           else
             # 已经没有剩余验证，直接删除上一个验证提示消息
             Nadia.delete_message(chat_id, sended_message.message_id)

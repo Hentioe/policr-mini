@@ -30,9 +30,8 @@ defmodule PolicrMini.Bot.Consumer do
     text = message.text
 
     applying = fn commander, state ->
-      command_name = commander.command()
-      match = text == command_name || text == "#{command_name}@#{username}"
-      {_, state} = if match, do: commander.handle(message, state), else: {:ignored, state}
+      {_, state} =
+        if commander.match?(text), do: commander.handle(message, state), else: {:ignored, state}
 
       state
     end

@@ -1,10 +1,13 @@
 defmodule PolicrMini.Bot.SyncCommander do
-  use PolicrMini.Bot.Commander
+  use PolicrMini.Bot.Commander, :sync
 
   alias PolicrMini.{ChatBusiness, UserBusiness}
   alias PolicrMini.Schema.Permission
 
-  command(:sync)
+  # 非管理员发送指令直接删除
+  @impl true
+  def handle(%{message_id: message_id, chat: %{id: chat_id}}, %{from_admin: false}),
+    do: Nadia.delete_message(chat_id, message_id)
 
   @impl true
   def handle(message, state) do

@@ -1,27 +1,24 @@
 defmodule PolicrMini.Bot.Commander do
-  defmacro __using__(_) do
+  defmacro __using__(command) when is_atom(command) do
     quote do
       alias PolicrMini.Bot.Commander
       import Commander
       import PolicrMini.Bot.Helper
 
       @behaviour Commander
+      @command "/#{Atom.to_string(unquote(command))}"
 
       @impl true
       def handle(message, state), do: {:ok, state}
+      @impl true
+      def match?(text), do: text == @command || text == "#{@command}@#{bot_username()}"
 
       defoverridable handle: 2
-    end
-  end
-
-  defmacro command(name) do
-    command_text = "/#{Atom.to_string(name)}"
-
-    quote do
-      def command, do: unquote(command_text)
+      defoverridable match?: 1
     end
   end
 
   @callback handle(message :: Nadia.Model.Message.t(), state :: PolicrMini.Bot.State.t()) ::
               {:ok | :ignored | :error, PolicrMini.Bot.State.t()}
+  @callback match?(text :: binary()) :: boolean()
 end

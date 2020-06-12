@@ -1,7 +1,5 @@
 defmodule PolicrMini.Bot.PingCommander do
-  use PolicrMini.Bot.Commander
-
-  command(:ping)
+  use PolicrMini.Bot.Commander, :ping
 
   @impl true
   def handle(message, state) do
