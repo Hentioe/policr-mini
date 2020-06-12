@@ -6,8 +6,14 @@ defmodule PolicrMini.Bot.SyncCommander do
 
   # 非管理员发送指令直接删除
   @impl true
-  def handle(%{message_id: message_id, chat: %{id: chat_id}}, %{from_admin: false}),
-    do: Nadia.delete_message(chat_id, message_id)
+  def handle(
+        %{message_id: message_id, chat: %{id: chat_id}} = message,
+        %{from_admin: false} = state
+      ) do
+    async(fn -> Nadia.delete_message(chat_id, message_id) end)
+
+    {message, state}
+  end
 
   @impl true
   def handle(message, state) do

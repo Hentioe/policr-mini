@@ -6,7 +6,8 @@ defmodule PolicrMini.Bot.StartCommander do
   """
   use PolicrMini.Bot.Commander, :start
 
-  alias PolicrMini.VerificationBusiness
+  alias PolicrMini.{VerificationBusiness, SchemeBusiness}
+  alias PolicrMini.Schema.{Verification, Scheme}
 
   @doc """
   重写后的 `match?/1` 函数，以 `/start` 开始即匹配。
@@ -53,22 +54,26 @@ defmodule PolicrMini.Bot.StartCommander do
 
   @doc """
   处理 v1 版本的验证参数。
+  主要进行以下大致流程，按先后顺序：
+  1. 读取验证方案
+  1. 发送验证消息
+  1. 创建消息快照
+  1. 更新验证记录
   """
-  def handle_args(["verification", "v1", chat_id], message) do
-    %{chat: %{id: from_user_id}} = message
+  def handle_args(["verification", "v1", target_chat_id], %{chat: %{id: from_user_id}} = _message) do
+    target_chat_id = target_chat_id |> String.to_integer()
 
-    if _verification =
-         VerificationBusiness.find_waiting_by_user(String.to_integer(chat_id), from_user_id) do
-      # TODO: 计算剩余时间
+    if verification = VerificationBusiness.find_unity_waiting(target_chat_id, from_user_id) do
+      # 读取验证方案
+      {:ok, scheme} = SchemeBusiness.fetch(target_chat_id)
 
-      # TODO: 读取验证方案
-
-      # TODO: 发送验证消息
+      # 发送验证消息
+      {text, markup} = make_verification_message(scheme, verification)
+      {:ok, _} = send_message(from_user_id, text, reply_markup: markup)
 
       # TODO: 创建消息快照
 
       # TODO: 更新验证记录
-      send_message(from_user_id, "正在对您进行验证。")
     else
       send_message(from_user_id, "您没有该目标群组的待验证记录。")
     end
@@ -81,5 +86,39 @@ defmodule PolicrMini.Bot.StartCommander do
     %{chat: %{id: chat_id}} = message
 
     send_message(chat_id, "很抱歉，我未能理解您的意图。")
+  end
+
+  @doc """
+  生成默认模式的验证消息（算数验证）。
+  """
+  @spec make_verification_message(Scheme.t(), Verification.t()) ::
+          {String.t(), InlineKeyboardMarkup.t()}
+  def make_verification_message(
+        %Scheme{verification_mode: nil},
+        %Verification{id: verification_id, chat: %{title: chat_title}} = verification
+      ) do
+    text = "来自【#{chat_title}】的算术验证题：请选择「1 + 1 = ?」。\n\n您还剩 #{time_left(verification)} 秒，通过可解除封印。"
+
+    markup = %InlineKeyboardMarkup{
+      inline_keyboard: [
+        1..3
+        |> Enum.map(fn i ->
+          %InlineKeyboardButton{
+            text: "#{i}",
+            callback_data: "verification:v1:#{i}:#{verification_id}"
+          }
+        end)
+      ]
+    }
+
+    {text, markup}
+  end
+
+  @doc """
+  根据验证记录计算剩余时间
+  """
+  @spec time_left(Verification.t()) :: integer()
+  def time_left(%Verification{seconds: seconds, inserted_at: inserted_at}) do
+    seconds - DateTime.diff(DateTime.utc_now(), inserted_at)
   end
 end

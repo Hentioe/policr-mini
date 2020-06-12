@@ -41,6 +41,7 @@ defmodule PolicrMini.Bot.Helper do
   """
   def fullname(%{id: id}), do: Integer.to_string(id)
 
+  @markdown_parse_mode "MarkdownV2"
   @doc """
   发送文本消息。
   如果 `options` 参数中不包含 `:disable_notification` 或 `:parse_mode` 配置，将为它们准备以下默认值：
@@ -51,7 +52,18 @@ defmodule PolicrMini.Bot.Helper do
     options =
       options
       |> Keyword.put_new(:disable_notification, true)
-      |> Keyword.put_new(:parse_mode, "MarkdownV2")
+      |> Keyword.put_new(:parse_mode, @markdown_parse_mode)
+
+    text =
+      if(options |> Keyword.get(:parse_mode) == @markdown_parse_mode) do
+        text
+        |> String.replace(".", "\\.")
+        |> String.replace("+", "\\+")
+        |> String.replace("-", "\\-")
+        |> String.replace("=", "\\=")
+      else
+        text
+      end
 
     Nadia.send_message(chat_id, text, options)
   end

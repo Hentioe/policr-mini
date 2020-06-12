@@ -51,8 +51,8 @@ defmodule PolicrMini.VerificationBusiness do
     |> Repo.one()
   end
 
-  @spec find_waiting_by_user(integer(), integer()) :: Verification.t()
-  def find_waiting_by_user(chat_id, user_id) when is_integer(chat_id) and is_integer(user_id) do
+  @spec find_unity_waiting(integer(), integer()) :: Verification.t()
+  def find_unity_waiting(chat_id, user_id) when is_integer(chat_id) and is_integer(user_id) do
     from(p in Verification,
       where: p.chat_id == ^chat_id,
       where: p.target_user_id == ^user_id,
@@ -62,5 +62,6 @@ defmodule PolicrMini.VerificationBusiness do
       limit: 1
     )
     |> Repo.one()
+    |> Repo.preload([:chat])
   end
 end
