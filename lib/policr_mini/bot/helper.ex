@@ -56,16 +56,45 @@ defmodule PolicrMini.Bot.Helper do
 
     text =
       if(options |> Keyword.get(:parse_mode) == @markdown_parse_mode) do
-        text
-        |> String.replace(".", "\\.")
-        |> String.replace("+", "\\+")
-        |> String.replace("-", "\\-")
-        |> String.replace("=", "\\=")
+        escape_markdown(text)
       else
         text
       end
 
     Nadia.send_message(chat_id, text, options)
+  end
+
+  @spec escape_markdown(String.t()) :: String.t()
+  @doc """
+  转义 Markdown 中不能被 Telegram 发送的字符。
+  """
+  def escape_markdown(text) do
+    text
+    |> String.replace(".", "\\.")
+    |> String.replace("+", "\\+")
+    |> String.replace("-", "\\-")
+    |> String.replace("=", "\\=")
+  end
+
+  @spec edit_message(integer(), integer(), String.t(), [{atom, any}]) ::
+          {:ok, Nadia.Model.Message.t()} | {:error, Nadia.Model.Error.t()}
+  @doc """
+  编辑消息。
+  如果 `options` 参数中不包含`:parse_mode` 配置，它将设置为 `”MarkdownV2“`。
+  """
+  def edit_message(chat_id, message_id, text, options \\ []) do
+    options =
+      options
+      |> Keyword.put_new(:parse_mode, @markdown_parse_mode)
+
+    text =
+      if(options |> Keyword.get(:parse_mode) == @markdown_parse_mode) do
+        escape_markdown(text)
+      else
+        text
+      end
+
+    Nadia.edit_message_text(chat_id, message_id, nil, text, options)
   end
 
   @doc """
@@ -158,4 +187,14 @@ defmodule PolicrMini.Bot.Helper do
   """
   def async(callback, [{:seconds, seconds}]) when is_integer(seconds) and is_function(callback),
     do: TaskAfter.task_after(seconds * 1000, callback)
+
+  @spec parse_callback_data(String.t()) :: {String.t(), [String.t()]}
+  @doc """
+  解析回调中的数据。
+  """
+  def parse_callback_data(data) when is_binary(data) do
+    [_, version | args] = data |> String.split(":")
+
+    {version, args}
+  end
 end

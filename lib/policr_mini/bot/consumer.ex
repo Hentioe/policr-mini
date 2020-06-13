@@ -14,15 +14,20 @@ defmodule PolicrMini.Bot.Consumer do
   end
 
   def receive(%Nadia.Model.Update{} = update) do
-    message = update.message
+    %{message: message, callback_query: callback_query} = update
 
-    dispatch_msg = fn ->
+    dispatch_message = fn ->
       message
       |> dispatch_commander
       |> dispatch_handler
     end
 
-    if message, do: DynamicSupervisor.start_child(__MODULE__, {Task, dispatch_msg})
+    dispatch_callback_query = fn -> callback_query |> dispatch_callbacker end
+
+    if message, do: DynamicSupervisor.start_child(__MODULE__, {Task, dispatch_message})
+
+    if callback_query,
+      do: DynamicSupervisor.start_child(__MODULE__, {Task, dispatch_callback_query})
   end
 
   def dispatch_commander(message) do
@@ -79,5 +84,16 @@ defmodule PolicrMini.Bot.Consumer do
     handlers |> Enum.reduce(state, applying)
 
     message
+  end
+
+  def dispatch_callbacker(callback_query) do
+    applying = fn callbacker ->
+      if callbacker.match?(callback_query.data),
+        do: callbacker.handle(callback_query),
+        else: :ignored
+    end
+
+    callbackers = FilterManager.callbackers()
+    callbackers |> Enum.each(applying)
   end
 end

@@ -185,4 +185,43 @@ defmodule PolicrMini.Bot.UserJoinedHandler do
         {:error, state}
     end
   end
+
+  @type reason :: :wronged | :timeout
+
+  @spec kick(integer(), map(), reason()) :: :ok | {:error, Nadia.Model.Error.t()}
+  def kick(chat_id, user, reason) when is_integer(chat_id) and is_map(user) and is_atom(reason) do
+    # 踢出用户
+    Nadia.kick_chat_member(chat_id, user.id)
+    # 解除限制以允许再次加入
+    async(fn -> Nadia.unban_chat_member(chat_id, user.id) end,
+      seconds: @allow_join_again_seconds
+    )
+
+    time_text =
+      if @allow_join_again_seconds < 60,
+        do: "#{@allow_join_again_seconds} 秒",
+        else: "#{to_string(@allow_join_again_seconds / 60)} 分钟"
+
+    text =
+      case reason do
+        :timeout ->
+          "刚刚#{at(user)}超时未验证，已经移出本群。\n\n过 #{time_text}后可再次尝试加入。"
+
+        :wronged ->
+          "刚刚#{at(user)}验证错误，已经移出本群。\n\n过 #{time_text}后可再次尝试加入。"
+      end
+
+    case send_message(chat_id, text) do
+      {:ok, sended_message} ->
+        async(
+          fn -> Nadia.delete_message(chat_id, sended_message.message_id) end,
+          seconds: 15
+        )
+
+        :ok
+
+      e ->
+        e
+    end
+  end
 end

@@ -19,5 +19,6 @@ defmodule PolicrMini.Schema.CustomKit do
     custom_kit
     |> cast(attrs, @required_fields ++ @optional_fields)
     |> validate_required(@required_fields)
+    |> assoc_constraint(:chat)
   end
 end

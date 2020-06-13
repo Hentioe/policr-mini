@@ -6,7 +6,7 @@ defmodule PolicrMini.Bot.StartCommander do
   """
   use PolicrMini.Bot.Commander, :start
 
-  alias PolicrMini.{VerificationBusiness, SchemeBusiness}
+  alias PolicrMini.{VerificationBusiness, SchemeBusiness, MessageSnapshotBusiness}
   alias PolicrMini.Schema.{Verification, Scheme}
 
   @doc """
@@ -60,7 +60,7 @@ defmodule PolicrMini.Bot.StartCommander do
   1. 创建消息快照
   1. 更新验证记录
   """
-  def handle_args(["verification", "v1", target_chat_id], %{chat: %{id: from_user_id}} = _message) do
+  def handle_args(["verification", "v1", target_chat_id], %{chat: %{id: from_user_id}} = message) do
     target_chat_id = target_chat_id |> String.to_integer()
 
     if verification = VerificationBusiness.find_unity_waiting(target_chat_id, from_user_id) do
@@ -69,11 +69,27 @@ defmodule PolicrMini.Bot.StartCommander do
 
       # 发送验证消息
       {text, markup} = make_verification_message(scheme, verification)
-      {:ok, _} = send_message(from_user_id, text, reply_markup: markup)
+      {:ok, sended_verifiction_message} = send_message(from_user_id, text, reply_markup: markup)
 
-      # TODO: 创建消息快照
+      # 创建消息快照
+      {:ok, message_snapshot} =
+        MessageSnapshotBusiness.create(%{
+          chat_id: target_chat_id,
+          message_id: sended_verifiction_message.message_id,
+          from_user_id: from_user_id,
+          from_user_name: fullname(message.from),
+          date: sended_verifiction_message.date,
+          text: sended_verifiction_message.text,
+          markup_body: Jason.encode!(markup, pretty: false)
+        })
 
-      # TODO: 更新验证记录
+      # 更新验证记录：关联消息快照、存储正确答案
+      {:ok, _} =
+        verification
+        |> VerificationBusiness.update(%{
+          message_snapshot_id: message_snapshot.id,
+          indices: [2]
+        })
     else
       send_message(from_user_id, "您没有该目标群组的待验证记录。")
     end
@@ -90,6 +106,7 @@ defmodule PolicrMini.Bot.StartCommander do
 
   @doc """
   生成默认模式的验证消息（算数验证）。
+  注意：当前生成的内容是静态的，测试用途。
   """
   @spec make_verification_message(Scheme.t(), Verification.t()) ::
           {String.t(), InlineKeyboardMarkup.t()}
@@ -101,7 +118,7 @@ defmodule PolicrMini.Bot.StartCommander do
 
     markup = %InlineKeyboardMarkup{
       inline_keyboard: [
-        1..3
+        1..5
         |> Enum.map(fn i ->
           %InlineKeyboardButton{
             text: "#{i}",

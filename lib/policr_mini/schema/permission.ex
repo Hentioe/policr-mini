@@ -24,5 +24,7 @@ defmodule PolicrMini.Schema.Permission do
     |> cast(attrs, @required_fields ++ @optional_fields)
     |> validate_required(@required_fields)
     |> unique_constraint([:chat_id, :user_id])
+    |> assoc_constraint(:chat)
+    |> assoc_constraint(:user)
   end
 end

@@ -25,5 +25,6 @@ defmodule PolicrMini.Schema.MessageSnapshot do
     message_snapshot
     |> cast(attrs, @required_fields ++ @optional_fields)
     |> validate_required(@required_fields)
+    |> assoc_constraint(:chat)
   end
 end

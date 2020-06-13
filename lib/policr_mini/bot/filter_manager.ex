@@ -4,7 +4,10 @@ defmodule PolicrMini.Bot.FilterManager do
   def start_link(opts) do
     commanders = Keyword.get(opts, :commanders, [])
     handlers = Keyword.get(opts, :handlers, [])
-    filters = [commanders: commanders, handlers: handlers]
+    callbackers = Keyword.get(opts, :callbackers, [])
+
+    filters = [commanders: commanders, handlers: handlers, callbackers: callbackers]
+
     Agent.start_link(fn -> filters end, name: __MODULE__)
   end
 
@@ -13,5 +16,8 @@ defmodule PolicrMini.Bot.FilterManager do
   end
 
   def commanders, do: get(:commanders)
+
   def handlers, do: get(:handlers)
+
+  def callbackers, do: get(:callbackers)
 end

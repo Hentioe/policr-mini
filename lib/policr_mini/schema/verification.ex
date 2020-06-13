@@ -27,5 +27,7 @@ defmodule PolicrMini.Schema.Verification do
     verification
     |> cast(attrs, @required_fields ++ @optional_fields)
     |> validate_required(@required_fields)
+    |> assoc_constraint(:chat)
+    |> assoc_constraint(:message_snapshot)
   end
 end
