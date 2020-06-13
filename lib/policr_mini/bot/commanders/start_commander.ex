@@ -7,7 +7,7 @@ defmodule PolicrMini.Bot.StartCommander do
   use PolicrMini.Bot.Commander, :start
 
   alias PolicrMini.{VerificationBusiness, SchemeBusiness, MessageSnapshotBusiness}
-  alias PolicrMini.Schema.{Verification, Scheme}
+  alias PolicrMini.Schema.Verification
 
   @doc """
   重写后的 `match?/1` 函数，以 `/start` 开始即匹配。
@@ -52,6 +52,8 @@ defmodule PolicrMini.Bot.StartCommander do
   """
   def dispatch(arg, message), do: arg |> String.split("_") |> handle_args(message)
 
+  @default_captcha_module PolicrMini.Bot.ArithmeticCaptcha
+
   @doc """
   处理 v1 版本的验证参数。
   主要进行以下大致流程，按先后顺序：
@@ -64,11 +66,15 @@ defmodule PolicrMini.Bot.StartCommander do
     target_chat_id = target_chat_id |> String.to_integer()
 
     if verification = VerificationBusiness.find_unity_waiting(target_chat_id, from_user_id) do
-      # 读取验证方案
-      {:ok, scheme} = SchemeBusiness.fetch(target_chat_id)
+      # 读取验证方案（当前的实现没有实际根据方案数据动态决定什么）
+      {:ok, _} = SchemeBusiness.fetch(target_chat_id)
 
       # 发送验证消息
-      {text, markup} = make_verification_message(scheme, verification)
+      %{question: question, markup: markup} = @default_captcha_module.make(verification.id)
+
+      text =
+        "来自【#{verification.chat.title}】的算术验证题：请选择「#{question}」。\n\n您还剩 #{time_left(verification)} 秒，通过可解除封印。"
+
       {:ok, sended_verifiction_message} = send_message(from_user_id, text, reply_markup: markup)
 
       # 创建消息快照
@@ -102,23 +108,6 @@ defmodule PolicrMini.Bot.StartCommander do
     %{chat: %{id: chat_id}} = message
 
     send_message(chat_id, "很抱歉，我未能理解您的意图。")
-  end
-
-  @doc """
-  生成默认模式的验证消息（算数验证）。
-  """
-  @spec make_verification_message(Scheme.t(), Verification.t()) ::
-          {String.t(), InlineKeyboardMarkup.t()}
-  def make_verification_message(
-        %Scheme{verification_mode: nil},
-        %Verification{id: verification_id, chat: %{title: chat_title}} = verification
-      ) do
-    {question, markup, _} = PolicrMini.Bot.ArithmeticCaptcha.make(verification_id)
-
-    text =
-      "来自【#{chat_title}】的算术验证题：请选择「#{question}」。\n\n您还剩 #{time_left(verification)} 秒，通过可解除封印。"
-
-    {text, markup}
   end
 
   @doc """

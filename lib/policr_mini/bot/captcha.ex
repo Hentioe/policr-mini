@@ -3,36 +3,54 @@ defmodule PolicrMini.Bot.Captcha do
   验证内容生成模块。
   """
 
-  @data_vsn "v1"
-
-  alias Nadia.Model.{InlineKeyboardMarkup, InlineKeyboardButton}
+  alias Nadia.Model.{InlineKeyboardButton, InlineKeyboardMarkup}
 
   @type candidate :: String.t() | integer()
+
+  defmodule Data do
+    defstruct [:question, :candidates, :markup, :correct_indices]
+
+    @type t :: %{
+            question: String.t(),
+            candidates: [[PolicrMini.Bot.Captcha.candidate(), ...], ...],
+            markup: InlineKeyboardMarkup.t() | nil,
+            correct_indices: [integer(), ...]
+          }
+  end
+
+  @data_vsn "v1"
 
   defmacro __using__(_) do
     quote do
       alias PolicrMini.Bot.Captcha
+
       import Captcha
 
       @behaviour Captcha
 
-      @spec make(integer()) :: {String.t(), InlineKeyboardMarkup.t(), [integer()]}
-      @doc """
-      生成问题标题、按钮和正确索引。
-      """
+      @impl true
       def make(verification_id) do
-        {question, candidates, indices} = made()
+        %{candidates: candidates} = captcha_data = made()
 
-        {question, build_markup(candidates, verification_id), indices}
+        captcha_data |> struct(markup: build_markup(candidates, verification_id)) |> IO.inspect()
       end
+
+      defoverridable make: 1
     end
   end
 
   @doc """
-  制造问题标题、候选数据和正确索引。
+  制造验证数据，提供 `candidates`。
   此函数需要自行实现。
   """
-  @callback made() :: {String.t(), [[candidate()]], [integer()]}
+  @callback made() :: Data.t()
+
+  @doc """
+  生成验证数据，将 `made/1` 函数制造的 `candidates` 数据和参数 `verification_id` 一起构造出 `markup`。
+  此函数在 `use` 模块时会默认生成。
+  参数 `verification_id` 为真实存在的验证记录编号。
+  """
+  @callback make(verification_id :: integer()) :: Data.t()
 
   @spec build_markup([[candidate()]], integer()) :: InlineKeyboardMarkup.t()
   @doc """

@@ -11,10 +11,10 @@ defmodule PolicrMini.Bot.ArithmeticCaptcha do
   """
   @impl true
   def made do
-    {
-      "1 + 1 = ?",
-      [[1, 2, 3, 4, 5]],
-      [2]
+    %Captcha.Data{
+      question: "1 + 1 = ?",
+      candidates: [[1, 2, 3, 4, 5]],
+      correct_indices: [2]
     }
   end
 end
