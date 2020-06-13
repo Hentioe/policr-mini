@@ -5,12 +5,12 @@ defmodule PolicrMini.Bot.Captcha do
 
   alias Nadia.Model.{InlineKeyboardButton, InlineKeyboardMarkup}
 
-  @type candidate :: String.t() | integer()
+  @type candidate :: String.t() | number()
 
   defmodule Data do
     defstruct [:question, :candidates, :markup, :correct_indices]
 
-    @type t :: %{
+    @type t :: %__MODULE__{
             question: String.t(),
             candidates: [[PolicrMini.Bot.Captcha.candidate(), ...], ...],
             markup: InlineKeyboardMarkup.t() | nil,
