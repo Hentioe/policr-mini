@@ -106,7 +106,6 @@ defmodule PolicrMini.Bot.StartCommander do
 
   @doc """
   生成默认模式的验证消息（算数验证）。
-  注意：当前生成的内容是静态的，测试用途。
   """
   @spec make_verification_message(Scheme.t(), Verification.t()) ::
           {String.t(), InlineKeyboardMarkup.t()}
@@ -114,19 +113,10 @@ defmodule PolicrMini.Bot.StartCommander do
         %Scheme{verification_mode: nil},
         %Verification{id: verification_id, chat: %{title: chat_title}} = verification
       ) do
-    text = "来自【#{chat_title}】的算术验证题：请选择「1 + 1 = ?」。\n\n您还剩 #{time_left(verification)} 秒，通过可解除封印。"
+    {question, markup, _} = PolicrMini.Bot.ArithmeticCaptcha.make(verification_id)
 
-    markup = %InlineKeyboardMarkup{
-      inline_keyboard: [
-        1..5
-        |> Enum.map(fn i ->
-          %InlineKeyboardButton{
-            text: "#{i}",
-            callback_data: "verification:v1:#{i}:#{verification_id}"
-          }
-        end)
-      ]
-    }
+    text =
+      "来自【#{chat_title}】的算术验证题：请选择「#{question}」。\n\n您还剩 #{time_left(verification)} 秒，通过可解除封印。"
 
     {text, markup}
   end

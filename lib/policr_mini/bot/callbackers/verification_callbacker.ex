@@ -48,9 +48,7 @@ defmodule PolicrMini.Bot.VerificationCallbacker do
 
           success_text = "恭喜您，验证通过。去试试自己的限制是否被解除吧。"
 
-          async(fn ->
-            edit_message(user_id, message_id, success_text)
-          end)
+          async(fn -> edit_message(user_id, message_id, success_text) end)
 
           seconds = DateTime.diff(DateTime.utc_now(), verification.inserted_at)
           text = "刚刚#{at(from)}通过了验证，用时 #{seconds} 秒。"
