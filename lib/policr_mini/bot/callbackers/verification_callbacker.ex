@@ -46,7 +46,7 @@ defmodule PolicrMini.Bot.VerificationCallbacker do
           {:ok, _} = verification |> VerificationBusiness.update(%{status: :passed})
           :ok = derestrict_chat_member(verification.chat_id, user_id)
 
-          success_text = "恭喜您，验证通过。去试试自己的限制是否被解除吧。"
+          success_text = "恭喜您，验证通过。如果限制仍未解除请尝试联系管理员。"
 
           async(fn -> edit_message(user_id, message_id, success_text) end)
 

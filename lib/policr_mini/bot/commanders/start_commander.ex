@@ -73,7 +73,7 @@ defmodule PolicrMini.Bot.StartCommander do
       captcha_data = @default_captcha_module.make()
 
       text =
-        "来自【#{verification.chat.title}】的验证问题，请选择确认「#{captcha_data.question}」。\n\n您还剩 #{
+        "来自『#{verification.chat.title}』的待完成验证，请确认问题并选择您认为正确的答案。\n\n#{captcha_data.question}\n\n您还剩 #{
           time_left(verification)
         } 秒，通过可解除封印。"
 

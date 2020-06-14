@@ -101,11 +101,11 @@ defmodule PolicrMini.Bot.UserJoinedHandler do
     text =
       if waiting_count == 0,
         do:
-          "新成员#{at(new_chat_member)}你好！\n您当前需要完成验证才能解除限制，验证有效时间只有 #{seconds} 秒。\n\n过期会被踢出或封禁，请尽快。",
+          "新成员#{at(new_chat_member)}你好！\n\n您当前需要完成验证才能解除限制，验证有效时间只有 #{seconds} 秒。\n过期会被踢出或封禁，请尽快。",
         else:
-          "刚来的#{at(new_chat_member)}和另外 #{waiting_count} 个还未验证的新成员，你们好！\n完成验证才能解除限制，验证有效时间不超过 #{
+          "刚来的#{at(new_chat_member)}和另外 #{waiting_count} 个还未验证的新成员，你们好！\n\n请主动完成验证解除限制，验证有效时间不超过 #{
             seconds
-          } 秒。\n\n过期会被踢出或封禁，请尽快。"
+          } 秒。\n过期会被踢出或封禁，请尽快。"
 
     markup = %InlineKeyboardMarkup{
       inline_keyboard: [
