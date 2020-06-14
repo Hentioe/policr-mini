@@ -8,7 +8,7 @@ defmodule PolicrMini.Bot.ArithmeticCaptcha do
   @number_range 1..50
 
   @doc """
-  制作算术验证数据。
+  生成算术验证数据。
   """
   @impl true
   def make do
@@ -18,37 +18,19 @@ defmodule PolicrMini.Bot.ArithmeticCaptcha do
     rn = @number_range |> Enum.random()
     # 计算正确答案
     correct_answer = ln + rn
-    # 生成错误答案候选列表
-    wrong_candidates =
+    # 生成错误答案列表
+    wrong_answers =
       @number_range
       |> Enum.filter(fn n -> n != correct_answer end)
       |> Enum.map(fn n -> n end)
-      |> Enum.shuffle()
-
-    # 生成错误答案列表
-    {_, wrong_answers} =
-      1..4
-      |> Enum.reduce({wrong_candidates, []}, fn _, {candidates, answers} ->
-        {answer, candidates} = candidates |> List.pop_at(0)
-
-        {candidates, answers ++ [answer]}
-      end)
+      |> Enum.take_random(4)
 
     candidates =
       ([correct_answer] ++ wrong_answers)
       |> Enum.shuffle()
 
-    correct_index =
-      candidates
-      |> Enum.with_index(1)
-      |> Enum.reduce(0, fn {answer, index}, correct_index ->
-        correct_index =
-          if correct_index > 0,
-            do: correct_index,
-            else: if(answer == correct_answer, do: index, else: 0)
-
-        correct_index
-      end)
+    # 查找正确答案的索引
+    correct_index = (candidates |> Enum.find_index(fn answer -> answer == correct_answer end)) + 1
 
     %Captcha.Data{
       question: "#{ln} + #{rn} = ?",
