@@ -70,10 +70,14 @@ defmodule PolicrMini.Bot.StartCommander do
       {:ok, _} = SchemeBusiness.fetch(target_chat_id)
 
       # 发送验证消息
-      %{question: question, markup: markup} = @default_captcha_module.make(verification.id)
+      captcha_data = @default_captcha_module.make()
 
       text =
-        "来自【#{verification.chat.title}】的算术验证题：请选择「#{question}」。\n\n您还剩 #{time_left(verification)} 秒，通过可解除封印。"
+        "来自【#{verification.chat.title}】的验证问题，请选择确认「#{captcha_data.question}」。\n\n您还剩 #{
+          time_left(verification)
+        } 秒，通过可解除封印。"
+
+      markup = PolicrMini.Bot.Captcha.build_markup(captcha_data.candidates, verification.id)
 
       {:ok, sended_verifiction_message} = send_message(from_user_id, text, reply_markup: markup)
 
@@ -94,7 +98,7 @@ defmodule PolicrMini.Bot.StartCommander do
         verification
         |> VerificationBusiness.update(%{
           message_snapshot_id: message_snapshot.id,
-          indices: [2]
+          indices: captcha_data.correct_indices
         })
     else
       send_message(from_user_id, "您没有该目标群组的待验证记录。")

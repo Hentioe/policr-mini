@@ -14,14 +14,14 @@ defmodule PolicrMini.Bot.CaptchaTest do
           "猪"
         ]
       ]
-      |> build_markup("v1", 100)
+      |> build_markup(100)
 
     assert markup == %InlineKeyboardMarkup{
              inline_keyboard: [
                [
-                 %InlineKeyboardButton{text: "猫", callback_data: "verification:v1:100:1"},
-                 %InlineKeyboardButton{text: "狗", callback_data: "verification:v1:100:2"},
-                 %InlineKeyboardButton{text: "猪", callback_data: "verification:v1:100:3"}
+                 %InlineKeyboardButton{text: "猫", callback_data: "verification:v1:1:100"},
+                 %InlineKeyboardButton{text: "狗", callback_data: "verification:v1:2:100"},
+                 %InlineKeyboardButton{text: "猪", callback_data: "verification:v1:3:100"}
                ]
              ]
            }
@@ -39,19 +39,19 @@ defmodule PolicrMini.Bot.CaptchaTest do
           6
         ]
       ]
-      |> build_markup("v1", 100)
+      |> build_markup(100)
 
     assert markup == %InlineKeyboardMarkup{
              inline_keyboard: [
                [
-                 %InlineKeyboardButton{text: "1", callback_data: "verification:v1:100:1"},
-                 %InlineKeyboardButton{text: "2", callback_data: "verification:v1:100:2"},
-                 %InlineKeyboardButton{text: "3", callback_data: "verification:v1:100:3"}
+                 %InlineKeyboardButton{text: "1", callback_data: "verification:v1:1:100"},
+                 %InlineKeyboardButton{text: "2", callback_data: "verification:v1:2:100"},
+                 %InlineKeyboardButton{text: "3", callback_data: "verification:v1:3:100"}
                ],
                [
-                 %InlineKeyboardButton{text: "4", callback_data: "verification:v1:100:4"},
-                 %InlineKeyboardButton{text: "5", callback_data: "verification:v1:100:5"},
-                 %InlineKeyboardButton{text: "6", callback_data: "verification:v1:100:6"}
+                 %InlineKeyboardButton{text: "4", callback_data: "verification:v1:4:100"},
+                 %InlineKeyboardButton{text: "5", callback_data: "verification:v1:5:100"},
+                 %InlineKeyboardButton{text: "6", callback_data: "verification:v1:6:100"}
                ]
              ]
            }

@@ -5,14 +5,13 @@ defmodule PolicrMini.Bot.Captcha do
 
   alias Nadia.Model.{InlineKeyboardButton, InlineKeyboardMarkup}
 
-  @type candidate :: String.t() | number()
-
   defmodule Data do
     defstruct [:question, :candidates, :markup, :correct_indices]
 
+    @type candidate :: String.t() | number()
     @type t :: %__MODULE__{
             question: String.t(),
-            candidates: [[PolicrMini.Bot.Captcha.candidate(), ...], ...],
+            candidates: [[candidate(), ...], ...],
             markup: InlineKeyboardMarkup.t() | nil,
             correct_indices: [integer(), ...]
           }
@@ -27,15 +26,6 @@ defmodule PolicrMini.Bot.Captcha do
       import Captcha
 
       @behaviour Captcha
-
-      @impl true
-      def make(verification_id) do
-        %{candidates: candidates} = captcha_data = made()
-
-        captcha_data |> struct(markup: build_markup(candidates, verification_id)) |> IO.inspect()
-      end
-
-      defoverridable make: 1
     end
   end
 
@@ -43,16 +33,9 @@ defmodule PolicrMini.Bot.Captcha do
   制造验证数据，提供 `candidates`。
   此函数需要自行实现。
   """
-  @callback made() :: Data.t()
+  @callback make() :: Data.t()
 
-  @doc """
-  生成验证数据，将 `made/1` 函数制造的 `candidates` 数据和参数 `verification_id` 一起构造出 `markup`。
-  此函数在 `use` 模块时会默认生成。
-  参数 `verification_id` 为真实存在的验证记录编号。
-  """
-  @callback make(verification_id :: integer()) :: Data.t()
-
-  @spec build_markup([[candidate()]], integer()) :: InlineKeyboardMarkup.t()
+  @spec build_markup([[Data.candidate()]], integer()) :: InlineKeyboardMarkup.t()
   @doc """
   从候选数据列表中构建 `Nadia.Model.InlineKeyboardMarkup`
   注意，参数 `candidates` 是一个二维数组。参数 `verification_id` 则需要一个已被记录的验证编号。
