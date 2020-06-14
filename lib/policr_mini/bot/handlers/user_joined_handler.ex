@@ -213,10 +213,7 @@ defmodule PolicrMini.Bot.UserJoinedHandler do
 
     case send_message(chat_id, text) do
       {:ok, sended_message} ->
-        async(
-          fn -> Nadia.delete_message(chat_id, sended_message.message_id) end,
-          seconds: 15
-        )
+        delete_message(chat_id, sended_message.message_id, delay_seconds: 15)
 
         :ok
 

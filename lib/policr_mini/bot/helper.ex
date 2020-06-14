@@ -6,6 +6,8 @@ defmodule PolicrMini.Bot.Helper do
 
   alias PolicrMini.ChatBusiness
 
+  @type tgerror :: {:error, Nadia.Model.Error.t()}
+
   @doc """
   获取机器人自身的 `id` 字段。详情参照 `PolicrMini.Bot.id/0` 函数。
   """
@@ -77,7 +79,7 @@ defmodule PolicrMini.Bot.Helper do
   end
 
   @spec edit_message(integer(), integer(), String.t(), [{atom, any}]) ::
-          {:ok, Nadia.Model.Message.t()} | {:error, Nadia.Model.Error.t()}
+          {:ok, Nadia.Model.Message.t()} | tgerror()
   @doc """
   编辑消息。
   如果 `options` 参数中不包含`:parse_mode` 配置，它将设置为 `”MarkdownV2“`。
@@ -116,6 +118,21 @@ defmodule PolicrMini.Bot.Helper do
     can_invite_users: false,
     can_pin_messages: false
   }
+
+  @spec delete_message(integer(), integer(), integer()) :: :ok | tgerror
+  @doc """
+  删除消息。
+  增加的 `delay_seconds` 参数可以实现延迟删除，但无法直接获得请求结果。
+  """
+  def delete_message(chat_id, message_id, delay_seconds \\ 0) do
+    if delay_seconds <= 0 do
+      Nadia.delete_message(chat_id, message_id)
+    else
+      async(fn -> Nadia.delete_message(chat_id, message_id) end, seconds: delay_seconds)
+
+      :ok
+    end
+  end
 
   @doc """
   限制聊天成员。
