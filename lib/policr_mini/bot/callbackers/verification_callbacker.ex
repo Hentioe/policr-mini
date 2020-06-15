@@ -53,7 +53,7 @@ defmodule PolicrMini.Bot.VerificationCallbacker do
           # 回答错误：更新验证记录的状态、根据方案实施操作并发送通知消息
           {:ok, _} = verification |> VerificationBusiness.update(%{status: :wronged})
           {:ok, scheme} = SchemeBusiness.fetch(verification.chat_id)
-          killing_method = scheme.killing_method || :kick
+          killing_method = scheme.killing_method || default!(:kmethod)
 
           case killing_method do
             :kick ->

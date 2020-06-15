@@ -56,9 +56,9 @@ defmodule PolicrMini.Bot.UserJoinedHandler do
         # 异步限制当前用户
         async(fn -> restrict_chat_member(chat_id, from_user_id) end)
 
-        mode = scheme.verification_mode || :image
-        entrance = scheme.verification_entrance || :unity
-        occasion = scheme.verification_occasion || :private
+        mode = scheme.verification_mode || default!(:vmode)
+        entrance = scheme.verification_entrance || default!(:ventrance)
+        occasion = scheme.verification_occasion || default!(:voccasion)
         seconds = scheme.seconds || @default_countdown
 
         handle(mode, message, state, entrance, occasion, seconds)

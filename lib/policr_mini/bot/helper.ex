@@ -196,6 +196,33 @@ defmodule PolicrMini.Bot.Helper do
     end
   end
 
+  @defaults [
+    vmode: :arithmetic,
+    ventrance: :unity,
+    voccasion: :private,
+    kmethod: :kick
+  ]
+
+  @type default_keys :: :vmode | :ventrance | :voccasion | :kmethod
+
+  @spec default!(default_keys()) :: any()
+  @doc """
+  获取默认配置。
+  当前 `key` 可以是以下值：
+  - `:vmode` - 验证方式
+  - `:ventrance` - 验证入口
+  - `:voccasion` - 验证场合
+  - `:kmethod` - 击杀方式
+  """
+  def default!(key) when is_atom(key) do
+    if default = @defaults[key] do
+      default
+    else
+      raise RuntimeError,
+            "The value of the unknown `key` parameter is in the `default!/1` function"
+    end
+  end
+
   @doc """
   异步执行函数，不指定延迟时间。
   """
