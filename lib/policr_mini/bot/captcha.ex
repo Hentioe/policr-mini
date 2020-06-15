@@ -33,7 +33,7 @@ defmodule PolicrMini.Bot.Captcha do
   制造验证数据，提供 `candidates`。
   此函数需要自行实现。
   """
-  @callback make() :: Data.t()
+  @callback make!() :: Data.t()
 
   @spec build_markup([[Data.candidate()]], integer()) :: InlineKeyboardMarkup.t()
   @doc """

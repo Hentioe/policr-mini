@@ -7,7 +7,7 @@ defmodule PolicrMini.EctoEnums do
     supergroup: "supergroup",
     channel: "channel"
 
-  defenum VerificationModeEnum, image: 0, custom: 1, arithmetic: 2
+  defenum VerificationModeEnum, image: 0, custom: 1, arithmetic: 2, initiative: 3
   defenum VerificationStatusEnum, waiting: 0, passed: 1, timeout: 2, wronged: 3
   defenum VerificationEntranceEnum, unity: 0, independent: 1
   defenum VerificationOccasionEnum, private: 0, public: 1

@@ -8,6 +8,16 @@ defmodule PolicrMini.Bot.StartCommander do
 
   alias PolicrMini.{VerificationBusiness, SchemeBusiness, MessageSnapshotBusiness}
   alias PolicrMini.Schema.Verification
+  alias PolicrMini.Bot.{ArithmeticCaptcha, FallbackCaptcha}
+
+  @default_mode :arithmetic
+  @fallback_captcha_module FallbackCaptcha
+
+  @captchas_maping [
+    arithmetic: ArithmeticCaptcha,
+    # 当前的备用验证就是主动验证
+    initiative: FallbackCaptcha
+  ]
 
   @doc """
   重写后的 `match?/1` 函数，以 `/start` 开始即匹配。
@@ -52,8 +62,6 @@ defmodule PolicrMini.Bot.StartCommander do
   """
   def dispatch(arg, message), do: arg |> String.split("_") |> handle_args(message)
 
-  @default_captcha_module PolicrMini.Bot.ArithmeticCaptcha
-
   @doc """
   处理 v1 版本的验证参数。
   主要进行以下大致流程，按先后顺序：
@@ -67,10 +75,19 @@ defmodule PolicrMini.Bot.StartCommander do
 
     if verification = VerificationBusiness.find_unity_waiting(target_chat_id, from_user_id) do
       # 读取验证方案（当前的实现没有实际根据方案数据动态决定什么）
-      {:ok, _} = SchemeBusiness.fetch(target_chat_id)
+      {:ok, scheme} = SchemeBusiness.fetch(target_chat_id)
+      mode = scheme.verification_mode || @default_mode
+
+      captcha_module = @captchas_maping[mode] || @default_mode
 
       # 发送验证消息
-      captcha_data = @default_captcha_module.make()
+      captcha_data =
+        try do
+          captcha_module.make!()
+        rescue
+          # TODO: 记录错误并提醒目标群组设置问题
+          _ -> @fallback_captcha_module.make!()
+        end
 
       text =
         "来自『#{verification.chat.title}』的待完成验证，请确认问题并选择您认为正确的答案。\n\n#{captcha_data.question}\n\n您还剩 #{
