@@ -119,18 +119,22 @@ defmodule PolicrMini.Bot.Helper do
     can_pin_messages: false
   }
 
-  @spec delete_message(integer(), integer(), integer()) :: :ok | tgerror
+  @spec delete_message(integer(), integer(), [{atom(), any()}]) :: :ok | tgerror
   @doc """
   删除消息。
-  增加的 `delay_seconds` 参数可以实现延迟删除，但无法直接获得请求结果。
+  附加的 `options` 参数可配置 `delay_seconds` 实现延迟删除。
+  注意，延迟删除无法直接获得请求结果，将直接返回 `:ok`。
   """
-  def delete_message(chat_id, message_id, delay_seconds \\ 0) do
-    if delay_seconds <= 0 do
-      Nadia.delete_message(chat_id, message_id)
-    else
+  def delete_message(chat_id, message_id, options \\ []) do
+    delay_seconds = options |> Keyword.get(:delay_seconds)
+
+    if delay_seconds do
+      delay_seconds = if delay_seconds < 0, do: 0, else: delay_seconds
       async(fn -> Nadia.delete_message(chat_id, message_id) end, seconds: delay_seconds)
 
       :ok
+    else
+      Nadia.delete_message(chat_id, message_id)
     end
   end
 
