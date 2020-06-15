@@ -10,7 +10,6 @@ defmodule PolicrMini.Bot.StartCommander do
   alias PolicrMini.Schema.Verification
   alias PolicrMini.Bot.{ArithmeticCaptcha, FallbackCaptcha}
 
-  @default_mode :arithmetic
   @fallback_captcha_module FallbackCaptcha
 
   @captchas_maping [
@@ -76,9 +75,9 @@ defmodule PolicrMini.Bot.StartCommander do
     if verification = VerificationBusiness.find_unity_waiting(target_chat_id, from_user_id) do
       # 读取验证方案（当前的实现没有实际根据方案数据动态决定什么）
       {:ok, scheme} = SchemeBusiness.fetch(target_chat_id)
-      mode = scheme.verification_mode || @default_mode
+      mode = scheme.verification_mode || default!(:vmode)
 
-      captcha_module = @captchas_maping[mode] || @default_mode
+      captcha_module = @captchas_maping[mode] || @fallback_captcha_module
 
       # 发送验证消息
       captcha_data =
