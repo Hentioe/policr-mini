@@ -100,4 +100,20 @@ defmodule PolicrMini.VerificationBusiness do
     |> Repo.one()
     |> Repo.preload([:chat])
   end
+
+  @spec find_last_unity_message_id(integer()) :: integer() | nil
+  @doc """
+  获取最后一个统一入口的验证消息编号。
+  """
+  def find_last_unity_message_id(chat_id) do
+    from(p in Verification,
+      select: p.message_id,
+      where: p.chat_id == ^chat_id,
+      where: p.entrance == ^@unity_entrance,
+      where: p.status == ^@waiting_status,
+      order_by: [desc: p.message_id],
+      limit: 1
+    )
+    |> Repo.one()
+  end
 end

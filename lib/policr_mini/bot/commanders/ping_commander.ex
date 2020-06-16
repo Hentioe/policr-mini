@@ -9,7 +9,7 @@ defmodule PolicrMini.Bot.PingCommander do
 
     case send_message(chat_id, "🏓") do
       {:ok, sended_message} ->
-        async(fn -> Nadia.delete_message(chat_id, sended_message.message_id) end, seconds: 10)
+        async(fn -> Nadia.delete_message(chat_id, sended_message.message_id) end, seconds: 8)
 
       _ ->
         # TODO: 记录错误

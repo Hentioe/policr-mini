@@ -48,7 +48,7 @@ defmodule PolicrMini.Bot.VerificationCallbacker do
         text = "刚刚#{at(from)}通过了验证，用时 #{seconds} 秒。"
 
         {:ok, sended_message} = send_message(verification.chat_id, text)
-        delete_message(verification.chat_id, sended_message.message_id, delay_seconds: 15)
+        delete_message(verification.chat_id, sended_message.message_id, delay_seconds: 8)
       else
         # 回答错误：更新验证记录的状态、根据方案实施操作并发送通知消息
         {:ok, _} = verification |> VerificationBusiness.update(%{status: :wronged})
@@ -75,16 +75,8 @@ defmodule PolicrMini.Bot.VerificationCallbacker do
         Nadia.delete_message(verification.chat_id, verification.message_id)
       else
         # 如果还存在多条验证，更新入口消息
-        # 提及当前最新的等待验证记录中的用户
-        if verification = VerificationBusiness.find_last_unity_waiting(verification.chat_id) do
-          user = %{id: verification.target_user_id, fullname: verification.target_user_name}
-          max_seconds = scheme.seconds || default!(:vseconds)
-
-          {text, _} =
-            UserJoinedHandler.make_unity_message(verification.chat_id, user, count, max_seconds)
-
-          edit_message(verification.chat_id, verification.message_id, text)
-        end
+        max_seconds = scheme.seconds || default!(:vseconds)
+        update_unity_verification_message(verification.chat_id, count, max_seconds)
       end
 
       :ok
@@ -98,6 +90,27 @@ defmodule PolicrMini.Bot.VerificationCallbacker do
         Nadia.answer_callback_query(callback_query_id, text: message, show_alert: true)
 
         :error
+    end
+  end
+
+  @spec update_unity_verification_message(integer(), integer(), integer()) ::
+          :not_found | {:error, Nadia.Model.Error.t()} | {:ok, Nadia.Model.Message.t()}
+  @doc """
+  更新统一验证入口消息
+  """
+  def update_unity_verification_message(chat_id, count, max_seconds) do
+    # 提及当前最新的等待验证记录中的用户
+    if verification = VerificationBusiness.find_last_unity_waiting(chat_id) do
+      user = %{id: verification.target_user_id, fullname: verification.target_user_name}
+
+      {text, markup} = UserJoinedHandler.make_unity_message(chat_id, user, count, max_seconds)
+
+      # 获取最新的验证入口消息编号
+      message_id = VerificationBusiness.find_last_unity_message_id(chat_id)
+
+      edit_message(chat_id, message_id, text, reply_markup: markup)
+    else
+      :not_found
     end
   end
 

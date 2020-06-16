@@ -21,30 +21,43 @@ defmodule PolicrMini.Bot.Helper do
   """
   defdelegate bot_username(), to: PolicrMini.Bot, as: :username
 
-  @doc """
-  通过同时包含 `first_name` 和 `last_name` 字段的 map 数据构造全名。
-  """
-  def fullname(%{first_name: first_name, last_name: last_name}), do: "#{first_name} #{last_name}"
+  # @doc """
+  # 通过同时包含 `first_name` 和 `last_name` 字段的 map 数据构造全名。
+  # """
+  # def fullname(%{first_name: first_name, last_name: last_name}),
+  #   do: "#{first_name} #{last_name}"
 
-  @doc """
-  通过仅包含 `first_name` 字段的 map 数据构造全名。
-  """
-  def fullname(%{first_name: first_name}), do: first_name
+  # @doc """
+  # 通过仅包含 `first_name` 字段的 map 数据构造全名。
+  # """
+  # def fullname(%{first_name: first_name}), do: first_name
 
-  @doc """
-  通过仅包含 `last_name` 字段的 map 数据构造全名。
-  """
-  def fullname(%{last_name: last_name}), do: last_name
+  # @doc """
+  # 通过仅包含 `last_name` 字段的 map 数据构造全名。
+  # """
+  # def fullname(%{last_name: last_name}), do: last_name
 
-  @doc """
-  通过包含 `fullname` 字段的 map 数据构造全名。
-  """
-  def fullname(%{fullname: fullname}), do: fullname
+  # @doc """
+  # 通过包含 `fullname` 字段的 map 数据构造全名。
+  # """
+  # def fullname(%{fullname: fullname}), do: fullname
 
   @doc """
   通过进包含 `id` 字段的 map 数据构造全名。
   """
   def fullname(%{id: id}), do: Integer.to_string(id)
+
+  @spec escape_markdown(String.t()) :: String.t()
+  @doc """
+  转义 Markdown 中不能被 Telegram 发送的字符。
+  """
+  def escape_markdown(text) do
+    text
+    |> String.replace(".", "\\.")
+    |> String.replace("+", "\\+")
+    |> String.replace("-", "\\-")
+    |> String.replace("=", "\\=")
+  end
 
   @markdown_parse_mode "MarkdownV2"
   @doc """
@@ -67,18 +80,6 @@ defmodule PolicrMini.Bot.Helper do
       end
 
     Nadia.send_message(chat_id, text, options)
-  end
-
-  @spec escape_markdown(String.t()) :: String.t()
-  @doc """
-  转义 Markdown 中不能被 Telegram 发送的字符。
-  """
-  def escape_markdown(text) do
-    text
-    |> String.replace(".", "\\.")
-    |> String.replace("+", "\\+")
-    |> String.replace("-", "\\-")
-    |> String.replace("=", "\\=")
   end
 
   @spec edit_message(integer(), integer(), String.t(), [{atom, any}]) ::

@@ -6,9 +6,10 @@ defmodule PolicrMini.Bot.UserJoinedHandler do
 
   alias PolicrMini.Schema.{Verification, Scheme}
   alias PolicrMini.{SchemeBusiness, VerificationBusiness}
+  alias PolicrMini.Bot.VerificationCallbacker
 
   if Mix.env() == :dev do
-    @default_countdown 120
+    @default_countdown 35
     @allow_join_again_seconds 15
   else
     @allow_join_again_seconds 60 * 5
@@ -103,9 +104,11 @@ defmodule PolicrMini.Bot.UserJoinedHandler do
            VerificationBusiness.update(verification, %{message_id: reminder_message.message_id}) do
       # 启动定时任务，读取验证记录并根据结果实施操作
       # TODO: 当前的实现没有检查在验证期间同一个用户重复加入的情况
+      {:ok, scheme} = SchemeBusiness.fetch(chat_id)
+
       start_scheduled_task(
         verification,
-        SchemeBusiness.fetch(chat_id),
+        scheme,
         seconds,
         reminder_message.message_id
       )
@@ -158,7 +161,9 @@ defmodule PolicrMini.Bot.UserJoinedHandler do
       if waiting_count == 1,
         do: "新成员#{at(user)}你好！\n\n您当前需要完成验证才能解除限制，验证有效时间不超过 #{seconds} 秒。\n过期会被踢出或封禁，请尽快。",
         else:
-          "刚来的#{at(user)}和另外 #{waiting_count} 个还未验证的新成员，你们好！\n\n请主动完成验证解除限制，验证有效时间不超过 #{seconds} 秒。\n过期会被踢出或封禁，请尽快。"
+          "刚来的#{at(user)}和另外 #{waiting_count - 1} 个还未验证的新成员，你们好！\n\n请主动完成验证解除限制，验证有效时间不超过 #{
+            seconds
+          } 秒。\n过期会被踢出或封禁，请尽快。"
 
     markup = %InlineKeyboardMarkup{
       inline_keyboard: [
@@ -179,7 +184,12 @@ defmodule PolicrMini.Bot.UserJoinedHandler do
   启动定时任务处理验证超时。
   # TODO: 根据 scheme 决定执行的动作
   """
-  def start_scheduled_task(%Verification{} = verification, scheme, seconds, reminder_message_id)
+  def start_scheduled_task(
+        %Verification{} = verification,
+        %Scheme{} = scheme,
+        seconds,
+        reminder_message_id
+      )
       when is_integer(seconds) and is_integer(reminder_message_id) do
     %{chat_id: chat_id, target_user_id: target_user_id, target_user_name: target_user_name} =
       verification
@@ -207,25 +217,18 @@ defmodule PolicrMini.Bot.UserJoinedHandler do
 
       waiting_count = VerificationBusiness.get_unity_waiting_count(chat_id)
 
-      if waiting_count > 0 do
-        # 提及当前最新的等待验证记录中的用户
-        if verification = VerificationBusiness.find_last_unity_waiting(verification.chat_id) do
-          user = %{id: verification.target_user_id, fullname: verification.target_user_name}
-          max_seconds = scheme.seconds || default!(:vseconds)
-
-          {text, _} =
-            make_unity_message(
-              verification.chat_id,
-              user,
-              waiting_count,
-              max_seconds
-            )
-
-          edit_message(verification.chat_id, verification.message_id, text)
-        end
-      else
+      if waiting_count == 0 do
         # 已经没有剩余验证，直接删除上一个提醒消息
         Nadia.delete_message(chat_id, reminder_message_id)
+      else
+        # 如果还存在多条验证，更新入口消息
+        max_seconds = scheme.seconds || default!(:vseconds)
+
+        VerificationCallbacker.update_unity_verification_message(
+          chat_id,
+          waiting_count,
+          max_seconds
+        )
       end
     end
 
