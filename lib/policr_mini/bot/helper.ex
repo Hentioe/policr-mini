@@ -1,7 +1,10 @@
 defmodule PolicrMini.Bot.Helper do
   @moduledoc """
-  机器人相关功能的助手模块，提供各种和机器人实现相关的各种便捷函数。
-  被 `PolicrMini.Bot.Handler`/`PolicrMini.Bot.Commander` 模块默认导入。
+  机器人功能助手模块，提供和机器人功能实现相关的各种辅助函数。
+  所有 `use` 以下模块的模块会默认导入本模块：
+  - `PolicrMini.Bot.Commander`
+  - `PolicrMini.Bot.Handler`
+  - `PolicrMini.Bot.Callbacker`
   """
 
   alias PolicrMini.ChatBusiness
@@ -200,10 +203,11 @@ defmodule PolicrMini.Bot.Helper do
     vmode: :arithmetic,
     ventrance: :unity,
     voccasion: :private,
+    vseconds: 120,
     kmethod: :kick
   ]
 
-  @type default_keys :: :vmode | :ventrance | :voccasion | :kmethod
+  @type default_keys :: :vmode | :ventrance | :voccasion | :vseconds | :kmethod
 
   @spec default!(default_keys()) :: any()
   @doc """
@@ -212,6 +216,7 @@ defmodule PolicrMini.Bot.Helper do
   - `:vmode` - 验证方式
   - `:ventrance` - 验证入口
   - `:voccasion` - 验证场合
+  - `:vseconds` - 验证时间
   - `:kmethod` - 击杀方式
   """
   def default!(key) when is_atom(key) do

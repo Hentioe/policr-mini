@@ -32,48 +32,67 @@ defmodule PolicrMini.Bot.VerificationCallbacker do
     chosen = chosen |> String.to_integer()
     verification_id = verification_id |> String.to_integer()
 
-    case validity_check(user_id, verification_id) do
-      {:ok, verification} ->
-        # 根据回答实施操作
-        if Enum.member?(verification.indices, chosen) do
-          # 回答正确：更新验证记录的状态、解除限制并发送通知消息
-          {:ok, _} = verification |> VerificationBusiness.update(%{status: :passed})
-          :ok = derestrict_chat_member(verification.chat_id, user_id)
-          success_text = "恭喜您，验证通过。如果限制仍未解除请尝试联系管理员。"
+    with {:ok, verification} <- validity_check(user_id, verification_id),
+         {:ok, scheme} <- SchemeBusiness.fetch(verification.chat_id) do
+      # 根据回答实施操作
+      if Enum.member?(verification.indices, chosen) do
+        # 回答正确：更新验证记录的状态、解除限制并发送通知消息
+        {:ok, _} = verification |> VerificationBusiness.update(%{status: :passed})
+        derestrict_chat_member(verification.chat_id, user_id)
+        success_text = "恭喜您，验证通过。如果限制仍未解除请尝试联系管理员。"
 
-          async(fn -> edit_message(user_id, message_id, success_text) end)
+        async(fn -> edit_message(user_id, message_id, success_text) end)
 
-          # 发送通知消息并延迟删除
-          seconds = DateTime.diff(DateTime.utc_now(), verification.inserted_at)
-          text = "刚刚#{at(from)}通过了验证，用时 #{seconds} 秒。"
+        # 发送通知消息并延迟删除
+        seconds = DateTime.diff(DateTime.utc_now(), verification.inserted_at)
+        text = "刚刚#{at(from)}通过了验证，用时 #{seconds} 秒。"
 
-          {:ok, sended_message} = send_message(verification.chat_id, text)
-          delete_message(verification.chat_id, sended_message.message_id, delay_seconds: 15)
-        else
-          # 回答错误：更新验证记录的状态、根据方案实施操作并发送通知消息
-          {:ok, _} = verification |> VerificationBusiness.update(%{status: :wronged})
-          {:ok, scheme} = SchemeBusiness.fetch(verification.chat_id)
-          killing_method = scheme.killing_method || default!(:kmethod)
+        {:ok, sended_message} = send_message(verification.chat_id, text)
+        delete_message(verification.chat_id, sended_message.message_id, delay_seconds: 15)
+      else
+        # 回答错误：更新验证记录的状态、根据方案实施操作并发送通知消息
+        {:ok, _} = verification |> VerificationBusiness.update(%{status: :wronged})
+        killing_method = scheme.killing_method || default!(:kmethod)
 
-          case killing_method do
-            :kick ->
-              text = "抱歉，验证错误。您已被移出群组，稍后可尝试重新加入。"
+        case killing_method do
+          :kick ->
+            text = "抱歉，验证错误。您已被移出群组，稍后可尝试重新加入。"
 
-              async(fn -> edit_message(user_id, message_id, text) end)
+            async(fn -> edit_message(user_id, message_id, text) end)
 
-              target_user = %{id: user_id, fullname: verification.target_user_name}
-              UserJoinedHandler.kick(verification.chat_id, target_user, :wronged)
-          end
+            target_user = %{id: user_id, fullname: verification.target_user_name}
+            UserJoinedHandler.kick(verification.chat_id, target_user, :wronged)
         end
+      end
 
-        # 更新验证记录中的选择索引
-        {:ok, _} = verification |> VerificationBusiness.update(%{chosen: chosen})
+      # 更新验证记录中的选择索引
+      {:ok, _} = verification |> VerificationBusiness.update(%{chosen: chosen})
 
+      count = VerificationBusiness.get_unity_waiting_count(verification.chat_id)
+
+      if count == 0 do
         # 如果没有等待验证了，立即删除入口消息
-        count = VerificationBusiness.get_unity_waiting_count(verification.chat_id)
-        if count == 0, do: Nadia.delete_message(verification.chat_id, verification.message_id)
-        # TODO: 如果还存在多条验证，更新入口消息
-        :ok
+        Nadia.delete_message(verification.chat_id, verification.message_id)
+      else
+        # 如果还存在多条验证，更新入口消息
+        # 提及当前最新的等待验证记录中的用户
+        if verification = VerificationBusiness.find_last_unity_waiting(verification.chat_id) do
+          user = %{id: verification.target_user_id, fullname: verification.target_user_name}
+          max_seconds = scheme.seconds || default!(:vseconds)
+
+          {text, _} =
+            UserJoinedHandler.make_unity_message(verification.chat_id, user, count, max_seconds)
+
+          edit_message(verification.chat_id, verification.message_id, text)
+        end
+      end
+
+      :ok
+    else
+      {:error, %Ecto.Changeset{} = _} ->
+        # TODO: 记录错误
+        message = "出现了一些未意料的错误，校验验证时失败。请管理员并通知作者。"
+        Nadia.answer_callback_query(callback_query_id, text: message, show_alert: true)
 
       {:error, message} ->
         Nadia.answer_callback_query(callback_query_id, text: message, show_alert: true)
