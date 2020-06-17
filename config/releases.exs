@@ -32,6 +32,13 @@ config :policr_mini, PolicrMiniWeb.Endpoint,
   secret_key_base: secret_key_base,
   server: true
 
+config :nadia,
+  token:
+    System.get_env("POLICR_MINI_BOT_TOKEN") ||
+      raise("""
+      environment variable POLICR_MINI_BOT_TOKEN is missing.
+      """)
+
 # ## Using releases (Elixir v1.9+)
 #
 # If you are doing OTP releases, you need to instruct Phoenix
