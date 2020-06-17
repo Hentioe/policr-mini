@@ -49,7 +49,7 @@ defmodule PolicrMini.Bot.StartCommander do
     if length(splited_text) == 2 do
       splited_text |> List.last() |> dispatch(message)
     else
-      send_message(chat_id, "访问[这里](https://github.com/Hentioe/policr-mini)了解了解我吧～")
+      send_message(chat_id, t("start.response"))
     end
 
     {:ok, state}

@@ -62,15 +62,17 @@ defmodule PolicrMini.Bot.Helper do
   @markdown_parse_mode "MarkdownV2"
   @doc """
   发送文本消息。
-  如果 `options` 参数中不包含 `:disable_notification` 或 `:parse_mode` 配置，将为它们准备以下默认值：
+  如果 `options` 参数中不包含以下配置，将为它们准备默认值：
   - `disable_notification`: `true`
   - `parse_mode`: `"MarkdownV2"`
+  - `disable_web_page_preview`: `false`
   """
   def send_message(chat_id, text, options \\ []) do
     options =
       options
       |> Keyword.put_new(:disable_notification, true)
       |> Keyword.put_new(:parse_mode, @markdown_parse_mode)
+      |> Keyword.put_new(:disable_web_page_preview, true)
 
     text =
       if(options |> Keyword.get(:parse_mode) == @markdown_parse_mode) do
@@ -86,12 +88,15 @@ defmodule PolicrMini.Bot.Helper do
           {:ok, Nadia.Model.Message.t()} | tgerror()
   @doc """
   编辑消息。
-  如果 `options` 参数中不包含`:parse_mode` 配置，它将设置为 `”MarkdownV2“`。
+  如果 `options` 参数中不包含以下配置，将为它们准备默认值：
+  - `parse_mode`: `"MarkdownV2"`
+  - `disable_web_page_preview`: `false`
   """
   def edit_message(chat_id, message_id, text, options \\ []) do
     options =
       options
       |> Keyword.put_new(:parse_mode, @markdown_parse_mode)
+      |> Keyword.put_new(:disable_web_page_preview, true)
 
     text =
       if(options |> Keyword.get(:parse_mode) == @markdown_parse_mode) do
@@ -248,7 +253,7 @@ defmodule PolicrMini.Bot.Helper do
     try do
       ExI18n.t(locale, key, values)
     rescue
-      _ -> "#{locale}:#{key}"
+      _ -> "#{locale}:#{key}" |> String.replace("_", "\\_")
     end
   end
 
