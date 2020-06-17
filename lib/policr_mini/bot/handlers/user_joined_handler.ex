@@ -8,12 +8,22 @@ defmodule PolicrMini.Bot.UserJoinedHandler do
   alias PolicrMini.{SchemeBusiness, VerificationBusiness}
   alias PolicrMini.Bot.VerificationCallbacker
 
-  if System.get_env("MIX_ENV", "dev") |> String.to_atom() == :dev do
-    @default_countdown 15
-    @allow_join_again_seconds 15
-  else
-    @allow_join_again_seconds 60 * 5
-    @default_countdown 120
+  @spec countdown :: integer()
+  @doc """
+  获取倒计时。
+  当前的实现会根据运行模式返回不同的值。
+  """
+  def countdown do
+    if PolicrMini.mix_env() == :dev, do: 15, else: 60 * 5
+  end
+
+  @spec allow_join_again_seconds :: integer()
+  @doc """
+  获取允许重新加入时长。
+  当前的实现会根据运行模式返回不同的值。
+  """
+  def allow_join_again_seconds do
+    if PolicrMini.mix_env() == :dev, do: 15, else: 60 * 2
   end
 
   @doc """
@@ -61,7 +71,7 @@ defmodule PolicrMini.Bot.UserJoinedHandler do
         mode = scheme.verification_mode || default!(:vmode)
         entrance = scheme.verification_entrance || default!(:ventrance)
         occasion = scheme.verification_occasion || default!(:voccasion)
-        seconds = scheme.seconds || @default_countdown
+        seconds = scheme.seconds || countdown()
 
         handle(mode, entrance, occasion, seconds, message, state)
 
@@ -208,7 +218,7 @@ defmodule PolicrMini.Bot.UserJoinedHandler do
         kick(chat_id, target_user, :timeout)
         # 解除限制以允许再次加入
         async(fn -> Nadia.unban_chat_member(chat_id, target_user_id) end,
-          seconds: @allow_join_again_seconds
+          seconds: allow_join_again_seconds()
         )
       end
 
@@ -243,13 +253,13 @@ defmodule PolicrMini.Bot.UserJoinedHandler do
     Nadia.kick_chat_member(chat_id, user.id)
     # 解除限制以允许再次加入
     async(fn -> Nadia.unban_chat_member(chat_id, user.id) end,
-      seconds: @allow_join_again_seconds
+      seconds: allow_join_again_seconds()
     )
 
     time_text =
-      if @allow_join_again_seconds < 60,
-        do: "#{@allow_join_again_seconds} #{t("units.sec")}",
-        else: "#{to_string(@allow_join_again_seconds / 60)} #{t("units.min")}"
+      if allow_join_again_seconds() < 60,
+        do: "#{allow_join_again_seconds()} #{t("units.sec")}",
+        else: "#{to_string(allow_join_again_seconds() / 60)} #{t("units.min")}"
 
     text =
       case reason do

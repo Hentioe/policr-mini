@@ -20,4 +20,6 @@ defmodule PolicrMini do
       end
     end
   end
+
+  def mix_env, do: System.get_env("MIX_ENV", "dev") |> String.to_atom()
 end
