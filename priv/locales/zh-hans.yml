@@ -1,0 +1,43 @@
+verification:
+  unity:
+    single_waiting: |
+      新成员%{mentioned_user}你好！
+
+      您当前需要完成验证才能解除限制，验证有效时间不超过 %{seconds} 秒。
+      过期会被踢出或封禁，请尽快。
+    multiple_waiting: |
+      刚来的%{mentioned_user}和另外 %{remaining_count} 个还未验证的新成员，你们好！
+
+      请主动完成验证以解除限制，验证有效时间不超过 %{seconds} 秒。
+      过期会被踢出或封禁，请尽快。
+  passed:
+    private: 恭喜您，验证通过。如果限制仍未解除请联系管理员。
+    notice: 刚刚%{mentioned_user}通过了验证，用时 %{seconds} 秒。
+  wronged:
+    kick:
+      private: 抱歉，验证错误。您已被移出群组，稍后可尝试重新加入。
+      notice: |
+        刚刚%{mentioned_user}验证错误，已经移出本群。
+
+        过 %{time_text}后可再次尝试加入。
+  timeout:
+    kick:
+      notice: |
+        刚刚%{mentioned_user}超时未验证，已经移出本群。
+
+        过 %{time_text}后可再次尝试加入。
+
+buttons:
+  verification:
+    click_here: 点此验证
+
+errors:
+  scheme_fetch_failed: 发生了一些错误，没有读取到本群的验证方案。如果重复出现此问题，请取消机器人的接管状态并通知作者。
+  verification_created_failed: |
+    发生了一些错误，针对%{mentioned_user}的验证创建失败。建议管理员自行甄再决定手动取消限制或封禁。
+
+    如果反复出现此问题，请取消接管状态并通知作者。
+
+units:
+  sec: 秒
+  min: 分钟

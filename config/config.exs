@@ -28,6 +28,16 @@ config :phoenix, :json_library, Jason
 # Task global configuration
 config :task_after, global_name: TaskAfter
 
+# Internationalization of bot messages
+config :exi18n,
+  default_locale: "zh-hans",
+  locales: ~w(zh-hans),
+  fallback: false,
+  loader: :yml,
+  loader_options: %{path: "priv/locales"},
+  var_prefix: "%{",
+  var_suffix: "}"
+
 # Import environment specific config. This must remain at the bottom
 # of this file so it overrides the configuration defined above.
 import_config "#{Mix.env()}.exs"

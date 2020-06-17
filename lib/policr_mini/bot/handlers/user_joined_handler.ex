@@ -9,7 +9,7 @@ defmodule PolicrMini.Bot.UserJoinedHandler do
   alias PolicrMini.Bot.VerificationCallbacker
 
   if Mix.env() == :dev do
-    @default_countdown 35
+    @default_countdown 15
     @allow_join_again_seconds 15
   else
     @allow_join_again_seconds 60 * 5
@@ -66,7 +66,7 @@ defmodule PolicrMini.Bot.UserJoinedHandler do
         handle(mode, entrance, occasion, seconds, message, state)
 
       _ ->
-        send_message(chat_id, "发生了一些错误，没有读取到本群的验证方案。如果重复出现此问题，请取消机器人的接管状态并通知作者。")
+        send_message(chat_id, t("errors.scheme_fetch_failed"))
 
         {:error, state}
     end
@@ -119,9 +119,7 @@ defmodule PolicrMini.Bot.UserJoinedHandler do
         # TODO: 打印错误
         # TODO: 删除此用户的等待验证记录
 
-        text =
-          "发生了一些错误，针对#{at(new_chat_member)}的验证创建失败。建议管理员自行甄再决定手动取消限制或封禁。\n\n如果反复出现此问题，请取消接管状态并通知作者。"
-
+        text = t("errors.verification_created_failed", %{mentioned_user: at(new_chat_member)})
         send_message(chat_id, text)
 
         {:error, state}
@@ -159,17 +157,19 @@ defmodule PolicrMini.Bot.UserJoinedHandler do
     # 读取等待验证的人数并根据人数分别响应不同的文本内容
     text =
       if waiting_count == 1,
-        do: "新成员#{at(user)}你好！\n\n您当前需要完成验证才能解除限制，验证有效时间不超过 #{seconds} 秒。\n过期会被踢出或封禁，请尽快。",
+        do: t("verification.unity.single_waiting", %{mentioned_user: at(user), seconds: seconds}),
         else:
-          "刚来的#{at(user)}和另外 #{waiting_count - 1} 个还未验证的新成员，你们好！\n\n请主动完成验证解除限制，验证有效时间不超过 #{
-            seconds
-          } 秒。\n过期会被踢出或封禁，请尽快。"
+          t("verification.unity.multiple_waiting", %{
+            mentioned_user: at(user),
+            remaining_count: waiting_count - 1,
+            seconds: seconds
+          })
 
     markup = %InlineKeyboardMarkup{
       inline_keyboard: [
         [
           %InlineKeyboardButton{
-            text: "点此验证",
+            text: t("buttons.verification.click_here"),
             url: "https://t.me/#{bot_username()}?start=verification_v1_#{chat_id}"
           }
         ]
@@ -248,16 +248,16 @@ defmodule PolicrMini.Bot.UserJoinedHandler do
 
     time_text =
       if @allow_join_again_seconds < 60,
-        do: "#{@allow_join_again_seconds} 秒",
-        else: "#{to_string(@allow_join_again_seconds / 60)} 分钟"
+        do: "#{@allow_join_again_seconds} #{t("units.sec")}",
+        else: "#{to_string(@allow_join_again_seconds / 60)} #{t("units.min")}"
 
     text =
       case reason do
         :timeout ->
-          "刚刚#{at(user)}超时未验证，已经移出本群。\n\n过 #{time_text}后可再次尝试加入。"
+          t("verification.timeout.kick.notice", %{mentioned_user: at(user), time_text: time_text})
 
         :wronged ->
-          "刚刚#{at(user)}验证错误，已经移出本群。\n\n过 #{time_text}后可再次尝试加入。"
+          t("verification.wronged.kick.notice", %{mentioned_user: at(user), time_text: time_text})
       end
 
     case send_message(chat_id, text) do

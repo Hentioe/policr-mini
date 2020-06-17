@@ -39,7 +39,7 @@ defmodule PolicrMini.Bot.VerificationCallbacker do
         # 回答正确：更新验证记录的状态、解除限制并发送通知消息
         {:ok, _} = verification |> VerificationBusiness.update(%{status: :passed})
         derestrict_chat_member(verification.chat_id, user_id)
-        success_text = "恭喜您，验证通过。如果限制仍未解除请尝试联系管理员。"
+        success_text = "恭喜您，验证通过。如果限制仍未解除请联系管理员。"
 
         async(fn -> edit_message(user_id, message_id, success_text) end)
 

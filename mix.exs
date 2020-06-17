@@ -20,7 +20,7 @@ defmodule PolicrMini.MixProject do
   def application do
     [
       mod: {PolicrMini.Application, []},
-      extra_applications: [:logger, :runtime_tools]
+      extra_applications: [:logger, :runtime_tools, :exi18n, :yaml_elixir]
     ]
   end
 
@@ -47,7 +47,9 @@ defmodule PolicrMini.MixProject do
       {:plug_cowboy, "~> 2.0"},
       {:ecto_enum, "~> 1.4"},
       {:task_after, "~> 1.2"},
-      {:nadia, path: "../nadia"}
+      {:nadia, path: "../nadia"},
+      {:exi18n, "~> 0.9.1"},
+      {:yaml_elixir, "~> 2.4"}
     ]
   end
 
