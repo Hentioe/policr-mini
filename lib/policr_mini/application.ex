@@ -44,7 +44,7 @@ defmodule PolicrMini.Application do
     ]
 
     children =
-      if Mix.env() == :test,
+      if System.get_env("MIX_ENV", "dev") |> String.to_atom() == :test,
         do: children,
         else: children ++ bot_children
 

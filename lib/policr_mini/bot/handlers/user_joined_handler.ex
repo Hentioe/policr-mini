@@ -8,7 +8,7 @@ defmodule PolicrMini.Bot.UserJoinedHandler do
   alias PolicrMini.{SchemeBusiness, VerificationBusiness}
   alias PolicrMini.Bot.VerificationCallbacker
 
-  if Mix.env() == :dev do
+  if System.get_env("MIX_ENV", "dev") |> String.to_atom() == :dev do
     @default_countdown 15
     @allow_join_again_seconds 15
   else
