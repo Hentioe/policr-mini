@@ -16,7 +16,7 @@ defmodule PolicrMini.Bot.Runner do
     verifications =
       verifications
       |> Enum.filter(fn v ->
-        remaining_seconds = DateTime.diff(v.inserted_at, DateTime.utc_now())
+        remaining_seconds = DateTime.diff(DateTime.utc_now(), v.inserted_at)
         remaining_seconds - (v.seconds + 30) < 0
       end)
 

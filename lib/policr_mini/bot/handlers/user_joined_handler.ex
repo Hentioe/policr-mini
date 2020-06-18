@@ -232,7 +232,7 @@ defmodule PolicrMini.Bot.UserJoinedHandler do
         Nadia.delete_message(chat_id, reminder_message_id)
       else
         # 如果还存在多条验证，更新入口消息
-        max_seconds = scheme.seconds || default!(:vseconds)
+        max_seconds = scheme.seconds || countdown()
 
         VerificationCallbacker.update_unity_verification_message(
           chat_id,
