@@ -46,7 +46,7 @@ defmodule PolicrMini.Application do
         id: "fix_expired_wait_status",
         start:
           {SchedEx, :run_every,
-           [PolicrMini.Bot.Runner, :fix_expired_wait_status, [], "*/1 * * * *"]}
+           [PolicrMini.Bot.Runner, :fix_expired_wait_status, [], "*/5 * * * *"]}
       }
     ]
 
