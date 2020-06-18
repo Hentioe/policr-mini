@@ -25,15 +25,7 @@ steps:
       - mix phx.digest
       - mix release
 
-  - name: image-build
-    image: docker
-    commands:
-      - docker build . -t bluerain/policr-mini
-    volumes:
-      - name: docker_sock
-        path: /var/run/docker.sock
-
-  - name: app-image-push
+  - name: image-push
     image: plugins/docker
     settings:
       repo: bluerain/policr-mini

@@ -1,6 +1,5 @@
 # PolicrMini
 
-[![Docker Build Status](https://img.shields.io/docker/build/bluerain/policr-mini)](https://hub.docker.com/r/bluerain/policr-mini)
 [![Build Status](https://github-ci.bluerain.io/api/badges/Hentioe/policr-mini/status.svg)](https://github-ci.bluerain.io/Hentioe/policr-mini)
 [![GitHub issues](https://img.shields.io/github/issues/Hentioe/policr-mini)](https://github.com/Hentioe/policr-mini/issues)
 [![Telegram chat link](https://img.shields.io/badge/%E5%8A%A0%E5%85%A5-%E4%B8%AD%E6%96%87%E7%A4%BE%E5%8C%BA-brightgreen.svg)](https://policr.telestd.me/community)
