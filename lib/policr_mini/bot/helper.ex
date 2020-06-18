@@ -253,8 +253,7 @@ defmodule PolicrMini.Bot.Helper do
     try do
       ExI18n.t(locale, key, values)
     rescue
-      e ->
-        e |> IO.inspect()
+      _ ->
         "#{locale}:#{key}" |> String.replace("_", "\\_")
     end
   end

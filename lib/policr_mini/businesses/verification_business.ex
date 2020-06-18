@@ -110,10 +110,22 @@ defmodule PolicrMini.VerificationBusiness do
       select: p.message_id,
       where: p.chat_id == ^chat_id,
       where: p.entrance == ^@unity_entrance,
-      where: p.status == ^@waiting_status,
       order_by: [desc: p.message_id],
       limit: 1
     )
     |> Repo.one()
+  end
+
+  @spec find_all_unity_waiting() :: [Verification.t()]
+  @doc """
+  查找所有的还在等待的统一入口验证
+  """
+  def find_all_unity_waiting() do
+    from(p in Verification,
+      where: p.entrance == ^@unity_entrance,
+      where: p.status == ^@waiting_status,
+      order_by: [asc: p.inserted_at]
+    )
+    |> Repo.all()
   end
 end

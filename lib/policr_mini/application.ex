@@ -40,7 +40,14 @@ defmodule PolicrMini.Application do
       # 消费消息的动态主管
       PolicrMini.Bot.Consumer,
       # 过滤器管理器
-      {PolicrMini.Bot.FilterManager, filters}
+      {PolicrMini.Bot.FilterManager, filters},
+      # 定时任务：修正过期的等待验证状态
+      %{
+        id: "fix_expired_wait_status",
+        start:
+          {SchedEx, :run_every,
+           [PolicrMini.Bot.Runner, :fix_expired_wait_status, [], "*/1 * * * *"]}
+      }
     ]
 
     children =

@@ -49,7 +49,8 @@ defmodule PolicrMini.MixProject do
       {:task_after, "~> 1.2"},
       {:nadia, github: "Hentioe/nadia"},
       {:exi18n, github: "Hentioe/exi18n"},
-      {:yaml_elixir, "~> 2.4"}
+      {:yaml_elixir, "~> 2.4"},
+      {:sched_ex, "~> 1.1"}
     ]
   end
 
