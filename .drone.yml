@@ -33,6 +33,21 @@ steps:
       - name: docker_sock
         path: /var/run/docker.sock
 
+  - name: app-image-push
+    image: plugins/docker
+    settings:
+      repo: bluerain/policr-mini
+      username: bluerain
+      password:
+        from_secret: docker_password
+      dockerfile: Dockerfile
+      tags: latest
+    when:
+      branch:
+        - master
+      event:
+        - push
+
 volumes:
   - name: docker_sock
     host:
