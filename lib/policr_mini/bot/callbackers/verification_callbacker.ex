@@ -75,7 +75,7 @@ defmodule PolicrMini.Bot.VerificationCallbacker do
         Nadia.delete_message(verification.chat_id, verification.message_id)
       else
         # 如果还存在多条验证，更新入口消息
-        max_seconds = scheme.seconds || default!(:vseconds)
+        max_seconds = scheme.seconds || UserJoinedHandler.countdown()
         update_unity_verification_message(verification.chat_id, count, max_seconds)
       end
 

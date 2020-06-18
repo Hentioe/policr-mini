@@ -209,11 +209,10 @@ defmodule PolicrMini.Bot.Helper do
     vmode: :arithmetic,
     ventrance: :unity,
     voccasion: :private,
-    vseconds: 120,
     kmethod: :kick
   ]
 
-  @type default_keys :: :vmode | :ventrance | :voccasion | :vseconds | :kmethod
+  @type default_keys :: :vmode | :ventrance | :voccasion | :kmethod
 
   @spec default!(default_keys()) :: any()
   @doc """
@@ -222,7 +221,6 @@ defmodule PolicrMini.Bot.Helper do
   - `:vmode` - 验证方式
   - `:ventrance` - 验证入口
   - `:voccasion` - 验证场合
-  - `:vseconds` - 验证时间
   - `:kmethod` - 击杀方式
   """
   def default!(key) when is_atom(key) do

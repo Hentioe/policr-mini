@@ -12,12 +12,12 @@ defmodule PolicrMini.Bot.Runner do
   def fix_expired_wait_status do
     # 获取所有处于等待状态的验证
     verifications = VerificationBusiness.find_all_unity_waiting()
-    # 过滤掉没有过期的验证
+    # 计算已经过期的验证
     verifications =
       verifications
       |> Enum.filter(fn v ->
         remaining_seconds = DateTime.diff(DateTime.utc_now(), v.inserted_at)
-        remaining_seconds - (v.seconds + 30) < 0
+        remaining_seconds - (v.seconds + 30) > 0
       end)
 
     # 修正状态
