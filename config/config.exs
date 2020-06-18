@@ -34,7 +34,7 @@ config :exi18n,
   locales: ~w(zh-hans),
   fallback: false,
   loader: :yml,
-  loader_options: %{path: "priv/locales"},
+  loader_options: %{path: {:policr_mini, "priv/locales"}},
   var_prefix: "%{",
   var_suffix: "}"
 
