@@ -41,6 +41,13 @@ defmodule PolicrMini.Bot do
     {:noreply, %{state | offset: offset}}
   end
 
+  @doc """
+  忽略拉取消息时产生的 SSL 错误
+  TODO: 记录错误
+  """
+  @impl true
+  def handle_info({:ssl_closed, _}, state), do: {:noreply, state}
+
   def id() do
     [{:id, id}] = :ets.lookup(:bot_info, :id)
 
