@@ -71,8 +71,10 @@ defmodule PolicrMini.Bot.VerificationCallbacker do
       count = VerificationBusiness.get_unity_waiting_count(verification.chat_id)
 
       if count == 0 do
+        # 获取最新的验证入口消息编号
+        message_id = VerificationBusiness.find_last_unity_message_id(verification.chat_id)
         # 如果没有等待验证了，立即删除入口消息
-        Nadia.delete_message(verification.chat_id, verification.message_id)
+        delete_message(verification.chat_id, message_id)
       else
         # 如果还存在多条验证，更新入口消息
         max_seconds = scheme.seconds || UserJoinedHandler.countdown()

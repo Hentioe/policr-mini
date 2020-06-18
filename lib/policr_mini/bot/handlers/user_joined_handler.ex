@@ -14,7 +14,7 @@ defmodule PolicrMini.Bot.UserJoinedHandler do
   当前的实现会根据运行模式返回不同的值。
   """
   def countdown do
-    if PolicrMini.mix_env() == :dev, do: 15, else: 60 * 5
+    if PolicrMini.mix_env() == :dev, do: 30, else: 60 * 5
   end
 
   @spec allow_join_again_seconds :: integer()
@@ -228,8 +228,10 @@ defmodule PolicrMini.Bot.UserJoinedHandler do
       waiting_count = VerificationBusiness.get_unity_waiting_count(chat_id)
 
       if waiting_count == 0 do
+        # 获取最新的验证入口消息编号
+        message_id = VerificationBusiness.find_last_unity_message_id(verification.chat_id)
         # 已经没有剩余验证，直接删除上一个提醒消息
-        Nadia.delete_message(chat_id, reminder_message_id)
+        delete_message(chat_id, message_id)
       else
         # 如果还存在多条验证，更新入口消息
         max_seconds = scheme.seconds || countdown()

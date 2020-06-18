@@ -110,6 +110,7 @@ defmodule PolicrMini.VerificationBusiness do
       select: p.message_id,
       where: p.chat_id == ^chat_id,
       where: p.entrance == ^@unity_entrance,
+      where: not is_nil(p.message_id),
       order_by: [desc: p.message_id],
       limit: 1
     )
