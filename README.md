@@ -1,12 +1,8 @@
 # PolicrMini
 
 [![Build Status](https://github-ci.bluerain.io/api/badges/Hentioe/policr-mini/status.svg)](https://github-ci.bluerain.io/Hentioe/policr-mini)
-
-<!-- [![GitHub release (latest by date)](https://img.shields.io/github/v/release/Hentioe/policr-mini)](https://github.com/Hentioe/policr-mini/releases/latest) -->
-<!-- [![GitHub license](https://img.shields.io/github/license/Hentioe/policr-mini)](https://github.com/Hentioe/policr-mini/blob/master/LICENSE) -->
-
 [![GitHub issues](https://img.shields.io/github/issues/Hentioe/policr-mini)](https://github.com/Hentioe/policr-mini/issues)
-[![Telegram chat link](https://img.shields.io/badge/%E4%B8%AD%E6%96%87%E7%A4%BE%E5%8C%BA%E7%BE%A4-brightgreen.svg)](https://t.me/mikack)
+[![Telegram chat link](https://img.shields.io/badge/%E5%8A%A0%E5%85%A5-%E4%B8%AD%E6%96%87%E7%A4%BE%E5%8C%BA%E7%BE%A4-brightgreen.svg)](https://policr.telestd.me/community)
 
 一个只保留本质功能的 Policr 精简版。
 
