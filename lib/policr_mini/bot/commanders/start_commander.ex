@@ -89,9 +89,7 @@ defmodule PolicrMini.Bot.StartCommander do
         end
 
       text =
-        "来自『#{verification.chat.title}』的待完成验证，请确认问题并选择您认为正确的答案。\n\n#{captcha_data.question}\n\n您还剩 #{
-          time_left(verification)
-        } 秒，通过可解除封印。"
+        "请确认问题并选择您认为正确的答案。\n\n#{captcha_data.question}\n\n您还剩 #{time_left(verification)} 秒，通过可解除封印。"
 
       markup = PolicrMini.Bot.Captcha.build_markup(captcha_data.candidates, verification.id)
 
