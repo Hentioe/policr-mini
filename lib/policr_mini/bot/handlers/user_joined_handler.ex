@@ -8,6 +8,9 @@ defmodule PolicrMini.Bot.UserJoinedHandler do
   alias PolicrMini.{SchemeBusiness, VerificationBusiness}
   alias PolicrMini.Bot.VerificationCallbacker
 
+  # 过期时间：15 分钟
+  @expired_seconds 60 * 15
+
   @spec countdown :: integer()
   @doc """
   获取倒计时。
@@ -59,35 +62,74 @@ defmodule PolicrMini.Bot.UserJoinedHandler do
   """
   @impl true
   def handle(message, state) do
-    %{chat: %{id: chat_id}, new_chat_member: %{id: new_user_id}} = message
+    %{chat: %{id: chat_id}, new_chat_member: new_chat_member, date: date} = message
 
-    case SchemeBusiness.fetch(chat_id) do
-      {:ok, scheme} ->
+    joined_datetime =
+      case date |> DateTime.from_unix() do
+        {:ok, datetime} -> datetime
+        _ -> DateTime.utc_now()
+      end
+
+    if DateTime.diff(DateTime.utc_now(), joined_datetime) >= @expired_seconds do
+      handle_expired(message, state)
+    else
+      case SchemeBusiness.fetch(chat_id) do
+        {:ok, scheme} ->
+          # 异步删除服务消息
+          async(fn -> Nadia.delete_message(chat_id, message.message_id) end)
+          # 异步限制新用户
+          async(fn -> restrict_chat_member(chat_id, new_chat_member.id) end)
+
+          mode = scheme.verification_mode || default!(:vmode)
+          entrance = scheme.verification_entrance || default!(:ventrance)
+          occasion = scheme.verification_occasion || default!(:voccasion)
+          seconds = scheme.seconds || countdown()
+
+          handle(mode, entrance, occasion, seconds, message, state)
+
+        _ ->
+          send_message(chat_id, t("errors.scheme_fetch_failed"))
+
+          {:error, state}
+      end
+    end
+  end
+
+  @spec handle_expired(Nadia.Model.Message.t(), PolicrMini.Bot.State.t()) ::
+          {:error, PolicrMini.Bot.State.t()} | {:ok, PolicrMini.Bot.State.t()}
+  @doc """
+  处理过期验证。
+  当前仅限制用户，并不发送验证消息。
+  """
+  def handle_expired(message, state) do
+    %{chat: %{id: chat_id}, new_chat_member: new_chat_member} = message
+
+    verification_params = %{
+      chat_id: chat_id,
+      target_user_id: new_chat_member.id,
+      target_user_name: fullname(new_chat_member),
+      entrance: :unity,
+      seconds: 0,
+      status: :expired
+    }
+
+    case VerificationBusiness.fetch(verification_params) do
+      {:ok, _} ->
         # 异步删除服务消息
-        async(fn -> Nadia.delete_message(chat_id, message.message_id) end)
+        async(fn -> delete_message(chat_id, message.message_id) end)
         # 异步限制新用户
-        async(fn -> restrict_chat_member(chat_id, new_user_id) end)
+        async(fn -> restrict_chat_member(chat_id, new_chat_member.id) end)
 
-        mode = scheme.verification_mode || default!(:vmode)
-        entrance = scheme.verification_entrance || default!(:ventrance)
-        occasion = scheme.verification_occasion || default!(:voccasion)
-        seconds = scheme.seconds || countdown()
-
-        handle(mode, entrance, occasion, seconds, message, state)
+        {:ok, state}
 
       _ ->
-        send_message(chat_id, t("errors.scheme_fetch_failed"))
-
+        # 记录错误
         {:error, state}
     end
   end
 
   @doc """
   算术验证 + 统一入口 + 私聊方案的细节实现。
-  主要进行以下大致流程，按先后顺序：
-  1. 删除上一条统一验证入口消息
-  1. 读取等待验证的人，根据人数分别响应不同的文本内容
-  1. 启动定时任务，读取验证记录并根据结果实施操作
   """
   def handle(:arithmetic, :unity, :private, seconds, message, state) do
     %{chat: %{id: chat_id}, new_chat_member: new_chat_member} = message
