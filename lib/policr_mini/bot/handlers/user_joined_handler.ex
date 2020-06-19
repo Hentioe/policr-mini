@@ -59,14 +59,14 @@ defmodule PolicrMini.Bot.UserJoinedHandler do
   """
   @impl true
   def handle(message, state) do
-    %{chat: %{id: chat_id}, from: %{id: from_user_id}} = message
+    %{chat: %{id: chat_id}, new_chat_member: %{id: new_user_id}} = message
 
     case SchemeBusiness.fetch(chat_id) do
       {:ok, scheme} ->
         # 异步删除服务消息
         async(fn -> Nadia.delete_message(chat_id, message.message_id) end)
-        # 异步限制当前用户
-        async(fn -> restrict_chat_member(chat_id, from_user_id) end)
+        # 异步限制新用户
+        async(fn -> restrict_chat_member(chat_id, new_user_id) end)
 
         mode = scheme.verification_mode || default!(:vmode)
         entrance = scheme.verification_entrance || default!(:ventrance)
