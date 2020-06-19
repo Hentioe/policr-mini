@@ -1,7 +1,9 @@
 defmodule PolicrMini.Bot.Handler do
+  alias PolicrMini.Bot.State
+
   defmacro __using__(_) do
     quote do
-      alias PolicrMini.Bot.Handler
+      alias PolicrMini.Bot.{Handler, State}
       alias Nadia.Model.{InlineKeyboardMarkup, InlineKeyboardButton}
 
       import Handler
@@ -19,8 +21,8 @@ defmodule PolicrMini.Bot.Handler do
     end
   end
 
-  @callback match?(msg :: Nadia.Model.Message.t(), state :: PolicrMini.Bot.State.t()) ::
-              {boolean(), PolicrMini.Bot.State.t()}
-  @callback handle(msg :: Nadia.Model.Message.t(), state :: PolicrMini.Bot.State.t()) ::
-              {:ok | :ignored | :error, PolicrMini.Bot.State.t()}
+  @callback match?(msg :: Nadia.Model.Message.t(), state :: State.t()) ::
+              {boolean(), State.t()}
+  @callback handle(msg :: Nadia.Model.Message.t(), state :: State.t()) ::
+              {:ok | :ignored | :error, State.t()}
 end

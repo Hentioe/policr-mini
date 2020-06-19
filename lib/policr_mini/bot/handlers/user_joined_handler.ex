@@ -64,51 +64,52 @@ defmodule PolicrMini.Bot.UserJoinedHandler do
   def handle(message, state) do
     %{chat: %{id: chat_id}, new_chat_member: new_chat_member, date: date} = message
 
-    joined_datetime =
-      case date |> DateTime.from_unix() do
-        {:ok, datetime} -> datetime
-        _ -> DateTime.utc_now()
-      end
+    case SchemeBusiness.fetch(chat_id) do
+      {:ok, scheme} ->
+        joined_datetime =
+          case date |> DateTime.from_unix() do
+            {:ok, datetime} -> datetime
+            _ -> DateTime.utc_now()
+          end
 
-    if DateTime.diff(DateTime.utc_now(), joined_datetime) >= @expired_seconds do
-      handle_expired(message, state)
-    else
-      case SchemeBusiness.fetch(chat_id) do
-        {:ok, scheme} ->
+        entrance = scheme.verification_entrance || default!(:ventrance)
+        mode = scheme.verification_mode || default!(:vmode)
+        occasion = scheme.verification_occasion || default!(:voccasion)
+        seconds = scheme.seconds || countdown()
+
+        if DateTime.diff(DateTime.utc_now(), joined_datetime) >= @expired_seconds do
+          # 处理过期验证
+          handle_expired(entrance, message, state)
+        else
           # 异步删除服务消息
           async(fn -> Nadia.delete_message(chat_id, message.message_id) end)
           # 异步限制新用户
           async(fn -> restrict_chat_member(chat_id, new_chat_member.id) end)
 
-          mode = scheme.verification_mode || default!(:vmode)
-          entrance = scheme.verification_entrance || default!(:ventrance)
-          occasion = scheme.verification_occasion || default!(:voccasion)
-          seconds = scheme.seconds || countdown()
-
           handle(mode, entrance, occasion, seconds, message, state)
+        end
 
-        _ ->
-          send_message(chat_id, t("errors.scheme_fetch_failed"))
+      _ ->
+        send_message(chat_id, t("errors.scheme_fetch_failed"))
 
-          {:error, state}
-      end
+        {:error, state}
     end
   end
 
-  @spec handle_expired(Nadia.Model.Message.t(), PolicrMini.Bot.State.t()) ::
-          {:error, PolicrMini.Bot.State.t()} | {:ok, PolicrMini.Bot.State.t()}
+  @spec handle_expired(atom(), Nadia.Model.Message.t(), State.t()) ::
+          {:error, State.t()} | {:ok, State.t()}
   @doc """
   处理过期验证。
   当前仅限制用户，并不发送验证消息。
   """
-  def handle_expired(message, state) do
+  def handle_expired(entrance, message, state) do
     %{chat: %{id: chat_id}, new_chat_member: new_chat_member} = message
 
     verification_params = %{
       chat_id: chat_id,
       target_user_id: new_chat_member.id,
       target_user_name: fullname(new_chat_member),
-      entrance: :unity,
+      entrance: entrance,
       seconds: 0,
       status: :expired
     }
@@ -123,7 +124,7 @@ defmodule PolicrMini.Bot.UserJoinedHandler do
         {:ok, state}
 
       _ ->
-        # 记录错误
+        # TODO: 记录错误
         {:error, state}
     end
   end
