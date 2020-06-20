@@ -13,7 +13,7 @@ defmodule PolicrMini.Bot.VerificationCallbacker do
 
   @doc """
   回调处理函数。
-  此函数仅仅解析参数并分发到其它子句中。
+  此函数仅仅解析参数并分发到 `handle_data/2` 子句中。
   """
   @impl true
   def handle(%{data: data} = callback_query) do
@@ -68,10 +68,10 @@ defmodule PolicrMini.Bot.VerificationCallbacker do
     else
       {:error, %Ecto.Changeset{} = changeset} ->
         Logger.error(
-          "A database error occurred while processing the answer. Details:: #{inspect(changeset)}"
+          "A database error occurred while processing the answer. Details: #{inspect(changeset)}"
         )
 
-        Nadia.answer_callback_query(callback_query_id,
+        answer_callback_query(callback_query_id,
           text: t("errors.check_answer_failed"),
           show_alert: true
         )
@@ -79,13 +79,15 @@ defmodule PolicrMini.Bot.VerificationCallbacker do
         :error
 
       {:error, :known, message} ->
-        Nadia.answer_callback_query(callback_query_id, text: message, show_alert: true)
+        answer_callback_query(callback_query_id, text: message, show_alert: true)
 
         :error
 
       e ->
+        answer_callback_query(callback_query_id, text: t("errors.unknown"), show_alert: true)
+
         Logger.error(
-          "A Unknown error occurred while processing the answer. Details:: #{inspect(e)}"
+          "A Unknown error occurred while processing the answer. Details: #{inspect(e)}"
         )
     end
   end

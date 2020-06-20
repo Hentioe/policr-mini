@@ -274,14 +274,4 @@ defmodule PolicrMini.Bot.Helper do
   """
   def async(callback, [{:seconds, seconds}]) when is_integer(seconds) and is_function(callback),
     do: TaskAfter.task_after(seconds * 1000, callback)
-
-  @spec parse_callback_data(String.t()) :: {String.t(), [String.t()]}
-  @doc """
-  解析回调中的数据。
-  """
-  def parse_callback_data(data) when is_binary(data) do
-    [_, version | args] = data |> String.split(":")
-
-    {version, args}
-  end
 end

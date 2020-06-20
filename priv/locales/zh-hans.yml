@@ -45,6 +45,7 @@ buttons:
     click_here: 点此验证
 
 errors:
+  unknown: 发生了一些未预料的情况，请向开发者反馈。
   scheme_fetch_failed: 发生了一些错误，没有读取到本群的验证方案。如果重复出现此问题，请取消机器人的接管状态并通知作者。
   verification_created_failed: |
     发生了一些错误，针对%{mentioned_user}的验证创建失败。建议管理员自行鉴别以后再决定手动封禁或取消限制。
