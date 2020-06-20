@@ -20,7 +20,7 @@ defmodule PolicrMini.Bot.SyncCommander do
     %{chat: %{id: chat_id}} = message
 
     # 同步群组和管理员信息，并自动设置接管状态
-    with {:ok, chat} = synchronize_chat(chat_id),
+    with {:ok, chat} <- synchronize_chat(chat_id),
          {:ok, _} <- synchronize_administrators(chat),
          # 获取自身权限
          {:ok, member} <- Nadia.get_chat_member(chat_id, PolicrMini.Bot.id()) do

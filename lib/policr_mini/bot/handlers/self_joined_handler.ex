@@ -17,7 +17,7 @@ defmodule PolicrMini.Bot.SelfJoinedHandler do
     chat_id = message.chat.id
 
     # 同步群组和管理员信息
-    with {:ok, chat} = SyncCommander.synchronize_chat(chat_id, init: true),
+    with {:ok, chat} <- SyncCommander.synchronize_chat(chat_id, init: true),
          {:ok, _} <- SyncCommander.synchronize_administrators(chat),
          :ok <- response(chat_id) do
       {:ok, state}

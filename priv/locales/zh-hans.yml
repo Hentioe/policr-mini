@@ -50,6 +50,10 @@ errors:
     发生了一些错误，针对%{mentioned_user}的验证创建失败。建议管理员自行鉴别以后再决定手动封禁或取消限制。
 
     如果反复出现此问题，请取消接管状态并通知作者。
+  check_answer_failed: 出现了一些未意料的错误，校验验证时失败。请管理员并通知作者。
+  verification_not_found: 没有找到和这条验证有关的记录哦～
+  verification_target_incorrect: 此条验证并不针对你～
+  verification_expired: 这条验证可能已经失效了～
 
 units:
   sec: 秒
