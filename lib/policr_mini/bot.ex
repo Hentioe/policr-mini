@@ -49,7 +49,7 @@ defmodule PolicrMini.Bot do
   """
   @impl true
   def handle_info({:ssl_closed, _} = details, state) do
-    Logger.error("An SSLerror occurred while pulling updates, details: #{inspect(details)}")
+    Logger.error("An SSL error occurred while pulling updates, details: #{inspect(details)}")
 
     {:noreply, state}
   end
