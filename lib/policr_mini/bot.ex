@@ -34,7 +34,8 @@ defmodule PolicrMini.Bot do
             do: List.last(updates).update_id + 1,
             else: last_offset
 
-        _ ->
+        e ->
+          Logger.error("An error occurred while pulling updates, details: #{inspect(e)}")
           last_offset
       end
 
@@ -48,7 +49,7 @@ defmodule PolicrMini.Bot do
   """
   @impl true
   def handle_info({:ssl_closed, _} = details, state) do
-    Logger.error("An SSL_CLOSED error occurred while pulling the message: #{inspect(details)}")
+    Logger.error("An SSLerror occurred while pulling updates, details: #{inspect(details)}")
 
     {:noreply, state}
   end

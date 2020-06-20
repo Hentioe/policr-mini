@@ -14,7 +14,7 @@ defmodule PolicrMini.Bot.PingCommander do
         async(fn -> Nadia.delete_message(chat_id, sended_message.message_id) end, seconds: 8)
 
       e ->
-        Logger.error("Error in response to `/ping` command: #{inspect(e)}")
+        Logger.error("Error in response to `/ping` command, details: #{inspect(e)}")
     end
 
     {:ok, state}

@@ -86,7 +86,7 @@ defmodule PolicrMini.Bot.VerificationCallbacker do
       :ok
     else
       {:error, %Ecto.Changeset{} = changeset} ->
-        Logger.error("Error in fetch verification scheme: #{inspect(changeset)}")
+        Logger.error("Error in fetch verification scheme, details: #{inspect(changeset)}")
         message = "出现了一些未意料的错误，校验验证时失败。请管理员并通知作者。"
         Nadia.answer_callback_query(callback_query_id, text: message, show_alert: true)
 

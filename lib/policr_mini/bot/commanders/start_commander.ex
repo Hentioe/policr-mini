@@ -88,7 +88,7 @@ defmodule PolicrMini.Bot.StartCommander do
         rescue
           e ->
             Logger.error(
-              "An error occurred in the verification data generation of group `#{target_chat_id}`, fallback to alternatives: #{
+              "An error occurred in the verification data generation of group `#{target_chat_id}`, fallback to alternatives. Details: #{
                 inspect(e)
               }"
             )

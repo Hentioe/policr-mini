@@ -91,7 +91,11 @@ defmodule PolicrMini.Bot.UserJoinedHandler do
           handle(mode, entrance, occasion, seconds, message, state)
         end
 
-      _ ->
+      e ->
+        Logger.error(
+          "An error occurred while reading the verification scheme, details: #{inspect(e)}"
+        )
+
         send_message(chat_id, t("errors.scheme_fetch_failed"))
 
         {:error, state}
@@ -126,7 +130,7 @@ defmodule PolicrMini.Bot.UserJoinedHandler do
         {:ok, state}
 
       e ->
-        Logger.error("An error occurred during fetch verification: #{inspect(e)}")
+        Logger.error("An error occurred during fetch verification, details: #{inspect(e)}")
 
         {:error, state}
     end
@@ -172,7 +176,7 @@ defmodule PolicrMini.Bot.UserJoinedHandler do
       {:ok, %{state | done: true, deleted: true}}
     else
       e ->
-        Logger.error("Error creating verification entrance: #{inspect(e)}")
+        Logger.error("Error creating verification entrance, details: #{inspect(e)}")
 
         text = t("errors.verification_created_failed", %{mentioned_user: at(new_chat_member)})
         send_message(chat_id, text)
@@ -324,7 +328,7 @@ defmodule PolicrMini.Bot.UserJoinedHandler do
         :ok
 
       e ->
-        Logger.error("Failed to send notification to kill user: #{inspect(e)}")
+        Logger.error("Failed to send notification to kill a user, details: #{inspect(e)}")
         e
     end
   end

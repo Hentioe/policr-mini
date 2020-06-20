@@ -7,6 +7,8 @@ defmodule PolicrMini.Bot.Helper do
   - `PolicrMini.Bot.Callbacker`
   """
 
+  require Logger
+
   alias PolicrMini.ChatBusiness
 
   @type tgerror :: {:error, Nadia.Model.Error.t()}
@@ -251,7 +253,11 @@ defmodule PolicrMini.Bot.Helper do
     try do
       ExI18n.t(locale, key, values)
     rescue
-      _ ->
+      e ->
+        Logger.error(
+          "An error occurred while searching for the translation, details: #{inspect(e)}"
+        )
+
         "#{locale}:#{key}" |> String.replace("_", "\\_")
     end
   end

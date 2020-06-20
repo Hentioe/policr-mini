@@ -23,7 +23,7 @@ defmodule PolicrMini.Bot.SelfJoinedHandler do
       {:ok, state}
     else
       e ->
-        Logger.error("An error occurred after the bot was invited: #{inspect(e)}")
+        Logger.error("An error occurred after the bot was invited, details: #{inspect(e)}")
         send_message(chat_id, t("self_joined.error"))
     end
 
