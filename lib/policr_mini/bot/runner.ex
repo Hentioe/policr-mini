@@ -3,6 +3,8 @@ defmodule PolicrMini.Bot.Runner do
   各定时任务实现模块。
   """
 
+  require Logger
+
   alias PolicrMini.VerificationBusiness
 
   @spec fix_expired_wait_status :: :ok
@@ -21,8 +23,10 @@ defmodule PolicrMini.Bot.Runner do
       end)
 
     # 修正状态
-    # TODO: 记录日志
     verifications |> Enum.each(fn v -> v |> VerificationBusiness.update(%{status: :expired}) end)
+
+    len = length(verifications)
+    if len > 0, do: Logger.info("Automatically correct #{len} expired verifications")
 
     :ok
   end

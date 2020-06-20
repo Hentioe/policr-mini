@@ -4,6 +4,8 @@ defmodule PolicrMini.Bot.UserJoinedHandler do
   """
   use PolicrMini.Bot.Handler
 
+  require Logger
+
   alias PolicrMini.Schema.{Verification, Scheme}
   alias PolicrMini.{SchemeBusiness, VerificationBusiness}
   alias PolicrMini.Bot.VerificationCallbacker
@@ -123,8 +125,9 @@ defmodule PolicrMini.Bot.UserJoinedHandler do
 
         {:ok, state}
 
-      _ ->
-        # TODO: 记录错误
+      e ->
+        Logger.error("An error occurred during fetch verification: #{inspect(e)}")
+
         {:error, state}
     end
   end
@@ -168,9 +171,8 @@ defmodule PolicrMini.Bot.UserJoinedHandler do
 
       {:ok, %{state | done: true, deleted: true}}
     else
-      _ ->
-        # TODO: 打印错误
-        # TODO: 删除此用户的等待验证记录
+      e ->
+        Logger.error("Error creating verification entrance: #{inspect(e)}")
 
         text = t("errors.verification_created_failed", %{mentioned_user: at(new_chat_member)})
         send_message(chat_id, text)
@@ -322,7 +324,7 @@ defmodule PolicrMini.Bot.UserJoinedHandler do
         :ok
 
       e ->
-        # TODO: 记录错误
+        Logger.error("Failed to send notification to kill user: #{inspect(e)}")
         e
     end
   end

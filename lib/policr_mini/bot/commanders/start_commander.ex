@@ -6,6 +6,8 @@ defmodule PolicrMini.Bot.StartCommander do
   """
   use PolicrMini.Bot.Commander, :start
 
+  require Logger
+
   alias PolicrMini.{VerificationBusiness, SchemeBusiness, MessageSnapshotBusiness}
   alias PolicrMini.Schema.Verification
   alias PolicrMini.Bot.{ArithmeticCaptcha, FallbackCaptcha}
@@ -84,8 +86,14 @@ defmodule PolicrMini.Bot.StartCommander do
         try do
           captcha_module.make!()
         rescue
-          # TODO: 记录错误并提醒目标群组设置问题
-          _ -> @fallback_captcha_module.make!()
+          e ->
+            Logger.error(
+              "An error occurred in the verification data generation of group `#{target_chat_id}`, fallback to alternatives: #{
+                inspect(e)
+              }"
+            )
+
+            @fallback_captcha_module.make!()
         end
 
       text =

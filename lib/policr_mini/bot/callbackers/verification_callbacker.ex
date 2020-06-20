@@ -5,6 +5,8 @@ defmodule PolicrMini.Bot.VerificationCallbacker do
 
   use PolicrMini.Bot.Callbacker, :verification
 
+  require Logger
+
   alias PolicrMini.Schema.Verification
   alias PolicrMini.{VerificationBusiness, SchemeBusiness}
   alias PolicrMini.Bot.UserJoinedHandler
@@ -83,8 +85,8 @@ defmodule PolicrMini.Bot.VerificationCallbacker do
 
       :ok
     else
-      {:error, %Ecto.Changeset{} = _} ->
-        # TODO: 记录错误
+      {:error, %Ecto.Changeset{} = changeset} ->
+        Logger.error("Error in fetch verification scheme: #{inspect(changeset)}")
         message = "出现了一些未意料的错误，校验验证时失败。请管理员并通知作者。"
         Nadia.answer_callback_query(callback_query_id, text: message, show_alert: true)
 

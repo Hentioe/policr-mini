@@ -1,6 +1,8 @@
 defmodule PolicrMini.Bot do
   use GenServer
 
+  require Logger
+
   alias __MODULE__.Consumer
 
   def start_link(default \\ []) when is_list(default) do
@@ -43,10 +45,13 @@ defmodule PolicrMini.Bot do
 
   @doc """
   忽略拉取消息时产生的 SSL 错误
-  TODO: 记录错误
   """
   @impl true
-  def handle_info({:ssl_closed, _}, state), do: {:noreply, state}
+  def handle_info({:ssl_closed, _} = details, state) do
+    Logger.error("An SSL_CLOSED error occurred while pulling the message: #{inspect(details)}")
+
+    {:noreply, state}
+  end
 
   def id() do
     [{:id, id}] = :ets.lookup(:bot_info, :id)
