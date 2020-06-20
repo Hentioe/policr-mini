@@ -1,6 +1,8 @@
 defmodule PolicrMini.Bot.SelfJoinedHandler do
   use PolicrMini.Bot.Handler
 
+  require Logger
+
   alias PolicrMini.Bot.SyncCommander
 
   @impl true
@@ -16,20 +18,39 @@ defmodule PolicrMini.Bot.SelfJoinedHandler do
 
     # 同步群组和管理员信息
     with {:ok, chat} = SyncCommander.synchronize_chat(chat_id, init: true),
-         {:ok, _} <- SyncCommander.synchronize_administrators(chat) do
-      {:ok, _} =
-        send_message(
-          chat_id,
-          "已成功登记本群信息，所有管理员皆可登入后台。\n\n功能启用方法：\n1. 将本机器人提升为管理员\n2. 发送 /sync@#{
-            PolicrMini.Bot.username()
-          } 指令",
-          parse_mode: nil
-        )
+         {:ok, _} <- SyncCommander.synchronize_administrators(chat),
+         :ok <- response(chat_id) do
+      {:ok, state}
     else
-      {:error, _} ->
-        send_message(chat_id, "出现了一些问题，群组登记失败。请联系作者。")
+      e ->
+        Logger.error("An error occurred after the bot was invited: #{inspect(e)}")
+        send_message(chat_id, t("self_joined.error"))
     end
 
     {:ok, %{state | done: true}}
+  end
+
+  @spec response(integer()) :: :ok | {:error, Nadia.Model.Error.t()}
+  @doc """
+  发送响应消息。
+  """
+  def response(chat_id) when is_integer(chat_id) do
+    text = t("self_joined.text", %{bot_username: bot_username()})
+
+    markup = %InlineKeyboardMarkup{
+      inline_keyboard: [
+        [
+          %InlineKeyboardButton{
+            text: t("self_joined.markup_text.subscribe"),
+            url: "https://t.me/policr_changelog"
+          }
+        ]
+      ]
+    }
+
+    case send_message(chat_id, text, reply_markup: markup, parse_mode: nil) do
+      {:ok, _} -> :ok
+      e -> e
+    end
   end
 end

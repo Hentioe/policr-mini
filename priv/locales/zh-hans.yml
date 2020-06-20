@@ -1,6 +1,16 @@
 start:
   response: 访问[这里](https://github.com/Hentioe/policr-mini)了解了解我吧～
 
+self_joined:
+  text: |
+    已成功登记本群信息，所有管理员皆可登入后台。
+
+    功能启用方法：
+    1. 将本机器人提升为管理员
+    2. 发送 /sync@%{bot_username} 指令
+  markup_text:
+    subscribe: 订阅更新
+  error: 出现了一些问题，群组登记失败。请联系作者。
 verification:
   unity:
     single_waiting: |
