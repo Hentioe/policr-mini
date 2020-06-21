@@ -1,10 +1,18 @@
 defmodule PolicrMini.Bot.SyncCommander do
+  @moduledoc """
+  `/sync` 命令的响应模块。
+  """
+
+  require Logger
+
   use PolicrMini.Bot.Commander, :sync
 
   alias PolicrMini.{ChatBusiness, UserBusiness}
-  alias PolicrMini.Schema.Permission
+  alias PolicrMini.Schema.{Permission, Chat}
 
-  # 非管理员发送指令直接删除
+  @doc """
+  非管理员发送指令直接删除。
+  """
   @impl true
   def handle(
         %{message_id: message_id, chat: %{id: chat_id}} = message,
@@ -15,6 +23,10 @@ defmodule PolicrMini.Bot.SyncCommander do
     {message, state}
   end
 
+  @doc """
+  同步群组数据。
+  包括群组信息、管理员数据。
+  """
   @impl true
   def handle(message, state) do
     %{chat: %{id: chat_id}} = message
@@ -34,28 +46,36 @@ defmodule PolicrMini.Bot.SyncCommander do
         chat |> ChatBusiness.takeover_cancelled()
       end
 
-      message_text = "同步完成。已更新群组和管理员数据。"
+      message_text = t("sync.success")
 
       message_text =
         if is_admin do
           message_text <>
-            "因为本机器人具备权限，" <>
-            if last_is_take_over, do: "新成员验证已处于接管状态。", else: "已接管新成员验证。"
+            t("sync.have_permissions") <>
+            if last_is_take_over, do: t("sync.already_takeover"), else: t("sync.has_takeover")
         else
           message_text <>
-            "因为本机器人不是管理员，" <>
-            if(last_is_take_over, do: "已取消对新成员验证的接管。", else: "没有接管新成员验证的能力。")
+            t("sync.no_permission") <>
+            if(last_is_take_over,
+              do: t("sync.cancelled_takeover"),
+              else: t("sync.unable_takeover")
+            )
         end
 
       send_message(chat_id, message_text)
     else
-      {:error, _} ->
-        send_message(chat_id, "出现了一些问题，同步失败。请联系作者。")
+      {:error, e} ->
+        Logger.error("An error occurred during synchronization. Details: #{inspect(e)}")
+        send_message(chat_id, t("errors.sync_failed"))
     end
 
     {:ok, state}
   end
 
+  @spec synchronize_chat(integer(), boolean()) :: {:ok, Chat.t()} | {:error, Ecto.Changeset.t()}
+  @doc """
+  同步群信息数据。
+  """
   def synchronize_chat(chat_id, init \\ false) when is_integer(chat_id) do
     case Nadia.get_chat(chat_id) do
       {:ok, chat} ->
@@ -106,7 +126,12 @@ defmodule PolicrMini.Bot.SyncCommander do
     end
   end
 
-  def synchronize_administrators(chat = %PolicrMini.Schema.Chat{id: chat_id})
+  @spec synchronize_administrators(Chat.t()) ::
+          {:ok, Chat.t()} | {:error, Ecto.Changeset.t()}
+  @doc """
+  同步管理员数据。
+  """
+  def synchronize_administrators(chat = %Chat{id: chat_id})
       when is_integer(chat_id) do
     case Nadia.get_chat_administrators(chat_id) do
       {:ok, administrators} ->
@@ -120,16 +145,24 @@ defmodule PolicrMini.Bot.SyncCommander do
         |> Enum.each(fn member ->
           user = member.user
 
-          {:ok, _} =
-            UserBusiness.fetch(
-              user.id,
-              %{
-                id: user.id,
-                first_name: user[:first_name],
-                last_name: user[:last_name],
-                username: user[:username]
-              }
-            )
+          user_params = %{
+            id: user.id,
+            first_name: user[:first_name],
+            last_name: user[:last_name],
+            username: user[:username]
+          }
+
+          case UserBusiness.fetch(user.id, user_params) do
+            {:ok, _} ->
+              nil
+
+            e ->
+              Logger.error(
+                "An error occurred while synchronizing the administrator `#{user.id}`. Details: #{
+                  inspect(e)
+                }"
+              )
+          end
         end)
 
         # 更新管理员列表
@@ -144,7 +177,13 @@ defmodule PolicrMini.Bot.SyncCommander do
             }
           end)
 
-        chat |> ChatBusiness.reset_administrators(permissions)
+        try do
+          chat |> ChatBusiness.reset_administrators!(permissions)
+
+          {:ok, chat}
+        rescue
+          e -> {:error, e}
+        end
 
       e ->
         e

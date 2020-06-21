@@ -25,7 +25,7 @@ defmodule PolicrMini.ChatBusiness do
     chat |> update(%{is_take_over: false})
   end
 
-  def reset_administrators(%Chat{} = chat, permissions) when is_list(permissions) do
+  def reset_administrators!(%Chat{} = chat, permissions) when is_list(permissions) do
     permission_params_list =
       permissions |> Enum.map(fn p -> p |> struct(chat_id: chat.id) |> Map.from_struct() end)
 
