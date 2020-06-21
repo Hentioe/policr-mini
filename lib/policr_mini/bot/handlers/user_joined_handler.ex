@@ -57,10 +57,6 @@ defmodule PolicrMini.Bot.UserJoinedHandler do
 
   @doc """
   新成员处理函数。
-  主要进行以下大致流程，按先后顺序：
-  1. 删除服务消息
-  1. 限制新成员权限
-  1. 读取验证方案，根据方案选择验证发送方式
   """
   @impl true
   def handle(message, state) do
@@ -161,11 +157,9 @@ defmodule PolicrMini.Bot.UserJoinedHandler do
          {text, markup} <- make_verification_message(verification, seconds),
          {:ok, reminder_message} <- send_message(chat_id, text, reply_markup: markup),
          {:ok, _} <-
-           VerificationBusiness.update(verification, %{message_id: reminder_message.message_id}) do
+           VerificationBusiness.update(verification, %{message_id: reminder_message.message_id}),
+         {:ok, scheme} <- SchemeBusiness.fetch(chat_id) do
       # 启动定时任务，读取验证记录并根据结果实施操作
-      # TODO: 当前的实现没有检查在验证期间同一个用户重复加入的情况
-      {:ok, scheme} = SchemeBusiness.fetch(chat_id)
-
       start_scheduled_task(
         verification,
         scheme,
@@ -176,7 +170,7 @@ defmodule PolicrMini.Bot.UserJoinedHandler do
       {:ok, %{state | done: true, deleted: true}}
     else
       e ->
-        Logger.error("Error creating verification entrance, details: #{inspect(e)}")
+        Logger.error("Error creating verification entrance. Details: #{inspect(e)}")
 
         text = t("errors.verification_created_failed", %{mentioned_user: at(new_chat_member)})
         send_message(chat_id, text)
@@ -257,18 +251,24 @@ defmodule PolicrMini.Bot.UserJoinedHandler do
 
     task = fn ->
       # 读取验证记录，为等待状态则实施操作
-      {:ok, latest_verification} = VerificationBusiness.get(verification.id)
+      case VerificationBusiness.get(verification.id) do
+        {:ok, latest_verification} ->
+          if latest_verification.status == :waiting do
+            # 更新状态为超时
+            latest_verification |> VerificationBusiness.update(%{status: :timeout})
+            # TODO: 此处需要根据 scheme
+            # 实施操作（踢出）
+            kick(chat_id, target_user, :timeout)
+            # 解除限制以允许再次加入
+            async(fn -> Nadia.unban_chat_member(chat_id, target_user_id) end,
+              seconds: allow_join_again_seconds()
+            )
+          end
 
-      if latest_verification.status == :waiting do
-        # 更新状态为超时
-        latest_verification |> VerificationBusiness.update(%{status: :timeout})
-        # TODO: 此处需要根据 scheme
-        # 实施操作（踢出）
-        kick(chat_id, target_user, :timeout)
-        # 解除限制以允许再次加入
-        async(fn -> Nadia.unban_chat_member(chat_id, target_user_id) end,
-          seconds: allow_join_again_seconds()
-        )
+        e ->
+          Logger.error(
+            "No verification of `#{e}` was found from the scheduled task, Details: #{inspect(e)}"
+          )
       end
 
       # TODO: 此处需要根据 scheme
@@ -328,7 +328,7 @@ defmodule PolicrMini.Bot.UserJoinedHandler do
         :ok
 
       e ->
-        Logger.error("Failed to send notification to kill a user, details: #{inspect(e)}")
+        Logger.error("Failed to send notification to kill a user. Details: #{inspect(e)}")
         e
     end
   end

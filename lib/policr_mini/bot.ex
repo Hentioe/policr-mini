@@ -36,6 +36,7 @@ defmodule PolicrMini.Bot do
 
         _e ->
           # TODO: 因为网络 timeout 问题太频繁，忽略记录日志。有待解决。
+          # E.g: {:error, %Nadia.Model.Error{reason: :timeout}}
           # Logger.error("An error occurred while pulling updates, details: #{inspect(e)}")
           last_offset
       end
@@ -48,6 +49,7 @@ defmodule PolicrMini.Bot do
   @doc """
   忽略拉取消息时产生的 SSL 错误
   TODO: 因为 SSL 问题太频繁，忽略记录日志。有待解决。
+  E.g: {:ssl_closed, {:sslsocket, {:gen_tcp, #Port<0.464>, :tls_connection, :undefined}, [#PID<0.9807.0>, #PID<0.9806.0>]}}
   """
   @impl true
   def handle_info({:ssl_closed, _} = _details, state) do
