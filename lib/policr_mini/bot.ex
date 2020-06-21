@@ -34,8 +34,9 @@ defmodule PolicrMini.Bot do
             do: List.last(updates).update_id + 1,
             else: last_offset
 
-        e ->
-          Logger.error("An error occurred while pulling updates, details: #{inspect(e)}")
+        _e ->
+          # TODO: 因为网络 timeout 问题太频繁，忽略记录日志。有待解决。
+          # Logger.error("An error occurred while pulling updates, details: #{inspect(e)}")
           last_offset
       end
 
@@ -46,10 +47,11 @@ defmodule PolicrMini.Bot do
 
   @doc """
   忽略拉取消息时产生的 SSL 错误
+  TODO: 因为 SSL 问题太频繁，忽略记录日志。有待解决。
   """
   @impl true
-  def handle_info({:ssl_closed, _} = details, state) do
-    Logger.error("An SSL error occurred while pulling updates, details: #{inspect(details)}")
+  def handle_info({:ssl_closed, _} = _details, state) do
+    # Logger.error("An SSL error occurred while pulling updates, details: #{inspect(details)}")
 
     {:noreply, state}
   end
