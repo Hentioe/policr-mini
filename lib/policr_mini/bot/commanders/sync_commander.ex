@@ -18,7 +18,7 @@ defmodule PolicrMini.Bot.SyncCommander do
         %{message_id: message_id, chat: %{id: chat_id}} = message,
         %{from_admin: false} = state
       ) do
-    async(fn -> Nadia.delete_message(chat_id, message_id) end)
+    Cleaner.delete_message(chat_id, message_id)
 
     {message, state}
   end

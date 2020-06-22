@@ -1,7 +1,7 @@
 defmodule PolicrMini.Bot.Callbacker do
   defmacro __using__(prefix) when is_atom(prefix) do
     quote do
-      alias PolicrMini.Bot.Callbacker
+      alias PolicrMini.Bot.{Callbacker, Cleaner}
       alias Nadia.Model.{InlineKeyboardMarkup, InlineKeyboardButton}
 
       import Callbacker

@@ -80,7 +80,7 @@ defmodule PolicrMini.Bot.UserJoinedHandler do
           handle_expired(entrance, message, state)
         else
           # 异步删除服务消息
-          async(fn -> Nadia.delete_message(chat_id, message.message_id) end)
+          Cleaner.delete_message(chat_id, message.message_id)
           # 异步限制新用户
           async(fn -> restrict_chat_member(chat_id, new_chat_member.id) end)
 
@@ -119,7 +119,7 @@ defmodule PolicrMini.Bot.UserJoinedHandler do
     case VerificationBusiness.fetch(verification_params) do
       {:ok, _} ->
         # 异步删除服务消息
-        async(fn -> delete_message(chat_id, message.message_id) end)
+        Cleaner.delete_message(chat_id, message.message_id)
         # 异步限制新用户
         async(fn -> restrict_chat_member(chat_id, new_chat_member.id) end)
 
@@ -142,7 +142,7 @@ defmodule PolicrMini.Bot.UserJoinedHandler do
     last_verification = VerificationBusiness.find_last_unity_waiting(chat_id)
 
     if last_verification,
-      do: async(fn -> Nadia.delete_message(chat_id, last_verification.message_id) end)
+      do: Cleaner.delete_message(chat_id, last_verification.message_id)
 
     verification_params = %{
       chat_id: chat_id,
@@ -280,7 +280,7 @@ defmodule PolicrMini.Bot.UserJoinedHandler do
         # 获取最新的验证入口消息编号
         message_id = VerificationBusiness.find_last_unity_message_id(verification.chat_id)
         # 已经没有剩余验证，直接删除上一个提醒消息
-        delete_message(chat_id, message_id)
+        Cleaner.delete_message(chat_id, message_id)
       else
         # 如果还存在多条验证，更新入口消息
         max_seconds = scheme.seconds || countdown()
@@ -323,7 +323,7 @@ defmodule PolicrMini.Bot.UserJoinedHandler do
 
     case send_message(chat_id, text) do
       {:ok, sended_message} ->
-        delete_message(chat_id, sended_message.message_id, delay_seconds: 8)
+        Cleaner.delete_message(chat_id, sended_message.message_id, delay_seconds: 8)
 
         :ok
 

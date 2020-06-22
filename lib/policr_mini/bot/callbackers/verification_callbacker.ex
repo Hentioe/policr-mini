@@ -57,7 +57,7 @@ defmodule PolicrMini.Bot.VerificationCallbacker do
         # 获取最新的验证入口消息编号
         message_id = VerificationBusiness.find_last_unity_message_id(verification.chat_id)
         # 如果没有等待验证了，立即删除入口消息
-        delete_message(verification.chat_id, message_id)
+        Cleaner.delete_message(verification.chat_id, message_id)
       else
         # 如果还存在多条验证，更新入口消息
         max_seconds = scheme.seconds || UserJoinedHandler.countdown()
@@ -116,7 +116,9 @@ defmodule PolicrMini.Bot.VerificationCallbacker do
         async(fn ->
           case send_message(verification.chat_id, text) do
             {:ok, sended_message} ->
-              delete_message(verification.chat_id, sended_message.message_id, delay_seconds: 8)
+              Cleaner.delete_message(verification.chat_id, sended_message.message_id,
+                delay_seconds: 8
+              )
 
             e ->
               Logger.error(

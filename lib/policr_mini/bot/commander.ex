@@ -1,7 +1,7 @@
 defmodule PolicrMini.Bot.Commander do
   defmacro __using__(command) when is_atom(command) do
     quote do
-      alias PolicrMini.Bot.Commander
+      alias PolicrMini.Bot.{Commander, Cleaner}
       alias Nadia.Model.{InlineKeyboardMarkup, InlineKeyboardButton}
 
       import Commander

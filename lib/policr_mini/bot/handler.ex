@@ -3,7 +3,7 @@ defmodule PolicrMini.Bot.Handler do
 
   defmacro __using__(_) do
     quote do
-      alias PolicrMini.Bot.{Handler, State}
+      alias PolicrMini.Bot.{Handler, State, Cleaner}
       alias Nadia.Model.{InlineKeyboardMarkup, InlineKeyboardButton}
 
       import Handler

@@ -61,13 +61,26 @@ defmodule PolicrMini.Bot.Helper do
     |> String.replace("=", "\\=")
   end
 
+  @time_seeds [0.2, 0.4, 0.8, 1.0]
   @markdown_parse_mode "MarkdownV2"
+
+  @type sendmsgopts :: [
+          {:disable_notification, boolean()},
+          {:parse_mode, String.t()},
+          {:disable_web_page_preview, boolean()},
+          {:reply_markup, Nadia.Model.InlineKeyboardMarkup.t()},
+          {:retry, integer()}
+        ]
+  @spec send_message(integer(), String.t(), sendmsgopts()) ::
+          {:error, Nadia.Model.Error.t()} | {:ok, Nadia.Model.Message.t()}
   @doc """
   发送文本消息。
   如果 `options` 参数中不包含以下配置，将为它们准备默认值：
   - `disable_notification`: `true`
   - `parse_mode`: `"MarkdownV2"`
   - `disable_web_page_preview`: `false`
+  - `retry`: 3
+  附加的 `retry` 参数表示自动重试次数。一般来讲，重试会发生在网络问题导致发送不成功的情况下，重试次数使用完毕仍然失败则不会继续发送。
   """
   def send_message(chat_id, text, options \\ []) do
     options =
@@ -75,6 +88,7 @@ defmodule PolicrMini.Bot.Helper do
       |> Keyword.put_new(:disable_notification, true)
       |> Keyword.put_new(:parse_mode, @markdown_parse_mode)
       |> Keyword.put_new(:disable_web_page_preview, true)
+      |> Keyword.put_new(:retry, 5)
 
     text =
       if(options |> Keyword.get(:parse_mode) == @markdown_parse_mode) do
@@ -83,7 +97,37 @@ defmodule PolicrMini.Bot.Helper do
         text
       end
 
-    Nadia.send_message(chat_id, text, options)
+    case Nadia.send_message(chat_id, text, options) do
+      {:ok, message} ->
+        {:ok, message}
+
+      {:error, %Nadia.Model.Error{reason: :timeout}} = e ->
+        # 处理重试（减少次数并递归）
+        retry = options |> Keyword.get(:retry)
+
+        if retry && retry > 0 do
+          Logger.debug("Send message timeout, ready to try again. Remaining times: #{retry}")
+          options = options |> Keyword.put(:retry, retry - 1)
+          send_message(chat_id, text, options)
+        else
+          e
+        end
+
+      {:error, %Nadia.Model.Error{reason: <<"Too Many Requests: retry after">> <> _rest}} = e ->
+        retry = options |> Keyword.get(:retry)
+
+        if retry && retry > 0 do
+          Logger.debug("Too many requests, restricted to send. Remaining times: #{retry}")
+          options = options |> Keyword.put(:retry, retry - 1)
+          :timer.sleep(trunc(800 * retry * Enum.random(@time_seeds)))
+          send_message(chat_id, text, options)
+        else
+          e
+        end
+
+      e ->
+        e
+    end
   end
 
   @spec edit_message(integer(), integer(), String.t(), [{atom, any}]) ::

@@ -35,6 +35,8 @@ defmodule PolicrMini.Application do
     ]
 
     bot_children = [
+      # 消息清理服务
+      PolicrMini.Bot.Cleaner,
       # 启动机器人（拉取消息）
       PolicrMini.Bot,
       # 消费消息的动态主管
