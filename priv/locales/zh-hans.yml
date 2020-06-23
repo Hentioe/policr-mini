@@ -36,9 +36,9 @@ verification:
   template: |
     请确认问题并选择您认为正确的答案。
 
-    %{question}
+    *%{question}*
 
-    您还剩 %{seconds} 秒，通过可解除封印。
+    您还剩 *%{seconds}* 秒，通过可解除封印。
   passed:
     private: 恭喜您，验证通过。如果限制仍未解除请联系管理员。
     notice: 刚刚%{mentioned_user}通过了验证，用时 %{seconds} 秒。

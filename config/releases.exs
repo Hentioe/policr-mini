@@ -20,7 +20,7 @@ config :policr_mini, PolicrMini.Repo,
 secret_key_base =
   System.get_env("POLICR_MINI_SERVER_SECRET_KEY_BASE") ||
     raise """
-    environment variable SECRET_KEY_BASE is missing.
+    environment variable POLICR_MINI_SERVER_SECRET_KEY_BASE is missing.
     You can generate one by calling: mix phx.gen.secret
     """
 
@@ -31,6 +31,14 @@ config :policr_mini, PolicrMiniWeb.Endpoint,
   ],
   secret_key_base: secret_key_base,
   server: true
+
+# Configures the image provider
+config :policr_mini, PolicrMini.Bot.ImageProvider,
+  path:
+    System.get_env("POLICR_MINI_BOT_IMAGES_PATH") ||
+      raise("""
+      environment variable POLICR_MINI_BOT_IMAGES_PATH is missing.
+      """)
 
 config :nadia,
   token:

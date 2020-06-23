@@ -18,6 +18,9 @@ config :policr_mini, PolicrMiniWeb.Endpoint,
   pubsub_server: PolicrMini.PubSub,
   live_view: [signing_salt: "hy+GpqGC"]
 
+# Configures the image provider
+config :policr_mini, PolicrMini.Bot.ImageProvider, path: "images"
+
 # Configures Elixir's Logger
 config :logger, :console,
   format: "$time $metadata[$level] $message\n",
