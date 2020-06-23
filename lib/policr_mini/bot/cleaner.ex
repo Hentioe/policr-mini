@@ -1,6 +1,6 @@
 defmodule PolicrMini.Bot.Cleaner do
   @moduledoc """
-  提供消息清理服务的模块。
+  提供消息清理服务的模块，委托验证消息发送和删除。
   TODO: 持久化缓存。
   """
 
@@ -23,7 +23,7 @@ defmodule PolicrMini.Bot.Cleaner do
   @doc """
   处理消息的删除请求。
   如果消息因为超时删除失败，将会立即重新删除（当前没有次数限制）。
-  TODO: 缓存消息删除次数，如果超过 3 次则不再重试。删除成功清理缓存。
+  TODO: 缓存消息删除次数，如果超过 5 次则不再重试。删除成功清理缓存。
   """
   def handle_cast({:delete, {chat_id, message_id, options}}, state) do
     Helper.async(fn ->
@@ -47,12 +47,14 @@ defmodule PolicrMini.Bot.Cleaner do
 
   @impl true
   def handle_cast({:update_vcache, {chat_id, message_id}}, state) do
-    {:noreply, Map.put(state, chat_id, message_id)}
+    vcache = Map.put(state.vcache, chat_id, message_id)
+    {:noreply, %{state | vcache: vcache}}
   end
 
   @impl true
   def handle_cast({:delete_vcache, chat_id}, state) do
-    {:noreply, Map.delete(state, chat_id)}
+    vcache = Map.delete(state.vcache, chat_id)
+    {:noreply, %{state | vcache: vcache}}
   end
 
   @impl true
@@ -63,7 +65,7 @@ defmodule PolicrMini.Bot.Cleaner do
 
   @impl true
   def handle_call({:get_vcache, chat_id}, _from, state) do
-    {:reply, Map.get(state, chat_id), state}
+    {:reply, Map.get(state.vcache, chat_id), state}
   end
 
   @impl true
