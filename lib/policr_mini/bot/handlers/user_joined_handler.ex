@@ -138,12 +138,6 @@ defmodule PolicrMini.Bot.UserJoinedHandler do
   def handle(:arithmetic, :unity, :private, seconds, message, state) do
     %{chat: %{id: chat_id}, new_chat_member: new_chat_member} = message
 
-    # 获取上一条等待验证记录
-    last_verification = VerificationBusiness.find_last_unity_waiting(chat_id)
-
-    if last_verification,
-      do: Cleaner.delete_message(chat_id, last_verification.message_id)
-
     verification_params = %{
       chat_id: chat_id,
       target_user_id: new_chat_member.id,
@@ -155,7 +149,8 @@ defmodule PolicrMini.Bot.UserJoinedHandler do
 
     with {:ok, verification} <- VerificationBusiness.fetch(verification_params),
          {text, markup} <- make_verification_message(verification, seconds),
-         {:ok, reminder_message} <- send_message(chat_id, text, reply_markup: markup),
+         {:ok, reminder_message} <-
+           Cleaner.send_verification_message(chat_id, text, reply_markup: markup),
          {:ok, _} <-
            VerificationBusiness.update(verification, %{message_id: reminder_message.message_id}),
          {:ok, scheme} <- SchemeBusiness.fetch(chat_id) do
@@ -277,10 +272,8 @@ defmodule PolicrMini.Bot.UserJoinedHandler do
       waiting_count = VerificationBusiness.get_unity_waiting_count(chat_id)
 
       if waiting_count == 0 do
-        # 获取最新的验证入口消息编号
-        message_id = VerificationBusiness.find_last_unity_message_id(verification.chat_id)
-        # 已经没有剩余验证，直接删除上一个提醒消息
-        Cleaner.delete_message(chat_id, message_id)
+        # 已经没有剩余验证，直接删除上一个入口消息
+        Cleaner.delete_latest_verification_message(chat_id)
       else
         # 如果还存在多条验证，更新入口消息
         max_seconds = scheme.seconds || countdown()
