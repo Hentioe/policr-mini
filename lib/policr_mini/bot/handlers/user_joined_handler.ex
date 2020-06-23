@@ -303,7 +303,7 @@ defmodule PolicrMini.Bot.UserJoinedHandler do
     time_text =
       if allow_join_again_seconds() < 60,
         do: "#{allow_join_again_seconds()} #{t("units.sec")}",
-        else: "#{to_string(allow_join_again_seconds() / 60)} #{t("units.min")}"
+        else: "#{to_string(trunc(allow_join_again_seconds() / 60))} #{t("units.min")}"
 
     text =
       case reason do

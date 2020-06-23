@@ -23,6 +23,7 @@ defmodule PolicrMini.Bot.Runner do
       end)
 
     # 修正状态
+    # TODO: 待优化：在同一个事物中更新所有验证记录
     verifications |> Enum.each(fn v -> v |> VerificationBusiness.update(%{status: :expired}) end)
 
     len = length(verifications)
