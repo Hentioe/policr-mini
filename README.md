@@ -2,7 +2,6 @@
 
 [![Build Status](https://github-ci.bluerain.io/api/badges/Hentioe/policr-mini/status.svg)](https://github-ci.bluerain.io/Hentioe/policr-mini)
 [![GitHub issues](https://img.shields.io/github/issues/Hentioe/policr-mini)](https://github.com/Hentioe/policr-mini/issues)
-[![Telegram chat link](https://img.shields.io/badge/%E5%8A%A0%E5%85%A5-%E4%B8%AD%E6%96%87%E7%A4%BE%E5%8C%BA-brightgreen.svg)](https://policr.telestd.me/community)
 
 一个只保留本质功能的 Policr 精简版。
 
@@ -14,8 +13,7 @@
 
 目前正处于开发阶段，但足够可用。将本项目的官方实例 [@policr_mini_bot](https://t.me/policr_mini_bot) 拉入群组可立即使用。
 
-当前使用本机器人会被视作参与内测，这期间不会提供任何途径修改机器人的任何设置。事实上正因为是测试，所有的设置都是动态的变化的（因为要充分测试）。
-
+当前使用本机器人会被视作参与内测，这期间不会提供任何途径修改机器人的任何设置。事实上正因为是测试，所有的设置都是动态的变化的（因为要充分测试）。  
 如果你想要一个足够稳定的版本，请关注本项目的公测计划或第一个版本的正式发布。
 
 ## 加入我们
