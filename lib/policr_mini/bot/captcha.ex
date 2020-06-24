@@ -6,11 +6,12 @@ defmodule PolicrMini.Bot.Captcha do
   alias Nadia.Model.{InlineKeyboardButton, InlineKeyboardMarkup}
 
   defmodule Data do
-    defstruct [:question, :candidates, :markup, :correct_indices]
+    defstruct [:question, :photo, :candidates, :markup, :correct_indices]
 
     @type candidate :: String.t() | number()
     @type t :: %__MODULE__{
             question: String.t(),
+            photo: String.t() | nil,
             candidates: [[candidate(), ...], ...],
             markup: InlineKeyboardMarkup.t() | nil,
             correct_indices: [integer(), ...]
@@ -48,13 +49,17 @@ defmodule PolicrMini.Bot.Captcha do
 
     # 生成一行按钮
     make_line = fn {candidates, line} ->
-      # 获取上一行的总数
-      count = if line == 0, do: 0, else: counts |> Enum.at(line - 1)
+      # 获取之前所有行的总数
+      count =
+        if line == 0,
+          do: 0,
+          else:
+            Enum.reduce(0..(line - 1), 0, fn index, total -> total + Enum.at(counts, index) end)
 
       candidates
       |> Enum.with_index(1)
       |> Enum.map(fn {text, i} ->
-        # 当前行的索引 + 上一行的总数 = 总索引位置
+        # 当前行的索引 + 之前行的总数 = 总索引位置
         index = count + i
 
         %InlineKeyboardButton{

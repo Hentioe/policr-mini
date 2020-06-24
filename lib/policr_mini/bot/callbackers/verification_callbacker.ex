@@ -104,7 +104,8 @@ defmodule PolicrMini.Bot.VerificationCallbacker do
         async(fn -> derestrict_chat_member(verification.chat_id, verification.target_user_id) end)
         # 更新验证结果
         async(fn ->
-          edit_message(verification.target_user_id, message_id, t("verification.passed.private"))
+          Cleaner.delete_message(verification.target_user_id, message_id)
+          send_message(verification.target_user_id, t("verification.passed.private"))
         end)
 
         # 发送通知消息并延迟删除
@@ -153,7 +154,11 @@ defmodule PolicrMini.Bot.VerificationCallbacker do
           :kick ->
             text = t("verification.wronged.kick.private")
 
-            async(fn -> edit_message(verification.target_user_id, message_id, text) end)
+            async(fn ->
+              Cleaner.delete_message(verification.target_user_id, message_id)
+              send_message(verification.target_user_id, text)
+            end)
+
             UserJoinedHandler.kick(verification.chat_id, from_user, :wronged)
 
             {:ok, verification}

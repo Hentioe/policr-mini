@@ -38,7 +38,7 @@ verification:
 
     *%{question}*
 
-    您还剩 *%{seconds}* 秒，通过可解除封印。
+    您还剩 %{seconds} 秒，通过可解除封印。
   passed:
     private: 恭喜您，验证通过。如果限制仍未解除请联系管理员。
     notice: 刚刚%{mentioned_user}通过了验证，用时 %{seconds} 秒。
@@ -74,7 +74,6 @@ errors:
   verification_target_incorrect: 此条验证并不针对你～
   verification_expired: 这条验证可能已经失效了～
   verification_no_wating: 您没有该目标群组的待验证记录。
-
 
 units:
   sec: 秒

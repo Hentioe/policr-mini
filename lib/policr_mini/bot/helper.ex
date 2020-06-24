@@ -64,9 +64,11 @@ defmodule PolicrMini.Bot.Helper do
   @time_seeds [0.2, 0.4, 0.8, 1.0]
   @markdown_parse_mode "MarkdownV2"
 
+  @type parsemode :: String.t()
+
   @type sendmsgopts :: [
           {:disable_notification, boolean()},
-          {:parse_mode, String.t()},
+          {:parse_mode, parsemode()},
           {:disable_web_page_preview, boolean()},
           {:reply_markup, Nadia.Model.InlineKeyboardMarkup.t()},
           {:retry, integer()}
@@ -79,7 +81,7 @@ defmodule PolicrMini.Bot.Helper do
   - `disable_notification`: `true`
   - `parse_mode`: `"MarkdownV2"`
   - `disable_web_page_preview`: `false`
-  - `retry`: 3
+  - `retry`: 5
   附加的 `retry` 参数表示自动重试次数。一般来讲，重试会发生在网络问题导致发送不成功的情况下，重试次数使用完毕仍然失败则不会继续发送。
   """
   def send_message(chat_id, text, options \\ []) do
@@ -106,7 +108,7 @@ defmodule PolicrMini.Bot.Helper do
         retry = options |> Keyword.get(:retry)
 
         if retry && retry > 0 do
-          Logger.debug("Send message timeout, ready to try again. Remaining times: #{retry}")
+          Logger.warn("Send message timeout, ready to try again. Remaining times: #{retry}")
           options = options |> Keyword.put(:retry, retry - 1)
           send_message(chat_id, text, options)
         else
@@ -117,10 +119,81 @@ defmodule PolicrMini.Bot.Helper do
         retry = options |> Keyword.get(:retry)
 
         if retry && retry > 0 do
-          Logger.debug("Too many requests, restricted to send. Remaining times: #{retry}")
+          Logger.warn("Too many requests, restricted to send. Remaining times: #{retry}")
           options = options |> Keyword.put(:retry, retry - 1)
           :timer.sleep(trunc(800 * retry * Enum.random(@time_seeds)))
           send_message(chat_id, text, options)
+        else
+          e
+        end
+
+      e ->
+        e
+    end
+  end
+
+  @type sendphotoopts :: [
+          {:disable_notification, boolean()},
+          {:parse_mode, parsemode()},
+          {:reply_markup, Nadia.Model.InlineKeyboardMarkup.t()},
+          {:retry, integer()}
+        ]
+
+  @spec send_photo(integer(), String.t(), sendphotoopts()) ::
+          {:error, Nadia.Model.Error.t()} | {:ok, Nadia.Model.Message.t()}
+  @doc """
+  发送图片。
+  如果 `options` 参数中不包含以下配置，将为它们准备默认值：
+  - `disable_notification`: `true`
+  - `parse_mode`: `"MarkdownV2"`
+  - `retry`: 5
+  附加的 `retry` 参数表示自动重试次数。一般来讲，重试会发生在网络问题导致发送不成功的情况下，重试次数使用完毕仍然失败则不会继续发送。
+  """
+  def send_photo(chat_id, photo, options \\ []) do
+    options =
+      options
+      |> Keyword.put_new(:disable_notification, true)
+      |> Keyword.put_new(:parse_mode, @markdown_parse_mode)
+      |> Keyword.put_new(:retry, 5)
+
+    options =
+      if caption = options[:caption] do
+        caption =
+          if(options |> Keyword.get(:parse_mode) == @markdown_parse_mode) do
+            escape_markdown(caption)
+          else
+            caption
+          end
+
+        options |> Keyword.put(:caption, caption)
+      else
+        options
+      end
+
+    case Nadia.send_photo(chat_id, photo, options) do
+      {:ok, message} ->
+        {:ok, message}
+
+      {:error, %Nadia.Model.Error{reason: :timeout}} = e ->
+        # 处理重试（减少次数并递归）
+        retry = options |> Keyword.get(:retry)
+
+        if retry && retry > 0 do
+          Logger.warn("Send message timeout, ready to try again. Remaining times: #{retry}")
+          options = options |> Keyword.put(:retry, retry - 1)
+          send_photo(chat_id, photo, options)
+        else
+          e
+        end
+
+      {:error, %Nadia.Model.Error{reason: <<"Too Many Requests: retry after">> <> _rest}} = e ->
+        retry = options |> Keyword.get(:retry)
+
+        if retry && retry > 0 do
+          Logger.warn("Too many requests, restricted to send. Remaining times: #{retry}")
+          options = options |> Keyword.put(:retry, retry - 1)
+          :timer.sleep(trunc(800 * retry * Enum.random(@time_seeds)))
+          send_photo(chat_id, photo, options)
         else
           e
         end
@@ -252,7 +325,7 @@ defmodule PolicrMini.Bot.Helper do
   end
 
   @defaults [
-    vmode: :arithmetic,
+    vmode: :image,
     ventrance: :unity,
     voccasion: :private,
     kmethod: :kick

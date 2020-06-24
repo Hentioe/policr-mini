@@ -10,11 +10,12 @@ defmodule PolicrMini.Bot.StartCommander do
 
   alias PolicrMini.{VerificationBusiness, SchemeBusiness, MessageSnapshotBusiness}
   alias PolicrMini.Schema.Verification
-  alias PolicrMini.Bot.{ArithmeticCaptcha, FallbackCaptcha}
+  alias PolicrMini.Bot.{ArithmeticCaptcha, FallbackCaptcha, ImageCaptcha}
 
   @fallback_captcha_module FallbackCaptcha
 
   @captchas_maping [
+    image: ImageCaptcha,
     arithmetic: ArithmeticCaptcha,
     # 当前的备用验证就是主动验证
     initiative: FallbackCaptcha
@@ -86,7 +87,9 @@ defmodule PolicrMini.Bot.StartCommander do
                from_user_name: fullname(message.from),
                date: verification_message.date,
                text: verification_message.text,
-               markup_body: Jason.encode!(markup, pretty: false)
+               markup_body: Jason.encode!(markup, pretty: false),
+               caption: verification_message.caption,
+               photo_id: get_photo_id(verification_message)
              }),
            # 更新验证记录：关联消息快照、存储正确答案
            {:ok, _} <-
@@ -134,7 +137,6 @@ defmodule PolicrMini.Bot.StartCommander do
 
     captcha_module = @captchas_maping[mode] || @fallback_captcha_module
 
-    # 发送验证消息
     captcha_data =
       try do
         captcha_module.make!()
@@ -149,15 +151,31 @@ defmodule PolicrMini.Bot.StartCommander do
           @fallback_captcha_module.make!()
       end
 
+    markup = PolicrMini.Bot.Captcha.build_markup(captcha_data.candidates, verification.id)
+
     text =
       t("verification.template", %{
         question: captcha_data.question,
         seconds: time_left(verification)
       })
 
-    markup = PolicrMini.Bot.Captcha.build_markup(captcha_data.candidates, verification.id)
+    send_fun =
+      case captcha_module do
+        ImageCaptcha ->
+          fn -> send_photo(user_id, captcha_data.photo, caption: text, reply_markup: markup) end
 
-    case send_message(user_id, text, reply_markup: markup) do
+        ArithmeticCaptcha ->
+          fn -> send_message(user_id, text, reply_markup: markup) end
+
+        FallbackCaptcha ->
+          fn -> send_message(user_id, text, reply_markup: markup) end
+
+        _ ->
+          fn -> send_message(user_id, text, reply_markup: markup) end
+      end
+
+    # 发送验证消息
+    case send_fun.() do
       {:ok, sended_message} ->
         {:ok, {sended_message, markup, captcha_data}}
 
@@ -173,4 +191,10 @@ defmodule PolicrMini.Bot.StartCommander do
   def time_left(%Verification{seconds: seconds, inserted_at: inserted_at}) do
     seconds - DateTime.diff(DateTime.utc_now(), inserted_at)
   end
+
+  def get_photo_id(%Nadia.Model.Message{photo: [%Nadia.Model.PhotoSize{file_id: file_id} | _]}),
+    do: file_id
+
+  def get_photo_id(%Nadia.Model.Message{photo: []}), do: nil
+  def get_photo_id(%Nadia.Model.Message{photo: nil}), do: nil
 end

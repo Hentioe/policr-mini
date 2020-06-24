@@ -133,9 +133,9 @@ defmodule PolicrMini.Bot.UserJoinedHandler do
   end
 
   @doc """
-  算术验证 + 统一入口 + 私聊方案的细节实现。
+  统一入口 + 私聊方案的细节实现。
   """
-  def handle(:arithmetic, :unity, :private, seconds, message, state) do
+  def handle(_, :unity, :private, seconds, message, state) do
     %{chat: %{id: chat_id}, new_chat_member: new_chat_member} = message
 
     verification_params = %{
