@@ -6,12 +6,13 @@ defmodule PolicrMini.Bot.ImageProvider do
   use Agent
 
   defmodule SeriesImage do
-    defstruct [:name_zh_hans, :files]
+    use TypedStruct
 
-    @type t :: %__MODULE__{
-            name_zh_hans: String.t(),
-            files: [String.t()]
-          }
+    @typedoc "一个图片系列"
+    typedstruct do
+      field :name_zh_hans, String.t()
+      field :files, [String.t()]
+    end
   end
 
   @metadata_fname "metadata.json"

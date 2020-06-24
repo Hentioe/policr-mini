@@ -1,11 +1,15 @@
 defmodule PolicrMini.Bot.State do
-  defstruct [:takeovered, :from_self, :from_admin, :deleted, :done]
+  @moduledoc """
+  在过滤器中传递的状态。
+  """
 
-  @type t :: %__MODULE__{
-          takeovered: boolean(),
-          from_self: boolean(),
-          from_admin: boolean(),
-          deleted: boolean(),
-          done: boolean()
-        }
+  use TypedStruct
+
+  typedstruct do
+    field :takeovered, boolean()
+    field :from_self, boolean()
+    field :from_admin, boolean()
+    field :deleted, boolean()
+    field :done, boolean()
+  end
 end

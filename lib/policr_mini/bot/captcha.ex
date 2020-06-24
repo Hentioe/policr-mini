@@ -6,16 +6,18 @@ defmodule PolicrMini.Bot.Captcha do
   alias Nadia.Model.{InlineKeyboardButton, InlineKeyboardMarkup}
 
   defmodule Data do
-    defstruct [:question, :photo, :candidates, :markup, :correct_indices]
-
+    @typedoc "单个候选内容"
     @type candidate :: String.t() | number()
-    @type t :: %__MODULE__{
-            question: String.t(),
-            photo: String.t() | nil,
-            candidates: [[candidate(), ...], ...],
-            markup: InlineKeyboardMarkup.t() | nil,
-            correct_indices: [integer(), ...]
-          }
+
+    use TypedStruct
+
+    typedstruct do
+      field :question, String.t()
+      field :photo, String.t() | nil
+      field :candidates, [[candidate(), ...], ...]
+      field :markup, InlineKeyboardMarkup.t() | nil
+      field :correct_indices, [integer(), ...]
+    end
   end
 
   @data_vsn "v1"
