@@ -135,11 +135,14 @@ defmodule PolicrMini.Bot.StartCommander do
   def send_verification_message(verification, scheme, chat_id, user_id) do
     mode = scheme.verification_mode || default!(:vmode)
 
-    captcha_module = @captchas_maping[mode] || @fallback_captcha_module
+    cmodule = @captchas_maping[mode] || @fallback_captcha_module
 
-    captcha_data =
+    # 获取验证数据。
+    # 如果构造验证数据的过程中出现异常，会使用备用验证模块。
+    # 所以最终采用的验证模块也需要重新返回。
+    {cmodule, cdata} =
       try do
-        captcha_module.make!()
+        {cmodule, cmodule.make!()}
       rescue
         e ->
           Logger.error(
@@ -148,21 +151,21 @@ defmodule PolicrMini.Bot.StartCommander do
             }"
           )
 
-          @fallback_captcha_module.make!()
+          {@fallback_captcha_module, @fallback_captcha_module.make!()}
       end
 
-    markup = PolicrMini.Bot.Captcha.build_markup(captcha_data.candidates, verification.id)
+    markup = PolicrMini.Bot.Captcha.build_markup(cdata.candidates, verification.id)
 
     text =
       t("verification.template", %{
-        question: captcha_data.question,
+        question: cdata.question,
         seconds: time_left(verification)
       })
 
     send_fun =
-      case captcha_module do
+      case cmodule do
         ImageCaptcha ->
-          fn -> send_photo(user_id, captcha_data.photo, caption: text, reply_markup: markup) end
+          fn -> send_photo(user_id, cdata.photo, caption: text, reply_markup: markup) end
 
         ArithmeticCaptcha ->
           fn -> send_message(user_id, text, reply_markup: markup) end
@@ -177,7 +180,7 @@ defmodule PolicrMini.Bot.StartCommander do
     # 发送验证消息
     case send_fun.() do
       {:ok, sended_message} ->
-        {:ok, {sended_message, markup, captcha_data}}
+        {:ok, {sended_message, markup, cdata}}
 
       e ->
         e

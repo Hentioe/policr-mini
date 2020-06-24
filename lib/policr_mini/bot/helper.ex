@@ -1,6 +1,6 @@
 defmodule PolicrMini.Bot.Helper do
   @moduledoc """
-  机器人功能助手模块，提供和机器人功能实现相关的各种辅助函数。
+  机器人功能助手模块，提供和机器人实现相关的各种辅助函数。
   所有 `use` 以下模块的模块会默认导入本模块：
   - `PolicrMini.Bot.Commander`
   - `PolicrMini.Bot.Handler`
@@ -139,8 +139,9 @@ defmodule PolicrMini.Bot.Helper do
           {:retry, integer()}
         ]
 
-  @spec send_photo(integer(), String.t(), sendphotoopts()) ::
-          {:error, Nadia.Model.Error.t()} | {:ok, Nadia.Model.Message.t()}
+  # TODO: 此处的 typespecs 会导致 ElixirLS 警告，有待进一步调查原因。
+  # @spec send_photo(integer(), String.t(), sendphotoopts()) ::
+  #         {:ok, Nadia.Model.Message.t()} | tgerror()
   @doc """
   发送图片。
   如果 `options` 参数中不包含以下配置，将为它们准备默认值：

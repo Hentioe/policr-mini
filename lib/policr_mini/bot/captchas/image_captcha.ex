@@ -7,16 +7,27 @@ defmodule PolicrMini.Bot.ImageCaptcha do
 
   use PolicrMini.Bot.Captcha
 
+  defmodule Error do
+    defexception [:message]
+  end
+
   @count 3
 
   @impl true
   def make! do
+    # 获得随机数量的系列图片
     series_images = PolicrMini.Bot.ImageProvider.random(@count)
 
-    correct_index = Enum.random(1..3)
+    # 检查图片的系列数量是否充足
+    if length(series_images) < @count, do: raise(Error, "There are not enough series of images")
 
+    # 生成正确索引
+    correct_index = Enum.random(1..@count)
+
+    # 生成候选数据
     candidates = series_images |> Enum.map(fn si -> [si.name_zh_hans] end)
 
+    # 获取正确索引位置的图片
     correct_series_image = series_images |> Enum.at(correct_index - 1)
     photo = correct_series_image.files |> Enum.random()
 
