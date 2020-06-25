@@ -1,6 +1,7 @@
 defmodule PolicrMini.Bot.Runner do
   @moduledoc """
   各个定时任务的具体实现模块。
+  TODO: 
   """
 
   require Logger
@@ -98,20 +99,5 @@ defmodule PolicrMini.Bot.Runner do
     )
 
     :ok
-  end
-
-  @doc """
-  忽略调用 API 时产生的 SSL 错误
-  TODO: 因为 SSL 问题太频繁，忽略记录日志。有待解决。
-  E.g: {:ssl_closed, {:sslsocket, {:gen_tcp, #Port<0.464>, :tls_connection, :undefined}, [#PID<0.9807.0>, #PID<0.9806.0>]}}
-  """
-  def handle_info({:ssl_closed, _} = details, state) do
-    Logger.error(
-      "An SSL error occurred during the execution of a scheduled task. Details: #{
-        inspect(details)
-      }"
-    )
-
-    {:noreply, state}
   end
 end
