@@ -133,15 +133,15 @@ defmodule PolicrMini.Bot.Helper do
   end
 
   @type sendphotoopts :: [
+          {:caption, String.t()},
           {:disable_notification, boolean()},
           {:parse_mode, parsemode() | nil},
           {:reply_markup, Nadia.Model.InlineKeyboardMarkup.t()},
           {:retry, integer()}
         ]
 
-  # TODO: 此处的 typespecs 会导致 ElixirLS 警告，有待进一步调查原因。
-  # @spec send_photo(integer(), String.t(), sendphotoopts()) ::
-  #         {:ok, Nadia.Model.Message.t()} | tgerror()
+  @spec send_photo(integer(), String.t(), sendphotoopts()) ::
+          {:ok, Nadia.Model.Message.t()} | tgerror()
   @doc """
   发送图片。
   如果 `options` 参数中不包含以下配置，将为它们准备默认值：
