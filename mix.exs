@@ -50,8 +50,8 @@ defmodule PolicrMini.MixProject do
       {:nadia, github: "Hentioe/nadia"},
       {:exi18n, github: "Hentioe/exi18n"},
       {:yaml_elixir, "~> 2.4"},
-      {:sched_ex, "~> 1.1"},
-      {:typed_struct, "~> 0.2.0"}
+      {:typed_struct, "~> 0.2.0"},
+      {:quantum, "~> 3.0"}
     ]
   end
 

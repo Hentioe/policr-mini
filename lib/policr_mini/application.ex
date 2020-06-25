@@ -45,22 +45,8 @@ defmodule PolicrMini.Application do
       PolicrMini.Bot.Consumer,
       # 过滤器管理器
       {PolicrMini.Bot.FilterManager, filters},
-      # 定时任务：修正过期的等待验证状态
-      %{
-        id: "fix_expired_wait_status",
-        start:
-          {SchedEx, :run_every,
-           [PolicrMini.Bot.Runner, :fix_expired_wait_status, [], "*/5 * * * *"]}
-      },
-      # 定时任务：检查已接管群组中的工作状态
-      %{
-        id: "check_working_status",
-        start: {
-          SchedEx,
-          :run_every,
-          [PolicrMini.Bot.Runner, :check_working_status, [], "*/55 * * * *"]
-        }
-      }
+      # 任务调度服务
+      PolicrMini.Bot.Scheduler
     ]
 
     children =

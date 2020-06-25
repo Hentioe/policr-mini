@@ -31,6 +31,15 @@ config :phoenix, :json_library, Jason
 # Task global configuration
 config :task_after, global_name: TaskAfter
 
+# Job schedule
+config :policr_mini, PolicrMini.Bot.Scheduler,
+  jobs: [
+    # 修正过期验证任务
+    {"*/5 * * * *", {PolicrMini.Bot.Runner, :fix_expired_wait_status, []}},
+    # 检查工作状态任务
+    {"*/55 * * * *", {PolicrMini.Bot.Runner, :check_working_status, []}}
+  ]
+
 # Internationalization of bot messages
 config :exi18n,
   default_locale: "zh-hans",
