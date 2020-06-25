@@ -1,7 +1,7 @@
 defmodule PolicrMini.Bot.Runner do
   @moduledoc """
   各个定时任务的具体实现模块。
-  TODO: 
+  TODO: 执行任务时产生的 SSL 错误消息没有被 `SchedEx.Runner` 处理。可能需要修补上游问题或使用自己的 `Runner`。
   """
 
   require Logger
