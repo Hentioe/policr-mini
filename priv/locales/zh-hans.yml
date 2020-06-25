@@ -74,6 +74,14 @@ errors:
   verification_target_incorrect: 此条验证并不针对你～
   verification_expired: 这条验证可能已经失效了～
   verification_no_wating: 您没有该目标群组的待验证记录。
+  no_permission: |
+    由于机器人缺少必要权限，已自动取消对新成员验证的接管。
+
+    如果需要恢复接管：
+    1. 将机器人提升为管理员并确保具备「限制用户」和「删除消息」的权限
+    2. 发送 /sync@%{bot_username} 指令
+
+    如没必要，请将本机器人移出群组。
 
 units:
   sec: 秒

@@ -6,14 +6,17 @@ defmodule PolicrMini.ChatBusiness do
   alias PolicrMini.Schema.Permission
   alias PolicrMini.PermissionBusiness
 
+  @spec create(map()) :: {:ok, Chat.t()} | {:error, Changeset.t()}
   def create(params) do
     %Chat{} |> Chat.changeset(params) |> Repo.insert()
   end
 
+  @spec update(Chat.t(), map()) :: {:ok, Chat.t()} | {:error, Changeset.t()}
   def update(%Chat{} = chat, attrs) do
     chat |> Chat.changeset(attrs) |> Repo.update()
   end
 
+  @spec fetch(integer(), map()) :: {:ok, Chat.t()} | {:error, Changeset.t()}
   def fetch(id, params) when is_integer(id) do
     case id |> get() do
       {:error, :not_found, _} -> create(params |> Map.put(:id, id))
@@ -21,10 +24,12 @@ defmodule PolicrMini.ChatBusiness do
     end
   end
 
+  @spec takeover_cancelled(Chat.t()) :: {:ok, Chat.t()} | {:error, Changeset.t()}
   def takeover_cancelled(%Chat{} = chat) do
     chat |> update(%{is_take_over: false})
   end
 
+  @spec reset_administrators!(Chat.t(), [Permission.t()]) :: :ok
   def reset_administrators!(%Chat{} = chat, permissions) when is_list(permissions) do
     permission_params_list =
       permissions |> Enum.map(fn p -> p |> struct(chat_id: chat.id) |> Map.from_struct() end)
@@ -47,9 +52,12 @@ defmodule PolicrMini.ChatBusiness do
       |> Enum.each(fn params ->
         {:ok, _} = PermissionBusiness.fetch(chat.id, params.user_id, params)
       end)
+
+      :ok
     end)
   end
 
+  @spec find_list(integer()) :: [Chat.t()]
   def find_list(user_id) when is_integer(user_id) do
     from(p in Permission, where: p.user_id == ^user_id)
     |> Repo.all()
@@ -57,10 +65,16 @@ defmodule PolicrMini.ChatBusiness do
     |> Enum.map(fn p -> p.chat end)
   end
 
+  @spec find_administrators(integer()) :: [Chat.t()]
   def find_administrators(chat_id) do
     from(p in Permission, where: p.chat_id == ^chat_id)
     |> Repo.all()
     |> Repo.preload([:user])
     |> Enum.map(fn p -> p.user end)
+  end
+
+  @spec find_takeovered :: [Chat.t()]
+  def find_takeovered do
+    from(c in Chat, where: c.is_take_over == true) |> Repo.all()
   end
 end

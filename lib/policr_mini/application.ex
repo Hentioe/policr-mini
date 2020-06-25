@@ -51,6 +51,15 @@ defmodule PolicrMini.Application do
         start:
           {SchedEx, :run_every,
            [PolicrMini.Bot.Runner, :fix_expired_wait_status, [], "*/5 * * * *"]}
+      },
+      # 定时任务：检查已接管群组中的工作状态
+      %{
+        id: "check_working_status",
+        start: {
+          SchedEx,
+          :run_every,
+          [PolicrMini.Bot.Runner, :check_working_status, [], "*/55 * * * *"]
+        }
       }
     ]
 

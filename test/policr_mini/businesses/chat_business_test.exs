@@ -81,13 +81,13 @@ defmodule PolicrMini.ChatBusinessTest do
     assert struct(chat2, is_take_over: true) == chat1
   end
 
-  test "reset_administrators/2" do
+  test "reset_administrators!/2" do
     chat_params = build_params()
     {:ok, chat} = ChatBusiness.create(chat_params)
     {:ok, user1} = UserBusiness.create(Factory.build(:user) |> Map.from_struct())
 
     chat
-    |> ChatBusiness.reset_administrators([
+    |> ChatBusiness.reset_administrators!([
       Factory.build(:permission, user_id: user1.id)
     ])
 
@@ -99,7 +99,7 @@ defmodule PolicrMini.ChatBusinessTest do
 
     {:ok, _} =
       chat
-      |> ChatBusiness.reset_administrators([
+      |> ChatBusiness.reset_administrators!([
         Factory.build(:permission, user_id: user1.id, tg_is_owner: false),
         Factory.build(:permission, user_id: user2.id)
       ])
@@ -110,7 +110,7 @@ defmodule PolicrMini.ChatBusinessTest do
     permission = PermissionBusiness.find(chat.id, user1.id)
     assert permission.tg_is_owner == false
 
-    {:ok, _} = chat |> ChatBusiness.reset_administrators([])
+    {:ok, _} = chat |> ChatBusiness.reset_administrators!([])
     users = ChatBusiness.find_administrators(chat.id)
     assert length(users) == 0
   end
@@ -123,13 +123,13 @@ defmodule PolicrMini.ChatBusinessTest do
 
     {:ok, _} =
       chat1
-      |> ChatBusiness.reset_administrators([
+      |> ChatBusiness.reset_administrators!([
         Factory.build(:permission, user_id: user.id)
       ])
 
     {:ok, _} =
       chat2
-      |> ChatBusiness.reset_administrators([
+      |> ChatBusiness.reset_administrators!([
         Factory.build(:permission, user_id: user.id)
       ])
 
@@ -149,7 +149,7 @@ defmodule PolicrMini.ChatBusinessTest do
     {:ok, user1} = UserBusiness.create(Factory.build(:user) |> Map.from_struct())
 
     chat
-    |> ChatBusiness.reset_administrators([
+    |> ChatBusiness.reset_administrators!([
       Factory.build(:permission, user_id: user1.id)
     ])
 
@@ -161,7 +161,7 @@ defmodule PolicrMini.ChatBusinessTest do
 
     {:ok, _} =
       chat
-      |> ChatBusiness.reset_administrators([
+      |> ChatBusiness.reset_administrators!([
         Factory.build(:permission, user_id: user1.id, tg_is_owner: false),
         Factory.build(:permission, user_id: user2.id)
       ])
