@@ -6,6 +6,7 @@ defmodule PolicrMini.Bot.Runner do
   require Logger
 
   alias PolicrMini.{VerificationBusiness, ChatBusiness}
+  alias PolicrMini.Schema.Chat
   alias PolicrMini.Bot.Helper, as: BotHelper
 
   @spec fix_expired_wait_status :: :ok
@@ -41,22 +42,6 @@ defmodule PolicrMini.Bot.Runner do
     # 获取接管的 chat 列表
     chats = ChatBusiness.find_takeovered()
 
-    cancel_takeover = fn chat ->
-      ChatBusiness.takeover_cancelled(chat)
-
-      BotHelper.async(fn ->
-        BotHelper.send_message(
-          chat.id,
-          BotHelper.t("errors.no_permission", %{bot_username: PolicrMini.Bot.username()}),
-          parse_mode: nil
-        )
-      end)
-
-      Logger.info(
-        "No permission in the group `#{chat.id}`, the takeover has been automatically cancelled."
-      )
-    end
-
     # 检查单个 chat 权限
     check_one = fn chat ->
       case Nadia.get_chat_member(chat.id, PolicrMini.Bot.id()) do
@@ -64,9 +49,9 @@ defmodule PolicrMini.Bot.Runner do
           # 检查权限并执行相应修正
           if chat.is_take_over do
             # 如果不是管理员，取消接管
-            unless member.status == "administrator", do: cancel_takeover.(chat)
+            unless member.status == "administrator", do: cancel_takeover(chat)
             # 如果没有限制用户权限，取消接管
-            if member.can_restrict_members == false, do: cancel_takeover.(chat)
+            if member.can_restrict_members == false, do: cancel_takeover(chat)
           end
 
           # 如果没有发消息权限，直接退出
@@ -74,6 +59,10 @@ defmodule PolicrMini.Bot.Runner do
             Nadia.leave_chat(chat.id)
             Logger.info("Unable to send message in group `#{chat.id}`, has left automatically.")
           end
+
+        # 已不在群组中
+        {:error, %Nadia.Model.Error{reason: "Forbidden: bot was kicked from the supergroup chat"}} ->
+          cancel_takeover(chat, false)
 
         e ->
           Logger.error("An error occurred while checking bot permissions. Details: #{inspect(e)}")
@@ -86,5 +75,43 @@ defmodule PolicrMini.Bot.Runner do
     chats |> Enum.each(fn chat -> check_one.(chat) end)
 
     :ok
+  end
+
+  @spec cancel_takeover(Chat.t(), boolean()) :: :ok
+  # 取消接管
+  defp cancel_takeover(%Chat{id: chat_id} = chat, send_notification \\ true)
+       when is_integer(chat_id) and is_boolean(send_notification) do
+    ChatBusiness.takeover_cancelled(chat)
+
+    if send_notification,
+      do:
+        BotHelper.async(fn ->
+          BotHelper.send_message(
+            chat.id,
+            BotHelper.t("errors.no_permission", %{bot_username: PolicrMini.Bot.username()}),
+            parse_mode: nil
+          )
+        end)
+
+    Logger.info(
+      "No permission in the group `#{chat_id}`, the takeover has been automatically cancelled."
+    )
+
+    :ok
+  end
+
+  @doc """
+  忽略调用 API 时产生的 SSL 错误
+  TODO: 因为 SSL 问题太频繁，忽略记录日志。有待解决。
+  E.g: {:ssl_closed, {:sslsocket, {:gen_tcp, #Port<0.464>, :tls_connection, :undefined}, [#PID<0.9807.0>, #PID<0.9806.0>]}}
+  """
+  def handle_info({:ssl_closed, _} = details, state) do
+    Logger.error(
+      "An SSL error occurred during the execution of a scheduled task. Details: #{
+        inspect(details)
+      }"
+    )
+
+    {:noreply, state}
   end
 end

@@ -68,7 +68,7 @@ defmodule PolicrMini.Bot.Helper do
 
   @type sendmsgopts :: [
           {:disable_notification, boolean()},
-          {:parse_mode, parsemode()},
+          {:parse_mode, parsemode() | nil},
           {:disable_web_page_preview, boolean()},
           {:reply_markup, Nadia.Model.InlineKeyboardMarkup.t()},
           {:retry, integer()}
@@ -134,7 +134,7 @@ defmodule PolicrMini.Bot.Helper do
 
   @type sendphotoopts :: [
           {:disable_notification, boolean()},
-          {:parse_mode, parsemode()},
+          {:parse_mode, parsemode() | nil},
           {:reply_markup, Nadia.Model.InlineKeyboardMarkup.t()},
           {:retry, integer()}
         ]
@@ -380,16 +380,25 @@ defmodule PolicrMini.Bot.Helper do
     end
   end
 
+  @spec async(function()) :: :ok
   @doc """
   异步执行函数，不指定延迟时间。
   """
-  def async(callback) when is_function(callback), do: TaskAfter.task_after(0, callback)
+  def async(callback) when is_function(callback) do
+    TaskAfter.task_after(0, callback)
 
+    :ok
+  end
+
+  @spec async(function(), [{:seconds, integer}, ...]) :: :ok
   @doc """
   异步执行函数，可指定单位为秒的延迟时间。
 
   iex> PolicrMini.Bot.Helper.async(fn -> IO.puts("Hello") end, seconds: 3)
   """
-  def async(callback, [{:seconds, seconds}]) when is_integer(seconds) and is_function(callback),
-    do: TaskAfter.task_after(seconds * 1000, callback)
+  def async(callback, [{:seconds, seconds}]) when is_integer(seconds) and is_function(callback) do
+    TaskAfter.task_after(seconds * 1000, callback)
+
+    :ok
+  end
 end
