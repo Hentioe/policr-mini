@@ -16,6 +16,12 @@
 当前使用本机器人会被视作参与内测，这期间不会提供任何途径修改机器人的任何设置。事实上正因为是测试，所有的设置都是动态变化的（因为要充分测试）。  
 如果你想要一个足够稳定的版本，请关注本项目的公测计划或第一个版本的正式发布。
 
+## 技术介绍
+
+本项目使用 Elixir 语言开发，具备 Erlang 系统一切优点。为了在开发过程中更轻易的从根源解决问题，作者本人从零开发了 Telegram bot 库（[Telegex](https://github.com/Hentioe/telegex)），并基于该库构建了本项目。
+
+相比之前使用的 [Nadia](https://github.com/zhyu/nadia) 和[曾考虑过](https://github.com/Hentioe/policr-mini/issues/6)的 [ExGram](https://github.com/rockneurotiko/ex_gram) 库，作为 [Telegex](https://github.com/Hentioe/telegex) 的现实案例，从事实上证明了它可以让机器人更加可靠、稳定的运行。
+
 ## 加入我们
 
 - [POLICR · 中文社区](https://policr.bluerain.io/community)
