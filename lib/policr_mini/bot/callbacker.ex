@@ -2,7 +2,7 @@ defmodule PolicrMini.Bot.Callbacker do
   defmacro __using__(prefix) when is_atom(prefix) do
     quote do
       alias PolicrMini.Bot.{Callbacker, Cleaner}
-      alias Nadia.Model.{InlineKeyboardMarkup, InlineKeyboardButton}
+      alias Telegex.Model.{InlineKeyboardMarkup, InlineKeyboardButton}
 
       import Callbacker
       import PolicrMini.Bot.Helper
@@ -20,16 +20,16 @@ defmodule PolicrMini.Bot.Callbacker do
     end
   end
 
-  @callback handle(callback_query :: Nadia.Model.CallbackQuery.t()) ::
+  @callback handle(callback_query :: Telegex.Model.CallbackQuery.t()) ::
               :ok | :ignored | :error
   @callback match?(data :: String.t()) :: boolean()
 
-  @spec answer_callback_query(String.t(), keyword()) :: :ok | {:error, Nadia.Model.Error.t()}
+  @spec answer_callback_query(String.t(), keyword()) :: :ok | {:error, Telegex.Model.errors()}
   @doc """
   响应回调查询。
   """
   def answer_callback_query(callback_query_id, options \\ []) do
-    Nadia.answer_callback_query(callback_query_id, options)
+    Telegex.answer_callback_query(callback_query_id, options)
   end
 
   @spec parse_callback_data(String.t()) :: {String.t(), [String.t()]}

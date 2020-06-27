@@ -2,7 +2,7 @@ defmodule PolicrMini.Bot.Commander do
   defmacro __using__(command) when is_atom(command) do
     quote do
       alias PolicrMini.Bot.{Commander, Cleaner}
-      alias Nadia.Model.{InlineKeyboardMarkup, InlineKeyboardButton}
+      alias Telegex.Model.{InlineKeyboardMarkup, InlineKeyboardButton}
 
       import Commander
       import PolicrMini.Bot.Helper
@@ -20,7 +20,7 @@ defmodule PolicrMini.Bot.Commander do
     end
   end
 
-  @callback handle(message :: Nadia.Model.Message.t(), state :: PolicrMini.Bot.State.t()) ::
+  @callback handle(message :: Telegex.Model.Message.t(), state :: PolicrMini.Bot.State.t()) ::
               {:ok | :ignored | :error, PolicrMini.Bot.State.t()}
   @callback match?(text :: binary()) :: boolean()
 end

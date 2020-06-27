@@ -19,7 +19,7 @@ defmodule PolicrMini.Bot.UserJoinedHandler do
   当前的实现会根据运行模式返回不同的值。
   """
   def countdown do
-    if PolicrMini.mix_env() == :dev, do: 30, else: 60 * 5
+    if PolicrMini.mix_env() == :dev, do: 30 * 3, else: 60 * 5
   end
 
   @spec allow_join_again_seconds :: integer()
@@ -41,13 +41,13 @@ defmodule PolicrMini.Bot.UserJoinedHandler do
   消息中不包含新成员，不匹配。
   """
   @impl true
-  def match?(%{new_chat_member: nil} = _message, state), do: {false, state}
+  def match?(%{new_chat_members: nil} = _message, state), do: {false, state}
 
   @doc """
   消息中的新成员类型是机器人，不匹配。
   """
   @impl true
-  def match?(%{new_chat_member: %{is_bot: true}} = _message, state), do: {false, state}
+  def match?(%{new_chat_members: %{is_bot: true}} = _message, state), do: {false, state}
 
   @doc """
   其余情况皆匹配。
@@ -60,7 +60,7 @@ defmodule PolicrMini.Bot.UserJoinedHandler do
   """
   @impl true
   def handle(message, state) do
-    %{chat: %{id: chat_id}, new_chat_member: new_chat_member, date: date} = message
+    %{chat: %{id: chat_id}, new_chat_members: [new_chat_member], date: date} = message
 
     case SchemeBusiness.fetch(chat_id) do
       {:ok, scheme} ->
@@ -98,14 +98,14 @@ defmodule PolicrMini.Bot.UserJoinedHandler do
     end
   end
 
-  @spec handle_expired(atom(), Nadia.Model.Message.t(), State.t()) ::
+  @spec handle_expired(atom(), Telegex.Model.Message.t(), State.t()) ::
           {:error, State.t()} | {:ok, State.t()}
   @doc """
   处理过期验证。
   当前仅限制用户，并不发送验证消息。
   """
   def handle_expired(entrance, message, state) do
-    %{chat: %{id: chat_id}, new_chat_member: new_chat_member} = message
+    %{chat: %{id: chat_id}, new_chat_members: [new_chat_member]} = message
 
     verification_params = %{
       chat_id: chat_id,
@@ -136,7 +136,7 @@ defmodule PolicrMini.Bot.UserJoinedHandler do
   统一入口 + 私聊方案的细节实现。
   """
   def handle(_, :unity, :private, seconds, message, state) do
-    %{chat: %{id: chat_id}, new_chat_member: new_chat_member} = message
+    %{chat: %{id: chat_id}, new_chat_members: [new_chat_member]} = message
 
     verification_params = %{
       chat_id: chat_id,
@@ -255,7 +255,7 @@ defmodule PolicrMini.Bot.UserJoinedHandler do
             # 实施操作（踢出）
             kick(chat_id, target_user, :timeout)
             # 解除限制以允许再次加入
-            async(fn -> Nadia.unban_chat_member(chat_id, target_user_id) end,
+            async(fn -> Telegex.unban_chat_member(chat_id, target_user_id) end,
               seconds: allow_join_again_seconds()
             )
           end
@@ -291,12 +291,12 @@ defmodule PolicrMini.Bot.UserJoinedHandler do
 
   @type reason :: :wronged | :timeout
 
-  @spec kick(integer(), map(), reason()) :: :ok | {:error, Nadia.Model.Error.t()}
+  @spec kick(integer(), map(), reason()) :: :ok | {:error, Telegex.Model.errors()}
   def kick(chat_id, user, reason) when is_integer(chat_id) and is_map(user) and is_atom(reason) do
     # 踢出用户
-    Nadia.kick_chat_member(chat_id, user.id)
+    Telegex.kick_chat_member(chat_id, user.id)
     # 解除限制以允许再次加入
-    async(fn -> Nadia.unban_chat_member(chat_id, user.id) end,
+    async(fn -> Telegex.unban_chat_member(chat_id, user.id) end,
       seconds: allow_join_again_seconds()
     )
 

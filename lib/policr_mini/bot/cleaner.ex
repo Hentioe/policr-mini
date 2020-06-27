@@ -28,10 +28,10 @@ defmodule PolicrMini.Bot.Cleaner do
   def handle_cast({:delete, {chat_id, message_id, options}}, state) do
     Helper.async(fn ->
       case Helper.delete_message(chat_id, message_id, options) do
-        :ok ->
+        {:ok, true} ->
           nil
 
-        {:error, %Nadia.Model.Error{reason: :timeout} = _error} ->
+        {:error, %Telegex.Model.RequestError{reason: :timeout} = _error} ->
           # 如果超时，继续删除（删除延迟部分）
           # TODO: 增加延迟删除，时长混入随机数计算
           options = options |> Keyword.delete(:delay_seconds)
@@ -126,9 +126,9 @@ defmodule PolicrMini.Bot.Cleaner do
           {:disable_notification, boolean}
           | {:disable_web_page_preview, boolean}
           | {:parse_mode, binary}
-          | {:reply_markup, Nadia.Model.InlineKeyboardMarkup.t()}
+          | {:reply_markup, Telegex.Model.InlineKeyboardMarkup.t()}
           | {:retry, integer}
-        ]) :: {:error, Nadia.Model.Error.t()} | {:ok, Nadia.Model.Message.t()}
+        ]) :: {:error, Telegex.Model.errors()} | {:ok, Telegex.Model.Message.t()}
   @doc """
   发送验证消息。
   此函数能自动删除旧消息，并维护缓存。

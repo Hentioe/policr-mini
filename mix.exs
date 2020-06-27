@@ -47,11 +47,11 @@ defmodule PolicrMini.MixProject do
       {:plug_cowboy, "~> 2.0"},
       {:ecto_enum, "~> 1.4"},
       {:task_after, "~> 1.2"},
-      {:nadia, github: "Hentioe/nadia"},
       {:exi18n, github: "Hentioe/exi18n"},
       {:yaml_elixir, "~> 2.4"},
       {:typed_struct, "~> 0.2.0"},
-      {:quantum, "~> 3.0"}
+      {:quantum, "~> 3.0"},
+      {:telegex, "0.1.0-rc.2"}
     ]
   end
 

@@ -35,7 +35,7 @@ defmodule PolicrMini.Bot.SyncCommander do
     with {:ok, chat} <- synchronize_chat(chat_id),
          {:ok, _} <- synchronize_administrators(chat),
          # 获取自身权限
-         {:ok, member} <- Nadia.get_chat_member(chat_id, PolicrMini.Bot.id()) do
+         {:ok, member} <- Telegex.get_chat_member(chat_id, PolicrMini.Bot.id()) do
       is_admin = member.status == "administrator"
 
       last_is_take_over = chat.is_take_over
@@ -77,7 +77,7 @@ defmodule PolicrMini.Bot.SyncCommander do
   同步群信息数据。
   """
   def synchronize_chat(chat_id, init \\ false) when is_integer(chat_id) do
-    case Nadia.get_chat(chat_id) do
+    case Telegex.get_chat(chat_id) do
       {:ok, chat} ->
         {small_photo_id, big_photo_id} =
           if photo = chat.photo, do: {photo.small_file_id, photo.big_file_id}, else: {nil, nil}
@@ -97,14 +97,14 @@ defmodule PolicrMini.Bot.SyncCommander do
           big_photo_id: big_photo_id,
           username: username,
           description: description,
-          tg_can_add_web_page_previews: chat_permissions[:can_add_web_page_previews],
-          tg_can_change_info: chat_permissions[:can_change_info],
-          tg_can_invite_users: chat_permissions[:can_invite_users],
-          tg_can_pin_messages: chat_permissions[:can_pin_messages],
-          tg_can_send_media_messages: chat_permissions[:can_send_media_messages],
-          tg_can_send_messages: chat_permissions[:can_send_messages],
-          tg_can_send_other_messages: chat_permissions[:can_send_other_messages],
-          tg_can_send_polls: chat_permissions[:can_send_polls]
+          tg_can_add_web_page_previews: chat_permissions.can_add_web_page_previews,
+          tg_can_change_info: chat_permissions.can_change_info,
+          tg_can_invite_users: chat_permissions.can_invite_users,
+          tg_can_pin_messages: chat_permissions.can_pin_messages,
+          tg_can_send_media_messages: chat_permissions.can_send_media_messages,
+          tg_can_send_messages: chat_permissions.can_send_messages,
+          tg_can_send_other_messages: chat_permissions.can_send_other_messages,
+          tg_can_send_polls: chat_permissions.can_send_polls
         }
 
         params =
@@ -133,7 +133,7 @@ defmodule PolicrMini.Bot.SyncCommander do
   """
   def synchronize_administrators(chat = %Chat{id: chat_id})
       when is_integer(chat_id) do
-    case Nadia.get_chat_administrators(chat_id) do
+    case Telegex.get_chat_administrators(chat_id) do
       {:ok, administrators} ->
         # 过滤自身
         administrators =
@@ -147,9 +147,9 @@ defmodule PolicrMini.Bot.SyncCommander do
 
           user_params = %{
             id: user.id,
-            first_name: user[:first_name],
-            last_name: user[:last_name],
-            username: user[:username]
+            first_name: user.first_name,
+            last_name: user.last_name,
+            username: user.username
           }
 
           case UserBusiness.fetch(user.id, user_params) do

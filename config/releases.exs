@@ -40,7 +40,7 @@ config :policr_mini, PolicrMini.Bot.ImageProvider,
       environment variable POLICR_MINI_BOT_IMAGES_PATH is missing.
       """)
 
-config :nadia,
+config :telegex,
   token:
     System.get_env("POLICR_MINI_BOT_TOKEN") ||
       raise("""

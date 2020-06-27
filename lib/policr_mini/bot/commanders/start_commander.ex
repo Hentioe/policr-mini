@@ -64,8 +64,8 @@ defmodule PolicrMini.Bot.StartCommander do
   """
   def dispatch(arg, message), do: arg |> String.split("_") |> handle_args(message)
 
-  @spec handle_args([String.t(), ...], Nadia.Model.Message.t()) ::
-          :ok | {:error, Nadia.Model.Error.t()}
+  @spec handle_args([String.t(), ...], Telegex.Model.Message.t()) ::
+          :ok | {:error, Telegex.Model.errors()}
   @doc """
   处理 v1 版本的验证参数。
   """
@@ -126,9 +126,9 @@ defmodule PolicrMini.Bot.StartCommander do
           integer(),
           integer()
         ) ::
-          {:error, Nadia.Model.Error.t()}
+          {:error, Telegex.Model.errors()}
           | {:ok,
-             {Nadia.Model.Message.t(), Nadia.Model.InlineKeyboardMarkup.t(), Captcha.Data.t()}}
+             {Telegex.Model.Message.t(), Telegex.Model.InlineKeyboardMarkup.t(), Captcha.Data.t()}}
   @doc """
   发送验证消息
   """
@@ -195,9 +195,9 @@ defmodule PolicrMini.Bot.StartCommander do
     seconds - DateTime.diff(DateTime.utc_now(), inserted_at)
   end
 
-  def get_photo_id(%Nadia.Model.Message{photo: [%Nadia.Model.PhotoSize{file_id: file_id} | _]}),
-    do: file_id
+  def get_photo_id(%Telegex.Model.Message{photo: [%Telegex.Model.PhotoSize{file_id: file_id} | _]}),
+      do: file_id
 
-  def get_photo_id(%Nadia.Model.Message{photo: []}), do: nil
-  def get_photo_id(%Nadia.Model.Message{photo: nil}), do: nil
+  def get_photo_id(%Telegex.Model.Message{photo: []}), do: nil
+  def get_photo_id(%Telegex.Model.Message{photo: nil}), do: nil
 end

@@ -7,7 +7,7 @@ defmodule PolicrMini.Bot do
 
   def start_link(default \\ []) when is_list(default) do
     # 获取机器人必要信息
-    {:ok, %Nadia.Model.User{id: id, username: username}} = Nadia.get_me()
+    {:ok, %Telegex.Model.User{id: id, username: username}} = Telegex.get_me()
     # 缓存机器人数据
     :ets.new(:bot_info, [:set, :named_table])
     :ets.insert(:bot_info, {:id, id})
@@ -25,7 +25,7 @@ defmodule PolicrMini.Bot do
   @impl true
   def handle_info(:pull, state = %{offset: last_offset}) do
     offset =
-      case Nadia.get_updates(offset: last_offset) do
+      case Telegex.get_updates(offset: last_offset) do
         {:ok, updates} ->
           # 消费消息
           updates |> Enum.each(fn update -> Consumer.receive(update) end)
@@ -36,7 +36,7 @@ defmodule PolicrMini.Bot do
 
         _e ->
           # TODO: 因为网络 timeout 问题太频繁，忽略记录日志。有待解决。
-          # E.g: {:error, %Nadia.Model.Error{reason: :timeout}}
+          # E.g: {:error, %Telegex.Model.RequestError{reason: :timeout}}
           # Logger.error("An error occurred while pulling updates, details: #{inspect(e)}")
           last_offset
       end

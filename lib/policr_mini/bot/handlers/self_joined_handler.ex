@@ -6,10 +6,10 @@ defmodule PolicrMini.Bot.SelfJoinedHandler do
   alias PolicrMini.Bot.SyncCommander
 
   @impl true
-  def match?(%{new_chat_member: nil} = _message, state), do: {false, state}
+  def match?(%{new_chat_members: nil} = _message, state), do: {false, state}
 
   @impl true
-  def match?(%{new_chat_member: %{id: joined_user_id}} = _message, state),
+  def match?(%{new_chat_members: [%{id: joined_user_id}]} = _message, state),
     do: {joined_user_id == bot_id(), state}
 
   @impl true
@@ -23,14 +23,14 @@ defmodule PolicrMini.Bot.SelfJoinedHandler do
       {:ok, state}
     else
       e ->
-        Logger.error("An error occurred after the bot was invited, details: #{inspect(e)}")
+        Logger.error("An error occurred after the bot was invited. Details: #{inspect(e)}")
         send_message(chat_id, t("self_joined.error"))
     end
 
     {:ok, %{state | done: true}}
   end
 
-  @spec response(integer()) :: :ok | {:error, Nadia.Model.Error.t()}
+  @spec response(integer()) :: :ok | {:error, Telegex.Model.errors()}
   @doc """
   发送响应消息。
   """

@@ -13,7 +13,7 @@ defmodule PolicrMini.Bot.Consumer do
     DynamicSupervisor.init(strategy: :one_for_one)
   end
 
-  def receive(%Nadia.Model.Update{} = update) do
+  def receive(%Telegex.Model.Update{} = update) do
     %{message: message, callback_query: callback_query} = update
 
     dispatch_message = fn ->

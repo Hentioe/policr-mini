@@ -11,7 +11,7 @@ defmodule PolicrMini.Bot.Helper do
 
   alias PolicrMini.ChatBusiness
 
-  @type tgerror :: {:error, Nadia.Model.Error.t()}
+  @type tgerror :: {:error, Telegex.Model.errors()}
 
   @doc """
   获取机器人自身的 `id` 字段。详情参照 `PolicrMini.Bot.id/0` 函数。
@@ -61,6 +61,11 @@ defmodule PolicrMini.Bot.Helper do
     |> String.replace("=", "\\=")
   end
 
+  # 过滤掉关键字列表中的 nil 值
+  defp delete_keyword_nils(keyword) when is_list(keyword) do
+    keyword |> Enum.filter(fn {_, value} -> value != nil end)
+  end
+
   @time_seeds [0.2, 0.4, 0.8, 1.0]
   @markdown_parse_mode "MarkdownV2"
 
@@ -70,11 +75,11 @@ defmodule PolicrMini.Bot.Helper do
           {:disable_notification, boolean()},
           {:parse_mode, parsemode() | nil},
           {:disable_web_page_preview, boolean()},
-          {:reply_markup, Nadia.Model.InlineKeyboardMarkup.t()},
+          {:reply_markup, Telegex.Model.InlineKeyboardMarkup.t()},
           {:retry, integer()}
         ]
   @spec send_message(integer(), String.t(), sendmsgopts()) ::
-          {:error, Nadia.Model.Error.t()} | {:ok, Nadia.Model.Message.t()}
+          {:ok, Telegex.Model.Message.t()} | tgerror()
   @doc """
   发送文本消息。
   如果 `options` 参数中不包含以下配置，将为它们准备默认值：
@@ -91,6 +96,7 @@ defmodule PolicrMini.Bot.Helper do
       |> Keyword.put_new(:parse_mode, @markdown_parse_mode)
       |> Keyword.put_new(:disable_web_page_preview, true)
       |> Keyword.put_new(:retry, 5)
+      |> delete_keyword_nils()
 
     text =
       if(options |> Keyword.get(:parse_mode) == @markdown_parse_mode) do
@@ -99,11 +105,11 @@ defmodule PolicrMini.Bot.Helper do
         text
       end
 
-    case Nadia.send_message(chat_id, text, options) do
+    case Telegex.send_message(chat_id, text, options) do
       {:ok, message} ->
         {:ok, message}
 
-      {:error, %Nadia.Model.Error{reason: :timeout}} = e ->
+      {:error, %Telegex.Model.RequestError{reason: :timeout}} = e ->
         # 处理重试（减少次数并递归）
         retry = options |> Keyword.get(:retry)
 
@@ -115,7 +121,8 @@ defmodule PolicrMini.Bot.Helper do
           e
         end
 
-      {:error, %Nadia.Model.Error{reason: <<"Too Many Requests: retry after">> <> _rest}} = e ->
+      {:error, %Telegex.Model.Error{description: <<"Too Many Requests: retry after">> <> _rest}} =
+          e ->
         retry = options |> Keyword.get(:retry)
 
         if retry && retry > 0 do
@@ -136,12 +143,12 @@ defmodule PolicrMini.Bot.Helper do
           {:caption, String.t()},
           {:disable_notification, boolean()},
           {:parse_mode, parsemode() | nil},
-          {:reply_markup, Nadia.Model.InlineKeyboardMarkup.t()},
+          {:reply_markup, Telegex.Model.InlineKeyboardMarkup.t()},
           {:retry, integer()}
         ]
 
   @spec send_photo(integer(), String.t(), sendphotoopts()) ::
-          {:ok, Nadia.Model.Message.t()} | tgerror()
+          {:ok, Telegex.Model.Message.t()} | tgerror()
   @doc """
   发送图片。
   如果 `options` 参数中不包含以下配置，将为它们准备默认值：
@@ -156,6 +163,7 @@ defmodule PolicrMini.Bot.Helper do
       |> Keyword.put_new(:disable_notification, true)
       |> Keyword.put_new(:parse_mode, @markdown_parse_mode)
       |> Keyword.put_new(:retry, 5)
+      |> delete_keyword_nils()
 
     options =
       if caption = options[:caption] do
@@ -171,11 +179,11 @@ defmodule PolicrMini.Bot.Helper do
         options
       end
 
-    case Nadia.send_photo(chat_id, photo, options) do
+    case Telegex.send_photo(chat_id, photo, options) do
       {:ok, message} ->
         {:ok, message}
 
-      {:error, %Nadia.Model.Error{reason: :timeout}} = e ->
+      {:error, %Telegex.Model.RequestError{reason: :timeout}} = e ->
         # 处理重试（减少次数并递归）
         retry = options |> Keyword.get(:retry)
 
@@ -187,7 +195,8 @@ defmodule PolicrMini.Bot.Helper do
           e
         end
 
-      {:error, %Nadia.Model.Error{reason: <<"Too Many Requests: retry after">> <> _rest}} = e ->
+      {:error, %Telegex.Model.Error{description: <<"Too Many Requests: retry after">> <> _rest}} =
+          e ->
         retry = options |> Keyword.get(:retry)
 
         if retry && retry > 0 do
@@ -204,19 +213,20 @@ defmodule PolicrMini.Bot.Helper do
     end
   end
 
-  @spec edit_message(integer(), integer(), String.t(), [{atom, any}]) ::
-          {:ok, Nadia.Model.Message.t()} | tgerror()
+  @spec edit_message_text(String.t(), keyword()) ::
+          {:ok, Telegex.Model.Message.t()} | tgerror()
   @doc """
   编辑消息。
   如果 `options` 参数中不包含以下配置，将为它们准备默认值：
   - `parse_mode`: `"MarkdownV2"`
   - `disable_web_page_preview`: `false`
   """
-  def edit_message(chat_id, message_id, text, options \\ []) do
+  def edit_message_text(text, options \\ []) do
     options =
       options
       |> Keyword.put_new(:parse_mode, @markdown_parse_mode)
       |> Keyword.put_new(:disable_web_page_preview, true)
+      |> delete_keyword_nils()
 
     text =
       if(options |> Keyword.get(:parse_mode) == @markdown_parse_mode) do
@@ -225,7 +235,7 @@ defmodule PolicrMini.Bot.Helper do
         text
       end
 
-    Nadia.edit_message_text(chat_id, message_id, nil, text, options)
+    Telegex.edit_message_text(text, options)
   end
 
   @doc """
@@ -234,10 +244,11 @@ defmodule PolicrMini.Bot.Helper do
   """
   def reply_message(chat_id, message_id, text, options \\ []) do
     options = options |> Keyword.merge(reply_to_message_id: message_id)
+
     send_message(chat_id, text, options)
   end
 
-  @default_restrict_permissions %Nadia.Model.ChatPermissions{
+  @default_restrict_permissions %Telegex.Model.ChatPermissions{
     can_send_messages: false,
     can_send_media_messages: false,
     can_send_polls: false,
@@ -248,22 +259,24 @@ defmodule PolicrMini.Bot.Helper do
     can_pin_messages: false
   }
 
-  @spec delete_message(integer(), integer(), [{atom(), any()}]) :: :ok | tgerror
+  @spec delete_message(integer(), integer(), [{atom(), any()}]) :: {:ok, true} | tgerror
   @doc """
   删除消息。
   附加的 `options` 参数可配置 `delay_seconds` 实现延迟删除。
   注意，延迟删除无法直接获得请求结果，将直接返回 `:ok`。
   """
   def delete_message(chat_id, message_id, options \\ []) do
-    delay_seconds = options |> Keyword.get(:delay_seconds)
+    delay_seconds =
+      options
+      |> Keyword.get(:delay_seconds)
 
     if delay_seconds do
       delay_seconds = if delay_seconds < 0, do: 0, else: delay_seconds
-      async(fn -> Nadia.delete_message(chat_id, message_id) end, seconds: delay_seconds)
+      async(fn -> Telegex.delete_message(chat_id, message_id) end, seconds: delay_seconds)
 
-      :ok
+      {:ok, true}
     else
-      Nadia.delete_message(chat_id, message_id)
+      Telegex.delete_message(chat_id, message_id)
     end
   end
 
@@ -280,7 +293,7 @@ defmodule PolicrMini.Bot.Helper do
   - `can_pin_messages`: `false`
   """
   def restrict_chat_member(chat_id, user_id) do
-    Nadia.restrict_chat_member(chat_id, user_id, @default_restrict_permissions)
+    Telegex.restrict_chat_member(chat_id, user_id, @default_restrict_permissions)
   end
 
   @doc """
@@ -300,7 +313,7 @@ defmodule PolicrMini.Bot.Helper do
        tg_can_pin_messages: can_pin_messages
      }} = ChatBusiness.get(chat_id)
 
-    Nadia.restrict_chat_member(chat_id, user_id, %Nadia.Model.ChatPermissions{
+    Telegex.restrict_chat_member(chat_id, user_id, %Telegex.Model.ChatPermissions{
       can_send_messages: can_send_messages,
       can_send_media_messages: can_send_media_messages,
       can_send_polls: can_send_polls,

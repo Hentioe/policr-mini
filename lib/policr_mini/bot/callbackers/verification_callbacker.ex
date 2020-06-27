@@ -20,7 +20,7 @@ defmodule PolicrMini.Bot.VerificationCallbacker do
     data |> parse_callback_data() |> handle_data(callback_query)
   end
 
-  @spec handle_data({String.t(), [String.t(), ...]}, Nadia.Model.CallbackQuery.t()) ::
+  @spec handle_data({String.t(), [String.t(), ...]}, Telegex.Model.CallbackQuery.t()) ::
           :error | :ok
   @doc """
   处理 v1 版本的验证。
@@ -91,12 +91,16 @@ defmodule PolicrMini.Bot.VerificationCallbacker do
     end
   end
 
-  @spec handle_correct(Verification.t(), integer(), Nadia.Model.User.t()) ::
+  @spec handle_correct(Verification.t(), integer(), Telegex.Model.User.t()) ::
           {:ok, Verification.t()} | {:error, any()}
   @doc """
   处理回答正确。
   """
-  def handle_correct(%Verification{} = verification, message_id, %Nadia.Model.User{} = from_user)
+  def handle_correct(
+        %Verification{} = verification,
+        message_id,
+        %Telegex.Model.User{} = from_user
+      )
       when is_integer(message_id) do
     case verification |> VerificationBusiness.update(%{status: :passed}) do
       {:ok, verification} ->
@@ -136,7 +140,7 @@ defmodule PolicrMini.Bot.VerificationCallbacker do
     end
   end
 
-  @spec handle_wrong(Verification.t(), atom(), integer(), Nadia.Model.User.t()) ::
+  @spec handle_wrong(Verification.t(), atom(), integer(), Telegex.Model.User.t()) ::
           {:ok, Verification.t()} | {:error, any()}
   @doc """
   处理回答错误。
@@ -145,7 +149,7 @@ defmodule PolicrMini.Bot.VerificationCallbacker do
         %Verification{} = verification,
         killing_method,
         message_id,
-        %Nadia.Model.User{} = from_user
+        %Telegex.Model.User{} = from_user
       ) do
     # 回答错误：更新验证记录的状态、根据方案实施操作并发送通知消息
     case verification |> VerificationBusiness.update(%{status: :wronged}) do
@@ -173,7 +177,7 @@ defmodule PolicrMini.Bot.VerificationCallbacker do
   end
 
   @spec update_unity_verification_message(integer(), integer(), integer()) ::
-          :not_found | {:error, Nadia.Model.Error.t()} | {:ok, Nadia.Model.Message.t()}
+          :not_found | {:error, Telegex.Model.errors()} | {:ok, Telegex.Model.Message.t()}
   @doc """
   更新统一验证入口消息
   """
@@ -187,7 +191,7 @@ defmodule PolicrMini.Bot.VerificationCallbacker do
       # 获取最新的验证入口消息编号
       message_id = VerificationBusiness.find_last_unity_message_id(chat_id)
 
-      edit_message(chat_id, message_id, text, reply_markup: markup)
+      edit_message_text(text, chat_id: chat_id, message_id: message_id, reply_markup: markup)
     else
       :not_found
     end

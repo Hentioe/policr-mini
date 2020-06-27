@@ -3,7 +3,7 @@ defmodule PolicrMini.Bot.Captcha do
   验证内容生成模块。
   """
 
-  alias Nadia.Model.{InlineKeyboardButton, InlineKeyboardMarkup}
+  alias Telegex.Model.{InlineKeyboardButton, InlineKeyboardMarkup}
 
   defmodule Data do
     @typedoc "单个候选内容"
@@ -40,7 +40,7 @@ defmodule PolicrMini.Bot.Captcha do
 
   @spec build_markup([[Data.candidate()]], integer()) :: InlineKeyboardMarkup.t()
   @doc """
-  从候选数据列表中构建 `Nadia.Model.InlineKeyboardMarkup`
+  从候选数据列表中构建 `Telegex.Model.InlineKeyboardMarkup`
   注意，参数 `candidates` 是一个二维数组。参数 `verification_id` 则需要一个已被记录的验证编号。
   此函数的 `candidates` 参数仅作为显示按钮的文本数据，因为回调数组由按钮所在的索引位置自动生成。
   """

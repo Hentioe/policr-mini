@@ -45,7 +45,7 @@ defmodule PolicrMini.Bot.Runner do
 
     # 检查单个 chat 权限
     check_one = fn chat ->
-      case Nadia.get_chat_member(chat.id, PolicrMini.Bot.id()) do
+      case Telegex.get_chat_member(chat.id, PolicrMini.Bot.id()) do
         {:ok, member} ->
           # 检查权限并执行相应修正
           if chat.is_take_over do
@@ -57,12 +57,13 @@ defmodule PolicrMini.Bot.Runner do
 
           # 如果没有发消息权限，直接退出
           if member.can_send_messages == false do
-            Nadia.leave_chat(chat.id)
+            Telegex.leave_chat(chat.id)
             Logger.info("Unable to send message in group `#{chat.id}`, has left automatically.")
           end
 
         # 已不在群组中
-        {:error, %Nadia.Model.Error{reason: "Forbidden: bot was kicked from the supergroup chat"}} ->
+        {:error,
+         %Telegex.Model.Error{description: "Forbidden: bot was kicked from the supergroup chat"}} ->
           cancel_takeover(chat, false)
 
         e ->
