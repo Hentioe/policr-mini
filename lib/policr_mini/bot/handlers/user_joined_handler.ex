@@ -43,6 +43,9 @@ defmodule PolicrMini.Bot.UserJoinedHandler do
   @impl true
   def match?(%{new_chat_members: nil} = _message, state), do: {false, state}
 
+  # 如果拉人或进群的是管理员，不匹配
+  def match?(_message, %{from_admin: true} = state), do: {false, state}
+
   @doc """
   消息中的新成员类型是机器人，不匹配。
   """
