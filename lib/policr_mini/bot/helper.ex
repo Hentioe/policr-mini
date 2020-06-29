@@ -114,7 +114,7 @@ defmodule PolicrMini.Bot.Helper do
         retry = options |> Keyword.get(:retry)
 
         if retry && retry > 0 do
-          Logger.warn("Send message timeout, ready to try again. Remaining times: #{retry}")
+          Logger.warn("Send message timeout, ready to try again. Remaining times: #{retry - 1}")
           options = options |> Keyword.put(:retry, retry - 1)
           send_message(chat_id, text, options)
         else
@@ -126,7 +126,7 @@ defmodule PolicrMini.Bot.Helper do
         retry = options |> Keyword.get(:retry)
 
         if retry && retry > 0 do
-          Logger.warn("Too many requests, restricted to send. Remaining times: #{retry}")
+          Logger.warn("Too many requests, restricted to send. Remaining times: #{retry - 1}")
           options = options |> Keyword.put(:retry, retry - 1)
           :timer.sleep(trunc(800 * retry * Enum.random(@time_seeds)))
           send_message(chat_id, text, options)
@@ -188,7 +188,7 @@ defmodule PolicrMini.Bot.Helper do
         retry = options |> Keyword.get(:retry)
 
         if retry && retry > 0 do
-          Logger.warn("Send message timeout, ready to try again. Remaining times: #{retry}")
+          Logger.warn("Send message timeout, ready to try again. Remaining times: #{retry - 1}")
           options = options |> Keyword.put(:retry, retry - 1)
           send_photo(chat_id, photo, options)
         else
@@ -200,7 +200,7 @@ defmodule PolicrMini.Bot.Helper do
         retry = options |> Keyword.get(:retry)
 
         if retry && retry > 0 do
-          Logger.warn("Too many requests, restricted to send. Remaining times: #{retry}")
+          Logger.warn("Too many requests, restricted to send. Remaining times: #{retry - 1}")
           options = options |> Keyword.put(:retry, retry - 1)
           :timer.sleep(trunc(800 * retry * Enum.random(@time_seeds)))
           send_photo(chat_id, photo, options)
