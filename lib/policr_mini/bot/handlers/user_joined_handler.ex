@@ -47,7 +47,7 @@ defmodule PolicrMini.Bot.UserJoinedHandler do
   消息中的新成员类型是机器人，不匹配。
   """
   @impl true
-  def match?(%{new_chat_members: %{is_bot: true}} = _message, state), do: {false, state}
+  def match?(%{new_chat_members: [%{is_bot: true}]} = _message, state), do: {false, state}
 
   @doc """
   其余情况皆匹配。
