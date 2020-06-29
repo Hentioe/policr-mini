@@ -21,6 +21,20 @@ config :policr_mini, PolicrMiniWeb.Endpoint,
 # Configures the image provider
 config :policr_mini, PolicrMini.Bot.ImageProvider, path: "images"
 
+# Job schedule
+config :policr_mini, PolicrMini.Bot.Scheduler,
+  jobs: [
+    # 修正过期验证任务
+    {"*/5 * * * *", {PolicrMini.Bot.Runner, :fix_expired_wait_status, []}},
+    # 检查工作状态任务
+    {"*/55 * * * *", {PolicrMini.Bot.Runner, :check_working_status, []}}
+  ]
+
+# Configures Telegex's timeouts
+config :telegex,
+  timeout: 1000 * 30,
+  recv_timeout: 1000 * 45
+
 # Configures Elixir's Logger
 config :logger, :console,
   format: "$time $metadata[$level] $message\n",
@@ -30,15 +44,6 @@ config :logger, :console,
 config :phoenix, :json_library, Jason
 # Task global configuration
 config :task_after, global_name: TaskAfter
-
-# Job schedule
-config :policr_mini, PolicrMini.Bot.Scheduler,
-  jobs: [
-    # 修正过期验证任务
-    {"*/5 * * * *", {PolicrMini.Bot.Runner, :fix_expired_wait_status, []}},
-    # 检查工作状态任务
-    {"*/55 * * * *", {PolicrMini.Bot.Runner, :check_working_status, []}}
-  ]
 
 # Internationalization of bot messages
 config :exi18n,
