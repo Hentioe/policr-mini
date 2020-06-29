@@ -53,6 +53,8 @@ defmodule PolicrMini.Bot.Runner do
             unless member.status == "administrator", do: cancel_takeover(chat)
             # 如果没有限制用户权限，取消接管
             if member.can_restrict_members == false, do: cancel_takeover(chat)
+            # 如果没有删除消息权限，取消接管
+            if member.can_delete_messages == false, do: cancel_takeover(chat)
           end
 
           # 如果没有发消息权限，直接退出
