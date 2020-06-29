@@ -114,6 +114,9 @@ defmodule PolicrMini.Bot.VerificationCallbacker do
 
         # 发送通知消息并延迟删除
         seconds = DateTime.diff(DateTime.utc_now(), verification.inserted_at)
+
+        async(fn -> verification.chat_id |> typing() end)
+
         text = t("verification.passed.notice", %{mentioned_user: at(from_user), seconds: seconds})
 
         # 发送通知

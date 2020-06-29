@@ -31,6 +31,8 @@ defmodule PolicrMini.Bot.SyncCommander do
   def handle(message, state) do
     %{chat: %{id: chat_id}} = message
 
+    async(fn -> chat_id |> typing() end)
+
     # 同步群组和管理员信息，并自动设置接管状态
     with {:ok, chat} <- synchronize_chat(chat_id),
          {:ok, _} <- synchronize_administrators(chat),
@@ -63,7 +65,6 @@ defmodule PolicrMini.Bot.SyncCommander do
         end
 
       async(fn ->
-        chat_id |> typing()
         send_message(chat_id, message_text)
       end)
     else
