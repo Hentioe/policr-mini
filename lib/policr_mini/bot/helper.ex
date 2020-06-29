@@ -325,6 +325,14 @@ defmodule PolicrMini.Bot.Helper do
     })
   end
 
+  @spec typing(integer()) :: {:ok, boolean()} | tgerror()
+  @doc """
+  让机器人显示正常打字的动作。
+  """
+  def typing(chat_id) do
+    Telegex.send_chat_action(chat_id, "typing")
+  end
+
   @doc """
   生成提及用户的文本内容。
   参数 `user` 需要满足 `fullname/1` 函数子句的任意条件，同时必须包含 `id` 字段。

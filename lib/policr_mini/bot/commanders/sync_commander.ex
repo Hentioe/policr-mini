@@ -62,7 +62,10 @@ defmodule PolicrMini.Bot.SyncCommander do
             )
         end
 
-      send_message(chat_id, message_text)
+      async(fn ->
+        chat_id |> typing()
+        send_message(chat_id, message_text)
+      end)
     else
       {:error, e} ->
         Logger.error("An error occurred during synchronization. Details: #{inspect(e)}")
