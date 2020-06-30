@@ -8,9 +8,17 @@ defmodule PolicrMini.Bot.SelfJoinedHandler do
   @impl true
   def match?(%{new_chat_members: nil} = _message, state), do: {false, state}
 
+  @doc """
+  单个用户加入，判断用户编号
+  """
   @impl true
   def match?(%{new_chat_members: [%{id: joined_user_id}]} = _message, state),
     do: {joined_user_id == bot_id(), state}
+
+  @doc """
+  多用户加入，不匹配（目前假设拉入的用户不会和其它加入用户一起合并到一条消息中。）
+  """
+  def match?(%{new_chat_members: [_, _]} = _message, state), do: {false, state}
 
   @impl true
   def handle(message, state) do
