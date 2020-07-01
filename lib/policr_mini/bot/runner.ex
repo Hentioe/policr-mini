@@ -40,45 +40,45 @@ defmodule PolicrMini.Bot.Runner do
   根据权限自动修正工作状态或退出群组。
   """
   def check_working_status do
-    # 获取接管的 chat 列表
-    chats = ChatBusiness.find_takeovered()
-
-    # 检查单个 chat 权限
-    check_one = fn chat ->
-      case Telegex.get_chat_member(chat.id, PolicrMini.Bot.id()) do
-        {:ok, member} ->
-          # 检查权限并执行相应修正
-          if chat.is_take_over do
-            # 如果不是管理员，取消接管
-            unless member.status == "administrator", do: cancel_takeover(chat)
-            # 如果没有限制用户权限，取消接管
-            if member.can_restrict_members == false, do: cancel_takeover(chat)
-            # 如果没有删除消息权限，取消接管
-            if member.can_delete_messages == false, do: cancel_takeover(chat)
-          end
-
-          # 如果没有发消息权限，直接退出
-          if member.can_send_messages == false do
-            Telegex.leave_chat(chat.id)
-            Logger.info("Unable to send message in group `#{chat.id}`, has left automatically.")
-          end
-
-        # 已不在群组中
-        {:error,
-         %Telegex.Model.Error{description: "Forbidden: bot was kicked from the supergroup chat"}} ->
-          cancel_takeover(chat, false)
-
-        e ->
-          Logger.error("An error occurred while checking bot permissions. Details: #{inspect(e)}")
-      end
-
-      # 休眠半秒检查下一个
-      :timer.sleep(500)
-    end
-
-    chats |> Enum.each(fn chat -> check_one.(chat) end)
+    ChatBusiness.find_takeovered() |> Enum.each(&handle_check_result/1)
 
     :ok
+  end
+
+  defp handle_check_result(%{id: chat_id, is_take_over: true, type: "group"}) do
+    BotHelper.send_message(chat_id, BotHelper.t("errors.no_super_group"))
+
+    Telegex.leave_chat(chat_id)
+  end
+
+  defp handle_check_result(%{id: chat_id, is_take_over: true, type: "channel"}),
+    do: Telegex.leave_chat(chat_id)
+
+  defp handle_check_result(%{is_take_over: true} = chat) do
+    case Telegex.get_chat_member(chat.id, PolicrMini.Bot.id()) do
+      {:ok, member} ->
+        # 检查权限并执行相应修正：
+
+        # 如果不是管理员，取消接管
+        unless member.status == "administrator", do: cancel_takeover(chat)
+        # 如果没有限制用户权限，取消接管
+        if member.can_restrict_members == false, do: cancel_takeover(chat)
+        # 如果没有删除消息权限，取消接管
+        if member.can_delete_messages == false, do: cancel_takeover(chat)
+        # 如果没有发消息权限，直接退出
+        if member.can_send_messages == false do
+          Telegex.leave_chat(chat.id)
+          Logger.info("Unable to send message in group `#{chat.id}`, has left automatically.")
+        end
+
+      # 已不在群组中
+      {:error,
+       %Telegex.Model.Error{description: "Forbidden: bot was kicked from the supergroup chat"}} ->
+        cancel_takeover(chat, false)
+
+      e ->
+        Logger.error("An error occurred while checking bot permissions. Details: #{inspect(e)}")
+    end
   end
 
   @spec cancel_takeover(Chat.t(), boolean()) :: :ok
