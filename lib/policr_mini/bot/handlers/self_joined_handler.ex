@@ -51,9 +51,13 @@ defmodule PolicrMini.Bot.SelfJoinedHandler do
 
     # 同步群组和管理员信息
     with {:ok, chat} <- SyncCommander.synchronize_chat(chat_id, true),
-         {:ok, _} <- SyncCommander.synchronize_administrators(chat) do
-      :ok = response(chat_id)
+         {:ok, _} <- SyncCommander.synchronize_administrators(chat),
+         :ok <- response(chat_id) do
     else
+      # 无发消息权限，直接退出
+      {:error, %Telegex.Model.Error{description: "Bad Request: have no rights to send a message"}} ->
+        Telegex.leave_chat(chat_id)
+
       e ->
         Logger.error("An error occurred after the bot was invited. Details: #{inspect(e)}")
         send_message(chat_id, t("self_joined.error"))
