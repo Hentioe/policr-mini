@@ -63,32 +63,15 @@ defmodule PolicrMini.Bot.UserJoinedHandler do
   """
   @impl true
   def handle(message, state) do
-    %{chat: %{id: chat_id}, new_chat_members: [new_chat_member], date: date} = message
+    %{chat: %{id: chat_id}, new_chat_members: new_chat_members} = message
 
     case SchemeBusiness.fetch(chat_id) do
       {:ok, scheme} ->
-        joined_datetime =
-          case date |> DateTime.from_unix() do
-            {:ok, datetime} -> datetime
-            _ -> DateTime.utc_now()
-          end
+        # 异步删除服务消息
+        Cleaner.delete_message(chat_id, message.message_id)
+        new_chat_members |> Enum.map(&handle_one(&1, scheme, message, state))
 
-        entrance = scheme.verification_entrance || default!(:ventrance)
-        mode = scheme.verification_mode || default!(:vmode)
-        occasion = scheme.verification_occasion || default!(:voccasion)
-        seconds = scheme.seconds || countdown()
-
-        if DateTime.diff(DateTime.utc_now(), joined_datetime) >= @expired_seconds do
-          # 处理过期验证
-          handle_expired(entrance, message, state)
-        else
-          # 异步删除服务消息
-          Cleaner.delete_message(chat_id, message.message_id)
-          # 异步限制新用户
-          async(fn -> restrict_chat_member(chat_id, new_chat_member.id) end)
-
-          handle(mode, entrance, occasion, seconds, message, state)
-        end
+        {:ok, %{state | done: true, deleted: true}}
 
       e ->
         Logger.error(
@@ -98,6 +81,37 @@ defmodule PolicrMini.Bot.UserJoinedHandler do
         send_message(chat_id, t("errors.scheme_fetch_failed"))
 
         {:error, state}
+    end
+  end
+
+  # 忽略 bot 类型的用户。
+  defp handle_one(%{is_bot: true} = _new_chat_member, _scheme, _message, state) do
+    {:ignored, state}
+  end
+
+  # 处理单个新成员的加入。
+  defp handle_one(new_chat_member, scheme, message, state) do
+    %{chat: %{id: chat_id}, date: date} = message
+
+    joined_datetime =
+      case date |> DateTime.from_unix() do
+        {:ok, datetime} -> datetime
+        _ -> DateTime.utc_now()
+      end
+
+    entrance = scheme.verification_entrance || default!(:ventrance)
+    mode = scheme.verification_mode || default!(:vmode)
+    occasion = scheme.verification_occasion || default!(:voccasion)
+    seconds = scheme.seconds || countdown()
+
+    if DateTime.diff(DateTime.utc_now(), joined_datetime) >= @expired_seconds do
+      # 处理过期验证
+      handle_expired(entrance, message, state)
+    else
+      # 异步限制新用户
+      async(fn -> restrict_chat_member(chat_id, new_chat_member.id) end)
+
+      handle_it(mode, entrance, occasion, seconds, message, state)
     end
   end
 
@@ -121,8 +135,6 @@ defmodule PolicrMini.Bot.UserJoinedHandler do
 
     case VerificationBusiness.fetch(verification_params) do
       {:ok, _} ->
-        # 异步删除服务消息
-        Cleaner.delete_message(chat_id, message.message_id)
         # 异步限制新用户
         async(fn -> restrict_chat_member(chat_id, new_chat_member.id) end)
 
@@ -138,7 +150,7 @@ defmodule PolicrMini.Bot.UserJoinedHandler do
   @doc """
   统一入口 + 私聊方案的细节实现。
   """
-  def handle(_, :unity, :private, seconds, message, state) do
+  def handle_it(_, :unity, :private, seconds, message, state) do
     %{chat: %{id: chat_id}, new_chat_members: [new_chat_member]} = message
 
     verification_params = %{
