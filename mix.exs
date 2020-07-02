@@ -51,7 +51,7 @@ defmodule PolicrMini.MixProject do
       {:yaml_elixir, "~> 2.4"},
       {:typed_struct, "~> 0.2.0"},
       {:quantum, "~> 3.0"},
-      {:telegex, "0.1.0-rc.11"}
+      {:telegex, "~> 0.1.0"}
     ]
   end
 
