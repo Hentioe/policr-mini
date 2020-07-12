@@ -12,6 +12,7 @@ defmodule PolicrMini.Application do
     SelfJoinedHandler,
     SelfLeftedHandler,
     UserJoinedHandler,
+    NewChatTitleHandler,
     TextHandler,
     VerificationCallbacker
   }
@@ -19,7 +20,13 @@ defmodule PolicrMini.Application do
   def start(_type, _args) do
     filters = [
       commanders: [StartCommander, PingCommander, SyncCommander],
-      handlers: [SelfJoinedHandler, SelfLeftedHandler, UserJoinedHandler, TextHandler],
+      handlers: [
+        SelfJoinedHandler,
+        SelfLeftedHandler,
+        UserJoinedHandler,
+        NewChatTitleHandler,
+        TextHandler
+      ],
       callbackers: [VerificationCallbacker]
     ]
 
