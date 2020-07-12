@@ -338,7 +338,11 @@ defmodule PolicrMini.Bot.Helper do
     Telegex.send_chat_action(chat_id, "typing")
   end
 
-  @type mention_opts :: [{:parse_mode, String.t()}, {:anonymization, boolean()}]
+  @type mention_opts :: [
+          {:parse_mode, String.t()},
+          {:anonymization, boolean()},
+          {:mosaic, boolean()}
+        ]
   @doc """
   生成提及用户的文本内容。
 
@@ -355,18 +359,68 @@ defmodule PolicrMini.Bot.Helper do
       options
       |> Keyword.put_new(:parse_mode, @markdown_parse_mode)
       |> Keyword.put_new(:anonymization, true)
+      |> Keyword.put_new(:mosaic, false)
 
     name =
       if options[:anonymization] do
         to_string(id)
       else
-        fullname(user)
+        name = fullname(user)
+
+        if options[:mosaic] do
+          mosaic_name(name)
+        else
+          name
+        end
       end
 
     case options[:parse_mode] do
       "MarkdownV2" -> "[#{Telegex.Marked.escape_text(name)}](tg://user?id=#{id})"
       "HTML" -> ~s(<a href="tg://user?id=#{id}">#{name}</a>)
     end
+  end
+
+  @doc """
+  给名字打马赛克（模拟）。
+
+  将名字中的部分字符替换成 `░` 符号。如果名字过长（超过五个字符），则只保留前后四个字符，中间使用两个 `█` 填充。
+  """
+  @spec mosaic_name(String.t()) :: String.t()
+  def mosaic_name(name) do
+    len = String.length(name)
+    mosaic_name(name, len)
+  end
+
+  def mosaic_name(name, len) when is_integer(len) and len == 1 do
+    name
+  end
+
+  def mosaic_name(name, len) when is_integer(len) and len == 2 do
+    name
+    |> String.graphemes()
+    |> Enum.with_index()
+    |> Enum.map(fn {char, index} ->
+      if index == 1, do: "░", else: char
+    end)
+    |> Enum.join("")
+  end
+
+  def mosaic_name(name, len) when is_integer(len) and len >= 3 and len <= 5 do
+    last_index = len - 1
+
+    name
+    |> String.graphemes()
+    |> Enum.with_index()
+    |> Enum.map(fn {char, index} ->
+      if index == 0 || index == last_index, do: char, else: "░"
+    end)
+    |> Enum.join("")
+  end
+
+  def mosaic_name(name, len) do
+    last_index = len - 1
+
+    "#{String.slice(name, 0..1)}██#{String.slice(name, (last_index - 1)..last_index)}"
   end
 
   @defaults [

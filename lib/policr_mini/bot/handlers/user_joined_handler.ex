@@ -165,7 +165,10 @@ defmodule PolicrMini.Bot.UserJoinedHandler do
     with {:ok, verification} <- VerificationBusiness.fetch(verification_params),
          {text, markup} <- make_verification_message(verification, seconds),
          {:ok, reminder_message} <-
-           Cleaner.send_verification_message(chat_id, text, reply_markup: markup),
+           Cleaner.send_verification_message(chat_id, text,
+             reply_markup: markup,
+             parse_mode: "MarkdownV2ToHTML"
+           ),
          {:ok, _} <-
            VerificationBusiness.update(verification, %{message_id: reminder_message.message_id}),
          {:ok, scheme} <- SchemeBusiness.fetch(chat_id) do
@@ -191,13 +194,13 @@ defmodule PolicrMini.Bot.UserJoinedHandler do
     end
   end
 
-  @spec make_verification_message(Verification.t(), integer()) ::
-          {String.t(), InlineKeyboardMarkup.t()}
   @doc """
   生成验证消息。
   注意：此函数需要在验证记录创建以后调用，否则会出现不正确的等待验证人数。
   因为当前默认统一验证入口的关系，此函数生成的验证入口而不是验证消息。
   """
+  @spec make_verification_message(Verification.t(), integer()) ::
+          {String.t(), InlineKeyboardMarkup.t()}
   def make_verification_message(%Verification{} = verification, seconds) do
     %{chat_id: chat_id, target_user_id: target_user_id, target_user_name: target_user_name} =
       verification
@@ -224,12 +227,12 @@ defmodule PolicrMini.Bot.UserJoinedHandler do
       if waiting_count == 1,
         do:
           t("verification.unity.single_waiting", %{
-            mentioned_user: mention(user),
+            mentioned_user: mention(user, anonymization: false, mosaic: true),
             seconds: seconds
           }),
         else:
           t("verification.unity.multiple_waiting", %{
-            mentioned_user: mention(user),
+            mentioned_user: mention(user, anonymization: false, mosaic: true),
             remaining_count: waiting_count - 1,
             seconds: seconds
           })
