@@ -117,11 +117,17 @@ defmodule PolicrMini.Bot.VerificationCallbacker do
 
         async(fn -> verification.chat_id |> typing() end)
 
-        marked_enabled = Application.get_env(:policr_mini, :marked_enabled)
+        # 注：启用此代码需要设置 send_message 函数的 parse_mode 为 "MarkdownV2ToHTML"
+        # marked_enabled = Application.get_env(:policr_mini, :marked_enabled)
 
+        # text =
+        #   t("verification.passed.notice", %{
+        #     mentioned_user: mention(from_user, anonymization: !marked_enabled),
+        #     seconds: seconds
+        #   })
         text =
           t("verification.passed.notice", %{
-            mentioned_user: mention(from_user, anonymization: !marked_enabled),
+            mentioned_user: mention(from_user),
             seconds: seconds
           })
 
