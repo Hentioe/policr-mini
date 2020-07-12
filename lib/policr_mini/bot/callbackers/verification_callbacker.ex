@@ -13,6 +13,7 @@ defmodule PolicrMini.Bot.VerificationCallbacker do
 
   @doc """
   回调处理函数。
+
   此函数仅仅解析参数并分发到 `handle_data/2` 子句中。
   """
   @impl true
@@ -20,13 +21,14 @@ defmodule PolicrMini.Bot.VerificationCallbacker do
     data |> parse_callback_data() |> handle_data(callback_query)
   end
 
-  @spec handle_data({String.t(), [String.t(), ...]}, Telegex.Model.CallbackQuery.t()) ::
-          :error | :ok
   @doc """
   处理 v1 版本的验证。
+
   此版本的数据参数格式为「被选择答案索引:验证编号」。
   TODO: 应该根据验证记录中的入口动态决定的 chat_id（当前因为默认私聊的关系直接使用了 user_id）。
   """
+  @spec handle_data({String.t(), [String.t(), ...]}, Telegex.Model.CallbackQuery.t()) ::
+          :error | :ok
   def handle_data({"v1", [chosen, verification_id]}, callback_query) do
     %{id: callback_query_id, from: %{id: user_id} = from, message: %{message_id: message_id}} =
       callback_query
@@ -91,11 +93,11 @@ defmodule PolicrMini.Bot.VerificationCallbacker do
     end
   end
 
-  @spec handle_correct(Verification.t(), integer(), Telegex.Model.User.t()) ::
-          {:ok, Verification.t()} | {:error, any()}
   @doc """
   处理回答正确。
   """
+  @spec handle_correct(Verification.t(), integer(), Telegex.Model.User.t()) ::
+          {:ok, Verification.t()} | {:error, any()}
   def handle_correct(
         %Verification{} = verification,
         message_id,
@@ -117,23 +119,17 @@ defmodule PolicrMini.Bot.VerificationCallbacker do
 
         async(fn -> verification.chat_id |> typing() end)
 
-        # 注：启用此代码需要设置 send_message 函数的 parse_mode 为 "MarkdownV2ToHTML"
-        # marked_enabled = Application.get_env(:policr_mini, :marked_enabled)
+        marked_enabled = Application.get_env(:policr_mini, :marked_enabled)
 
-        # text =
-        #   t("verification.passed.notice", %{
-        #     mentioned_user: mention(from_user, anonymization: !marked_enabled),
-        #     seconds: seconds
-        #   })
         text =
           t("verification.passed.notice", %{
-            mentioned_user: mention(from_user),
+            mentioned_user: mention(from_user, anonymization: !marked_enabled),
             seconds: seconds
           })
 
         # 发送通知
         async(fn ->
-          case send_message(verification.chat_id, text) do
+          case send_message(verification.chat_id, text, parse_mode: "MarkdownV2ToHTML") do
             {:ok, sended_message} ->
               Cleaner.delete_message(verification.chat_id, sended_message.message_id,
                 delay_seconds: 8
@@ -155,11 +151,11 @@ defmodule PolicrMini.Bot.VerificationCallbacker do
     end
   end
 
-  @spec handle_wrong(Verification.t(), atom(), integer(), Telegex.Model.User.t()) ::
-          {:ok, Verification.t()} | {:error, any()}
   @doc """
   处理回答错误。
   """
+  @spec handle_wrong(Verification.t(), atom(), integer(), Telegex.Model.User.t()) ::
+          {:ok, Verification.t()} | {:error, any()}
   def handle_wrong(
         %Verification{} = verification,
         killing_method,
@@ -191,11 +187,11 @@ defmodule PolicrMini.Bot.VerificationCallbacker do
     end
   end
 
-  @spec update_unity_verification_message(integer(), integer(), integer()) ::
-          :not_found | {:error, Telegex.Model.errors()} | {:ok, Telegex.Model.Message.t()}
   @doc """
   更新统一验证入口消息
   """
+  @spec update_unity_verification_message(integer(), integer(), integer()) ::
+          :not_found | {:error, Telegex.Model.errors()} | {:ok, Telegex.Model.Message.t()}
   def update_unity_verification_message(chat_id, count, max_seconds) do
     # 提及当前最新的等待验证记录中的用户
     if verification = VerificationBusiness.find_last_unity_waiting(chat_id) do
@@ -212,10 +208,10 @@ defmodule PolicrMini.Bot.VerificationCallbacker do
     end
   end
 
-  @spec validity_check(integer(), integer()) :: {:ok, Verification.t()} | {:error, String.t()}
   @doc """
   检查验证数据是否有效。
   """
+  @spec validity_check(integer(), integer()) :: {:ok, Verification.t()} | {:error, String.t()}
   def validity_check(user_id, verification_id)
       when is_integer(user_id) and is_integer(verification_id) do
     with {:ok, verification} <- VerificationBusiness.get(verification_id),
