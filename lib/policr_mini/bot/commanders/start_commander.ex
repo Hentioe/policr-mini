@@ -156,25 +156,60 @@ defmodule PolicrMini.Bot.StartCommander do
 
     markup = PolicrMini.Bot.Captcha.build_markup(cdata.candidates, verification.id)
 
-    text =
-      t("verification.template", %{
-        question: cdata.question,
-        seconds: time_left(verification)
-      })
+    {text, parse_mode} =
+      if Application.get_env(:policr_mini, :marked_enabled) do
+        text =
+          t("verification.template_issue_33", %{
+            chat_name: Telegex.Marked.escape_text(verification.chat.title),
+            question: cdata.question,
+            seconds: time_left(verification)
+          })
+
+        {text, "MarkdownV2ToHTML"}
+      else
+        text =
+          t("verification.template", %{
+            question: cdata.question,
+            seconds: time_left(verification)
+          })
+
+        {text, "MarkdownV2"}
+      end
 
     send_fun =
       case cmodule do
         ImageCaptcha ->
-          fn -> send_photo(user_id, cdata.photo, caption: text, reply_markup: markup) end
+          fn ->
+            send_photo(user_id, cdata.photo,
+              caption: text,
+              reply_markup: markup,
+              parse_mode: parse_mode
+            )
+          end
 
         ArithmeticCaptcha ->
-          fn -> send_message(user_id, text, reply_markup: markup) end
+          fn ->
+            send_message(user_id, text,
+              reply_markup: markup,
+              parse_mode: parse_mode
+            )
+          end
 
         FallbackCaptcha ->
-          fn -> send_message(user_id, text, reply_markup: markup) end
+          fn ->
+            send_message(user_id, text,
+              reply_markup: markup,
+              parse_mode: parse_mode
+            )
+          end
 
         _ ->
-          fn -> send_message(user_id, text, reply_markup: markup) end
+          fn ->
+            send_message(user_id, text,
+              reply_markup: markup,
+              parse_mode: parse_mode
+            )
+          end
       end
 
     # 发送验证消息

@@ -30,6 +30,10 @@ config :policr_mini, PolicrMini.Bot.Scheduler,
     {"*/55 * * * *", {PolicrMini.Bot.Runner, :check_working_status, []}}
   ]
 
+# Configure marked
+config :policr_mini,
+  marked_enabled: false
+
 # Configures Telegex's timeouts
 config :telegex,
   timeout: 1000 * 30,

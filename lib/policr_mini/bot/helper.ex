@@ -68,6 +68,7 @@ defmodule PolicrMini.Bot.Helper do
 
   @time_seeds [0.2, 0.4, 0.8, 1.0]
   @markdown_parse_mode "MarkdownV2"
+  @markdown_to_html_parse_mode "MarkdownV2ToHTML"
 
   @type parsemode :: String.t()
 
@@ -98,11 +99,20 @@ defmodule PolicrMini.Bot.Helper do
       |> Keyword.put_new(:retry, 5)
       |> delete_keyword_nils()
 
-    text =
-      if(options |> Keyword.get(:parse_mode) == @markdown_parse_mode) do
-        escape_markdown(text)
-      else
-        text
+    parse_mode = Keyword.get(options, :parse_mode)
+
+    {text, options} =
+      case parse_mode do
+        @markdown_parse_mode ->
+          text = escape_markdown(text)
+          {text, options}
+
+        @markdown_to_html_parse_mode ->
+          text = Telegex.Marked.as_html(text)
+          {text, Keyword.put(options, :parse_mode, "HTML")}
+
+        _ ->
+          {text, options}
       end
 
     case Telegex.send_message(chat_id, text, options) do
@@ -165,16 +175,25 @@ defmodule PolicrMini.Bot.Helper do
       |> Keyword.put_new(:retry, 5)
       |> delete_keyword_nils()
 
+    parse_mode = Keyword.get(options, :parse_mode)
+
     options =
       if caption = options[:caption] do
-        caption =
-          if(options |> Keyword.get(:parse_mode) == @markdown_parse_mode) do
-            escape_markdown(caption)
-          else
-            caption
-          end
+        case parse_mode do
+          @markdown_parse_mode ->
+            caption = escape_markdown(caption)
+            Keyword.put(options, :caption, caption)
 
-        options |> Keyword.put(:caption, caption)
+          @markdown_to_html_parse_mode ->
+            caption = Telegex.Marked.as_html(caption)
+
+            options
+            |> Keyword.put(:caption, caption)
+            |> Keyword.put(:parse_mode, "HTML")
+
+          _ ->
+            options
+        end
       else
         options
       end

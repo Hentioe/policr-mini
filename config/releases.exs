@@ -40,6 +40,10 @@ config :policr_mini, PolicrMini.Bot.ImageProvider,
       environment variable POLICR_MINI_BOT_IMAGES_PATH is missing.
       """)
 
+# Configure marked
+config :policr_mini,
+  marked_enabled: (System.get_env("POLICR_MINI_BOT_ISSUE_33") || "false") == "true"
+
 config :telegex,
   token:
     System.get_env("POLICR_MINI_BOT_TOKEN") ||

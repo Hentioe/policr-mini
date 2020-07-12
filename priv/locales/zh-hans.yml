@@ -39,6 +39,12 @@ verification:
     *%{question}*
 
     您还剩 %{seconds} 秒，通过可解除封印。
+  template_issue_33: |
+    _来自『*%{chat_name}*』的验证，请确认问题并选择您认为正确的答案。_
+
+    *%{question}*
+
+    您还剩 __%{seconds}__ 秒，通过可解除封印。
   passed:
     private: 恭喜您，验证通过。如果限制仍未解除请联系管理员。
     notice: 刚刚 %{mentioned_user} 通过了验证，用时 %{seconds} 秒。
