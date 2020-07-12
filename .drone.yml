@@ -3,7 +3,7 @@ name: default
 
 steps:
   - name: app-compile
-    image: bluerain/elixir:1.10.3-slim
+    image: bluerain/elixir:1.10.4-slim
     environment:
       MIX_ENV: prod
     commands:
