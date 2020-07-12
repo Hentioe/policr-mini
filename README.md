@@ -1,6 +1,6 @@
 # PolicrMini
 
-[![Build Status](https://github-ci.bluerain.io/api/badges/Hentioe/policr-mini/status.svg)](https://github-ci.bluerain.io/Hentioe/policr-mini)
+[![Build Status](https://cloud.drone.io/api/badges/Hentioe/policr-mini/status.svg)](https://cloud.drone.io/Hentioe/policr-mini)
 [![GitHub issues](https://img.shields.io/github/issues/Hentioe/policr-mini)](https://github.com/Hentioe/policr-mini/issues)
 ![Languages top](https://img.shields.io/github/languages/top/Hentioe/policr-mini)
 ![GitHub](https://img.shields.io/github/license/Hentioe/policr-mini)
