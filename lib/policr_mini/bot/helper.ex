@@ -23,30 +23,16 @@ defmodule PolicrMini.Bot.Helper do
   """
   defdelegate bot_username(), to: PolicrMini.Bot, as: :username
 
-  # @doc """
-  # 通过同时包含 `first_name` 和 `last_name` 字段的 map 数据构造全名。
-  # """
-  # def fullname(%{first_name: first_name, last_name: last_name}),
-  #   do: "#{first_name} #{last_name}"
-
-  # @doc """
-  # 通过仅包含 `first_name` 字段的 map 数据构造全名。
-  # """
-  # def fullname(%{first_name: first_name}), do: first_name
-
-  # @doc """
-  # 通过仅包含 `last_name` 字段的 map 数据构造全名。
-  # """
-  # def fullname(%{last_name: last_name}), do: last_name
-
-  # @doc """
-  # 通过包含 `fullname` 字段的 map 数据构造全名。
-  # """
-  # def fullname(%{fullname: fullname}), do: fullname
-
   @doc """
-  通过进包含 `id` 字段的 map 数据构造全名。
+  根据 map 数据构造用户全名。
+
+  如果 fist_name 和 last_name 都不存在，则使用 id。
   """
+  def fullname(%{first_name: first_name, last_name: last_name}),
+    do: "#{first_name}#{last_name}"
+
+  def fullname(%{first_name: first_name}), do: first_name
+  def fullname(%{fullname: fullname}), do: fullname
   def fullname(%{id: id}), do: Integer.to_string(id)
 
   @spec escape_markdown(String.t()) :: String.t()
@@ -352,16 +338,34 @@ defmodule PolicrMini.Bot.Helper do
     Telegex.send_chat_action(chat_id, "typing")
   end
 
+  @type mention_opts :: [{:parse_mode, String.t()}, {:anonymization, boolean()}]
   @doc """
   生成提及用户的文本内容。
+
   参数 `user` 需要满足 `fullname/1` 函数子句的任意条件，同时必须包含 `id` 字段。
-  参数 `parse_mode` 默认值为 `"MarkdownV2"`，可配置为 `"HTML"`。
-  注意 `parse_mode` 需要跟 `send_message/3` 中的配置一致，否则最终的消息形式不正确，并且无法对被提及用户产生通知。
+  参数 `options` 可包括以下选项：
+  - `parse_mode` 默认值为 `"MarkdownV2"`，可配置为 `"HTML"`。
+  - `anonymization` 默认值为 `true`，可配置为 `false`。
+
+  注意：`parse_mode` 需要跟 `send_message/3` 中的配置一致，否则最终的消息形式不正确，并且无法对被提及用户产生通知。
   """
-  def at(user, parse_mode \\ "MarkdownV2") when is_map(user) do
-    case parse_mode do
-      "MarkdownV2" -> "[#{fullname(user)}](tg://user?id=#{user.id})"
-      "HTML" -> ~s(<a href="tg://user?id=#{user.id}">#{fullname(user)}</a>)
+  @spec mention(map(), mention_opts()) :: String.t()
+  def mention(%{id: id} = user, options \\ []) do
+    options =
+      options
+      |> Keyword.put_new(:parse_mode, @markdown_parse_mode)
+      |> Keyword.put_new(:anonymization, true)
+
+    name =
+      if options[:anonymization] do
+        to_string(id)
+      else
+        fullname(user)
+      end
+
+    case options[:parse_mode] do
+      "MarkdownV2" -> "[#{Telegex.Marked.escape_text(name)}](tg://user?id=#{id})"
+      "HTML" -> ~s(<a href="tg://user?id=#{id}">#{name}</a>)
     end
   end
 

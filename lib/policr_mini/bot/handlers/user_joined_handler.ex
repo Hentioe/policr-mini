@@ -182,7 +182,9 @@ defmodule PolicrMini.Bot.UserJoinedHandler do
       e ->
         Logger.error("Error creating verification entrance. Details: #{inspect(e)}")
 
-        text = t("errors.verification_created_failed", %{mentioned_user: at(new_chat_member)})
+        text =
+          t("errors.verification_created_failed", %{mentioned_user: mention(new_chat_member)})
+
         send_message(chat_id, text)
 
         {:error, state}
@@ -220,10 +222,14 @@ defmodule PolicrMini.Bot.UserJoinedHandler do
     # 读取等待验证的人数并根据人数分别响应不同的文本内容
     text =
       if waiting_count == 1,
-        do: t("verification.unity.single_waiting", %{mentioned_user: at(user), seconds: seconds}),
+        do:
+          t("verification.unity.single_waiting", %{
+            mentioned_user: mention(user),
+            seconds: seconds
+          }),
         else:
           t("verification.unity.multiple_waiting", %{
-            mentioned_user: at(user),
+            mentioned_user: mention(user),
             remaining_count: waiting_count - 1,
             seconds: seconds
           })
@@ -323,10 +329,16 @@ defmodule PolicrMini.Bot.UserJoinedHandler do
     text =
       case reason do
         :timeout ->
-          t("verification.timeout.kick.notice", %{mentioned_user: at(user), time_text: time_text})
+          t("verification.timeout.kick.notice", %{
+            mentioned_user: mention(user),
+            time_text: time_text
+          })
 
         :wronged ->
-          t("verification.wronged.kick.notice", %{mentioned_user: at(user), time_text: time_text})
+          t("verification.wronged.kick.notice", %{
+            mentioned_user: mention(user),
+            time_text: time_text
+          })
       end
 
     async(fn -> chat_id |> typing() end)

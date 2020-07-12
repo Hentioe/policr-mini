@@ -32,7 +32,7 @@ config :policr_mini, PolicrMini.Bot.Scheduler,
 
 # Configure marked
 config :policr_mini,
-  marked_enabled: false
+  marked_enabled: true
 
 # Configures Telegex's timeouts
 config :telegex,

@@ -117,7 +117,13 @@ defmodule PolicrMini.Bot.VerificationCallbacker do
 
         async(fn -> verification.chat_id |> typing() end)
 
-        text = t("verification.passed.notice", %{mentioned_user: at(from_user), seconds: seconds})
+        marked_enabled = Application.get_env(:policr_mini, :marked_enabled)
+
+        text =
+          t("verification.passed.notice", %{
+            mentioned_user: mention(from_user, anonymization: !marked_enabled),
+            seconds: seconds
+          })
 
         # 发送通知
         async(fn ->
