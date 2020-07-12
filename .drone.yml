@@ -26,21 +26,16 @@ steps:
       - mix release
 
   - name: image-push
-    image: plugins/docker
-    settings:
-      repo: bluerain/policr-mini
-      username: bluerain
-      password:
-        from_secret: docker_password
-      dockerfile: Dockerfile
-      tags: latest
-    when:
-      branch:
-        - master
-      event:
-        - push
-
-volumes:
-  - name: docker_sock
-    host:
-      path: /var/run/docker.sock
+      image: plugins/docker
+      settings:
+        repo: bluerain/policr-mini
+        username: bluerain
+        password:
+          from_secret: docker_password
+        dockerfile: Dockerfile
+        tags: latest
+      when:
+        branch:
+          - master
+        event:
+          - push
