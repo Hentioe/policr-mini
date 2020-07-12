@@ -17,7 +17,7 @@ steps:
       - npm run deploy --prefix assets
 
   - name: app-build
-    image: bluerain/elixir:1.10.3-slim
+    image: bluerain/elixir:1.10.4-slim
     pull: always
     environment:
       MIX_ENV: prod
