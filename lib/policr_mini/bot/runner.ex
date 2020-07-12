@@ -71,9 +71,16 @@ defmodule PolicrMini.Bot.Runner do
           Logger.info("Unable to send message in group `#{chat.id}`, has left automatically.")
         end
 
-      # 已不在群组中
+      # 机器人被封禁
       {:error,
        %Telegex.Model.Error{description: "Forbidden: bot was kicked from the supergroup chat"}} ->
+        cancel_takeover(chat, false)
+
+      # 机器人已不在群中
+      {:error,
+       %Telegex.Model.Error{
+         description: "Forbidden: bot is not a member of the supergroup chat"
+       }} ->
         cancel_takeover(chat, false)
 
       e ->
