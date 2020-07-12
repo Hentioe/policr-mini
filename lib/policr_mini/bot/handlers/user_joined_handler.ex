@@ -333,20 +333,20 @@ defmodule PolicrMini.Bot.UserJoinedHandler do
       case reason do
         :timeout ->
           t("verification.timeout.kick.notice", %{
-            mentioned_user: mention(user),
+            mentioned_user: mention(user, anonymization: false, mosaic: true),
             time_text: time_text
           })
 
         :wronged ->
           t("verification.wronged.kick.notice", %{
-            mentioned_user: mention(user),
+            mentioned_user: mention(user, anonymization: false, mosaic: true),
             time_text: time_text
           })
       end
 
     async(fn -> chat_id |> typing() end)
 
-    case send_message(chat_id, text) do
+    case send_message(chat_id, text, parse_mode: "MarkdownV2ToHTML") do
       {:ok, sended_message} ->
         Cleaner.delete_message(chat_id, sended_message.message_id, delay_seconds: 8)
 
