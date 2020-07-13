@@ -33,7 +33,7 @@ config :policr_mini, PolicrMiniWeb.Endpoint,
   server: true
 
 # Configures the image provider
-config :policr_mini, PolicrMini.Bot.ImageProvider,
+config :policr_mini, PolicrMiniBot.ImageProvider,
   path:
     System.get_env("POLICR_MINI_BOT_IMAGES_PATH") ||
       raise("""

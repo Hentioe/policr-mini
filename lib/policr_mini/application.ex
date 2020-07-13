@@ -5,7 +5,7 @@ defmodule PolicrMini.Application do
 
   use Application
 
-  alias PolicrMini.Bot.{
+  alias PolicrMiniBot.{
     StartCommander,
     PingCommander,
     SyncCommander,
@@ -43,17 +43,17 @@ defmodule PolicrMini.Application do
 
     bot_children = [
       # 图片供应服务
-      PolicrMini.Bot.ImageProvider,
+      PolicrMiniBot.ImageProvider,
       # 消息清理服务
-      PolicrMini.Bot.Cleaner,
+      PolicrMiniBot.Cleaner,
       # 拉取更新消息
-      PolicrMini.Bot.UpdatePoller,
+      PolicrMiniBot.UpdatePoller,
       # 消费消息的动态主管
-      PolicrMini.Bot.Consumer,
+      PolicrMiniBot.Consumer,
       # 过滤器管理器
-      {PolicrMini.Bot.FilterManager, filters},
+      {PolicrMiniBot.FilterManager, filters},
       # 任务调度服务
-      PolicrMini.Bot.Scheduler
+      PolicrMiniBot.Scheduler
     ]
 
     children =

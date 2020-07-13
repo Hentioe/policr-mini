@@ -19,15 +19,15 @@ config :policr_mini, PolicrMiniWeb.Endpoint,
   live_view: [signing_salt: "hy+GpqGC"]
 
 # Configures the image provider
-config :policr_mini, PolicrMini.Bot.ImageProvider, path: "images"
+config :policr_mini, PolicrMiniBot.ImageProvider, path: "images"
 
 # Job schedule
-config :policr_mini, PolicrMini.Bot.Scheduler,
+config :policr_mini, PolicrMiniBot.Scheduler,
   jobs: [
     # 修正过期验证任务
-    {"*/5 * * * *", {PolicrMini.Bot.Runner, :fix_expired_wait_status, []}},
+    {"*/5 * * * *", {PolicrMiniBot.Runner, :fix_expired_wait_status, []}},
     # 检查工作状态任务
-    {"*/55 * * * *", {PolicrMini.Bot.Runner, :check_working_status, []}}
+    {"*/55 * * * *", {PolicrMiniBot.Runner, :check_working_status, []}}
   ]
 
 # Configure marked
