@@ -26,7 +26,7 @@
 
 ## 加入我们
 
-- [POLICR · 中文社区](https://policr.bluerain.io/community)
+- [POLICR · 中文社区](https://mini.telestd.me/community)
 - [POLICR · 更新通知](https://t.me/policr_changelog)
 
 ## 功能设计
