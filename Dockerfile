@@ -21,7 +21,4 @@ ENV LANG=C.UTF-8
 ENV PATH="$APP_HOME/bin:$PATH"
 
 
-EXPOSE 4000
-
-
 ENTRYPOINT [ "policr_mini", "start" ]
