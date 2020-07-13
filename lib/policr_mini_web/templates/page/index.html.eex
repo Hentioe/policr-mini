@@ -1,38 +1,42 @@
-<section class="phx-hero">
-  <h1><%= gettext "Welcome to %{name}!", name: "Phoenix" %></h1>
-  <p>Peace-of-mind from prototype to production</p>
-</section>
-
-<section class="row">
-  <article class="column">
-    <h2>Resources</h2>
-    <ul>
-      <li>
-        <a href="https://hexdocs.pm/phoenix/overview.html">Guides &amp; Docs</a>
-      </li>
-      <li>
-        <a href="https://github.com/phoenixframework/phoenix">Source</a>
-      </li>
-      <li>
-        <a href="https://github.com/phoenixframework/phoenix/blob/v1.5/CHANGELOG.md">v1.5 Changelog</a>
-      </li>
-    </ul>
-  </article>
-  <article class="column">
-    <h2>Help</h2>
-    <ul>
-      <li>
-        <a href="https://elixirforum.com/c/phoenix-forum">Forum</a>
-      </li>
-      <li>
-        <a href="https://webchat.freenode.net/?channels=elixir-lang">#elixir-lang on Freenode IRC</a>
-      </li>
-      <li>
-        <a href="https://twitter.com/elixirphoenix">Twitter @elixirphoenix</a>
-      </li>
-      <li>
-        <a href="https://elixir-slackin.herokuapp.com/">Elixir on Slack</a>
-      </li>
-    </ul>
-  </article>
-</section>
+<style>
+  html,
+  body {
+    padding: 0;
+    margin: 0;
+  }
+  #loading-wrapper {
+    position: fixed;
+    top: 0;
+    right: 0;
+    left: 0;
+    bottom: 0;
+    background: rgba(255, 255, 255, 1);
+  }
+  #loading {
+    width: 85px;
+    height: 85px;
+    top: 0;
+    right: 0;
+    left: 0;
+    bottom: 0;
+    margin: auto;
+    user-select: none;
+    position: absolute;
+  }
+</style>
+<div id="loading-wrapper">
+  <div id="loading">
+    <img
+      src="<%= Routes.static_path(@conn, ~s{/images/logo-x85.png}) %>"
+    />
+  </div>
+</div>
+<div id="app"></div>
+<link
+  rel="stylesheet"
+  href="<%= Routes.static_path(@conn, ~s{/css/user.css}) %>"
+/>
+<script
+  type="text/javascript"
+  src="<%= Routes.static_path(@conn, ~s{/js/user.js}) %>"
+></script>
