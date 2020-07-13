@@ -46,8 +46,8 @@ defmodule PolicrMini.Application do
       PolicrMini.Bot.ImageProvider,
       # 消息清理服务
       PolicrMini.Bot.Cleaner,
-      # 启动机器人（拉取消息）
-      PolicrMini.Bot,
+      # 拉取更新消息
+      PolicrMini.Bot.UpdatePoller,
       # 消费消息的动态主管
       PolicrMini.Bot.Consumer,
       # 过滤器管理器

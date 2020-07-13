@@ -21,5 +21,5 @@ defmodule PolicrMini do
     end
   end
 
-  def mix_env, do: System.get_env("MIX_ENV", "dev") |> String.to_atom()
+  def mix_env, do: Application.get_env(:policr_mini, :environment)
 end

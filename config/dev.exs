@@ -1,5 +1,8 @@
 use Mix.Config
 
+# Definition environment
+config :policr_mini, :environment, :dev
+
 # Configure your database
 config :policr_mini, PolicrMini.Repo,
   username: "postgres",
@@ -29,7 +32,8 @@ config :policr_mini, PolicrMiniWeb.Endpoint,
       "--watch-stdin",
       cd: Path.expand("../assets", __DIR__)
     ]
-  ]
+  ],
+  server: true
 
 # ## SSL Support
 #

@@ -1,5 +1,8 @@
 use Mix.Config
 
+# Definition environment
+config :policr_mini, :environment, :test
+
 # Configure your database
 #
 # The MIX_TEST_PARTITION environment variable can be used
