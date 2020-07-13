@@ -28,10 +28,13 @@ defmodule PolicrMini.Bot.Helper do
 
   如果 fist_name 和 last_name 都不存在，则使用 id。
   """
-  def fullname(%{first_name: first_name, last_name: last_name}),
-    do: "#{first_name}#{last_name}"
+  @spec fullname(map()) :: String.t()
+  def fullname(%{first_name: first_name, last_name: nil}),
+    do: first_name
 
-  def fullname(%{first_name: first_name}), do: first_name
+  def fullname(%{first_name: first_name, last_name: last_name}),
+    do: "#{first_name} #{last_name}"
+
   def fullname(%{fullname: fullname}), do: fullname
   def fullname(%{id: id}), do: Integer.to_string(id)
 
