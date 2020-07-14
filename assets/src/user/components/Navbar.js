@@ -6,7 +6,7 @@ const Link = styled.a.attrs({})`
 `;
 
 const MenuItem = styled(Link).attrs({})`
-  ${tw`lg:inline-flex lg:w-auto w-full px-3 py-2 rounded text-gray-600 items-center justify-center hover:bg-gray-700 hover:text-white`}
+  ${tw`md:inline-flex md:w-auto w-full px-5 py-2 rounded text-gray-600 items-center justify-center`}
 `;
 
 // 参考来源：https://tailwindcomponents.com/component/simple-responsive-navigation-bar-1
@@ -39,16 +39,16 @@ export default () => {
         </svg>
       </button> */}
       <div
-        tw="hidden w-full lg:inline-flex lg:flex-grow lg:w-auto"
+        tw="hidden w-full md:inline-flex md:flex-grow md:w-auto"
         className="top-navbar"
         id="navigation"
       >
-        <div tw="lg:inline-flex lg:flex-row lg:ml-auto lg:w-auto w-full lg:items-center items-start  flex flex-col lg:h-auto">
+        <div tw="md:inline-flex md:ml-auto md:flex-row md:w-auto w-full md:items-center items-start flex flex-col md:h-auto">
           <MenuItem href="/">
             <span>首页</span>
           </MenuItem>
           <MenuItem href="#">
-            <span>教程</span>
+            <span>后台</span>
           </MenuItem>
           <MenuItem href="#">
             <span>社区</span>
@@ -58,6 +58,9 @@ export default () => {
           </MenuItem>
           <MenuItem href="#">
             <span>关于</span>
+          </MenuItem>
+          <MenuItem href="#" tw="bg-yellow-400">
+            <span>快速入门</span>
           </MenuItem>
         </div>
       </div>

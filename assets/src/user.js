@@ -24,8 +24,8 @@ const App = () => {
   );
 };
 
-let renderDelay = 0;
-if (DEBUG) renderDelay = 600;
+let renderDelay = 600;
+if (DEBUG) renderDelay = 0;
 
 setTimeout(() => {
   ReactDOM.render(<App />, document.getElementById("app"));
