@@ -15,6 +15,14 @@ const InlineKeybordButton = styled.div.attrs({})`
   ${tw`shadow-sm bg-blue-400 text-white rounded-md px-4 py-2 text-sm mt-1 flex justify-center bg-opacity-75 cursor-pointer`}
 `;
 
+const Divider = styled.div.attrs({})`
+  ${tw`mt-1`}
+`;
+
+const Paragraph = styled.p.attrs({})`
+  ${tw`m-0`}
+`;
+
 export default () => {
   return (
     <>
@@ -22,14 +30,56 @@ export default () => {
       <UnifiedFlexBox tw="flex-wrap mt-20">
         <div tw="w-8/12">
           <p tw="text-blue-500 text-4xl font-bold tracking-widest">
-            社区驱动的开源验证机器人，致力于自助部署和使用。
+            由社区驱动的开源验证机器人，致力于自主部署使用。
           </p>
-          <p tw="text-gray-500">
+          <p tw="text-gray-600">
             本项目从 Policr
-            机器人的开发和运营过程中吸取了丰富的经验，设计更加现代。不新增、不膨胀，单一而专注的同时将持续优化本职功能和体验。欢迎有资源的人加入我们，共建社区生态。
+            机器人的开发和运营过程中吸取了丰富的经验，设计更加现代，功能单一不膨胀。在未来的更新过程中也只会继续改进核心功能和优化体验，保持本质不变。
           </p>
+          <div tw="mt-24 flex">
+            <div tw="w-6/12 flex">
+              <div tw="flex-1 self-start">
+                <span tw="text-green-600 font-bold tracking-wider">
+                  「已完成
+                </span>
+              </div>
+              <div tw="flex-1 self-center">
+                <span tw="text-6xl font-extrabold text-red-400 underline">
+                  99999
+                </span>
+              </div>
+              <div tw="flex-1 self-end">
+                <span tw="float-right text-green-600 font-bold tracking-wider">
+                  次验证」
+                </span>
+              </div>
+            </div>
+            <div tw="w-6/12 flex flex-col">
+              {/* TODO: 修复此处的 border 宽度和颜色没有起作用的问题 */}
+              <div tw="flex-1 border-l-8 border-blue-500">
+                <div tw="ml-10">
+                  <p tw="text-gray-600">
+                    在后台调整机器人的设置、管理封禁列表或查看验证日志
+                  </p>
+                  <a tw="text-blue-500 text-sm font-bold no-underline" href="#">
+                    &gt; 进入这里阅读后台使用指南
+                  </a>
+                </div>
+              </div>
+              <div tw="flex-1 border-l-8 border-blue-500">
+                <div tw="ml-10">
+                  <p tw="text-gray-600">
+                    通过算术计算、图片识别或自定义问题“考核”入群成员
+                  </p>
+                  <a tw="text-blue-500 text-sm font-bold no-underline" href="#">
+                    &gt; 来了解如何自己设定验证方案
+                  </a>
+                </div>
+              </div>
+            </div>
+          </div>
         </div>
-        <div tw="w-4/12 flex content-between flex-col justify-between">
+        <div tw="w-4/12 flex flex-col content-between justify-between">
           {/* 验证入口消息, 开始 */}
           <div tw="flex justify-between">
             <div tw="w-2/12 self-end">
@@ -40,6 +90,10 @@ export default () => {
             </div>
             <div tw="w-10/12">
               <div tw="shadow rounded-md p-4 text-sm">
+                <span tw="text-red-700 font-semibold cursor-pointer">
+                  Policr Mini (Internal beta)
+                </span>
+                <Divider />
                 新成员 <span tw="text-blue-500 cursor-pointer">机░人</span>{" "}
                 你好！
                 <br />
@@ -66,14 +120,16 @@ export default () => {
               <div tw="shadow rounded-md text-sm">
                 <img src="/images/etx400.jpg" tw="w-full rounded-t" />
                 <div tw="px-4 py-1">
-                  <p tw="italic">
+                  <Paragraph tw="italic">
                     来自『<span tw="font-bold">POLICR · 中文社区</span>
                     』的验证，请确认问题并选择您认为正确的答案。
-                  </p>
-                  <p tw="font-bold">图片中的事物是？</p>
-                  <p>
+                  </Paragraph>
+                  <Divider />
+                  <Paragraph tw="font-bold">图片中的事物是？</Paragraph>
+                  <Divider />
+                  <Paragraph>
                     您还剩 <span tw="underline">198</span> 秒，通过可解除封印。
-                  </p>
+                  </Paragraph>
                 </div>
               </div>
               <div tw="mt-2">
@@ -92,6 +148,21 @@ export default () => {
           {/* 验证消息，结束 */}
         </div>
       </UnifiedFlexBox>
+      <div tw="bg-gray-800">
+        <UnifiedFlexBox tw="my-10 py-5 flex-col items-center">
+          <div>
+            <p tw="text-3xl text-white font-bold">加入我们</p>
+          </div>
+          <div tw="">
+            <Paragraph tw="text-3xl text-white">❤</Paragraph>
+          </div>
+          <div tw="">
+            <p tw="text-xl text-gray-200 tracking-wider">
+              如果您正在使用自己部署的实例，且有开放服务的想法和比较包容的心态，欢迎申请注册成为社区运营实例。
+            </p>
+          </div>
+        </UnifiedFlexBox>
+      </div>
     </>
   );
 };
