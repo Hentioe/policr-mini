@@ -9,13 +9,22 @@ const MenuItem = styled(Link).attrs({})`
   ${tw`md:inline-flex md:w-auto w-full px-5 py-2 rounded text-gray-600 items-center justify-center`}
 `;
 
+const BetaMarkup = styled.span.attrs({})`
+  font-size: 0.5rem;
+  margin-bottom: 0.5rem;
+  ${tw`text-teal-400 font-semibold`}
+`;
+
 // 参考来源：https://tailwindcomponents.com/component/simple-responsive-navigation-bar-1
 export default () => {
   return (
     <nav tw="flex items-center bg-white p-3 flex-wrap">
       {/* LOGO&主页链接 */}
-      <Link href="/" tw="p-2 mr-4 inline-flex items-center text-blue-500">
-        <span tw="text-xl font-bold tracking-wide uppercase">policr mini</span>
+      <Link href="/" tw="p-2 mr-4 inline-flex items-center">
+        <span tw="text-xl font-bold text-blue-500 tracking-wide uppercase">
+          policr mini
+        </span>
+        <BetaMarkup>beta</BetaMarkup>
       </Link>
       {/* 参考按钮实现：https://tailwindui.com/components/application-ui/navigation/navbars */}
       {/* 展开/隐藏菜单按钮 */}

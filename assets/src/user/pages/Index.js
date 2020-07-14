@@ -27,7 +27,8 @@ export default () => {
   return (
     <>
       <Title>首页</Title>
-      <UnifiedFlexBox tw="flex-wrap mt-20">
+      <UnifiedFlexBox tw="mt-20">
+        {/* 左边主要内容区域 */}
         <div tw="w-8/12">
           <p tw="text-blue-500 text-4xl font-bold tracking-widest">
             由社区驱动的开源验证机器人，致力于自主部署使用。
@@ -37,7 +38,7 @@ export default () => {
             机器人的开发和运营过程中吸取了丰富的经验，设计更加现代，功能单一不膨胀。在未来的更新过程中也只会继续改进核心功能和优化体验，保持本质不变。
           </p>
           <div tw="mt-24 flex">
-            <div tw="w-6/12 flex">
+            <div tw="w-7/12 flex mr-6">
               <div tw="flex-1 self-start">
                 <span tw="text-green-600 font-bold tracking-wider">
                   「已完成
@@ -54,23 +55,22 @@ export default () => {
                 </span>
               </div>
             </div>
-            <div tw="w-6/12 flex flex-col">
-              {/* TODO: 修复此处的 border 宽度和颜色没有起作用的问题 */}
-              <div tw="flex-1 border-l-8 border-blue-500">
+            <div tw="w-5/12 flex flex-col">
+              <div tw="py-3 flex-1 border-solid border-0 border-l-4 border-blue-500">
                 <div tw="ml-10">
-                  <p tw="text-gray-600">
-                    在后台调整机器人的设置、管理封禁列表或查看验证日志
-                  </p>
+                  <Paragraph tw="text-gray-600 mb-3">
+                    在后台定制机器人的功能，管理封禁列表或查看验证日志
+                  </Paragraph>
                   <a tw="text-blue-500 text-sm font-bold no-underline" href="#">
                     &gt; 进入这里阅读后台使用指南
                   </a>
                 </div>
               </div>
-              <div tw="flex-1 border-l-8 border-blue-500">
+              <div tw="mt-10 py-3 flex-1 border-solid border-0 border-l-4 border-blue-500">
                 <div tw="ml-10">
-                  <p tw="text-gray-600">
-                    通过算术计算、图片识别或自定义问题“考核”入群成员
-                  </p>
+                  <Paragraph tw="text-gray-600 mb-3">
+                    通过算术题、识别图片或自定义问答内容“考核”入群成员
+                  </Paragraph>
                   <a tw="text-blue-500 text-sm font-bold no-underline" href="#">
                     &gt; 来了解如何自己设定验证方案
                   </a>
@@ -79,6 +79,7 @@ export default () => {
             </div>
           </div>
         </div>
+        {/* 右边验证展示区域 */}
         <div tw="w-4/12 flex flex-col content-between justify-between">
           {/* 验证入口消息, 开始 */}
           <div tw="flex justify-between">
@@ -94,8 +95,10 @@ export default () => {
                   Policr Mini (Internal beta)
                 </span>
                 <Divider />
-                新成员 <span tw="text-blue-500 cursor-pointer">机░人</span>{" "}
-                你好！
+                <Paragraph>
+                  新成员 <span tw="text-blue-500 cursor-pointer">机░人</span>{" "}
+                  你好！
+                </Paragraph>
                 <br />
                 您当前需要完成验证才能解除限制，验证有效时间不超过{" "}
                 <span tw="underline">300</span> 秒。过期会被踢出或封禁，请尽快。
@@ -124,9 +127,9 @@ export default () => {
                     来自『<span tw="font-bold">POLICR · 中文社区</span>
                     』的验证，请确认问题并选择您认为正确的答案。
                   </Paragraph>
-                  <Divider />
+                  <br />
                   <Paragraph tw="font-bold">图片中的事物是？</Paragraph>
-                  <Divider />
+                  <br />
                   <Paragraph>
                     您还剩 <span tw="underline">198</span> 秒，通过可解除封印。
                   </Paragraph>

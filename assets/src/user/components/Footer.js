@@ -9,14 +9,20 @@ const UnifiedFlexBox = styled(UnifiedBox).attrs({})`
   ${tw`flex`}
 `;
 
-const Link = styled.a.attrs({})`
+const Link = styled.a.attrs({
+  target: "_blank",
+})`
   ${tw`no-underline`}
 `;
-const IconLink = styled(Link).attrs({})`
+const IconLink = styled(Link).attrs({
+  target: "_blank",
+})`
   ${tw`text-black`}
 `;
 
-const NavLink = styled(Link).attrs({})`
+const NavLink = styled(Link).attrs({
+  target: "_blank",
+})`
   ${tw`text-gray-900 mb-3`}
 `;
 
@@ -29,7 +35,7 @@ export default () => {
             <img src="/images/logo-x85.png" />
           </div>
           <div tw="ml-6">
-            <p tw="text-black text-xl font-bold underline">policrmini</p>
+            <p tw="text-black text-xl font-bold">policrmini</p>
             <p tw="text-black text-xs font-bold tracking-wider">
               项目组：Telestd
             </p>
