@@ -3,7 +3,7 @@ import "../styles/user.scss";
 import React, { useEffect } from "react";
 import ReactDOM from "react-dom";
 import IndexPage from "./user/pages/Index";
-import { Navbar } from "./user/components";
+import { Header, Footer } from "./user/components";
 
 const DEBUG = process.env.NODE_ENV == "development";
 
@@ -17,8 +17,9 @@ const App = () => {
   return (
     <React.StrictMode>
       <div>
-        <Navbar />
+        <Header />
         <IndexPage />
+        <Footer />
       </div>
     </React.StrictMode>
   );

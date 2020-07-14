@@ -26,9 +26,7 @@
 </style>
 <div id="loading-wrapper">
   <div id="loading">
-    <img
-      src="<%= Routes.static_path(@conn, ~s{/images/logo-x85.png}) %>"
-    />
+    <img src="<%= Routes.static_path(@conn, ~s{/images/logo-x85.png}) %>" />
   </div>
 </div>
 <div id="app"></div>
@@ -40,3 +38,4 @@
   type="text/javascript"
   src="<%= Routes.static_path(@conn, ~s{/js/user.js}) %>"
 ></script>
+<link rel="stylesheet" href="//at.alicdn.com/t/font_1944362_2kj9n350qw1.css" />

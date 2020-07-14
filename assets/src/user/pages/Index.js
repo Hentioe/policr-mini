@@ -149,17 +149,28 @@ export default () => {
         </div>
       </UnifiedFlexBox>
       <div tw="bg-gray-800">
-        <UnifiedFlexBox tw="my-10 py-5 flex-col items-center">
-          <div>
-            <p tw="text-3xl text-white font-bold">加入我们</p>
-          </div>
-          <div tw="">
-            <Paragraph tw="text-3xl text-white">❤</Paragraph>
-          </div>
-          <div tw="">
-            <p tw="text-xl text-gray-200 tracking-wider">
-              如果您正在使用自己部署的实例，且有开放服务的想法和比较包容的心态，欢迎申请注册成为社区运营实例。
+        <UnifiedFlexBox tw="mt-10 py-16">
+          <div tw="w-7/12">
+            <p tw="text-2xl font-bold text-gray-200">构建自己的实例。</p>
+            <p tw="text-gray-300">
+              通过简单的 Shell 命令和 Web 服务配置，即可部署在低至 512MB 内存的
+              Linux 服务器上。
             </p>
+
+            <button tw="mt-6 bg-green-500 border-0 text-white px-6 py-4">
+              让我们开始吧
+            </button>
+          </div>
+          <div tw="w-5/12">
+            <p tw="text-gray-200 italic tracking-wider">
+              如果您正在使用自己部署的实例，且有开放服务的想法和比较包容的心态，欢迎申请注册成为社区运营实例。所有被视作社区运营的实例都应该是相对可靠的，会被本项目推荐到可选实例列表中。
+            </p>
+            <p tw="text-gray-200">
+              也因为如此申请成功的条件相对严苛，它主要是对服务稳定性的考察。
+            </p>
+            <a tw="text-white float-right" href="#">
+              申请社区运营
+            </a>
           </div>
         </UnifiedFlexBox>
       </div>

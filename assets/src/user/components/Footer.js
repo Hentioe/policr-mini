@@ -1,0 +1,70 @@
+import React from "react";
+import tw, { styled } from "twin.macro";
+
+const UnifiedBox = styled.div.attrs({})`
+  ${tw`mx-10`}
+`;
+
+const UnifiedFlexBox = styled(UnifiedBox).attrs({})`
+  ${tw`flex`}
+`;
+
+const Link = styled.a.attrs({})`
+  ${tw`no-underline`}
+`;
+const IconLink = styled(Link).attrs({})`
+  ${tw`text-black`}
+`;
+
+const NavLink = styled(Link).attrs({})`
+  ${tw`text-gray-900 mb-3`}
+`;
+
+export default () => {
+  return (
+    <footer tw="bg-yellow-400">
+      <UnifiedFlexBox tw="py-10">
+        <div tw="w-7/12 flex">
+          <div>
+            <img src="/images/logo-x85.png" />
+          </div>
+          <div tw="ml-6">
+            <p tw="text-black text-xl font-bold underline">policrmini</p>
+            <p tw="text-black text-xs font-bold tracking-wider">
+              项目组：Telestd
+            </p>
+            <p tw="text-black text-xs font-bold tracking-wider">
+              隶属于：POLICR
+            </p>
+          </div>
+        </div>
+        <div tw="w-5/12 flex">
+          <div tw="w-2/12">
+            <IconLink href="https://mini.telestd.me/community" tw="mr-2">
+              <i
+                style={{ fontSize: 24 }}
+                className="iconfont icon-telegram"
+              ></i>
+            </IconLink>
+            <IconLink href="https://github.com/Hentioe/policr-mini">
+              <i style={{ fontSize: 24 }} className="iconfont icon-github"></i>
+            </IconLink>
+          </div>
+          <div tw="w-10/12">
+            <div tw="flex h-full">
+              <div tw="flex-1 flex flex-col">
+                <NavLink href="#">社区群组</NavLink>
+                <NavLink href="#">更新频道</NavLink>
+                <NavLink href="#">关于我们</NavLink>
+              </div>
+              <div tw="flex-1 flex flex-col">
+                <NavLink href="#">编辑百科</NavLink>
+                <NavLink href="#">贡献翻译</NavLink>
+              </div>
+            </div>
+          </div>
+        </div>
+      </UnifiedFlexBox>
+    </footer>
+  );
+};

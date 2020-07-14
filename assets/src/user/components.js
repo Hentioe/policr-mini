@@ -1,4 +1,6 @@
 import Title from "./components/Title";
-import Navbar from "./components/Navbar";
+import Header from "./components/Header";
+import Footer from "./components/Footer";
+import { UnifiedBox, UnifiedFlexBox } from "./components/Unified";
 
-export { Title, Navbar };
+export { Title, Header, Footer, UnifiedBox, UnifiedFlexBox };

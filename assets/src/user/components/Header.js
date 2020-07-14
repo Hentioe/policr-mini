@@ -51,7 +51,7 @@ export default () => {
             <span>后台</span>
           </MenuItem>
           <MenuItem href="#">
-            <span>社区</span>
+            <span>社群</span>
           </MenuItem>
           <MenuItem href="#">
             <span>维基</span>
