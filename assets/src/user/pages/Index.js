@@ -24,6 +24,14 @@ const Paragraph = styled.p.attrs({})`
   ${tw`m-0`}
 `;
 
+const Avatar = () => {
+  return (
+    <a href="https://t.me/policr_mini_bot" target="_blank">
+      <img src="/images/avatarx75.jpg" tw="w-12 rounded-full shadow-sm" />
+    </a>
+  );
+};
+
 const fetcher = (url) => fetch(url).then((r) => r.json());
 const initialHomeData = {
   total: 0,
@@ -100,10 +108,7 @@ export default () => {
           {/* 验证入口消息, 开始 */}
           <div tw="flex justify-between">
             <div tw="w-2/12 self-end">
-              <img
-                src="/images/avatarx75.jpg"
-                tw="w-12 rounded-full shadow-sm"
-              />
+              <Avatar />
             </div>
             <div tw="w-10/12">
               <div tw="shadow rounded-md p-4 text-sm">
@@ -130,10 +135,7 @@ export default () => {
           {/* 验证消息，开始 */}
           <div tw="flex justify-between mt-2">
             <div tw="w-2/12 self-end">
-              <img
-                src="/images/avatarx75.jpg"
-                tw="w-12 rounded-full shadow-sm"
-              />
+              <Avatar />
             </div>
             <div tw="w-10/12">
               <div tw="shadow rounded-md text-sm">
