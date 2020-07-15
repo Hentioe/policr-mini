@@ -44,8 +44,8 @@ export default () => {
             </p>
           </div>
         </div>
-        <div tw="w-5/12 flex">
-          <div tw="w-2/12">
+        <div tw="w-5/12 flex justify-end">
+          <div tw="mr-16">
             <IconLink href="https://mini.telestd.me/community" tw="mr-2">
               <i
                 style={{ fontSize: 24 }}
@@ -56,16 +56,16 @@ export default () => {
               <i style={{ fontSize: 24 }} className="iconfont icon-github"></i>
             </IconLink>
           </div>
-          <div tw="w-10/12">
-            <div tw="flex h-full">
-              <div tw="flex-1 flex flex-col">
+          <div>
+            <div tw="flex">
+              <div tw="flex flex-col mr-16">
                 <NavLink href="https://mini.telestd.me/community">
                   社区群组
                 </NavLink>
                 <NavLink href="https://t.me/policr_changelog">更新频道</NavLink>
                 <NavLink href="#">关于我们</NavLink>
               </div>
-              <div tw="flex-1 flex flex-col">
+              <div tw="flex flex-col">
                 <NavLink href="#">编辑百科</NavLink>
                 <NavLink href="#">贡献翻译</NavLink>
               </div>

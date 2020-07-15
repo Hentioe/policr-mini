@@ -4,7 +4,7 @@ import { Helmet } from "react-helmet";
 export default ({ children: children }) => {
   return (
     <Helmet>
-      <title>{`${children} - PolicrMini`}</title>
+      <title>{`${children} - Policr Mini`}</title>
     </Helmet>
   );
 };

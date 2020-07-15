@@ -3,6 +3,6 @@ defmodule PolicrMiniWeb.PageControllerTest do
 
   test "GET /", %{conn: conn} do
     conn = get(conn, "/")
-    assert html_response(conn, 200) =~ "载入中 - PolicrMini"
+    assert html_response(conn, 200) =~ "载入中 - Policr Mini"
   end
 end
