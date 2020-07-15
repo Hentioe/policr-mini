@@ -61,9 +61,9 @@ export default () => {
                 </span>
               </div>
               <div tw="flex-1 self-center">
-                <span tw="text-6xl font-extrabold text-red-400 underline">
+                <Paragraph tw="text-6xl font-extrabold text-red-400 text-center underline">
                   {homeData.total}
-                </span>
+                </Paragraph>
               </div>
               <div tw="flex-1 self-end">
                 <span tw="float-right text-green-600 font-bold tracking-wider">
