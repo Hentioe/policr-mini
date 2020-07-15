@@ -1,7 +1,9 @@
 import React from "react";
 import tw, { styled } from "twin.macro";
+import useSWR from "swr";
 
 import { Title } from "../components";
+import ErrorPage from "./Error";
 
 const UnifiedBox = styled.div.attrs({})`
   ${tw`mx-10`}
@@ -23,7 +25,27 @@ const Paragraph = styled.p.attrs({})`
   ${tw`m-0`}
 `;
 
+const fetcher = (url) => fetch(url).then((r) => r.json());
+const initialHomeData = {
+  total: 0,
+};
+
 export default () => {
+  const { data, error } = useSWR("/api/home", fetcher);
+
+  if (error)
+    return (
+      <ErrorPage>
+        <p>Data loading failed. Please try again later.</p>
+      </ErrorPage>
+    );
+  const homeData = data || initialHomeData;
+  return (
+    <ErrorPage>
+      <p>Data loading failed. Please try again later.</p>
+    </ErrorPage>
+  );
+
   return (
     <>
       <Title>首页</Title>
@@ -31,22 +53,22 @@ export default () => {
         {/* 左边主要内容区域 */}
         <div tw="w-8/12">
           <p tw="text-blue-500 text-4xl font-bold tracking-widest">
-            由社区驱动的开源验证机器人，致力于自主部署使用。
+            由社区驱动的开源验证机器人，致力于自主部署和使用。
           </p>
           <p tw="text-gray-600">
             本项目从 Policr
-            机器人的开发和运营过程中吸取了丰富的经验，设计更加现代，功能单一不膨胀。在未来的更新过程中也只会继续改进核心功能和优化体验，保持本质不变。
+            机器人的开发和运营过程中吸取了丰富的经验，设计更加现代，功能单一不膨胀。在未来的更新过程中也只会继续改进核心功能和优化体验，本质保持不变。
           </p>
           <div tw="mt-24 flex">
             <div tw="w-7/12 flex mr-6">
               <div tw="flex-1 self-start">
                 <span tw="text-green-600 font-bold tracking-wider">
-                  「已完成
+                  「已进行
                 </span>
               </div>
               <div tw="flex-1 self-center">
                 <span tw="text-6xl font-extrabold text-red-400 underline">
-                  99999
+                  {homeData.total}
                 </span>
               </div>
               <div tw="flex-1 self-end">
@@ -59,7 +81,7 @@ export default () => {
               <div tw="py-3 flex-1 border-solid border-0 border-l-4 border-blue-500">
                 <div tw="ml-10">
                   <Paragraph tw="text-gray-600 mb-3">
-                    在后台定制机器人的功能，管理封禁列表或查看验证日志
+                    在后台定制机器人的功能，管理封禁列表和查看验证日志
                   </Paragraph>
                   <a tw="text-blue-500 text-sm font-bold no-underline" href="#">
                     &gt; 进入这里阅读后台使用指南
@@ -69,7 +91,7 @@ export default () => {
               <div tw="mt-10 py-3 flex-1 border-solid border-0 border-l-4 border-blue-500">
                 <div tw="ml-10">
                   <Paragraph tw="text-gray-600 mb-3">
-                    通过算术题、识别图片或自定义问答内容“考核”入群成员
+                    通过解答算术题、识别图片或自定义问答内容“考核”入群成员
                   </Paragraph>
                   <a tw="text-blue-500 text-sm font-bold no-underline" href="#">
                     &gt; 来了解如何自己设定验证方案

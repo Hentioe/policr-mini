@@ -13,14 +13,15 @@ defmodule PolicrMiniWeb.Router do
     plug :accepts, ["json"]
   end
 
+  scope "/api", PolicrMiniWeb.API do
+    pipe_through :api
+
+    get "/home", HomeController, :index
+  end
+
   scope "/", PolicrMiniWeb do
     pipe_through :browser
 
     get "/*path", PageController, :index
   end
-
-  # Other scopes may use custom stacks.
-  # scope "/api", PolicrMiniWeb do
-  #   pipe_through :api
-  # end
 end

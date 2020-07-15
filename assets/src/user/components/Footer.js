@@ -59,8 +59,10 @@ export default () => {
           <div tw="w-10/12">
             <div tw="flex h-full">
               <div tw="flex-1 flex flex-col">
-                <NavLink href="#">社区群组</NavLink>
-                <NavLink href="#">更新频道</NavLink>
+                <NavLink href="https://mini.telestd.me/community">
+                  社区群组
+                </NavLink>
+                <NavLink href="https://t.me/policr_changelog">更新频道</NavLink>
                 <NavLink href="#">关于我们</NavLink>
               </div>
               <div tw="flex-1 flex flex-col">

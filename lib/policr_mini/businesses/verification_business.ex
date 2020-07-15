@@ -5,21 +5,22 @@ defmodule PolicrMini.VerificationBusiness do
 
   import Ecto.Query, only: [from: 2]
 
-  @spec create(%{optional(atom() | String.t()) => any()}) ::
-          {:ok, Verification.t()} | {:error, Changeset.t()}
+  @typep modelwrited :: {:ok, Verification.t()} | {:error, Changeset.t()}
+
   @doc """
   创建验证记录。
   """
+  @spec create(%{optional(atom() | String.t()) => any()}) :: modelwrited()
   def create(params) when is_map(params) do
     %Verification{} |> Verification.changeset(params) |> Repo.insert()
   end
 
-  @spec fetch(%{optional(atom() | String.t()) => any()}) ::
-          {:ok, Verification.t()} | {:error, Changeset.t()}
   @doc """
   获取或创建验证记录。
   尝试获取已存在的验证记录时，仅获取统一入口下的等待验证记录。
   """
+
+  @spec fetch(%{optional(atom() | String.t()) => any()}) :: modelwrited()
   def fetch(%{chat_id: chat_id, target_user_id: target_user_id} = params) do
     case find_unity_waiting(chat_id, target_user_id) do
       nil -> create(params)
@@ -27,8 +28,7 @@ defmodule PolicrMini.VerificationBusiness do
     end
   end
 
-  @spec update(Verification.t(), %{optional(atom() | binary()) => any()}) ::
-          {:ok, Verification.t()} | {:error, Changeset.t()}
+  @spec update(Verification.t(), %{optional(atom() | binary()) => any()}) :: modelwrited()
   @doc """
   更新验证记录。
   """
@@ -39,10 +39,10 @@ defmodule PolicrMini.VerificationBusiness do
   @unity_entrance VerificationEntranceEnum.__enum_map__()[:unity]
   @waiting_status VerificationStatusEnum.__enum_map__()[:waiting]
 
-  @spec find_last_unity_waiting(integer()) :: Verification.t() | nil
   @doc """
   查找统一入口下最晚的等待验证。
   """
+  @spec find_last_unity_waiting(integer()) :: Verification.t() | nil
   def find_last_unity_waiting(chat_id) when is_integer(chat_id) do
     from(p in Verification,
       where: p.chat_id == ^chat_id,
@@ -54,10 +54,10 @@ defmodule PolicrMini.VerificationBusiness do
     |> Repo.one()
   end
 
-  @spec find_first_unity_waiting(integer()) :: Verification.t() | nil
   @doc """
   查找统一入口下最早的等待验证。
   """
+  @spec find_first_unity_waiting(integer()) :: Verification.t() | nil
   def find_first_unity_waiting(chat_id) when is_integer(chat_id) do
     from(p in Verification,
       where: p.chat_id == ^chat_id,
@@ -69,10 +69,10 @@ defmodule PolicrMini.VerificationBusiness do
     |> Repo.one()
   end
 
-  @spec get_unity_waiting_count(integer()) :: integer()
   @doc """
   获取统一入口的等待验证数量。
   """
+  @spec get_unity_waiting_count(integer()) :: integer()
   def get_unity_waiting_count(chat_id) do
     from(p in Verification,
       select: count(p.id),
@@ -83,11 +83,10 @@ defmodule PolicrMini.VerificationBusiness do
     |> Repo.one()
   end
 
-  @spec find_unity_waiting(integer(), integer()) :: Verification.t() | nil
   @doc """
   查找统一入口的等待验证。
-  此函数限定了用户，所以 `user_id` 是必须的。
   """
+  @spec find_unity_waiting(integer(), integer()) :: Verification.t() | nil
   def find_unity_waiting(chat_id, user_id) when is_integer(chat_id) and is_integer(user_id) do
     from(p in Verification,
       where: p.chat_id == ^chat_id,
@@ -101,10 +100,10 @@ defmodule PolicrMini.VerificationBusiness do
     |> Repo.preload([:chat])
   end
 
-  @spec find_last_unity_message_id(integer()) :: integer() | nil
   @doc """
   获取最后一个统一入口的验证消息编号。
   """
+  @spec find_last_unity_message_id(integer()) :: integer() | nil
   def find_last_unity_message_id(chat_id) do
     from(p in Verification,
       select: p.message_id,
@@ -117,10 +116,10 @@ defmodule PolicrMini.VerificationBusiness do
     |> Repo.one()
   end
 
-  @spec find_all_unity_waiting() :: [Verification.t()]
   @doc """
-  查找所有的还在等待的统一入口验证
+  查找所有的还在等待的统一入口验证。
   """
+  @spec find_all_unity_waiting() :: [Verification.t()]
   def find_all_unity_waiting() do
     from(p in Verification,
       where: p.entrance == ^@unity_entrance,
@@ -128,5 +127,13 @@ defmodule PolicrMini.VerificationBusiness do
       order_by: [asc: p.inserted_at]
     )
     |> Repo.all()
+  end
+
+  @doc """
+  获取验证总数。
+  """
+  @spec get_total :: integer()
+  def get_total do
+    from(v in Verification, select: count(v.id)) |> Repo.one()
   end
 end

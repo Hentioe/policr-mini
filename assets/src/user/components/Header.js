@@ -12,7 +12,7 @@ const MenuItem = styled(Link).attrs({})`
 const BetaMarkup = styled.span.attrs({})`
   font-size: 0.5rem;
   margin-bottom: 0.5rem;
-  ${tw`text-teal-400 font-semibold`}
+  ${tw`text-yellow-500 font-semibold`}
 `;
 
 // 参考来源：https://tailwindcomponents.com/component/simple-responsive-navigation-bar-1
@@ -59,7 +59,7 @@ export default () => {
           <MenuItem href="#">
             <span>后台</span>
           </MenuItem>
-          <MenuItem href="#">
+          <MenuItem target="_blank" href="https://mini.telestd.me/community">
             <span>社群</span>
           </MenuItem>
           <MenuItem href="#">
