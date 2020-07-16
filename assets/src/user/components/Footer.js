@@ -1,37 +1,31 @@
 import React from "react";
 import tw, { styled } from "twin.macro";
 
-const UnifiedBox = styled.div.attrs({})`
-  ${tw`mx-10`}
-`;
+import { UnifiedFlexBox } from "./Unified";
 
-const UnifiedFlexBox = styled(UnifiedBox).attrs({})`
-  ${tw`flex`}
-`;
-
-const Link = styled.a.attrs({
+const linkAttrs = {
   target: "_blank",
-})`
+};
+
+const Link = styled.a.attrs(linkAttrs)`
   ${tw`no-underline`}
 `;
-const IconLink = styled(Link).attrs({
-  target: "_blank",
-})`
+
+const IconLink = styled(Link)`
   ${tw`text-black`}
 `;
 
-const NavLink = styled(Link).attrs({
-  target: "_blank",
-})`
+const NavLink = styled(Link)`
   ${tw`text-gray-900 mb-3`}
 `;
 
 export default () => {
   return (
     <footer tw="bg-yellow-400">
-      <UnifiedFlexBox tw="py-10">
-        <div tw="w-7/12 flex">
-          <div>
+      <UnifiedFlexBox tw="py-10 flex-wrap-reverse">
+        {/* 品牌信息 */}
+        <div tw="w-full xl:w-7/12 flex justify-around xl:justify-start mt-10 xl:mt-0">
+          <div tw="self-end xl:self-start">
             <img src="/images/logo-x85.png" />
           </div>
           <div tw="ml-6">
@@ -44,8 +38,8 @@ export default () => {
             </p>
           </div>
         </div>
-        <div tw="w-5/12 flex justify-end">
-          <div tw="mr-16">
+        <div tw="w-full xl:w-5/12 flex justify-center xl:justify-end">
+          <div tw="mr-8 xl:mr-16">
             <IconLink href="https://mini.telestd.me/community" tw="mr-2">
               <i
                 style={{ fontSize: 24 }}

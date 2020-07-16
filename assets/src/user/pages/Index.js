@@ -2,32 +2,24 @@ import React from "react";
 import tw, { styled } from "twin.macro";
 import useSWR from "swr";
 
-import { Title, ErrorParagraph } from "../components";
+import { Title, ErrorParagraph, UnifiedFlexBox } from "../components";
 
-const UnifiedBox = styled.div.attrs({})`
-  ${tw`mx-10`}
-`;
-
-const UnifiedFlexBox = styled(UnifiedBox).attrs({})`
-  ${tw`flex`}
-`;
-
-const InlineKeybordButton = styled.div.attrs({})`
+const InlineKeybordButton = styled.div`
   ${tw`shadow-sm bg-blue-400 text-white rounded-md px-4 py-2 text-sm mt-1 flex justify-center bg-opacity-75 cursor-pointer`}
 `;
 
-const Divider = styled.div.attrs({})`
+const Divider = styled.div`
   ${tw`mt-1`}
 `;
 
-const Paragraph = styled.p.attrs({})`
+const Paragraph = styled.p`
   ${tw`m-0`}
 `;
 
 const Avatar = () => {
   return (
     <a href="https://t.me/policr_mini_bot" target="_blank">
-      <img src="/images/avatarx75.jpg" tw="w-12 rounded-full shadow-sm" />
+      <img src="/images/avatarx75.jpg" tw="w-full rounded-full shadow-sm" />
     </a>
   );
 };
@@ -51,37 +43,41 @@ export default () => {
   return (
     <>
       <Title>首页</Title>
-      <UnifiedFlexBox tw="mt-20">
+      <UnifiedFlexBox tw="mt-0 xl:mt-20 flex-wrap">
         {/* 左边主要内容区域 */}
-        <div tw="w-8/12">
-          <p tw="text-blue-500 text-4xl font-bold tracking-widest">
+        <div tw="w-full xl:w-8/12">
+          <p tw="text-blue-500 text-2xl text-center xl:text-4xl xl:text-left font-bold tracking-widest">
             由社区驱动的开源验证机器人，致力于自主部署和使用。
           </p>
-          <p tw="text-gray-600">
+          <p tw="text-sm text-center xl:text-base xl:text-left text-gray-600">
             本项目从 Policr
             机器人的开发和运营过程中吸取了丰富的经验，设计更加现代，功能单一不膨胀。在未来的更新过程中也只会继续改进核心功能和优化体验，本质保持不变。
           </p>
-          <div tw="mt-24 flex">
-            <div tw="w-7/12 flex mr-6">
-              <div tw="flex-1 self-start">
-                <span tw="text-green-600 font-bold tracking-wider">
-                  「已进行
-                </span>
-              </div>
-              <div tw="flex-1 self-center">
-                <Paragraph tw="text-6xl font-extrabold text-red-400 text-center underline">
-                  {homeData.total}
-                </Paragraph>
-              </div>
-              <div tw="flex-1 self-end">
-                <span tw="float-right text-green-600 font-bold tracking-wider">
-                  次验证」
-                </span>
+          <div tw="mt-24 flex flex-wrap">
+            {/* 验证数据 */}
+            <div tw="w-full xl:w-7/12 flex">
+              <div tw="flex-1 flex xl:pr-10">
+                <div tw="flex-1 self-start">
+                  <span tw="text-green-600 font-bold tracking-wider">
+                    「已进行
+                  </span>
+                </div>
+                <div tw="flex-1 self-center">
+                  <Paragraph tw="text-6xl font-extrabold text-red-400 text-center underline">
+                    {homeData.total}
+                  </Paragraph>
+                </div>
+                <div tw="flex-1 self-end">
+                  <span tw="float-right text-green-600 font-bold tracking-wider">
+                    次验证」
+                  </span>
+                </div>
               </div>
             </div>
-            <div tw="w-5/12 flex flex-col">
-              <div tw="py-3 flex-1 border-solid border-0 border-l-4 border-blue-500">
-                <div tw="ml-10">
+            {/* 主要功能简介与导航 */}
+            <div tw="hidden w-full xl:w-5/12 xl:flex flex-col">
+              <div tw="py-3 flex-1 border-solid border-0 xl:border-l-4 border-blue-500">
+                <div tw="xl:ml-10">
                   <Paragraph tw="text-gray-600 mb-3">
                     在后台定制机器人的功能，管理封禁列表和查看验证日志
                   </Paragraph>
@@ -90,8 +86,8 @@ export default () => {
                   </a>
                 </div>
               </div>
-              <div tw="mt-10 py-3 flex-1 border-solid border-0 border-l-4 border-blue-500">
-                <div tw="ml-10">
+              <div tw="mt-10 py-3 flex-1 border-solid border-0 xl:border-l-4 border-blue-500">
+                <div tw="xl:ml-10">
                   <Paragraph tw="text-gray-600 mb-3">
                     通过解答算术题、识别图片或自定义问答内容“考核”入群成员
                   </Paragraph>
@@ -104,10 +100,10 @@ export default () => {
           </div>
         </div>
         {/* 右边验证展示区域 */}
-        <div tw="w-4/12 flex flex-col content-between justify-between">
+        <div tw="hidden w-full xl:w-4/12 xl:flex flex-col content-between justify-between mt-10 xl:mt-0">
           {/* 验证入口消息, 开始 */}
           <div tw="flex justify-between">
-            <div tw="w-2/12 self-end">
+            <div tw="w-2/12 self-end px-8">
               <Avatar />
             </div>
             <div tw="w-10/12">
@@ -134,7 +130,7 @@ export default () => {
           {/* 验证入口消息, 结束 */}
           {/* 验证消息，开始 */}
           <div tw="flex justify-between mt-2">
-            <div tw="w-2/12 self-end">
+            <div tw="w-2/12 self-end px-8">
               <Avatar />
             </div>
             <div tw="w-10/12">
@@ -169,9 +165,10 @@ export default () => {
           {/* 验证消息，结束 */}
         </div>
       </UnifiedFlexBox>
+      {/* 自主部署简介和导航 */}
       <div tw="bg-gray-800">
-        <UnifiedFlexBox tw="mt-10 py-16">
-          <div tw="w-7/12">
+        <UnifiedFlexBox tw="mt-10 py-16 flex-wrap">
+          <div tw="w-full xl:w-7/12 mb-8 xl:mb-0">
             <p tw="text-2xl font-bold text-gray-200">构建自己的实例。</p>
             <p tw="text-gray-300">
               通过简单的 Shell 命令和 Web 服务配置，即可部署在低至 512MB 内存的
@@ -182,7 +179,7 @@ export default () => {
               让我们开始吧
             </button>
           </div>
-          <div tw="w-5/12">
+          <div tw="w-full xl:w-5/12">
             <p tw="text-gray-200 italic tracking-wider">
               如果您正在使用自己部署的实例，且有开放服务的想法和比较包容的心态，欢迎申请注册成为社区运营实例。所有被视作社区运营的实例都应该是相对可靠的，会被本项目推荐到可选实例列表中。
             </p>
