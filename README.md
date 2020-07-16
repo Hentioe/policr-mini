@@ -5,6 +5,8 @@
 ![Languages top](https://img.shields.io/github/languages/top/Hentioe/policr-mini)
 ![GitHub](https://img.shields.io/github/license/Hentioe/policr-mini)
 
+> 注意：请不要将本项目的**官方实例**邀请到「不符合中国内地法律」的群组中，这样会造成身处国内的项目维护或运营人员带来无尽的麻烦。也因为如此，如果本机器人自作主张的终止服务（退群），请给予包容和谅解。
+
 一个只保留本质功能的 Policr 精简版。
 
 ## 介绍
