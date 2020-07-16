@@ -4,7 +4,7 @@ const ErrorView = ({ children: children }) => {
   return <div>{children}</div>;
 };
 
-const ErrorViewParagraph = ({ children: children }) => {
+const ErrorParagraph = ({ children: children }) => {
   return (
     <ErrorView>
       <p>{children}</p>
@@ -13,4 +13,4 @@ const ErrorViewParagraph = ({ children: children }) => {
 };
 
 export default ErrorView;
-export { ErrorViewParagraph };
+export { ErrorParagraph };

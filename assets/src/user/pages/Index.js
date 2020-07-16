@@ -2,7 +2,7 @@ import React from "react";
 import tw, { styled } from "twin.macro";
 import useSWR from "swr";
 
-import { Title, ErrorViewParagraph } from "../components";
+import { Title, ErrorParagraph } from "../components";
 
 const UnifiedBox = styled.div.attrs({})`
   ${tw`mx-10`}
@@ -42,9 +42,9 @@ export default () => {
 
   if (error)
     return (
-      <ErrorViewParagraph>
+      <ErrorParagraph>
         Data loading failed. Please try again later.
-      </ErrorViewParagraph>
+      </ErrorParagraph>
     );
   const homeData = data || initialHomeData;
 
