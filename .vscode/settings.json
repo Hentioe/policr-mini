@@ -1,6 +1,8 @@
 {
     "files.watcherExclude": {
-        "**/deps/*/**": true,
-        "**/priv/static/*/**": true
+        "**/_build/**": true,
+        "**/.elixir_ls/**": true,
+        "**/deps/**": true,
+        "**/priv/static/**": true
     }
 }
