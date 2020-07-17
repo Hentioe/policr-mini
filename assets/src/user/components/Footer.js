@@ -24,8 +24,8 @@ export default () => {
     <footer tw="bg-yellow-400">
       <UnifiedFlexBox tw="py-10 flex-wrap-reverse">
         {/* 品牌信息 */}
-        <div tw="w-full xl:w-7/12 flex justify-around xl:justify-start mt-10 xl:mt-0">
-          <div tw="self-end xl:self-start">
+        <div tw="w-full lg:w-7/12 flex justify-around lg:justify-start mt-10 lg:mt-0">
+          <div tw="self-end lg:self-start">
             <img src="/images/logo-x85.png" />
           </div>
           <div tw="ml-6">
@@ -38,8 +38,8 @@ export default () => {
             </p>
           </div>
         </div>
-        <div tw="w-full xl:w-5/12 flex justify-center xl:justify-end">
-          <div tw="mr-8 xl:mr-16">
+        <div tw="w-full lg:w-5/12 flex justify-center lg:justify-end">
+          <div tw="mr-8 lg:mr-16">
             <IconLink href="https://mini.telestd.me/community" tw="mr-2">
               <i
                 style={{ fontSize: 24 }}

@@ -22,9 +22,9 @@ const BetaMarkup = styled.span`
 // 参考来源：https://tailwindcomponents.com/component/simple-responsive-navigation-bar-1
 export default () => {
   return (
-    <nav tw="flex items-center bg-white p-3 flex-wrap">
+    <nav tw="flex items-center bg-white p-2 md:p-3 flex-wrap">
       {/* LOGO&主页链接 */}
-      <Link href="/" tw="p-2 mr-4 inline-flex items-center">
+      <Link href="/" tw="p-0 md:p-1 lg:p-2 mr-4 inline-flex items-center">
         <span tw="text-lg md:text-xl font-bold text-blue-500 tracking-wide uppercase">
           policr mini
         </span>

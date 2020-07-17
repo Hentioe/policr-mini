@@ -43,20 +43,20 @@ export default () => {
   return (
     <>
       <Title>首页</Title>
-      <UnifiedFlexBox tw="mt-0 xl:mt-20 flex-wrap">
+      <UnifiedFlexBox tw="mt-0 md:mt-10 lg:mt-20 flex-wrap">
         {/* 左边主要内容区域 */}
-        <div tw="w-full xl:w-8/12">
-          <p tw="text-blue-500 text-2xl text-center xl:text-4xl xl:text-left font-bold tracking-widest">
+        <div tw="w-full lg:w-8/12">
+          <p tw="text-blue-500 text-2xl text-center md:text-3xl lg:text-4xl lg:text-left font-bold tracking-widest">
             由社区驱动的开源验证机器人，致力于自主部署和使用。
           </p>
-          <p tw="text-sm text-center xl:text-base xl:text-left text-gray-600">
+          <p tw="text-sm text-center md:text-base lg:text-left text-gray-600">
             本项目从 Policr
             机器人的开发和运营过程中吸取了丰富的经验，设计更加现代，功能单一不膨胀。在未来的更新过程中也只会继续改进核心功能和优化体验，本质保持不变。
           </p>
           <div tw="mt-10 lg:mt-24 flex flex-wrap">
             {/* 验证数据 */}
-            <div tw="w-full xl:w-7/12 flex">
-              <div tw="flex-1 flex xl:pr-10">
+            <div tw="w-full lg:w-7/12 flex">
+              <div tw="flex-1 flex lg:pr-10">
                 <div tw="flex-1 self-start">
                   <span tw="text-green-600 font-bold tracking-wider">
                     「已进行
@@ -75,9 +75,9 @@ export default () => {
               </div>
             </div>
             {/* 主要功能简介与导航 */}
-            <div tw="hidden w-full xl:w-5/12 xl:flex flex-col">
-              <div tw="py-3 flex-1 border-solid border-0 xl:border-l-4 border-blue-500">
-                <div tw="xl:ml-10">
+            <div tw="hidden w-full lg:w-5/12 lg:flex flex-col">
+              <div tw="py-3 flex-1 border-solid border-0 lg:border-l-4 border-blue-500">
+                <div tw="lg:ml-10">
                   <Paragraph tw="text-gray-600 mb-3">
                     在后台定制机器人的功能，管理封禁列表和查看验证日志
                   </Paragraph>
@@ -86,8 +86,8 @@ export default () => {
                   </a>
                 </div>
               </div>
-              <div tw="mt-10 py-3 flex-1 border-solid border-0 xl:border-l-4 border-blue-500">
-                <div tw="xl:ml-10">
+              <div tw="mt-10 py-3 flex-1 border-solid border-0 lg:border-l-4 border-blue-500">
+                <div tw="lg:ml-10">
                   <Paragraph tw="text-gray-600 mb-3">
                     通过解答算术题、识别图片或自定义问答内容“考核”入群成员
                   </Paragraph>
@@ -100,7 +100,7 @@ export default () => {
           </div>
         </div>
         {/* 右边验证展示区域 */}
-        <div tw="hidden w-full xl:w-4/12 xl:flex flex-col content-between justify-between mt-10 xl:mt-0">
+        <div tw="hidden w-full lg:w-4/12 lg:flex flex-col content-between justify-between mt-10 lg:mt-0">
           {/* 验证入口消息, 开始 */}
           <div tw="flex justify-between">
             <div tw="w-2/12 self-end px-8">
@@ -168,7 +168,7 @@ export default () => {
       {/* 自主部署简介和导航 */}
       <div tw="bg-gray-800">
         <UnifiedFlexBox tw="mt-10 py-16 flex-wrap">
-          <div tw="w-full xl:w-7/12 mb-8 xl:mb-0">
+          <div tw="w-full lg:w-7/12 mb-8 lg:mb-0">
             <p tw="text-2xl font-bold text-gray-200">构建自己的实例。</p>
             <p tw="text-gray-300">
               通过简单的 Shell 命令和 Web 服务配置，即可部署在低至 512MB 内存的
@@ -179,7 +179,7 @@ export default () => {
               让我们开始吧
             </button>
           </div>
-          <div tw="w-full xl:w-5/12">
+          <div tw="w-full lg:w-5/12">
             <p tw="text-gray-200 italic tracking-wider">
               如果您正在使用自己部署的实例，且有开放服务的想法和比较包容的心态，欢迎申请注册成为社区运营实例。所有被视作社区运营的实例都应该是相对可靠的，会被本项目推荐到可选实例列表中。
             </p>
