@@ -1,0 +1,6 @@
+{
+    "files.watcherExclude": {
+        "**/deps/*/**": true,
+        "**/priv/static/*/**": true
+    }
+}
