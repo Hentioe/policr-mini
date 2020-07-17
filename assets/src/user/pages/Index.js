@@ -53,7 +53,7 @@ export default () => {
             本项目从 Policr
             机器人的开发和运营过程中吸取了丰富的经验，设计更加现代，功能单一不膨胀。在未来的更新过程中也只会继续改进核心功能和优化体验，本质保持不变。
           </p>
-          <div tw="mt-24 flex flex-wrap">
+          <div tw="mt-10 lg:mt-24 flex flex-wrap">
             {/* 验证数据 */}
             <div tw="w-full xl:w-7/12 flex">
               <div tw="flex-1 flex xl:pr-10">
