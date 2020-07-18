@@ -52,7 +52,8 @@ defmodule PolicrMini.MixProject do
       {:typed_struct, "~> 0.2.0"},
       {:quantum, "~> 3.0"},
       {:telegex, "~> 0.1.0"},
-      {:telegex_marked, "~> 0.0.8"}
+      {:telegex_marked, "~> 0.0.8"},
+      {:pow, "~> 1.0"}
     ]
   end
 
