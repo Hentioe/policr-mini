@@ -1,4 +1,8 @@
 defmodule PolicrMini.Schema.MessageSnapshot do
+  @moduledoc """
+  消息快照模型。
+  """
+
   use PolicrMini.Schema
 
   alias PolicrMini.Schema.Chat

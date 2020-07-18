@@ -2,6 +2,7 @@ defmodule PolicrMiniBot.NewChatTitleHandler do
   @moduledoc """
   群组标题修改的处理器。
   """
+
   use PolicrMiniBot.Handler
 
   require Logger

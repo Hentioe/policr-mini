@@ -49,7 +49,7 @@ defmodule PolicrMini.VerificationBusinessTest do
     verification_params = build_params()
     {:ok, verification1} = VerificationBusiness.create(verification_params)
 
-    updated_message_id = 10987
+    updated_message_id = 10_987
     updated_indices = [3, 5]
     updated_seconds = 120
     updated_status = 1

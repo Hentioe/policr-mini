@@ -1,4 +1,4 @@
-defmodule PolicrMiniBot.UpdatePoller do
+defmodule PolicrMiniBot.UpdatesPoller do
   @moduledoc """
   获取消息更新的轮训器。
   """
@@ -40,7 +40,7 @@ defmodule PolicrMiniBot.UpdatePoller do
   如果收到 `{:ssl_closed, _}` 消息，会输出错误日志，但目前没有做任何网络检查或试图挽救的措施。
   """
   @impl true
-  def handle_info(:pull, state = %{offset: last_offset}) do
+  def handle_info(:pull, %{offset: last_offset} = state) do
     offset =
       case Telegex.get_updates(offset: last_offset) do
         {:ok, updates} ->

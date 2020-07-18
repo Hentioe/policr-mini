@@ -2,6 +2,7 @@ defmodule PolicrMiniBot.UserJoinedHandler do
   @moduledoc """
   新用户加入处理模块。
   """
+
   use PolicrMiniBot.Handler
 
   require Logger
@@ -69,7 +70,7 @@ defmodule PolicrMiniBot.UserJoinedHandler do
       {:ok, scheme} ->
         # 异步删除服务消息
         Cleaner.delete_message(chat_id, message.message_id)
-        new_chat_members |> Enum.map(&handle_one(&1, scheme, message, state))
+        Enum.each(new_chat_members, &handle_one(&1, scheme, message, state))
 
         {:ok, %{state | done: true, deleted: true}}
 

@@ -47,7 +47,7 @@ defmodule PolicrMini.Application do
       # 消息清理服务
       PolicrMiniBot.Cleaner,
       # 拉取更新消息
-      PolicrMiniBot.UpdatePoller,
+      PolicrMiniBot.UpdatesPoller,
       # 消费消息的动态主管
       PolicrMiniBot.Consumer,
       # 过滤器管理器

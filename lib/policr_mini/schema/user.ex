@@ -1,4 +1,8 @@
 defmodule PolicrMini.Schema.User do
+  @moduledoc """
+  用户模型。
+  """
+
   use PolicrMini.Schema
 
   @required_fields ~w(id)a

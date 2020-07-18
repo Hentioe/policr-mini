@@ -32,7 +32,7 @@ defmodule PolicrMini.Schema.VerificationTest do
   test "changeset/2" do
     verification = Factory.build(:verification, chat_id: 123_456_789_011, message_snapshot_id: 1)
 
-    updated_message_id = 19121
+    updated_message_id = 19_121
     updated_indices = [2, 3]
     updated_seconds = 120
     updated_status = 3

@@ -112,7 +112,7 @@ defmodule PolicrMini.ChatBusinessTest do
 
     {:ok, _} = chat |> ChatBusiness.reset_administrators!([])
     users = ChatBusiness.find_administrators(chat.id)
-    assert length(users) == 0
+    assert Enum.empty?(users)
   end
 
   test "find_list/1" do

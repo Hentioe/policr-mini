@@ -75,7 +75,7 @@ defmodule PolicrMini.CustomKitBusinessTest do
     {:ok, _} = custom_kit |> CustomKitBusiness.delete()
 
     custom_kits = CustomKitBusiness.find_list(custom_kit_params.chat_id)
-    assert length(custom_kits) == 0
+    assert Enum.empty?(custom_kits)
   end
 
   test "random_one/1" do

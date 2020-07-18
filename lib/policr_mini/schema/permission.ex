@@ -1,4 +1,8 @@
 defmodule PolicrMini.Schema.Permission do
+  @moduledoc """
+  权限模型。
+  """
+
   use PolicrMini.Schema
 
   alias PolicrMini.Schema.{Chat, User}

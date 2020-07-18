@@ -1,4 +1,8 @@
 defmodule PolicrMini.SchemeBusiness do
+  @moduledoc """
+  方案的业务功能实现。
+  """
+
   use PolicrMini, business: PolicrMini.Schema.Scheme
 
   import Ecto.Query, only: [from: 2]

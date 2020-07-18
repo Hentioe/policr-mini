@@ -1,4 +1,8 @@
 defmodule PolicrMini.ChatBusiness do
+  @moduledoc """
+  群组的业务功能实现。
+  """
+
   use PolicrMini, business: PolicrMini.Schema.Chat
 
   import Ecto.Query, only: [from: 2]

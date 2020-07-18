@@ -6,6 +6,10 @@ defmodule PolicrMiniBot.Captcha do
   alias Telegex.Model.{InlineKeyboardButton, InlineKeyboardMarkup}
 
   defmodule Data do
+    @moduledoc """
+    验证数据
+    """
+
     @typedoc "单个候选内容"
     @type candidate :: String.t() | number()
 

@@ -1,4 +1,8 @@
 defmodule PolicrMiniBot.SelfJoinedHandler do
+  @moduledoc """
+  自身加入新群组的处理器。
+  """
+
   use PolicrMiniBot.Handler
 
   require Logger

@@ -1,4 +1,8 @@
 defmodule PolicrMiniBot.TextHandler do
+  @moduledoc """
+  文字消息的处理器。
+  """
+
   use PolicrMiniBot.Handler
 
   @impl true

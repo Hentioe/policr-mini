@@ -1,4 +1,8 @@
 defmodule PolicrMini.CustomKitBusiness do
+  @moduledoc """
+  自定义验证套件的业务功能实现。
+  """
+
   use PolicrMini, business: PolicrMini.Schema.CustomKit
 
   import Ecto.Query, only: [from: 2]

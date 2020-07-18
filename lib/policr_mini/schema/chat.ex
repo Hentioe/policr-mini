@@ -1,4 +1,8 @@
 defmodule PolicrMini.Schema.Chat do
+  @moduledoc """
+  群组（或通用 chat ）模型。
+  """
+
   use PolicrMini.Schema
 
   alias PolicrMini.EctoEnums.ChatTypeEnum

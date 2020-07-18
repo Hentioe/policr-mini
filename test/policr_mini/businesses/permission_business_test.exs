@@ -172,6 +172,6 @@ defmodule PolicrMini.PermissionBusinessTest do
         user_id: permission_params.user_id
       )
 
-    assert length(permissions) == 0
+    assert Enum.empty?(permissions)
   end
 end

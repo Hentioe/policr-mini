@@ -1,4 +1,8 @@
 defmodule PolicrMini.Schema.CustomKit do
+  @moduledoc """
+  自定义套件模型。
+  """
+
   use PolicrMini.Schema
 
   alias PolicrMini.Schema.Chat

@@ -1,4 +1,8 @@
 defmodule PolicrMiniBot.Consumer do
+  @moduledoc """
+  消息更新的消费实现。
+  """
+
   use DynamicSupervisor
 
   alias PolicrMiniBot.{FilterManager, State}
@@ -81,7 +85,7 @@ defmodule PolicrMiniBot.Consumer do
     end
 
     handlers = FilterManager.handlers()
-    handlers |> Enum.reduce(state, applying)
+    _state = Enum.reduce(handlers, state, applying)
 
     message
   end

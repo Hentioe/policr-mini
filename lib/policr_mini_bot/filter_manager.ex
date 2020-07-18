@@ -1,4 +1,8 @@
 defmodule PolicrMiniBot.FilterManager do
+  @moduledoc """
+  过滤器管理器。
+  """
+
   use Agent
 
   def start_link(opts) do

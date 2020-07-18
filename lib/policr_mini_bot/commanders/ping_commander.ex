@@ -1,4 +1,8 @@
 defmodule PolicrMiniBot.PingCommander do
+  @moduledoc """
+  ping 命令
+  """
+
   use PolicrMiniBot.Commander, :ping
 
   require Logger

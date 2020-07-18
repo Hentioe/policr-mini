@@ -1,4 +1,8 @@
 defmodule PolicrMiniBot.SelfLeftedHandler do
+  @moduledoc """
+  自身离开群组的处理器。
+  """
+
   use PolicrMiniBot.Handler
 
   alias PolicrMini.ChatBusiness

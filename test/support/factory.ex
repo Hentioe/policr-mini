@@ -1,4 +1,6 @@
 defmodule PolicrMini.Factory do
+  @moduledoc false
+
   def build(:user) do
     %PolicrMini.Schema.User{
       id: 123_456_789,
@@ -10,7 +12,7 @@ defmodule PolicrMini.Factory do
 
   def build(:chat) do
     %PolicrMini.Schema.Chat{
-      id: 123_456_789_0,
+      id: 1_234_567_890,
       type: "supergroup",
       title: "Elixir 编程语言",
       small_photo_id: "KdIlCrIKzd",

@@ -1,4 +1,8 @@
 defmodule PolicrMini.Schema.Scheme do
+  @moduledoc """
+  方案模型。
+  """
+
   use PolicrMini.Schema
 
   alias PolicrMini.Schema.Chat

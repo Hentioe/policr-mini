@@ -1,4 +1,8 @@
 defmodule PolicrMiniBot.Handler do
+  @moduledoc """
+  通用处理器。
+  """
+
   alias PolicrMiniBot.State
 
   defmacro __using__(_) do

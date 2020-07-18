@@ -1,4 +1,8 @@
 defmodule PolicrMini.VerificationBusiness do
+  @moduledoc """
+  验证的业务功能实现。
+  """
+
   use PolicrMini, business: PolicrMini.Schema.Verification
 
   alias PolicrMini.EctoEnums.{VerificationEntranceEnum, VerificationStatusEnum}

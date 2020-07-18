@@ -1,4 +1,8 @@
 defmodule PolicrMiniBot.Callbacker do
+  @moduledoc """
+  回调处理器。
+  """
+
   defmacro __using__(prefix) when is_atom(prefix) do
     quote do
       alias PolicrMiniBot.{Callbacker, Cleaner}

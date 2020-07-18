@@ -1,4 +1,8 @@
 defmodule PolicrMiniBot.Commander do
+  @moduledoc """
+  命令处理器。
+  """
+
   defmacro __using__(command) when is_atom(command) do
     quote do
       alias PolicrMiniBot.{Commander, Cleaner}

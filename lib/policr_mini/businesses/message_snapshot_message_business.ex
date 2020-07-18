@@ -1,4 +1,8 @@
 defmodule PolicrMini.MessageSnapshotBusiness do
+  @moduledoc """
+  消息快照的业务功能实现。
+  """
+
   use PolicrMini, business: PolicrMini.Schema.MessageSnapshot
 
   def create(params) do

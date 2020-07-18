@@ -1,4 +1,8 @@
 defmodule PolicrMini.Schema.Verification do
+  @moduledoc """
+  验证模型。
+  """
+
   use PolicrMini.Schema
 
   alias PolicrMini.EctoEnums.{VerificationEntranceEnum, VerificationStatusEnum}

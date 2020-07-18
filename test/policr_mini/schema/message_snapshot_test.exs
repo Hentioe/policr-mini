@@ -31,7 +31,7 @@ defmodule PolicrMini.Schema.MessageSnapshotTest do
   test "changeset/2" do
     message_snapshot = Factory.build(:message_snapshot, chat_id: 123_456_789_011)
 
-    updated_message_id = 19867
+    updated_message_id = 19_867
     updated_from_user_id = 987_654_321
     updated_from_user_name = "小明"
     updated_date = 1_591_654_974

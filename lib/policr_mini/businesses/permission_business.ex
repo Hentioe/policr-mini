@@ -1,4 +1,8 @@
 defmodule PolicrMini.PermissionBusiness do
+  @moduledoc """
+  权限的业务功能实现。
+  """
+
   use PolicrMini, business: PolicrMini.Schema.Permission
 
   import Ecto.Query, only: [from: 2, dynamic: 2]

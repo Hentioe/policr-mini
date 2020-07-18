@@ -1,4 +1,8 @@
 defmodule PolicrMini.UserBusiness do
+  @moduledoc """
+  用户的业务功能实现。
+  """
+
   use PolicrMini, business: PolicrMini.Schema.User
 
   def create(params) do

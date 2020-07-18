@@ -1,11 +1,15 @@
 defmodule PolicrMiniBot.ImageProvider do
   @moduledoc """
-  实现图片提供服务的模块。
+  图片提供服务。
   """
 
   use Agent
 
   defmodule SeriesImage do
+    @moduledoc """
+    系列图片。
+    """
+
     use TypedStruct
 
     @typedoc "一个图片系列"

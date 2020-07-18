@@ -1,4 +1,6 @@
 defmodule PolicrMini.Release do
+  @moduledoc false
+
   @app :policr_mini
 
   def migrate do

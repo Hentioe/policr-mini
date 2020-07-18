@@ -1,4 +1,8 @@
 defmodule PolicrMini.EctoEnums do
+  @moduledoc """
+  枚举类型定义。
+  """
+
   import EctoEnum
 
   defenum ChatTypeEnum,
