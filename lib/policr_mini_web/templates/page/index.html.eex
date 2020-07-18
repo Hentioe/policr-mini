@@ -39,3 +39,7 @@
   src="<%= Routes.static_path(@conn, ~s{/js/user.js}) %>"
 ></script>
 <link rel="stylesheet" href="//at.alicdn.com/t/font_1944362_2kj9n350qw1.css" />
+<link
+  href="https://fonts.googleapis.com/css2?family=Solway:wght@300;400;500;700;800&display=swap"
+  rel="stylesheet"
+/>
