@@ -17,6 +17,8 @@ defmodule PolicrMini.Schema.User do
     timestamps()
   end
 
+  @type t :: map()
+
   def changeset(%__MODULE__{} = user, attrs) when is_map(attrs) do
     user
     |> cast(attrs, @required_fields ++ @optional_fields)

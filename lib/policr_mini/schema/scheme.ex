@@ -30,6 +30,8 @@ defmodule PolicrMini.Schema.Scheme do
     timestamps()
   end
 
+  @type t :: map()
+
   def changeset(%__MODULE__{} = scheme, attrs) when is_map(attrs) do
     scheme
     |> cast(attrs, @required_fields ++ @optional_fields)

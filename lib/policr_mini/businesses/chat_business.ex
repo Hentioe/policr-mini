@@ -10,17 +10,19 @@ defmodule PolicrMini.ChatBusiness do
   alias PolicrMini.Schema.Permission
   alias PolicrMini.PermissionBusiness
 
-  @spec create(map()) :: {:ok, Chat.t()} | {:error, Changeset.t()}
+  @typep modelwrited :: {:ok, Chat.t()} | {:error, Ecto.Changeset.t()}
+
+  @spec create(map()) :: modelwrited()
   def create(params) do
     %Chat{} |> Chat.changeset(params) |> Repo.insert()
   end
 
-  @spec update(Chat.t(), map()) :: {:ok, Chat.t()} | {:error, Changeset.t()}
+  @spec update(Chat.t(), map()) :: modelwrited()
   def update(%Chat{} = chat, attrs) do
     chat |> Chat.changeset(attrs) |> Repo.update()
   end
 
-  @spec fetch(integer(), map()) :: {:ok, Chat.t()} | {:error, Changeset.t()}
+  @spec fetch(integer(), map()) :: modelwrited()
   def fetch(id, params) when is_integer(id) do
     case id |> get() do
       {:error, :not_found, _} -> create(params |> Map.put(:id, id))
@@ -28,7 +30,7 @@ defmodule PolicrMini.ChatBusiness do
     end
   end
 
-  @spec takeover_cancelled(Chat.t()) :: {:ok, Chat.t()} | {:error, Changeset.t()}
+  @spec takeover_cancelled(Chat.t()) :: modelwrited()
   def takeover_cancelled(%Chat{} = chat) do
     chat |> update(%{is_take_over: false})
   end

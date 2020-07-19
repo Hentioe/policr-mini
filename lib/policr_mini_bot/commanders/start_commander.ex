@@ -122,13 +122,14 @@ defmodule PolicrMiniBot.StartCommander do
 
   @spec send_verification_message(
           Verification.t(),
-          Scheme.t(),
+          PolicrMini.Schema.Scheme.t(),
           integer(),
           integer()
         ) ::
           {:error, Telegex.Model.errors()}
           | {:ok,
-             {Telegex.Model.Message.t(), Telegex.Model.InlineKeyboardMarkup.t(), Captcha.Data.t()}}
+             {Telegex.Model.Message.t(), Telegex.Model.InlineKeyboardMarkup.t(),
+              PolicrMiniBot.Captcha.Data.t()}}
   @doc """
   发送验证消息
   """

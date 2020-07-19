@@ -25,6 +25,8 @@ defmodule PolicrMini.Schema.MessageSnapshot do
     timestamps()
   end
 
+  @type t :: map()
+
   def changeset(%__MODULE__{} = message_snapshot, attrs) when is_map(attrs) do
     message_snapshot
     |> cast(attrs, @required_fields ++ @optional_fields)

@@ -49,7 +49,7 @@ defmodule PolicrMiniBot.SelfJoinedHandler do
     Telegex.leave_chat(chat_id)
   end
 
-  @spec handle_it(Telegex.Message.t()) :: no_return()
+  @spec handle_it(Telegex.Model.Message.t()) :: no_return()
   defp handle_it(message) do
     chat_id = message.chat.id
 

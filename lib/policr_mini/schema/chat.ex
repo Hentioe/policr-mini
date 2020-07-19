@@ -42,6 +42,8 @@ defmodule PolicrMini.Schema.Chat do
     timestamps()
   end
 
+  @type t :: map()
+
   def changeset(%__MODULE__{} = chat, attrs) when is_map(attrs) do
     chat
     |> cast(attrs, @required_fields ++ @optional_fields)

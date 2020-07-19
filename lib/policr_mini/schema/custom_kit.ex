@@ -19,6 +19,8 @@ defmodule PolicrMini.Schema.CustomKit do
     timestamps()
   end
 
+  @type t :: map()
+
   def changeset(%__MODULE__{} = custom_kit, attrs) when is_map(attrs) do
     custom_kit
     |> cast(attrs, @required_fields ++ @optional_fields)

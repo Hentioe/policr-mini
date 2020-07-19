@@ -23,6 +23,8 @@ defmodule PolicrMini.Schema.Permission do
     timestamps()
   end
 
+  @type t :: map()
+
   def changeset(%__MODULE__{} = permission, attrs) when is_map(attrs) do
     permission
     |> cast(attrs, @required_fields ++ @optional_fields)
