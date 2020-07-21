@@ -3,12 +3,11 @@ defmodule PolicrMiniBot.SelfJoinedHandler do
   自身加入新群组的处理器。
   """
 
-  use PolicrMiniBot.Plug, :handler
+  use PolicrMiniBot, plug: :handler
 
   require Logger
 
   alias PolicrMiniBot.SyncCommander
-  alias Telegex.Model.{InlineKeyboardMarkup, InlineKeyboardButton}
 
   @doc """
   判断新消息中包含的新用户是否为机器人自己。

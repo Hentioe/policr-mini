@@ -1,7 +1,31 @@
 defmodule PolicrMiniBot do
   @moduledoc """
-  机器人功能的根模块。
+  机器人功能。
   """
+
+  defmacro __using__(plug: opts) do
+    quote do
+      import PolicrMiniBot.Helper
+
+      alias PolicrMiniBot.{State, Cleaner}
+
+      alias Telegex.Model.{
+        Update,
+        Message,
+        CallbackQuery,
+        InlineKeyboardMarkup,
+        InlineKeyboardButton
+      }
+
+      use Telegex.Plug.Preset, unquote(opts)
+    end
+  end
+
+  defmacro __using__(:plug) do
+    quote do
+      use Telegex.Plug
+    end
+  end
 
   @doc """
   获取机器人的 ID。

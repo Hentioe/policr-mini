@@ -35,6 +35,9 @@ defmodule PolicrMini.MixProject do
     [
       {:credo, "~> 1.4", only: [:dev, :test], runtime: false},
       {:dialyxir, "~> 1.0", only: [:dev], runtime: false},
+      {:telegex, "~> 0.1.0"},
+      {:telegex_marked, "~> 0.0.8"},
+      {:telegex_plug, "~> 0.1.0"},
       {:phoenix, "~> 1.5.3"},
       {:phoenix_ecto, "~> 4.1"},
       {:ecto_sql, "~> 3.4"},
@@ -53,10 +56,7 @@ defmodule PolicrMini.MixProject do
       {:yaml_elixir, "~> 2.4"},
       {:typed_struct, "~> 0.2.0"},
       {:quantum, "~> 3.0"},
-      {:telegex, "~> 0.1.0"},
-      {:telegex_marked, "~> 0.0.8"},
-      {:pow, "~> 1.0"},
-      {:telegex_plug, "0.1.0-rc.0"}
+      {:pow, "~> 1.0"}
     ]
   end
 

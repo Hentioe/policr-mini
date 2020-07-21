@@ -3,11 +3,7 @@ defmodule PolicrMiniBot.PingCommander do
   ping 命令。
   """
 
-  use Telegex.Plug.Preset, commander: :ping
-
-  import PolicrMiniBot.Helper
-
-  alias PolicrMiniBot.Cleaner
+  use PolicrMiniBot, plug: [commander: :ping]
 
   require Logger
 

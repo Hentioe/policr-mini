@@ -5,13 +5,10 @@ defmodule PolicrMiniBot.SyncCommander do
 
   require Logger
 
-  use Telegex.Plug.Preset, commander: :sync
-
-  import PolicrMiniBot.Helper
+  use PolicrMiniBot, plug: [commander: :sync]
 
   alias PolicrMini.{ChatBusiness, UserBusiness}
   alias PolicrMini.Schema.{Permission, Chat}
-  alias PolicrMiniBot.Cleaner
 
   @doc """
   非管理员发送指令直接删除。

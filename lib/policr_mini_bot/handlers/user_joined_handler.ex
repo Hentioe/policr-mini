@@ -3,14 +3,13 @@ defmodule PolicrMiniBot.UserJoinedHandler do
   新用户加入处理模块。
   """
 
-  use PolicrMiniBot.Plug, :handler
+  use PolicrMiniBot, plug: :handler
 
   require Logger
 
   alias PolicrMini.Schema.{Verification, Scheme}
   alias PolicrMini.{SchemeBusiness, VerificationBusiness}
-  alias PolicrMiniBot.{State, Cleaner, VerificationCaller}
-  alias Telegex.Model.{InlineKeyboardMarkup, InlineKeyboardButton}
+  alias PolicrMiniBot.VerificationCaller
 
   # 过期时间：15 分钟
   @expired_seconds 60 * 15

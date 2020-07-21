@@ -3,7 +3,7 @@ defmodule PolicrMiniBot.SelfLeftedHandler do
   自身离开群组的处理器。
   """
 
-  use PolicrMiniBot.Plug, :handler
+  use PolicrMiniBot, plug: :handler
 
   alias PolicrMini.ChatBusiness
 

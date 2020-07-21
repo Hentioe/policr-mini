@@ -3,13 +3,13 @@ defmodule PolicrMiniBot.VerificationCaller do
   验证回调处理模块。
   """
 
-  use PolicrMiniBot.Plug, caller: [prefix: "verification:"]
+  use PolicrMiniBot, plug: [caller: [prefix: "verification:"]]
 
   require Logger
 
   alias PolicrMini.Schema.Verification
   alias PolicrMini.{VerificationBusiness, SchemeBusiness}
-  alias PolicrMiniBot.{Cleaner, UserJoinedHandler}
+  alias PolicrMiniBot.UserJoinedHandler
 
   @doc """
   回调处理函数。

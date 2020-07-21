@@ -5,9 +5,7 @@ defmodule PolicrMiniBot.StartCommander do
   这是因为 `/start` 是当前设计中唯一一个需要携带参数的命令。
   """
 
-  use Telegex.Plug.Preset, commander: :start
-
-  import PolicrMiniBot.Helper
+  use PolicrMiniBot, plug: [commander: :start]
 
   require Logger
 
