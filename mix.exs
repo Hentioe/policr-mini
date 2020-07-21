@@ -55,7 +55,8 @@ defmodule PolicrMini.MixProject do
       {:quantum, "~> 3.0"},
       {:telegex, "~> 0.1.0"},
       {:telegex_marked, "~> 0.0.8"},
-      {:pow, "~> 1.0"}
+      {:pow, "~> 1.0"},
+      {:telegex_plug, path: "../telegex_plug"}
     ]
   end
 

@@ -4,7 +4,10 @@ defmodule PolicrMiniBot.StartCommander do
   与其它命令不同，`/start` 命令不需要完整匹配，以 `/start` 开头的**私聊文本消息**都能进入处理函数。
   这是因为 `/start` 是当前设计中唯一一个需要携带参数的命令。
   """
-  use PolicrMiniBot.Commander, :start
+
+  use Telegex.Plug.Preset, commander: :start
+
+  import PolicrMiniBot.Helper
 
   require Logger
 
@@ -22,10 +25,16 @@ defmodule PolicrMiniBot.StartCommander do
   ]
 
   @doc """
-  重写后的 `match?/1` 函数，以 `/start` 开始即匹配。
+  重写匹配规则，以 `/start` 开始即匹配。
   """
   @impl true
-  def match?(text), do: text |> String.starts_with?(@command)
+  def match(text, state) do
+    if String.starts_with?(text, @command) do
+      {:match, state}
+    else
+      {:nomatch, state}
+    end
+  end
 
   @doc """
   群组消息，忽略。

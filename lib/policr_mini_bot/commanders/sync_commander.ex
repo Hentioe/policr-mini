@@ -5,22 +5,24 @@ defmodule PolicrMiniBot.SyncCommander do
 
   require Logger
 
-  use PolicrMiniBot.Commander, :sync
+  use Telegex.Plug.Preset, commander: :sync
+
+  import PolicrMiniBot.Helper
 
   alias PolicrMini.{ChatBusiness, UserBusiness}
   alias PolicrMini.Schema.{Permission, Chat}
+  alias PolicrMiniBot.Cleaner
 
   @doc """
   非管理员发送指令直接删除。
   """
   @impl true
-  def handle(
-        %{message_id: message_id, chat: %{id: chat_id}} = message,
-        %{from_admin: false} = state
-      ) do
+  def handle(message, %{from_admin: false} = state) do
+    %{message_id: message_id, chat: %{id: chat_id}} = message
+
     Cleaner.delete_message(chat_id, message_id)
 
-    {message, state}
+    {:ok, %{state | deleted: true}}
   end
 
   @doc """

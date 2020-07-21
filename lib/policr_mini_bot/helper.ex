@@ -502,4 +502,22 @@ defmodule PolicrMiniBot.Helper do
 
     :ok
   end
+
+  @doc """
+  响应回调查询。
+  """
+  @spec answer_callback_query(String.t(), keyword()) :: :ok | {:error, Telegex.Model.errors()}
+  def answer_callback_query(callback_query_id, options \\ []) do
+    Telegex.answer_callback_query(callback_query_id, options)
+  end
+
+  @doc """
+  解析回调中的数据。
+  """
+  @spec parse_callback_data(String.t()) :: {String.t(), [String.t()]}
+  def parse_callback_data(data) when is_binary(data) do
+    [_, version | args] = data |> String.split(":")
+
+    {version, args}
+  end
 end

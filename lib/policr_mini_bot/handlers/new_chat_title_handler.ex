@@ -3,7 +3,7 @@ defmodule PolicrMiniBot.NewChatTitleHandler do
   群组标题修改的处理器。
   """
 
-  use PolicrMiniBot.Handler
+  use PolicrMiniBot.Plug, :handler
 
   require Logger
 
@@ -15,15 +15,16 @@ defmodule PolicrMiniBot.NewChatTitleHandler do
   消息中的 `new_chat_title` 为 `nil` 时，表示不匹配。否则匹配。
   """
   @impl true
-  def match?(%{new_chat_title: nil} = _message, state), do: {false, state}
+  def match(%{new_chat_title: nil} = _message, state), do: {:nomatch, state}
   @impl true
-  def match?(_message, state), do: {true, state}
+  def match(_message, state), do: {:match, state}
 
   @doc """
   处理群组标题修改。
 
   更新数据库中对应的群组的标题数据。
   """
+  @impl true
   def handle(message, state) do
     %{new_chat_title: new_chat_title, chat: %{id: chat_id}} = message
 

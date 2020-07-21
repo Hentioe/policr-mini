@@ -6,6 +6,7 @@ defmodule PolicrMini.Application do
   use Application
 
   alias PolicrMiniBot.{
+    IdentityCheckPreheater,
     StartCommander,
     PingCommander,
     SyncCommander,
@@ -13,22 +14,14 @@ defmodule PolicrMini.Application do
     SelfLeftedHandler,
     UserJoinedHandler,
     NewChatTitleHandler,
-    TextHandler,
-    VerificationCallbacker
+    VerificationCaller
   }
 
   def start(_type, _args) do
-    filters = [
-      commanders: [StartCommander, PingCommander, SyncCommander],
-      handlers: [
-        SelfJoinedHandler,
-        SelfLeftedHandler,
-        UserJoinedHandler,
-        NewChatTitleHandler,
-        TextHandler
-      ],
-      callbackers: [VerificationCallbacker]
-    ]
+    install_plugs([IdentityCheckPreheater])
+    install_plugs([StartCommander, PingCommander, SyncCommander])
+    install_plugs([SelfJoinedHandler, SelfLeftedHandler, UserJoinedHandler, NewChatTitleHandler])
+    install_plugs([VerificationCaller])
 
     children = [
       # Start the Ecto repository
@@ -50,8 +43,6 @@ defmodule PolicrMini.Application do
       PolicrMiniBot.UpdatesPoller,
       # 消费消息的动态主管
       PolicrMiniBot.Consumer,
-      # 过滤器管理器
-      {PolicrMiniBot.FilterManager, filters},
       # 任务调度服务
       PolicrMiniBot.Scheduler
     ]
@@ -72,5 +63,9 @@ defmodule PolicrMini.Application do
   def config_change(changed, _new, removed) do
     PolicrMiniWeb.Endpoint.config_change(changed, removed)
     :ok
+  end
+
+  defp install_plugs(plugs) do
+    Telegex.Plug.Pipeline.install(plugs)
   end
 end

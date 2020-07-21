@@ -19,6 +19,8 @@ defmodule PolicrMiniBot.UpdatesPoller do
     Logger.info("Checking bot information…")
     {:ok, %Telegex.Model.User{id: id, username: username}} = Telegex.get_me()
     Logger.info("Bot (@#{username}) is working")
+    # 更新 Plug 中缓存的用户名
+    Telegex.Plug.update_username(username)
     # 缓存机器人数据
     :ets.new(:bot_info, [:set, :named_table])
     :ets.insert(:bot_info, {:id, id})

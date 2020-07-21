@@ -1,15 +1,15 @@
-defmodule PolicrMiniBot.VerificationCallbacker do
+defmodule PolicrMiniBot.VerificationCaller do
   @moduledoc """
   验证回调处理模块。
   """
 
-  use PolicrMiniBot.Callbacker, :verification
+  use PolicrMiniBot.Plug, caller: [prefix: "verification:"]
 
   require Logger
 
   alias PolicrMini.Schema.Verification
   alias PolicrMini.{VerificationBusiness, SchemeBusiness}
-  alias PolicrMiniBot.UserJoinedHandler
+  alias PolicrMiniBot.{Cleaner, UserJoinedHandler}
 
   @doc """
   回调处理函数。
@@ -17,7 +17,7 @@ defmodule PolicrMiniBot.VerificationCallbacker do
   此函数仅仅解析参数并分发到 `handle_data/2` 子句中。
   """
   @impl true
-  def handle(%{data: data} = callback_query) do
+  def handle(%{data: data} = callback_query, _state) do
     data |> parse_callback_data() |> handle_data(callback_query)
   end
 

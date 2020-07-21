@@ -3,16 +3,23 @@ defmodule PolicrMiniBot.SelfLeftedHandler do
   自身离开群组的处理器。
   """
 
-  use PolicrMiniBot.Handler
+  use PolicrMiniBot.Plug, :handler
 
   alias PolicrMini.ChatBusiness
 
+  @doc """
+  检查消息中离开的用户是否为机器人自己。
+  """
   @impl true
-  def match?(%{left_chat_member: nil} = _message, state), do: {false, state}
-
+  def match(%{left_chat_member: nil} = _message, state), do: {:nomatch, state}
   @impl true
-  def match?(%{left_chat_member: %{id: lefted_user_id}} = _message, state),
-    do: {lefted_user_id == bot_id(), state}
+  def match(%{left_chat_member: %{id: lefted_user_id}} = _message, state) do
+    if lefted_user_id == bot_id() do
+      {:match, state}
+    else
+      {:nomatch, state}
+    end
+  end
 
   @impl true
   def handle(message, state) do

@@ -9,7 +9,7 @@ defmodule PolicrMiniBot.State do
     field :takeovered, boolean()
     field :from_self, boolean()
     field :from_admin, boolean()
-    field :deleted, boolean()
-    field :done, boolean()
+    field :deleted, boolean(), default: false
+    field :done, boolean(), default: false
   end
 end

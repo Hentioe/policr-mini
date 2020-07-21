@@ -3,27 +3,37 @@ defmodule PolicrMiniBot.SelfJoinedHandler do
   自身加入新群组的处理器。
   """
 
-  use PolicrMiniBot.Handler
+  use PolicrMiniBot.Plug, :handler
 
   require Logger
 
   alias PolicrMiniBot.SyncCommander
-
-  @impl true
-  def match?(%{new_chat_members: nil} = _message, state), do: {false, state}
+  alias Telegex.Model.{InlineKeyboardMarkup, InlineKeyboardButton}
 
   @doc """
-  单个用户加入，判断用户编号
+  判断新消息中包含的新用户是否为机器人自己。
   """
   @impl true
-  def match?(%{new_chat_members: [%{id: member_id}]} = _message, state),
-    do: {member_id == bot_id(), state}
+  def match(%{new_chat_members: nil} = _message, state), do: {:nomatch, state}
+  @impl true
+  def match(%{new_chat_members: [%{id: member_id}]} = _message, state) do
+    if member_id == bot_id() do
+      {:match, state}
+    else
+      {:nomatch, state}
+    end
+  end
 
-  @doc """
-  多个用户加入，判断用户编号
-  """
-  def match?(%{new_chat_members: members} = _message, state),
-    do: {members |> Enum.find(fn member -> member.id == bot_id() end) != nil, state}
+  @impl true
+  def match(%{new_chat_members: members} = _message, state) do
+    bot_id = bot_id()
+
+    if Enum.find(members, fn member -> member.id == bot_id end) != nil do
+      {:match, state}
+    else
+      {:nomatch, state}
+    end
+  end
 
   @impl true
   def handle(message, state) do

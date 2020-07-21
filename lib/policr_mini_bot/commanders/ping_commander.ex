@@ -1,9 +1,13 @@
 defmodule PolicrMiniBot.PingCommander do
   @moduledoc """
-  ping 命令
+  ping 命令。
   """
 
-  use PolicrMiniBot.Commander, :ping
+  use Telegex.Plug.Preset, commander: :ping
+
+  import PolicrMiniBot.Helper
+
+  alias PolicrMiniBot.Cleaner
 
   require Logger
 
@@ -21,6 +25,6 @@ defmodule PolicrMiniBot.PingCommander do
         Logger.error("Error in response to `/ping` command. Details: #{inspect(e)}")
     end
 
-    {:ok, state}
+    {:ok, %{state | deleted: true}}
   end
 end

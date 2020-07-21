@@ -3,13 +3,14 @@ defmodule PolicrMiniBot.UserJoinedHandler do
   新用户加入处理模块。
   """
 
-  use PolicrMiniBot.Handler
+  use PolicrMiniBot.Plug, :handler
 
   require Logger
 
   alias PolicrMini.Schema.{Verification, Scheme}
   alias PolicrMini.{SchemeBusiness, VerificationBusiness}
-  alias PolicrMiniBot.VerificationCallbacker
+  alias PolicrMiniBot.{State, Cleaner, VerificationCaller}
+  alias Telegex.Model.{InlineKeyboardMarkup, InlineKeyboardButton}
 
   # 过期时间：15 分钟
   @expired_seconds 60 * 15
@@ -23,41 +24,30 @@ defmodule PolicrMiniBot.UserJoinedHandler do
     if PolicrMini.mix_env() == :dev, do: 30 * 3, else: 60 * 5
   end
 
-  @spec allow_join_again_seconds :: integer()
   @doc """
   获取允许重新加入时长。
   当前的实现会根据运行模式返回不同的值。
   """
+  @spec allow_join_again_seconds :: integer()
   def allow_join_again_seconds do
     if PolicrMini.mix_env() == :dev, do: 15, else: 60 * 2
   end
 
   @doc """
-  未接管状态，不匹配。
+  检查消息中包含的新加入用户是否有效。
+
+  如果群组未接管、拉人或进群的是管理员或机器人，都不匹配。除此之外包含新成员的消息都匹配。
   """
   @impl true
-  def match?(_message, %{takeovered: false} = state), do: {false, state}
-
-  @doc """
-  消息中不包含新成员，不匹配。
-  """
+  def match(_message, %{takeovered: false} = state), do: {:nomatch, state}
   @impl true
-  def match?(%{new_chat_members: nil} = _message, state), do: {false, state}
-
-  # 如果拉人或进群的是管理员，不匹配
-  def match?(_message, %{from_admin: true} = state), do: {false, state}
-
-  @doc """
-  消息中的新成员类型是机器人，不匹配。
-  """
+  def match(%{new_chat_members: nil} = _message, state), do: {:nomatch, state}
   @impl true
-  def match?(%{new_chat_members: [%{is_bot: true}]} = _message, state), do: {false, state}
-
-  @doc """
-  其余情况皆匹配。
-  """
+  def match(_message, %{from_admin: true} = state), do: {:nomatch, state}
   @impl true
-  def match?(_message, state), do: {true, state}
+  def match(%{new_chat_members: [%{is_bot: true}]} = _message, state), do: {:nomatch, state}
+  @impl true
+  def match(_message, state), do: {:match, state}
 
   @doc """
   新成员处理函数。
@@ -116,12 +106,12 @@ defmodule PolicrMiniBot.UserJoinedHandler do
     end
   end
 
-  @spec handle_expired(atom(), Telegex.Model.Message.t(), State.t()) ::
-          {:error, State.t()} | {:ok, State.t()}
   @doc """
   处理过期验证。
   当前仅限制用户，并不发送验证消息。
   """
+  @spec handle_expired(atom(), Telegex.Model.Message.t(), State.t()) ::
+          {:error, State.t()} | {:ok, State.t()}
   def handle_expired(entrance, message, state) do
     %{chat: %{id: chat_id}, new_chat_members: [new_chat_member]} = message
 
@@ -303,7 +293,7 @@ defmodule PolicrMiniBot.UserJoinedHandler do
         # 如果还存在多条验证，更新入口消息
         max_seconds = scheme.seconds || countdown()
 
-        VerificationCallbacker.update_unity_verification_message(
+        VerificationCaller.update_unity_verification_message(
           chat_id,
           waiting_count,
           max_seconds
