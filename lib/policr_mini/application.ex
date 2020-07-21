@@ -66,6 +66,6 @@ defmodule PolicrMini.Application do
   end
 
   defp install_plugs(plugs) do
-    Telegex.Plug.Pipeline.install(plugs)
+    Telegex.Plug.Pipeline.install_all(plugs)
   end
 end
