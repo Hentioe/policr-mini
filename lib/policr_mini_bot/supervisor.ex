@@ -20,7 +20,7 @@ defmodule PolicrMiniBot.Supervisor do
   end
 
   @impl true
-  def init(:ok) do
+  def init(_init_arg) do
     install_plugs([FromCheckPreheater])
     install_plugs([StartCommander, PingCommander, SyncCommander])
     install_plugs([SelfJoinedHandler, SelfLeftedHandler, UserJoinedHandler, NewChatTitleHandler])
@@ -41,7 +41,8 @@ defmodule PolicrMiniBot.Supervisor do
 
     # See https://hexdocs.pm/elixir/Supervisor.html
     # for other strategies and supported options
-    opts = [strategy: :one_for_one, name: PolicrMiniBot.Supervisor]
+    opts = [strategy: :one_for_one]
+
     Supervisor.init(children, opts)
   end
 
