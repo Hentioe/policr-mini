@@ -1,6 +1,6 @@
-defmodule PolicrMiniBot.IdentityCheckPreheater do
+defmodule PolicrMiniBot.FromCheckPreheater do
   @moduledoc """
-  检查身份的预热器。
+  检查并缓存来源信息的预热器。
   """
 
   use Telegex.Plug.Preset, :preheater
