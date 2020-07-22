@@ -4,6 +4,7 @@ defmodule PolicrMiniBot.Supervisor do
   use Supervisor
 
   alias PolicrMiniBot.{
+    TakeoverCheckPreheater,
     FromCheckPreheater,
     StartCommander,
     PingCommander,
@@ -21,7 +22,7 @@ defmodule PolicrMiniBot.Supervisor do
 
   @impl true
   def init(_init_arg) do
-    install_plugs([FromCheckPreheater])
+    install_plugs([TakeoverCheckPreheater, FromCheckPreheater])
     install_plugs([StartCommander, PingCommander, SyncCommander])
     install_plugs([SelfJoinedHandler, SelfLeftedHandler, UserJoinedHandler, NewChatTitleHandler])
     install_plugs([VerificationCaller])
