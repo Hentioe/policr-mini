@@ -13,10 +13,21 @@ defmodule PolicrMiniWeb.Router do
     plug :accepts, ["json"]
   end
 
+  pipeline :admin do
+    plug PolicrMiniWeb.TokenAuthentication, from: :page
+    plug :put_layout, {PolicrMiniWeb.LayoutView, :admin}
+  end
+
   scope "/api", PolicrMiniWeb.API do
     pipe_through :api
 
     get "/home", HomeController, :index
+  end
+
+  scope "/admin", PolicrMiniWeb.Admin do
+    pipe_through [:browser, :admin]
+
+    get "/*path", PageController, :index
   end
 
   scope "/", PolicrMiniWeb do
