@@ -7,6 +7,7 @@ defmodule PolicrMini.PermissionBusiness do
 
   import Ecto.Query, only: [from: 2, dynamic: 2]
 
+  @spec find(integer, integer) :: Permission.t() | nil
   def find(chat_id, user_id) when is_integer(chat_id) and is_integer(user_id) do
     from(p in Permission, where: p.chat_id == ^chat_id, where: p.user_id == ^user_id)
     |> Repo.one()
@@ -30,6 +31,8 @@ defmodule PolicrMini.PermissionBusiness do
     end
   end
 
+  @type find_list_conds :: [{:chat_id, integer()}, {:user_id, integer()}]
+  @spec find_list(find_list_conds()) :: [Permission.t()]
   def find_list(conds) when is_list(conds) do
     filter_chat_id =
       if chat_id = conds[:chat_id],

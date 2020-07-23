@@ -78,4 +78,12 @@ defmodule PolicrMiniWeb do
   defmacro __using__(which) when is_atom(which) do
     apply(__MODULE__, which, [])
   end
+
+  @doc """
+  创建一个用户 Token
+  """
+  @spec create_token(integer()) :: String.t()
+  def create_token(user_id) do
+    Phoenix.Token.sign(PolicrMiniWeb.Endpoint, "user_id", user_id)
+  end
 end

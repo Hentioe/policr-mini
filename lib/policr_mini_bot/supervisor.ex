@@ -9,6 +9,7 @@ defmodule PolicrMiniBot.Supervisor do
     StartCommander,
     PingCommander,
     SyncCommander,
+    LoginCommander,
     SelfJoinedHandler,
     SelfLeftedHandler,
     UserJoinedHandler,
@@ -23,7 +24,7 @@ defmodule PolicrMiniBot.Supervisor do
   @impl true
   def init(_init_arg) do
     install_plugs([TakeoverCheckPreheater, FromCheckPreheater])
-    install_plugs([StartCommander, PingCommander, SyncCommander])
+    install_plugs([StartCommander, PingCommander, SyncCommander, LoginCommander])
     install_plugs([SelfJoinedHandler, SelfLeftedHandler, UserJoinedHandler, NewChatTitleHandler])
     install_plugs([VerificationCaller])
 

@@ -18,10 +18,13 @@ config :policr_mini, PolicrMiniWeb.Endpoint,
   pubsub_server: PolicrMini.PubSub,
   live_view: [signing_salt: "hy+GpqGC"]
 
-# Configures the image provider
+# 配置根链接
+config :policr_mini, PolicrMiniWeb, root_url: "http://0.0.0.0:4000/"
+
+# 配置图片服务
 config :policr_mini, PolicrMiniBot.ImageProvider, path: "images"
 
-# Job schedule
+# 任务调度配置
 config :policr_mini, PolicrMiniBot.Scheduler,
   jobs: [
     # 修正过期验证任务
@@ -30,11 +33,11 @@ config :policr_mini, PolicrMiniBot.Scheduler,
     {"*/55 * * * *", {PolicrMiniBot.Runner, :check_working_status, []}}
   ]
 
-# Configure marked
+# 配置 Marked
 config :policr_mini,
   marked_enabled: true
 
-# Configures Telegex's timeouts
+# 配置 Telegex
 config :telegex,
   timeout: 1000 * 30,
   recv_timeout: 1000 * 45

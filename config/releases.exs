@@ -32,6 +32,15 @@ config :policr_mini, PolicrMiniWeb.Endpoint,
   secret_key_base: secret_key_base,
   server: true
 
+# 配置根链接
+config :policr_mini, PolicrMiniWeb,
+  root_url:
+    System.get_env("POLICR_MINI_SERVER_ROOT_URL") ||
+      raise("""
+      environment variable POLICR_MINI_SERVER_ROOT_URL is missing.
+      You can generate one by calling: mix phx.gen.secret
+      """)
+
 # Configures the image provider
 config :policr_mini, PolicrMiniBot.ImageProvider,
   path:
