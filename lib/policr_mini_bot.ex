@@ -17,7 +17,7 @@ defmodule PolicrMiniBot do
         InlineKeyboardButton
       }
 
-      use Telegex.Plug.Preset, unquote(opts)
+      use Telegex.Plug.Presets, unquote(opts)
     end
   end
 

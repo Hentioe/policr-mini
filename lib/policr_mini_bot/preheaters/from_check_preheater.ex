@@ -3,7 +3,7 @@ defmodule PolicrMiniBot.FromCheckPreheater do
   检查并缓存来源信息的预热器。
   """
 
-  use Telegex.Plug.Preset, :preheater
+  use PolicrMiniBot, plug: :preheater
 
   alias PolicrMini.PermissionBusiness
 
