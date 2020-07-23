@@ -6,7 +6,8 @@ defmodule PolicrMini.Factory do
       id: 123_456_789,
       first_name: "小",
       last_name: "明",
-      username: "xiaoming"
+      username: "xiaoming",
+      token_ver: 0
     }
   end
 

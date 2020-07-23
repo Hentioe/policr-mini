@@ -5,8 +5,11 @@ defmodule PolicrMini.UserBusiness do
 
   use PolicrMini, business: PolicrMini.Schema.User
 
+  @type return_writed :: {:ok, User.t()} | {:error, Ecto.Changeset.t()}
+
+  @spec create(map()) :: return_writed
   def create(params) do
-    %User{} |> User.changeset(params) |> Repo.insert()
+    %User{token_ver: 0} |> User.changeset(params) |> Repo.insert()
   end
 
   def update(%User{} = user, attrs) do

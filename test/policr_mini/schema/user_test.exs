@@ -14,6 +14,7 @@ defmodule PolicrMini.Schema.UserTest do
                  :first_name,
                  :last_name,
                  :username,
+                 :token_ver,
                  :inserted_at,
                  :updated_at
                ]
@@ -48,7 +49,8 @@ defmodule PolicrMini.Schema.UserTest do
     assert changeset.validations == []
 
     assert changeset.required == [
-             :id
+             :id,
+             :token_ver
            ]
 
     assert changeset.valid?
