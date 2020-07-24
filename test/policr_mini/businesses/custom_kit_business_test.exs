@@ -23,7 +23,7 @@ defmodule PolicrMini.CustomKitBusinessTest do
 
     assert custom_kit.chat_id == custom_kit_params.chat_id
     assert custom_kit.title == custom_kit_params.title
-    assert custom_kit.answer_body == custom_kit_params.answer_body
+    assert custom_kit.answers == custom_kit_params.answers
   end
 
   test "update/2" do
@@ -31,18 +31,18 @@ defmodule PolicrMini.CustomKitBusinessTest do
     {:ok, custom_kit1} = CustomKitBusiness.create(custom_kit)
 
     updated_title = "老虎吃人吗？"
-    updated_answer_body = "+吃 -不吃"
+    updated_answers = ["+吃", "-不吃"]
 
     {:ok, custom_kit2} =
       custom_kit1
       |> CustomKitBusiness.update(%{
         title: updated_title,
-        answer_body: updated_answer_body
+        answers: updated_answers
       })
 
     assert custom_kit2.id == custom_kit1.id
     assert custom_kit2.title == updated_title
-    assert custom_kit2.answer_body == updated_answer_body
+    assert custom_kit2.answers == updated_answers
   end
 
   test "find_list/1" do

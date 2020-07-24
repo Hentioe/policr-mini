@@ -7,19 +7,20 @@ defmodule PolicrMini.Schema.CustomKit do
 
   alias PolicrMini.Schema.Chat
 
-  @required_fields ~w(chat_id title answer_body)a
-  @optional_fields ~w()a
+  @required_fields ~w(chat_id title answers)a
+  @optional_fields ~w(photos)a
 
   schema "custom_kits" do
     belongs_to :chat, Chat
 
     field :title, :string
-    field :answer_body, :string
+    field :answers, {:array, :string}
+    field :photos, {:array, :string}
 
     timestamps()
   end
 
-  @type t :: map()
+  @type t :: Ecto.Schema.t()
 
   def changeset(%__MODULE__{} = custom_kit, attrs) when is_map(attrs) do
     custom_kit

@@ -13,7 +13,8 @@ defmodule PolicrMini.Schema.CustomKitTest do
                  :id,
                  :chat_id,
                  :title,
-                 :answer_body,
+                 :answers,
+                 :photos,
                  :inserted_at,
                  :updated_at
                ]
@@ -25,17 +26,17 @@ defmodule PolicrMini.Schema.CustomKitTest do
   test "changeset/2" do
     custom_kit = Factory.build(:custom_kit, chat_id: 123_456_789_011)
 
-    updated_title = "1+1=?"
-    updated_answer_body = "+2 -3"
+    updated_title = "1 + 1= ?"
+    updated_answers = ["+2", "-3"]
 
     params = %{
       "title" => updated_title,
-      "answer_body" => updated_answer_body
+      "answers" => updated_answers
     }
 
     changes = %{
       title: updated_title,
-      answer_body: updated_answer_body
+      answers: updated_answers
     }
 
     changeset = CustomKit.changeset(custom_kit, params)
@@ -47,7 +48,7 @@ defmodule PolicrMini.Schema.CustomKitTest do
     assert changeset.required == [
              :chat_id,
              :title,
-             :answer_body
+             :answers
            ]
 
     assert changeset.valid?

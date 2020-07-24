@@ -37,7 +37,7 @@ defmodule PolicrMini.Factory do
   def build(:custom_kit) do
     %PolicrMini.Schema.CustomKit{
       title: "猫吃老鼠吗？",
-      answer_body: "+吃 -不吃"
+      answers: ["+吃", "-不吃"]
     }
   end
 
