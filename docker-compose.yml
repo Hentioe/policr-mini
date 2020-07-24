@@ -9,7 +9,7 @@ services:
       POSTGRES_PASSWORD: postgres
 
   pgadmin:
-    image: dpage/pgadmin4:4.22
+    image: dpage/pgadmin4:4.24
     environment:
       PGADMIN_DEFAULT_EMAIL: pgadmin4@pgadmin.org
       PGADMIN_DEFAULT_PASSWORD: admin
