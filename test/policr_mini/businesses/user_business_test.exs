@@ -63,4 +63,16 @@ defmodule PolicrMini.UserBusinessTest do
 
     assert user1 == user2
   end
+
+  test "upgrade_token_ver/1" do
+    {:ok, user} = UserBusiness.create(build_params())
+
+    assert user.token_ver == 0
+
+    assert UserBusiness.upgrade_token_ver(user.id)
+
+    {:ok, user} = UserBusiness.get(user.id)
+
+    assert user.token_ver == 1
+  end
 end

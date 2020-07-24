@@ -80,10 +80,24 @@ defmodule PolicrMiniWeb do
   end
 
   @doc """
-  创建一个用户 Token
+  创建一个用户 Token。
+
+  目前唯一可能返回错误的情况是用户不存在，即 `{:error, :notfound}`。
   """
-  @spec create_token(integer()) :: String.t()
+  @spec create_token(integer()) :: {:ok, String.t()} | {:error, :notfound}
   def create_token(user_id) do
-    Phoenix.Token.sign(PolicrMiniWeb.Endpoint, "user_id", user_id)
+    case PolicrMini.UserBusiness.get(user_id) do
+      {:ok, user} ->
+        token =
+          Phoenix.Token.sign(PolicrMiniWeb.Endpoint, "user auth", %{
+            user_id: user_id,
+            token_ver: user.token_ver
+          })
+
+        {:ok, token}
+
+      {:error, :not_found, _} ->
+        {:error, :notfound}
+    end
   end
 end

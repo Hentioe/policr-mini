@@ -17,11 +17,10 @@ defmodule PolicrMiniBot.LoginCommander do
   def handle(%{chat: %{type: "private"}} = message, state) do
     %{chat: %{id: chat_id}, from: %{id: user_id}} = message
 
-    # 检查用户是否具备权限记录
-    if is_admin(user_id) do
-      token = PolicrMiniWeb.create_token(user_id)
+    with {:ok, :isadmin} <- check_user(user_id),
+         {:ok, token} <- PolicrMiniWeb.create_token(user_id) do
       text = t("login.success", %{token: token})
-      reply_markup = make_markup(token)
+      reply_markup = make_markup(user_id, token)
 
       case send_message(chat_id, text, reply_markup: reply_markup, parse_mode: "MarkdownV2ToHTML") do
         {:ok, _} ->
@@ -33,9 +32,15 @@ defmodule PolicrMiniBot.LoginCommander do
           {:error, state}
       end
     else
-      send_message(chat_id, t("login.not_admin"))
+      {:error, :nonadmin} ->
+        send_message(chat_id, t("login.non_admin"), parse_mode: "MarkdownV2ToHTML")
 
-      {:ok, state}
+        {:ok, state}
+
+      {:error, :notfound} ->
+        send_message(chat_id, t("login.not_found"), parse_mode: "MarkdownV2ToHTML")
+
+        {:ok, state}
     end
   end
 
@@ -56,21 +61,32 @@ defmodule PolicrMiniBot.LoginCommander do
     {:ok, %{state | deleted: true}}
   end
 
-  @spec make_markup(String.t()) :: InlineKeyboardMarkup.t()
-  defp make_markup(token) do
+  @spec make_markup(integer, String.t()) :: InlineKeyboardMarkup.t()
+  defp make_markup(user_id, token) do
     root_url = Application.get_env(:policr_mini, PolicrMiniWeb)[:root_url]
 
     %InlineKeyboardMarkup{
       inline_keyboard: [
-        [%InlineKeyboardButton{text: t("login.btn_text"), url: "#{root_url}admin?token=#{token}"}]
+        [
+          %InlineKeyboardButton{
+            text: t("login.revoke_text"),
+            callback_data: "revoke:v1:#{user_id}"
+          }
+        ],
+        [
+          %InlineKeyboardButton{
+            text: t("login.join_text"),
+            url: "#{root_url}admin?token=#{token}"
+          }
+        ]
       ]
     }
   end
 
-  @spec is_admin(integer()) :: boolean()
-  defp is_admin(user_id) do
+  @spec check_user(integer()) :: {:ok, :isadmin} | {:error, :nonadmin}
+  defp check_user(user_id) do
     list = PermissionBusiness.find_list(user_id: user_id)
 
-    length(list) > 0
+    if length(list) > 0, do: {:ok, :isadmin}, else: {:error, :nonadmin}
   end
 end

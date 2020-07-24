@@ -6,9 +6,14 @@ defmodule PolicrMiniWeb.TokenAuthentication do
   支持两种 `:from` 值，分别是 `:page`（默认）和 `:api`。适配 API 将响应 JSON 文本和 `401` 状态码。
   """
 
-  @expired_sec 60 * 15
+  @expired_sec 60 * 25
+
+  @type auth :: %{user_id: integer(), token_ver: integer()}
 
   import Plug.Conn
+
+  alias PolicrMini.Schema.User
+  alias PolicrMini.UserBusiness
 
   def init(opts) do
     opts
@@ -19,9 +24,7 @@ defmodule PolicrMiniWeb.TokenAuthentication do
   def call(conn, %{from: :page}) do
     {token_from, token} = find_token(conn)
 
-    {is_auth, user_id} = verify(token)
-
-    if is_auth do
+    if user = verify(token) do
       case token_from do
         :query ->
           # 将 token 写入 cookie 并重定向到不带参数的 admin 页面
@@ -31,7 +34,7 @@ defmodule PolicrMiniWeb.TokenAuthentication do
           |> redirect_to_admin()
 
         :cookies ->
-          assign(conn, :user_id, user_id)
+          assign(conn, :user, user)
       end
     else
       conn
@@ -61,14 +64,25 @@ defmodule PolicrMiniWeb.TokenAuthentication do
     end
   end
 
-  @spec verify(String.t()) :: {boolean(), integer()}
+  @spec verify(String.t()) :: User.t() | nil
   defp verify(token) do
-    case Phoenix.Token.verify(PolicrMiniWeb.Endpoint, "user_id", token, max_age: @expired_sec) do
-      {:ok, user_id} ->
-        {true, user_id}
+    case Phoenix.Token.verify(PolicrMiniWeb.Endpoint, "user auth", token, max_age: @expired_sec) do
+      {:ok, auth} ->
+        check_auth_info(auth)
 
       _ ->
-        {false, 0}
+        nil
+    end
+  end
+
+  @spec check_auth_info(map) :: User.t() | nil
+  defp check_auth_info(%{user_id: user_id, token_ver: token_ver}) do
+    case UserBusiness.get(user_id) do
+      {:ok, user} ->
+        if user.token_ver == token_ver, do: user, else: nil
+
+      {:error, :not_found, _} ->
+        nil
     end
   end
 

@@ -18,14 +18,9 @@ defmodule PolicrMini.Schema.User do
     timestamps()
   end
 
-  @type t :: %{
-          id: integer(),
-          first_name: String.t(),
-          last_name: String.t(),
-          username: String.t(),
-          token_ver: integer()
-        }
+  @type t :: Ecto.Schema.t()
 
+  @spec changeset(t, map) :: Ecto.Changeset.t()
   def changeset(%__MODULE__{} = user, attrs) when is_map(attrs) do
     user
     |> cast(attrs, @required_fields ++ @optional_fields)
