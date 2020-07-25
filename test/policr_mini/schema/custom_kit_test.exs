@@ -1,5 +1,6 @@
 defmodule PolicrMini.Schemas.CustomKitTest do
   use ExUnit.Case
+  doctest PolicrMini.Schemas.CustomKit
 
   alias PolicrMini.Factory
   alias PolicrMini.Schemas.CustomKit

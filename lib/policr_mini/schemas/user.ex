@@ -18,7 +18,7 @@ defmodule PolicrMini.Schemas.User do
     timestamps()
   end
 
-  @type t :: Ecto.Schemas.t()
+  @type t :: Ecto.Schema.t()
 
   @spec changeset(t, map) :: Ecto.Changeset.t()
   def changeset(%__MODULE__{} = user, attrs) when is_map(attrs) do

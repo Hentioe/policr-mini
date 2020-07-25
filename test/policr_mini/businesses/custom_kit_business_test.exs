@@ -90,4 +90,32 @@ defmodule PolicrMini.CustomKitBusinessTest do
     assert custom_kits |> Enum.member?(CustomKitBusiness.random_one(custom_kit_params.chat_id))
     assert custom_kits |> Enum.member?(CustomKitBusiness.random_one(custom_kit_params.chat_id))
   end
+
+  test "create/1 and invalid answers field" do
+    incorrect_format_answers = ["无效的答案", "-错误答案"]
+    missing_corrent_answers = ["-错误答案1", "-错误答案2"]
+
+    custom_kit_params = build_params(answers: incorrect_format_answers)
+    {:error, changeset} = CustomKitBusiness.create(custom_kit_params)
+
+    assert changeset.errors == [{:answers, {"incorrect format", []}}]
+
+    custom_kit_params = %{custom_kit_params | answers: missing_corrent_answers}
+    {:error, changeset} = CustomKitBusiness.create(custom_kit_params)
+
+    assert changeset.errors == [{:answers, {"missing correct answer", []}}]
+
+    custom_kit_params = %{custom_kit_params | answers: ["+正确答案", "-错误答案"]}
+    {:ok, custom_kit} = CustomKitBusiness.create(custom_kit_params)
+
+    {:error, changeset} =
+      CustomKitBusiness.update(custom_kit, %{answers: incorrect_format_answers})
+
+    assert changeset.errors == [{:answers, {"incorrect format", []}}]
+
+    {:error, changeset} =
+      CustomKitBusiness.update(custom_kit, %{answers: missing_corrent_answers})
+
+    assert changeset.errors == [{:answers, {"missing correct answer", []}}]
+  end
 end
