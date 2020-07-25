@@ -7,7 +7,7 @@ defmodule PolicrMiniBot.VerificationCaller do
 
   require Logger
 
-  alias PolicrMini.Schema.Verification
+  alias PolicrMini.Schemas.Verification
   alias PolicrMini.{VerificationBusiness, SchemeBusiness}
   alias PolicrMiniBot.UserJoinedHandler
 

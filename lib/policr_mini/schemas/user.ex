@@ -1,4 +1,4 @@
-defmodule PolicrMini.Schema.User do
+defmodule PolicrMini.Schemas.User do
   @moduledoc """
   用户模型。
   """
@@ -18,7 +18,7 @@ defmodule PolicrMini.Schema.User do
     timestamps()
   end
 
-  @type t :: Ecto.Schema.t()
+  @type t :: Ecto.Schemas.t()
 
   @spec changeset(t, map) :: Ecto.Changeset.t()
   def changeset(%__MODULE__{} = user, attrs) when is_map(attrs) do

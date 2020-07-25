@@ -7,7 +7,7 @@ defmodule PolicrMiniBot.Runner do
   require Logger
 
   alias PolicrMini.{VerificationBusiness, ChatBusiness}
-  alias PolicrMini.Schema.Chat
+  alias PolicrMini.Schemas.Chat
   alias PolicrMiniBot.Helper, as: BotHelper
 
   @spec fix_expired_wait_status :: :ok

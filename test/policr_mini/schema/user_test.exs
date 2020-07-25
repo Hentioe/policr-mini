@@ -1,8 +1,8 @@
-defmodule PolicrMini.Schema.UserTest do
+defmodule PolicrMini.Schemas.UserTest do
   use ExUnit.Case
 
   alias PolicrMini.Factory
-  alias PolicrMini.Schema.User
+  alias PolicrMini.Schemas.User
 
   describe "schema" do
     test "schema metadata" do

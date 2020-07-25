@@ -3,7 +3,7 @@ defmodule PolicrMini.MessageSnapshotBusiness do
   消息快照的业务功能实现。
   """
 
-  use PolicrMini, business: PolicrMini.Schema.MessageSnapshot
+  use PolicrMini, business: PolicrMini.Schemas.MessageSnapshot
 
   def create(params) do
     %MessageSnapshot{} |> MessageSnapshot.changeset(params) |> Repo.insert()

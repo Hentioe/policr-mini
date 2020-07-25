@@ -10,7 +10,7 @@ defmodule PolicrMiniBot.StartCommander do
   require Logger
 
   alias PolicrMini.{VerificationBusiness, SchemeBusiness, MessageSnapshotBusiness}
-  alias PolicrMini.Schema.Verification
+  alias PolicrMini.Schemas.Verification
   alias PolicrMiniBot.{ArithmeticCaptcha, FallbackCaptcha, ImageCaptcha}
 
   @fallback_captcha_module FallbackCaptcha
@@ -129,7 +129,7 @@ defmodule PolicrMiniBot.StartCommander do
 
   @spec send_verification_message(
           Verification.t(),
-          PolicrMini.Schema.Scheme.t(),
+          PolicrMini.Schemas.Scheme.t(),
           integer(),
           integer()
         ) ::

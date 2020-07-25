@@ -8,7 +8,7 @@ defmodule PolicrMiniBot.SyncCommander do
   use PolicrMiniBot, plug: [commander: :sync]
 
   alias PolicrMini.{ChatBusiness, UserBusiness}
-  alias PolicrMini.Schema.{Permission, Chat}
+  alias PolicrMini.Schemas.{Permission, Chat}
 
   @doc """
   非管理员发送指令直接删除。

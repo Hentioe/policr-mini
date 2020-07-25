@@ -1,8 +1,8 @@
-defmodule PolicrMini.Schema.CustomKitTest do
+defmodule PolicrMini.Schemas.CustomKitTest do
   use ExUnit.Case
 
   alias PolicrMini.Factory
-  alias PolicrMini.Schema.CustomKit
+  alias PolicrMini.Schemas.CustomKit
 
   describe "schema" do
     test "schema metadata" do

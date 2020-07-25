@@ -12,7 +12,7 @@ defmodule PolicrMiniWeb.TokenAuthentication do
 
   import Plug.Conn
 
-  alias PolicrMini.Schema.User
+  alias PolicrMini.Schemas.User
   alias PolicrMini.UserBusiness
 
   def init(opts) do

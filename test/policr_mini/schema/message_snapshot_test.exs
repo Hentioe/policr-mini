@@ -1,8 +1,8 @@
-defmodule PolicrMini.Schema.MessageSnapshotTest do
+defmodule PolicrMini.Schemas.MessageSnapshotTest do
   use ExUnit.Case
 
   alias PolicrMini.Factory
-  alias PolicrMini.Schema.MessageSnapshot
+  alias PolicrMini.Schemas.MessageSnapshot
 
   describe "schema" do
     test "schema metadata" do

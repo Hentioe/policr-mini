@@ -3,7 +3,7 @@ defmodule PolicrMini.CustomKitBusiness do
   自定义验证套件的业务功能实现。
   """
 
-  use PolicrMini, business: PolicrMini.Schema.CustomKit
+  use PolicrMini, business: PolicrMini.Schemas.CustomKit
 
   import Ecto.Query, only: [from: 2]
 

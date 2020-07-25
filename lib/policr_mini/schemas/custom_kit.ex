@@ -1,11 +1,11 @@
-defmodule PolicrMini.Schema.CustomKit do
+defmodule PolicrMini.Schemas.CustomKit do
   @moduledoc """
   自定义套件模型。
   """
 
   use PolicrMini.Schema
 
-  alias PolicrMini.Schema.Chat
+  alias PolicrMini.Schemas.Chat
 
   @required_fields ~w(chat_id title answers)a
   @optional_fields ~w(photos)a
@@ -20,7 +20,7 @@ defmodule PolicrMini.Schema.CustomKit do
     timestamps()
   end
 
-  @type t :: Ecto.Schema.t()
+  @type t :: Ecto.Schemas.t()
 
   def changeset(%__MODULE__{} = custom_kit, attrs) when is_map(attrs) do
     custom_kit

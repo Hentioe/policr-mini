@@ -1,11 +1,11 @@
-defmodule PolicrMini.Schema.Scheme do
+defmodule PolicrMini.Schemas.Scheme do
   @moduledoc """
   方案模型。
   """
 
   use PolicrMini.Schema
 
-  alias PolicrMini.Schema.Chat
+  alias PolicrMini.Schemas.Chat
 
   alias PolicrMini.EctoEnums.{
     VerificationModeEnum,
