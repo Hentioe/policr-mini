@@ -18,10 +18,22 @@ defmodule PolicrMiniWeb.Router do
     plug :put_layout, {PolicrMiniWeb.LayoutView, :admin}
   end
 
+  pipeline :admin_api do
+    plug :accepts, ["json"]
+    plug PolicrMiniWeb.TokenAuthentication, from: :api
+  end
+
   scope "/api", PolicrMiniWeb.API do
     pipe_through :api
 
     get "/home", HomeController, :index
+  end
+
+  scope "/api/admin", PolicrMiniWeb.API.Admin do
+    pipe_through [:admin_api]
+
+    get "/chats", ChatController, :index
+    get "/chats/:id", ChatController, :show
   end
 
   scope "/admin", PolicrMiniWeb.Admin do

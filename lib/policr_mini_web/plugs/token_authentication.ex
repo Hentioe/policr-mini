@@ -8,7 +8,7 @@ defmodule PolicrMiniWeb.TokenAuthentication do
 
   @expired_sec 60 * 25
 
-  @type auth :: %{user_id: integer(), token_ver: integer()}
+  @type auth_info :: %{user_id: integer(), token_ver: integer()}
 
   import Plug.Conn
 
@@ -37,9 +37,17 @@ defmodule PolicrMiniWeb.TokenAuthentication do
           assign(conn, :user, user)
       end
     else
-      conn
-      |> delete_resp_cookie("token")
-      |> redirect_to_login()
+      redirect_to_login(conn)
+    end
+  end
+
+  def call(conn, %{from: :api}) do
+    {_, token} = find_token(conn)
+
+    if user = verify(token) do
+      assign(conn, :user, user)
+    else
+      resp_unauthorized(conn)
     end
   end
 
@@ -75,7 +83,7 @@ defmodule PolicrMiniWeb.TokenAuthentication do
     end
   end
 
-  @spec check_auth_info(map) :: User.t() | nil
+  @spec check_auth_info(auth_info) :: User.t() | nil
   defp check_auth_info(%{user_id: user_id, token_ver: token_ver}) do
     case UserBusiness.get(user_id) do
       {:ok, user} ->
@@ -97,6 +105,14 @@ defmodule PolicrMiniWeb.TokenAuthentication do
   defp redirect_to_admin(%Plug.Conn{} = conn) do
     conn
     |> Phoenix.Controller.redirect(to: "/admin")
+    |> halt()
+  end
+
+  @spec resp_unauthorized(Plug.Conn.t()) :: Plug.Conn.t()
+  defp resp_unauthorized(%Plug.Conn{} = conn) do
+    conn
+    |> put_status(:unauthorized)
+    |> Phoenix.Controller.json(%{errors: ["no authorization"]})
     |> halt()
   end
 end
