@@ -25,12 +25,12 @@ const Avatar = () => {
 };
 
 const fetcher = (url) => fetch(url).then((r) => r.json());
-const initialHomeData = {
+const initialIndexData = {
   total: 0,
 };
 
 export default () => {
-  const { data, error } = useSWR("/api/home", fetcher);
+  const { data, error } = useSWR("/api/index", fetcher);
 
   if (error)
     return (
@@ -38,7 +38,7 @@ export default () => {
         Data loading failed. Please try again later.
       </ErrorParagraph>
     );
-  const homeData = data || initialHomeData;
+  const indexData = data || initialIndexData;
 
   return (
     <>
@@ -64,7 +64,7 @@ export default () => {
                 </div>
                 <div tw="flex-1 self-center">
                   <Paragraph tw="text-6xl font-extrabold text-red-400 text-center underline">
-                    {homeData.total}
+                    {indexData.total}
                   </Paragraph>
                 </div>
                 <div tw="flex-1 self-end">

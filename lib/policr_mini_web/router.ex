@@ -26,7 +26,7 @@ defmodule PolicrMiniWeb.Router do
   scope "/api", PolicrMiniWeb.API do
     pipe_through :api
 
-    get "/home", HomeController, :index
+    get "/index", IndexController, :index
   end
 
   scope "/api/admin", PolicrMiniWeb.API.Admin do

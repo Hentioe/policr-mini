@@ -1,4 +1,4 @@
-defmodule PolicrMiniWeb.API.HomeController do
+defmodule PolicrMiniWeb.API.IndexController do
   @moduledoc """
   首页 API 控制器实现。
   """

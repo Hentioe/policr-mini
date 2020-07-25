@@ -1,4 +1,4 @@
-defmodule PolicrMiniWeb.API.HomeView do
+defmodule PolicrMiniWeb.API.IndexView do
   @moduledoc """
   首页数据的渲染实现。
   """
