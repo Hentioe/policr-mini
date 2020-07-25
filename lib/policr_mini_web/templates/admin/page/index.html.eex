@@ -1,1 +1,9 @@
-管理员后台。
+<div id="app"></div>
+<link
+  rel="stylesheet"
+  href="<%= Routes.static_path(@conn, ~s{/css/admin.css}) %>"
+/>
+<script
+  type="text/javascript"
+  src="<%= Routes.static_path(@conn, ~s{/js/admin.js}) %>"
+></script>
