@@ -38,7 +38,6 @@ config :policr_mini, PolicrMiniWeb,
     System.get_env("POLICR_MINI_SERVER_ROOT_URL") ||
       raise("""
       environment variable POLICR_MINI_SERVER_ROOT_URL is missing.
-      You can generate one by calling: mix phx.gen.secret
       """)
 
 # Configures the image provider
