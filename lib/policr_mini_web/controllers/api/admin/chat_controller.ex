@@ -14,12 +14,17 @@ defmodule PolicrMiniWeb.API.Admin.ChatController do
   end
 
   def photo(conn, %{"id" => id}) do
-    {:ok, chat} = ChatBusiness.get(String.to_integer(id))
-    {:ok, %{file_path: file_path}} = Telegex.get_file(chat.small_photo_id)
+    try do
+      {:ok, chat} = ChatBusiness.get(String.to_integer(id))
+      {:ok, %{file_path: file_path}} = Telegex.get_file(chat.small_photo_id)
 
-    file_url = "https://api.telegram.org/file/bot#{Telegex.Config.token()}/#{file_path}"
+      file_url = "https://api.telegram.org/file/bot#{Telegex.Config.token()}/#{file_path}"
 
-    Phoenix.Controller.redirect(conn, external: file_url)
+      Phoenix.Controller.redirect(conn, external: file_url)
+    rescue
+      _ ->
+        Phoenix.Controller.redirect(conn, to: "/images/img_failed_to_load-x100.png")
+    end
   end
 
   def show(conn, %{"id" => id}) do
