@@ -30,6 +30,14 @@ const ChatItem = ({ chat: chat }) => {
 
 const fetcher = (url) => fetch(url).then((r) => r.json());
 
+const Loading = () => {
+  return (
+    <div tw="flex justify-center my-6">
+      <MoonLoader size={25} color="#47A8D8" />
+    </div>
+  );
+};
+
 export default () => {
   const dispatch = useDispatch();
   const { data, error } = useSWR("/admin/api/chats", fetcher);
@@ -42,7 +50,7 @@ export default () => {
 
   return (
     <div>
-      <div tw="bg-gray-100 rounded-lg mx-4 my-2">
+      <div tw="flex flex-col bg-gray-100 rounded-lg shadow mx-4 my-2">
         <div tw="p-3 border border-solid border-0 border-b border-gray-200">
           <span tw="hidden lg:inline text-xl font-bold">您的群组</span>
           <span tw="lg:hidden block text-center text-xl font-bold">群组</span>
@@ -72,9 +80,7 @@ export default () => {
             </div>
           </>
         ) : (
-          <div tw="p-3 flex justify-center">
-            <MoonLoader size={25} color="#47A8D8" />
-          </div>
+          <Loading />
         )}
       </div>
     </div>
