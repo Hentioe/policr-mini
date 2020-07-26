@@ -8,7 +8,7 @@ import { configureStore } from "@reduxjs/toolkit";
 import thunkMiddleware from "redux-thunk";
 import reduxLogger from "redux-logger";
 
-import { Nav, ChatList } from "./admin/components";
+import { Sidebar, ChatList } from "./admin/components";
 import Statistics from "./admin/pages/Statistics";
 
 import Reducers from "./admin/reducers";
@@ -27,7 +27,7 @@ const App = () => {
       <Provider store={store}>
         <div tw="flex min-h-screen px-0 lg:px-12 xl:px-12">
           <div tw="w-2/12 md:w-2/12 xl:w-3/12">
-            <Nav />
+            <Sidebar />
           </div>
           <div tw="w-10/12 md:w-8/12 xl:w-6/12 border-solid border-0 border-l border-r border-gray-300">
             <Statistics />
