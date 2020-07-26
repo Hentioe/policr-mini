@@ -16,8 +16,13 @@ const ChatItem = ({ chat: chat }) => {
   return (
     <ChatItemBox>
       <div tw="flex justify-center lg:justify-start">
-        <img tw="w-12 lg:w-6" src={`/admin/api/chats/${chat.id}/photo`} />
-        <span tw="hidden lg:inline ml-2 font-bold truncate">{chat.title}</span>
+        <img
+          tw="w-12 h-12 lg:w-8 lg:h-8"
+          src={`/admin/api/chats/${chat.id}/photo`}
+        />
+        <span tw="self-center hidden lg:inline ml-2 font-bold truncate">
+          {chat.title}
+        </span>
       </div>
     </ChatItemBox>
   );
@@ -52,7 +57,9 @@ export default () => {
             <div tw="p-3">
               {data.ending ? (
                 <>
-                  <span tw="hidden lg:inline text-gray-600">没有更多了</span>
+                  <span tw="hidden lg:inline text-lg text-gray-600">
+                    没有更多了
+                  </span>
                   <span tw="block lg:hidden text-center text-gray-600">
                     没有了
                   </span>
