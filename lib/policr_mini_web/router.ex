@@ -29,7 +29,7 @@ defmodule PolicrMiniWeb.Router do
     get "/index", IndexController, :index
   end
 
-  scope "/api/admin", PolicrMiniWeb.API.Admin do
+  scope "/admin/api", PolicrMiniWeb.API.Admin do
     pipe_through [:admin_api]
 
     get "/chats", ChatController, :index
