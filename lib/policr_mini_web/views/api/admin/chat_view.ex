@@ -6,8 +6,8 @@ defmodule PolicrMiniWeb.API.Admin.ChatView do
   use PolicrMiniWeb, :view
 
   @spec render(String.t(), map()) :: map()
-  def render("index.json", %{chats: chats}) do
-    %{chats: render_many(chats, __MODULE__, "chat.json")}
+  def render("index.json", %{chats: chats, ending: ending}) do
+    %{chats: render_many(chats, __MODULE__, "chat.json"), ending: ending}
   end
 
   def render("show.json", %{chat: chat}) do

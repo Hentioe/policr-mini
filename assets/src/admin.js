@@ -10,7 +10,7 @@ import Statistics from "./admin/pages/Statistics";
 const App = () => {
   return (
     <React.StrictMode>
-      <div tw="flex h-screen px-0 lg:px-24 xl:px-12">
+      <div tw="flex min-h-screen px-0 lg:px-12 xl:px-12">
         <div tw="w-2/12 md:w-2/12 xl:w-3/12">
           <Nav />
         </div>
