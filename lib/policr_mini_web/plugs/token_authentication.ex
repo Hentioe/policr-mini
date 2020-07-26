@@ -6,7 +6,7 @@ defmodule PolicrMiniWeb.TokenAuthentication do
   支持两种 `:from` 值，分别是 `:page`（默认）和 `:api`。适配 API 将响应 JSON 文本和 `401` 状态码。
   """
 
-  @expired_sec 60 * 25
+  @expired_sec 60 * 60 * 24
 
   @type auth_info :: %{user_id: integer(), token_ver: integer()}
 
