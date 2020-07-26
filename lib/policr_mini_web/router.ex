@@ -29,11 +29,11 @@ defmodule PolicrMiniWeb.Router do
     get "/index", IndexController, :index
   end
 
-  scope "/admin/api", PolicrMiniWeb.API.Admin do
+  scope "/admin/api", PolicrMiniWeb.Admin.API do
     pipe_through [:admin_api]
 
-    get "/chats/:id/photo", ChatController, :photo
     get "/chats", ChatController, :index
+    get "/chats/:id/photo", ChatController, :photo
     get "/chats/:id", ChatController, :show
   end
 

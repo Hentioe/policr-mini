@@ -1,4 +1,4 @@
-defmodule PolicrMiniWeb.API.Admin.ChatController do
+defmodule PolicrMiniWeb.Admin.API.ChatController do
   @moduledoc """
   和 chat 相关的后台 API 控制器。
   """

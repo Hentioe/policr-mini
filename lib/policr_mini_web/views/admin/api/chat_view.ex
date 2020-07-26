@@ -1,4 +1,4 @@
-defmodule PolicrMiniWeb.API.Admin.ChatView do
+defmodule PolicrMiniWeb.Admin.API.ChatView do
   @moduledoc """
   后台 chat 数据的渲染实现。
   """
