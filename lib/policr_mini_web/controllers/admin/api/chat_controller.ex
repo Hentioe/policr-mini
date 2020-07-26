@@ -23,7 +23,7 @@ defmodule PolicrMiniWeb.Admin.API.ChatController do
       Phoenix.Controller.redirect(conn, external: file_url)
     rescue
       _ ->
-        Phoenix.Controller.redirect(conn, to: "/images/img_failed_to_load-x128.png")
+        Phoenix.Controller.redirect(conn, to: "/images/telegram-x128.png")
     end
   end
 
