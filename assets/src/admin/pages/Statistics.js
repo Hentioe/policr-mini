@@ -1,11 +1,11 @@
 import React from "react";
-import { Title } from "../components";
+import { Title, NotImplemented } from "../components";
 import { useSelector } from "react-redux";
 import "twin.macro";
 import MoonLoader from "react-spinners/MoonLoader";
 
 export default () => {
-  const { isLoaded, list, selected } = useSelector((state) => state.chats);
+  const { isLoaded } = useSelector((state) => state.chats);
 
   if (!isLoaded)
     return (
@@ -17,7 +17,9 @@ export default () => {
   return (
     <>
       <Title>数据统计</Title>
-      <div>数据统计</div>
+      <div>
+        <NotImplemented />
+      </div>
     </>
   );
 };
