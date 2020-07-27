@@ -1,20 +1,23 @@
 import React, { useEffect } from "react";
+import { useSelector } from "react-redux";
 import useSWR from "swr";
 import tw, { styled } from "twin.macro";
 import { useDispatch } from "react-redux";
+import { useHistory, useLocation } from "react-router-dom";
 import MoonLoader from "react-spinners/MoonLoader";
 
-import { receiveChats } from "../slices/chats";
+import { receiveChats, selectChat } from "../slices/chats";
 
-const ChatItemBox = styled.div(() => [
+const ChatItemBox = styled.div(({ selected = false }) => [
   tw`p-3 flex flex-col`, // 布局
   tw`border border-solid border-0 border-b border-gray-200`, // 边框
   tw`hover:bg-gray-200 cursor-pointer`, // 交互
+  selected && tw`text-blue-500`,
 ]);
 
-const ChatItem = ({ chat: chat }) => {
+const ChatItem = ({ chat: chat, selected: selected, onSelect: onSelect }) => {
   return (
-    <ChatItemBox>
+    <ChatItemBox selected={selected} onClick={onSelect}>
       <div tw="flex justify-center lg:justify-start">
         <img
           tw="w-12 h-12 lg:w-8 lg:h-8"
@@ -38,13 +41,42 @@ const Loading = () => {
   );
 };
 
+function getIdFromLocation(location) {
+  const re = /^\/admin\/chats\/(-\d+)\//i;
+  const found = location.pathname.match(re);
+  if (found && found.length == 2) {
+    const [, id] = found;
+    return id;
+  }
+
+  return null;
+}
+
 export default () => {
   const dispatch = useDispatch();
+  const history = useHistory();
+  const location = useLocation();
+
   const { data, error } = useSWR("/admin/api/chats", fetcher);
+  const chatsState = useSelector((state) => state.chats);
+
+  const handleSelect = (id) => history.push(`/admin/chats/${id}/statistics`);
 
   useEffect(() => {
     if (data) dispatch(receiveChats(data.chats));
   }, [data]);
+
+  useEffect(() => {
+    if (chatsState.selected == null && data) {
+      history.push(`/admin/chats/${data.chats[0].id}/statistics`);
+    }
+  }, [chatsState]);
+
+  // 根据 URL 的变化修改选中的群组
+  useEffect(() => {
+    const chatId = getIdFromLocation(location);
+    if (chatId) dispatch(selectChat(chatId));
+  }, [location]);
 
   if (error) return <div>载入出错</div>;
 
@@ -55,11 +87,16 @@ export default () => {
           <span tw="hidden lg:inline text-xl font-bold">您的群组</span>
           <span tw="lg:hidden block text-center text-xl font-bold">群组</span>
         </div>
-        {data ? (
+        {chatsState.isLoaded ? (
           <>
             <div>
-              {data.chats.map((chat) => (
-                <ChatItem key={chat.id} chat={chat} />
+              {chatsState.list.map((chat) => (
+                <ChatItem
+                  key={chat.id}
+                  chat={chat}
+                  selected={chatsState.selected == chat.id}
+                  onSelect={() => handleSelect(chat.id)}
+                />
               ))}
             </div>
             <div tw="p-3">

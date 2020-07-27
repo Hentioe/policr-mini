@@ -6,7 +6,7 @@ import MoonLoader from "react-spinners/MoonLoader";
 
 const NavItemLink = styled(
   RouteLink
-)(({ selected = false, ending = false }) => [
+)(({ selected = false, ending: ending }) => [
   tw`py-3 px-6 no-underline text-black tracking-wider`,
   tw`hover:bg-blue-100 hover:text-blue-500`,
   selected && tw`text-blue-500`,
@@ -27,7 +27,7 @@ const NavItem = ({
 };
 
 function isSelect(page, url) {
-  const re = new RegExp(`^/admin/chats/\\d+/${page}`);
+  const re = new RegExp(`^/admin/chats/-\\d+/${page}`);
 
   return re.test(url);
 }
@@ -41,7 +41,8 @@ const Loading = () => {
 };
 
 export default () => {
-  const { isLoaded } = useSelector((state) => state.chats);
+  const chatsState = useSelector((state) => state.chats);
+  const { isLoaded, selected: currentChatId } = chatsState;
   const location = useLocation();
 
   return (
@@ -55,44 +56,44 @@ export default () => {
           <>
             <NavItem
               title="数据统计"
-              href="#"
+              href={`/admin/chats/${currentChatId}/statistics`}
               selected={isSelect("statistics", location.pathname)}
             />
             <NavItem
               title="验证方案"
-              href="#"
+              href={`/admin/chats/${currentChatId}/scheme`}
               selected={isSelect("scheme", location.pathname)}
             />
             <NavItem
               title="验证提示"
-              href="#"
+              href={`/admin/chats/${currentChatId}/template`}
               selected={isSelect("template", location.pathname)}
             />
             <NavItem
               title="验证日志"
-              href="#"
+              href={`/admin/chats/${currentChatId}/logs`}
               selected={isSelect("logs", location.pathname)}
             />
             <NavItem
               title="封禁记录"
-              href="#"
+              href={`/admin/chats/${currentChatId}/banned`}
               selected={isSelect("banned", location.pathname)}
             />
             <NavItem
               title="管理员权限"
-              href="#"
+              href={`/admin/chats/${currentChatId}/permissions`}
               selected={isSelect("permissions", location.pathname)}
             />
             <NavItem
               title="机器人属性"
-              href="#"
+              href={`/admin/chats/${currentChatId}/properties`}
               selected={isSelect("properties", location.pathname)}
             />
             <NavItem
               title="自定义"
-              href="#"
+              href={`/admin/chats/${currentChatId}/custom`}
               selected={isSelect("custom", location.pathname)}
-              ending
+              ending="true"
             />
           </>
         ) : (
