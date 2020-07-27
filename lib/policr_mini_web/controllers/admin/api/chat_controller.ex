@@ -7,6 +7,8 @@ defmodule PolicrMiniWeb.Admin.API.ChatController do
 
   alias PolicrMini.ChatBusiness
 
+  action_fallback PolicrMiniWeb.API.FallbackController
+
   def index(%{assigns: %{user: user}} = conn, _prams) do
     chats = ChatBusiness.find_list(user.id)
 
@@ -14,22 +16,20 @@ defmodule PolicrMiniWeb.Admin.API.ChatController do
   end
 
   def photo(conn, %{"id" => id}) do
-    try do
-      {:ok, chat} = ChatBusiness.get(String.to_integer(id))
-      {:ok, %{file_path: file_path}} = Telegex.get_file(chat.small_photo_id)
-
+    with {:ok, chat} <- ChatBusiness.get(String.to_integer(id)),
+         {:ok, %{file_path: file_path}} <- Telegex.get_file(chat.small_photo_id) do
       file_url = "https://api.telegram.org/file/bot#{Telegex.Config.token()}/#{file_path}"
 
       Phoenix.Controller.redirect(conn, external: file_url)
-    rescue
+    else
       _ ->
         Phoenix.Controller.redirect(conn, to: "/images/telegram-x128.png")
     end
   end
 
   def show(conn, %{"id" => id}) do
-    {:ok, chat} = ChatBusiness.get(String.to_integer(id))
-
-    render(conn, "show.json", %{chat: chat})
+    with {:ok, chat} <- ChatBusiness.get(String.to_integer(id)) do
+      render(conn, "show.json", %{chat: chat})
+    end
   end
 end

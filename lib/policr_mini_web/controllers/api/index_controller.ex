@@ -6,6 +6,8 @@ defmodule PolicrMiniWeb.API.IndexController do
 
   alias PolicrMini.VerificationBusiness
 
+  action_fallback PolicrMiniWeb.API.FallbackController
+
   def index(conn, _params) do
     total = VerificationBusiness.get_total()
 

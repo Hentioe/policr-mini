@@ -112,7 +112,7 @@ defmodule PolicrMiniWeb.TokenAuthentication do
   defp resp_unauthorized(%Plug.Conn{} = conn) do
     conn
     |> put_status(:unauthorized)
-    |> Phoenix.Controller.json(%{errors: ["no authorization"]})
+    |> Phoenix.Controller.json(%{errors: %{description: "Unauthorized"}})
     |> halt()
   end
 end
