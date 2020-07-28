@@ -1,6 +1,6 @@
 defmodule PolicrMiniWeb.Admin.API.ChatView do
   @moduledoc """
-  后台 chat 数据的渲染实现。
+  渲染后台群组数据。
   """
 
   use PolicrMiniWeb, :view
@@ -8,6 +8,14 @@ defmodule PolicrMiniWeb.Admin.API.ChatView do
   @spec render(String.t(), map()) :: map()
   def render("index.json", %{chats: chats, ending: ending}) do
     %{chats: render_many(chats, __MODULE__, "chat.json"), ending: ending}
+  end
+
+  def render("customs.json", %{chat: chat, custom_kits: custom_kits}) do
+    %{
+      chat: render_one(chat, __MODULE__, "chat.json"),
+      custom_kits:
+        render_many(custom_kits, PolicrMiniWeb.Admin.API.CustomKitView, "custom_kit.json")
+    }
   end
 
   def render("show.json", %{chat: chat}) do

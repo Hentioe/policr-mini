@@ -19,6 +19,7 @@ defmodule PolicrMini.CustomKitBusiness do
     custom_kit |> Repo.delete()
   end
 
+  @spec find_list(integer) :: [CustomKit.t()]
   def find_list(chat_id) when is_integer(chat_id) do
     from(c in CustomKit, where: c.chat_id == ^chat_id) |> Repo.all()
   end

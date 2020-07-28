@@ -34,6 +34,7 @@ defmodule PolicrMiniWeb.Router do
 
     get "/chats", ChatController, :index
     get "/chats/:id/photo", ChatController, :photo
+    get "/chats/:id/customs", ChatController, :customs
     get "/chats/:id", ChatController, :show
   end
 

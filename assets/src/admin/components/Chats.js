@@ -31,8 +31,6 @@ const ChatItem = ({ chat: chat, selected: selected, onSelect: onSelect }) => {
   );
 };
 
-const fetcher = (url) => fetch(url).then((r) => r.json());
-
 const Loading = () => {
   return (
     <div tw="flex justify-center my-6">
@@ -52,15 +50,19 @@ function getIdFromLocation(location) {
   return null;
 }
 
+const endpoint = "/admin/api/chats";
+const defaultMenu = "custom";
+
 export default () => {
   const dispatch = useDispatch();
   const history = useHistory();
   const location = useLocation();
 
-  const { data, error } = useSWR("/admin/api/chats", fetcher);
+  const { data, error } = useSWR(endpoint);
   const chatsState = useSelector((state) => state.chats);
 
-  const handleSelect = (id) => history.push(`/admin/chats/${id}/statistics`);
+  const handleSelect = (id) =>
+    history.push(`/admin/chats/${id}/${defaultMenu}`);
 
   useEffect(() => {
     if (data) dispatch(receiveChats(data.chats));
@@ -68,7 +70,7 @@ export default () => {
 
   useEffect(() => {
     if (chatsState.selected == null && data) {
-      history.push(`/admin/chats/${data.chats[0].id}/statistics`);
+      history.push(`/admin/chats/${data.chats[0].id}/${defaultMenu}`);
     }
   }, [chatsState]);
 
