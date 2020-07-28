@@ -6,6 +6,7 @@ import { useDispatch } from "react-redux";
 import { useHistory, useLocation } from "react-router-dom";
 import MoonLoader from "react-spinners/MoonLoader";
 
+import { getIdFromLocation } from "../helper";
 import { receiveChats, selectChat } from "../slices/chats";
 
 const ChatItemBox = styled.div(({ selected = false }) => [
@@ -38,17 +39,6 @@ const Loading = () => {
     </div>
   );
 };
-
-function getIdFromLocation(location) {
-  const re = /^\/admin\/chats\/(-\d+)\//i;
-  const found = location.pathname.match(re);
-  if (found && found.length == 2) {
-    const [, id] = found;
-    return id;
-  }
-
-  return null;
-}
 
 const endpoint = "/admin/api/chats";
 const defaultMenu = "custom";

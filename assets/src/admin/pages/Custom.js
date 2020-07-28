@@ -18,7 +18,9 @@ function makeEndpoint(chat_id) {
 export default () => {
   const chatsState = useSelector((state) => state.chats);
   const { data, error } = useSWR(
-    chatsState && chatsState.isLoaded ? makeEndpoint(chatsState.selected) : null
+    chatsState && chatsState.isLoaded && chatsState.selected
+      ? makeEndpoint(chatsState.selected)
+      : null
   );
 
   const isLoaded = () => chatsState.isLoaded && data;
