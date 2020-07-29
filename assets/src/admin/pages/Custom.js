@@ -1,7 +1,8 @@
-import React, { useState } from "react";
+import React, { useState, useCallback } from "react";
 import useSWR from "swr";
 import { useSelector } from "react-redux";
 import tw, { styled } from "twin.macro";
+import Select from "react-select";
 
 import {
   PageHeader,
@@ -12,7 +13,7 @@ import {
 } from "../components";
 
 const FormSection = styled.div`
-  ${tw`flex flex-wrap py-4`}
+  ${tw`flex flex-wrap items-center py-4`}
 `;
 const FormLable = styled.label`
   ${tw`w-full mb-2 lg:mb-0 lg:w-3/12 font-bold`}
@@ -21,8 +22,27 @@ const FormLable = styled.label`
 const FormInput = styled.input.attrs({
   type: "text",
 })`
-  ${tw`text-lg box-border rounded appearance-none shadow border text-gray-700 focus:outline-none focus:shadow-outline`}
+  border: 0 solid #e2e8f0;
+  border-color: hsl(0, 0%, 80%);
+  ${tw`h-8 box-border rounded appearance-none border focus:outline-none focus:shadow-outline`};
 `;
+
+const FormButton = styled.button`
+  border: 0 solid #e2e8f0;
+  border-color: hsl(0, 0%, 80%);
+  ${tw`h-10 font-bold rounded-full bg-white cursor-pointer border hover:border-gray-100 hover:shadow hover:bg-gray-100`}
+`;
+
+const kitTypeOptions = [
+  { value: "Text", label: "文字提问" },
+  // { value: "Photo", label: "图片提问" },
+];
+const answerROWOptions = [
+  { value: "Right", label: "✅ 正确" },
+  { value: "Wrong", label: "❎ 错误" },
+];
+
+const initialAnswer = { row: answerROWOptions[1], text: "" };
 
 function makeEndpoint(chat_id) {
   return `/admin/api/chats/${chat_id}/customs`;
@@ -35,10 +55,43 @@ export default () => {
       ? makeEndpoint(chatsState.selected)
       : null
   );
-  const [editingId, setEditingId] = useState(0); // 为 0 或负数都为 `false`，可适用于只允许正数的 id 判断是否有效
-  const [startEditing, setStartEdinting] = useState(true);
+  const [isEditing, setIsEditing] = useState(true);
+  // const [editingId, setEditingId] = useState(0); // 为 0 或负数都为 `false`，可适用于只允许正数的 id 判断是否有效
+  const [editingKitType, setEditingKitType] = useState(kitTypeOptions[0]);
+  const [answers, setAnswers] = useState([initialAnswer]);
 
-  const handleStartEditing = () => setStartEdinting(!startEditing);
+  const handleIsEditing = () => setIsEditing(!isEditing);
+  const handleKitTypeChange = (value) => setEditingKitType(value);
+  const handleCancelEditing = () => {
+    setIsEditing(false);
+    setAnswers([initialAnswer]);
+  };
+  const handleAnswerROWChange = useCallback(
+    (value, index) => {
+      const newAnswers = [];
+      // 如果编辑的不是第一个，插入数组头部
+      if (index > 0) newAnswers.push(...answers.slice(0, index));
+      // 插入编辑后的当前答案
+      newAnswers.push({ ...answers[index], row: value });
+      // 如果编辑的不是最后一个，追加数组尾部
+      if (index < answers.length - 1)
+        newAnswers.push(...answers.slice(index, answers.length - 1));
+      setAnswers(newAnswers);
+    },
+    [answers]
+  );
+  const handleAnswerAddOrDelete = useCallback(
+    (index) => {
+      if (index == answers.length - 1) {
+        setAnswers([...answers, initialAnswer]);
+      } else {
+        const newAnswers = [...answers];
+        newAnswers[index] = undefined;
+        setAnswers(newAnswers.filter((ans) => ans));
+      }
+    },
+    [answers]
+  );
 
   const isLoaded = () => chatsState.isLoaded && data;
 
@@ -57,10 +110,7 @@ export default () => {
             <main>
               <p tw="text-center text-gray-700 font-bold">
                 当前未添加任何问题，
-                <span
-                  tw="underline cursor-pointer"
-                  onClick={handleStartEditing}
-                >
+                <span tw="underline cursor-pointer" onClick={handleIsEditing}>
                   点此添加
                 </span>
                 。
@@ -72,34 +122,62 @@ export default () => {
               <span tw="text-lg font-bold">当前编辑的问题</span>
             </header>
             <main>
-              {startEditing ? (
+              {isEditing ? (
                 <form>
                   <FormSection>
-                    <FormLable>选择问题的类型</FormLable>
-                    <select tw="w-full lg:w-9/12" defaultValue="Text">
-                      <option value="Text">文字提问</option>
-                      <option value="Photo">图片提问</option>
-                    </select>
-                  </FormSection>
-                  <FormSection>
-                    <FormLable>问题的标题</FormLable>
-                    <FormInput tw="w-full lg:w-9/12" />
-                  </FormSection>
-                  <FormSection>
-                    <FormLable>答案1</FormLable>
-                    <div tw="w-full lg:w-9/12 flex">
-                      <div tw="flex-none flex">
-                        <select defaultValue="Text">
-                          <option value="Text">正确答案</option>
-                          <option value="Photo">错误答案</option>
-                        </select>
-                      </div>
-                      <div tw="flex-1 px-4">
-                        <FormInput tw="w-full" />
-                      </div>
-                      <button tw="flex-none">继续添加</button>
+                    <FormLable>类型</FormLable>
+                    <div tw="w-full lg:w-9/12">
+                      <Select
+                        value={editingKitType}
+                        options={kitTypeOptions}
+                        onChange={handleKitTypeChange}
+                      />
                     </div>
                   </FormSection>
+                  <FormSection>
+                    <FormLable>标题</FormLable>
+                    <FormInput tw="w-full lg:w-9/12" />
+                  </FormSection>
+                  {answers.map((answer, index) => (
+                    <FormSection key={index}>
+                      <FormLable>答案{index + 1}</FormLable>
+                      <div tw="w-full lg:w-9/12 flex items-center">
+                        <div css={{ width: "7rem" }}>
+                          <Select
+                            value={answer.row}
+                            options={answerROWOptions}
+                            onChange={(value) =>
+                              handleAnswerROWChange(value, index)
+                            }
+                          />
+                        </div>
+                        <div tw="flex-1 px-4 flex items-center">
+                          <FormInput tw="w-full inline" />
+                        </div>
+                        <span
+                          tw="text-blue-400 font-bold cursor-pointer"
+                          onClick={() => handleAnswerAddOrDelete(index)}
+                        >
+                          {answers.length - 1 == index ? "+ 添加" : "- 删除"}
+                        </span>
+                      </div>
+                    </FormSection>
+                  ))}
+                  <div tw="flex">
+                    <div tw="flex-1 pr-10">
+                      <FormButton
+                        tw="w-full text-white bg-red-600 hover:bg-red-500"
+                        onClick={handleCancelEditing}
+                      >
+                        取消
+                      </FormButton>
+                    </div>
+                    <div tw="flex-1 pl-10">
+                      <FormButton tw="w-full text-white bg-green-600 hover:bg-green-500">
+                        确认
+                      </FormButton>
+                    </div>
+                  </div>
                 </form>
               ) : (
                 <p tw="text-center text-gray-700 font-bold">
