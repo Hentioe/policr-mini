@@ -21,7 +21,7 @@ const NavItem = ({
 }) => {
   return (
     <NavItemLink to={href} selected={selected} ending={ending}>
-      <span tw="xl:text-lg font-bold">{title}</span>
+      <span tw="xl:text-lg">{title}</span>
     </NavItemLink>
   );
 };
@@ -49,8 +49,8 @@ export default () => {
     <nav>
       <div tw="flex flex-col bg-gray-100 rounded-lg mx-4 my-2 shadow">
         <div tw="p-3 border border-solid border-0 border-b border-gray-200">
-          <span tw="hidden lg:inline text-xl font-bold">管理员菜单</span>
-          <span tw="lg:hidden block text-center text-xl font-bold">菜单</span>
+          <span tw="hidden lg:inline text-xl text-black">管理员菜单</span>
+          <span tw="lg:hidden block text-center text-xl text-black">菜单</span>
         </div>
         {isLoaded ? (
           <>

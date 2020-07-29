@@ -16,7 +16,7 @@ const FormSection = styled.div`
   ${tw`flex flex-wrap items-center py-4`}
 `;
 const FormLable = styled.label`
-  ${tw`w-full mb-2 lg:mb-0 lg:w-3/12 font-bold`}
+  ${tw`w-full mb-2 lg:mb-0 lg:w-3/12`}
 `;
 
 const FormInput = styled.input.attrs({
@@ -30,7 +30,7 @@ const FormInput = styled.input.attrs({
 const FormButton = styled.button`
   border: 0 solid #e2e8f0;
   border-color: hsl(0, 0%, 80%);
-  ${tw`h-10 font-bold rounded-full bg-white cursor-pointer border hover:border-gray-100 hover:shadow hover:bg-gray-100`}
+  ${tw`py-2 tracking-widest font-bold rounded-full bg-white cursor-pointer border hover:border-gray-100 hover:shadow hover:bg-gray-100`}
 `;
 
 const kitTypeOptions = [
@@ -38,9 +38,14 @@ const kitTypeOptions = [
   // { value: "Photo", label: "图片提问" },
 ];
 const answerROWOptions = [
-  { value: "Right", label: "✅ 正确" },
-  { value: "Wrong", label: "❎ 错误" },
+  { value: "Right", label: "正确" },
+  { value: "Wrong", label: "错误" },
 ];
+
+const Title = styled.span`
+  color: #2f3235;
+  ${tw`text-lg`}
+`;
 
 const initialAnswer = { row: answerROWOptions[1], text: "" };
 
@@ -105,10 +110,10 @@ export default () => {
         <PageBody>
           <PageSection>
             <header>
-              <span tw="text-lg font-bold">已添加好的问题</span>
+              <Title>已添加好的问题</Title>
             </header>
             <main>
-              <p tw="text-center text-gray-700 font-bold">
+              <p tw="p-0 py-5 text-center text-lg text-gray-400 font-bold">
                 当前未添加任何问题，
                 <span tw="underline cursor-pointer" onClick={handleIsEditing}>
                   点此添加
@@ -119,7 +124,7 @@ export default () => {
           </PageSection>
           <PageSection>
             <header>
-              <span tw="text-lg font-bold">当前编辑的问题</span>
+              <Title>当前编辑的问题</Title>
             </header>
             <main>
               {isEditing ? (
@@ -142,7 +147,7 @@ export default () => {
                     <FormSection key={index}>
                       <FormLable>答案{index + 1}</FormLable>
                       <div tw="w-full lg:w-9/12 flex items-center">
-                        <div css={{ width: "7rem" }}>
+                        <div css={{ width: "5.5rem" }}>
                           <Select
                             value={answer.row}
                             options={answerROWOptions}
@@ -158,7 +163,7 @@ export default () => {
                           tw="text-blue-400 font-bold cursor-pointer"
                           onClick={() => handleAnswerAddOrDelete(index)}
                         >
-                          {answers.length - 1 == index ? "+ 添加" : "- 删除"}
+                          {answers.length - 1 == index ? "添加" : "删除"}
                         </span>
                       </div>
                     </FormSection>
@@ -188,7 +193,7 @@ export default () => {
           </PageSection>
           <PageSection>
             <header>
-              <span tw="text-lg font-bold">正在预览的问题</span>
+              <Title>正在预览的问题</Title>
             </header>
             <main>
               <NotImplemented />

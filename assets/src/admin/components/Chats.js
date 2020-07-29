@@ -24,7 +24,7 @@ const ChatItem = ({ chat: chat, selected: selected, onSelect: onSelect }) => {
           tw="w-12 h-12 lg:w-8 lg:h-8"
           src={`/admin/api/chats/${chat.id}/photo`}
         />
-        <span tw="self-center hidden lg:inline ml-2 font-bold truncate">
+        <span tw="self-center hidden lg:inline ml-2 truncate">
           {chat.title}
         </span>
       </div>
@@ -76,8 +76,8 @@ export default () => {
     <div>
       <div tw="flex flex-col bg-gray-100 rounded-lg shadow mx-4 my-2">
         <div tw="p-3 border border-solid border-0 border-b border-gray-200">
-          <span tw="hidden lg:inline text-xl font-bold">您的群组</span>
-          <span tw="lg:hidden block text-center text-xl font-bold">群组</span>
+          <span tw="hidden lg:inline text-xl text-black">您的群组</span>
+          <span tw="lg:hidden block text-center text-xl text-black">群组</span>
         </div>
         {chatsState.isLoaded ? (
           <>
