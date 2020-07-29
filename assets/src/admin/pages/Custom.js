@@ -3,6 +3,8 @@ import useSWR from "swr";
 import { useSelector } from "react-redux";
 import tw, { styled } from "twin.macro";
 import Select from "react-select";
+import fetch from "unfetch";
+import { toast } from "react-toastify";
 
 import { PageHeader, PageBody, PageSection, PageLoading } from "../components";
 
@@ -21,15 +23,18 @@ const FormInput = styled.input.attrs({
   ${tw`h-8 px-2 box-border rounded appearance-none border focus:outline-none focus:shadow-outline`};
 `;
 
-const FormButton = styled.button`
+const FormButton = styled.button.attrs(({ disabled: disabled }) => ({
+  disabled: disabled,
+}))`
   border: 0 solid #e2e8f0;
   border-color: hsl(0, 0%, 80%);
   ${tw`py-2 tracking-widest font-bold rounded-full bg-white cursor-pointer border hover:border-gray-100 hover:shadow hover:bg-gray-100`}
+  ${({ disabled: disabled }) => disabled && tw`cursor-not-allowed`}
 `;
 
 const kitTypeOptions = [
   { value: "Text", label: "文字提问" },
-  // { value: "Photo", label: "图片提问" },
+  { value: "Photo", label: "图片提问", isDisabled: true },
 ];
 
 const Title = styled.span`
@@ -66,6 +71,8 @@ const answerROWOptions = [
   { value: ROW.WRONG, label: "错误" },
 ];
 
+const initialEditingTitle = "你明白正在编辑的东西吗？";
+const initialEditingId = 0;
 const initialAnswer = { row: answerROWOptions[1], text: "我不明白" };
 
 function makeEndpoint(chat_id) {
@@ -79,10 +86,10 @@ export default () => {
       ? makeEndpoint(chatsState.selected)
       : null
   );
-  const [isEditing, setIsEditing] = useState(true);
-  // const [editingId, setEditingId] = useState(0); // 为 0 或负数都为 `false`，可适用于只允许正数的 id 判断是否有效
+  const [isEditing, setIsEditing] = useState(false);
+  const [editingId, setEditingId] = useState(initialEditingId);
   const [editingKitType, setEditingKitType] = useState(kitTypeOptions[0]);
-  const [editintTitle, setEditingTitle] = useState("你明白正在编辑的东西吗？");
+  const [editintTitle, setEditingTitle] = useState(initialEditingTitle);
   const [answers, setAnswers] = useState([initialAnswer]);
 
   const handleIsEditing = () => setIsEditing(!isEditing);
@@ -146,6 +153,52 @@ export default () => {
     return EDITING_CHECK.VALID;
   }, [isEditing, editintTitle, answers]);
 
+  const handleSave = useCallback(
+    (e) => {
+      e.preventDefault();
+      let endpoint = "/admin/api/customs";
+      let method = "POST";
+      if (editingId) {
+        endpoint = `/admin/api/customs/${editingId}`;
+        method = "PUT";
+      }
+      fetch(endpoint, {
+        method: method,
+        headers: {
+          "Content-Type": "application/json",
+        },
+        body: JSON.stringify({
+          chat_id: chatsState.selected,
+          title: editintTitle,
+          answers: answers.map(
+            (ans) => `${ans.row.value ? "+" : "-"}${ans.text.trim()}`
+          ),
+        }),
+      })
+        .then((r) => r.json())
+        .then((data) => {
+          if (data.errors) {
+            toast.error("保存出错，请检查内容有效性。", {
+              position: "bottom-center",
+              autoClose: 2500,
+              hideProgressBar: false,
+              closeOnClick: true,
+              pauseOnHover: true,
+              draggable: true,
+              progress: undefined,
+            });
+          } else {
+            // TODO: 保存成功，关闭编辑并更新自定义问题列表
+            setIsEditing(false);
+            setEditingTitle(initialEditingTitle);
+            setEditingId(initialEditingId);
+            setAnswers([initialAnswer]);
+          }
+        });
+    },
+    [editintTitle, answers]
+  );
+
   const editingCheckResult = checkEditintValid();
 
   let title = "自定义";
@@ -161,13 +214,42 @@ export default () => {
               <Title>已添加好的问题</Title>
             </header>
             <main>
-              <HintParagraph>
-                当前未添加任何问题，
-                <span tw="underline cursor-pointer" onClick={handleIsEditing}>
-                  点此添加
-                </span>
-                。
-              </HintParagraph>
+              {data.custom_kits.length > 0 ? (
+                <div>
+                  {data.custom_kits.map((customKit, index) => (
+                    <div tw="my-4" key={index}>
+                      <Paragraph tw="tracking-wide font-bold">
+                        {customKit.title}
+                      </Paragraph>
+                      <div tw="border border-solid border-0 border-gray-400 border-l-4 pl-2">
+                        {customKit.answers.map((ans, index) => (
+                          <Paragraph key={index} tw="border-l-4">
+                            {ans}
+                          </Paragraph>
+                        ))}
+                      </div>
+                      <div tw="text-sm">
+                        <span tw="text-blue-400 cursor-pointer">编辑</span>·
+                        <span tw="text-blue-400 cursor-pointer">删除</span>
+                      </div>
+                    </div>
+                  ))}
+                  <span
+                    tw="text-blue-400 font-bold cursor-pointer"
+                    onClick={handleIsEditing}
+                  >
+                    添加
+                  </span>
+                </div>
+              ) : (
+                <HintParagraph>
+                  当前未添加任何问题，
+                  <span tw="underline cursor-pointer" onClick={handleIsEditing}>
+                    点此添加
+                  </span>
+                  。
+                </HintParagraph>
+              )}
             </main>
           </PageSection>
           <PageSection>
@@ -236,16 +318,18 @@ export default () => {
                       </FormButton>
                     </div>
                     <div tw="flex-1 pl-10">
-                      <FormButton tw="w-full text-white bg-green-600 hover:bg-green-500">
-                        确认
+                      <FormButton
+                        disabled={editingCheckResult !== EDITING_CHECK.VALID}
+                        tw="w-full text-white bg-green-600 hover:bg-green-500"
+                        onClick={(e) => handleSave(e)}
+                      >
+                        保存
                       </FormButton>
                     </div>
                   </div>
                 </form>
               ) : (
-                <p tw="text-center text-gray-700 font-bold">
-                  请选择或新增一个问题。
-                </p>
+                <HintParagraph>请选择或新增一个问题。</HintParagraph>
               )}
             </main>
           </PageSection>
@@ -286,8 +370,8 @@ export default () => {
                       </Paragraph>
                     </div>
                     <div tw="flex flex-col mt-2">
-                      {answers.map((ans) => (
-                        <InlineKeybordButton>
+                      {answers.map((ans, index) => (
+                        <InlineKeybordButton key={index}>
                           <span>{ans.text}</span>
                         </InlineKeybordButton>
                       ))}

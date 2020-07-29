@@ -1,4 +1,5 @@
 import "../styles/admin.scss";
+import "react-toastify/dist/ReactToastify.css";
 
 import React from "react";
 import ReactDOM from "react-dom";
@@ -9,6 +10,7 @@ import thunkMiddleware from "redux-thunk";
 import reduxLogger from "redux-logger";
 import { BrowserRouter as Router, Switch, Route } from "react-router-dom";
 import { SWRConfig } from "swr";
+import { ToastContainer } from "react-toastify";
 
 import { Sidebar, Chats } from "./admin/components";
 import {
@@ -81,6 +83,17 @@ const App = () => {
                 <Chats />
               </div>
             </div>
+            <ToastContainer
+              position="bottom-center"
+              autoClose={2500}
+              hideProgressBar={false}
+              newestOnTop={false}
+              closeOnClick
+              rtl={false}
+              pauseOnFocusLoss
+              draggable
+              pauseOnHover
+            />
           </Router>
         </SWRConfig>
       </Provider>

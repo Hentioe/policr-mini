@@ -1,6 +1,6 @@
 defmodule PolicrMiniWeb.Admin.API.ChatController do
   @moduledoc """
-  和 chat 相关的后台 API 控制器。
+  和 Chat 相关的后台 API 控制器。
   """
 
   use PolicrMiniWeb, :controller

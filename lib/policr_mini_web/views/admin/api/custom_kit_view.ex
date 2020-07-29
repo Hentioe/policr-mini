@@ -6,7 +6,7 @@ defmodule PolicrMiniWeb.Admin.API.CustomKitView do
   use PolicrMiniWeb, :view
 
   @spec render(String.t(), map()) :: map()
-  def render("custom_kit.json", %{chat: chat}) do
-    chat |> Map.drop([:__meta__]) |> Map.from_struct()
+  def render("custom_kit.json", %{custom_kit: custom_kit}) do
+    custom_kit |> Map.drop([:__meta__, :chat]) |> Map.from_struct()
   end
 end
