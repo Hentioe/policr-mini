@@ -148,10 +148,13 @@ export default () => {
 
   const handleIsEditing = () => setIsEditing(!isEditing);
   const handleKitTypeChange = (value) => setEditingKitType(value);
-  const handleCancelEditing = () => {
+  const initEditingContent = () => {
     setIsEditing(false);
+    setEditingTitle(initialEditingTitle);
+    setEditingId(initialEditingId);
     setAnswers([initialAnswer]);
   };
+  const handleCancelEditing = () => initEditingContent();
   const handleTitleChange = (e) => setEditingTitle(e.target.value.trim());
   const handleAnswerROWChange = useCallback(
     (value, index) => {
@@ -213,12 +216,8 @@ export default () => {
         else {
           // 保存成功
           mutate();
-
-          // 关闭编辑
-          setIsEditing(false);
-          setEditingTitle(initialEditingTitle);
-          setEditingId(initialEditingId);
-          setAnswers([initialAnswer]);
+          // 初始化编辑内容
+          initEditingContent();
         }
       });
     },
@@ -257,7 +256,8 @@ export default () => {
   );
 
   useEffect(() => {
-    setIsEditing(false);
+    // 初始化编辑内容
+    initEditingContent();
   }, [location]);
 
   const editingCheckResult = checkEditintValid();
