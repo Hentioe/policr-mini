@@ -1,12 +1,14 @@
-import React, { useState, useCallback } from "react";
+import React, { useState, useCallback, useEffect } from "react";
 import useSWR from "swr";
 import { useSelector } from "react-redux";
 import tw, { styled } from "twin.macro";
 import Select from "react-select";
 import fetch from "unfetch";
 import { toast } from "react-toastify";
+import { useLocation } from "react-router-dom";
 
 import { PageHeader, PageBody, PageSection, PageLoading } from "../components";
+import { updateInNewArray } from "../helper";
 
 const FormSection = styled.div`
   ${tw`flex flex-wrap items-center py-4`}
@@ -54,6 +56,16 @@ const InlineKeybordButton = styled.div`
   ${tw`shadow-sm bg-blue-400 text-white rounded-md px-4 py-2 text-sm mt-1 flex justify-center bg-opacity-75 cursor-pointer`}
 `;
 
+const TableHeaderCell = styled.th`
+  ${tw`font-normal text-gray-500 text-left pr-6`}
+`;
+
+const TableDataRow = styled.tr``;
+const TableDataCell = styled.td(() => [
+  tw`border border-dashed border-0 border-t border-gray-300`,
+  tw`py-2`,
+]);
+
 const EDITING_CHECK = {
   VALID: 1,
   NO_EDINTINT: 0,
@@ -66,22 +78,64 @@ const ROW = {
   WRONG: 0,
 };
 
-const answerROWOptions = [
-  { value: ROW.RIGHT, label: "正确" },
-  { value: ROW.WRONG, label: "错误" },
-];
+const RIGHT_FLAG = { value: ROW.RIGHT, label: "正确" };
+const WRONG_FLAG = { value: ROW.WRONG, label: "错误" };
 
-const initialEditingTitle = "你明白正在编辑的东西吗？";
+const answerROWOptions = [RIGHT_FLAG, WRONG_FLAG];
+
+const initialEditingTitle = "";
 const initialEditingId = 0;
-const initialAnswer = { row: answerROWOptions[1], text: "我不明白" };
+const initialAnswer = { row: answerROWOptions[1], text: "" };
 
 function makeEndpoint(chat_id) {
   return `/admin/api/chats/${chat_id}/customs`;
 }
 
+const saveCustomKit = async ({ id, chat_id, title, answers }) => {
+  let endpoint = "/admin/api/customs";
+  let method = "POST";
+  if (id) {
+    endpoint = `/admin/api/customs/${id}`;
+    method = "PUT";
+  }
+  return fetch(endpoint, {
+    method: method,
+    headers: {
+      "Content-Type": "application/json",
+    },
+    body: JSON.stringify({
+      chat_id: chat_id,
+      title: title,
+      answers: answers,
+    }),
+  }).then((r) => r.json());
+};
+
+const deleteCustomKit = async (id) => {
+  const endpoint = `/admin/api/customs/${id}`;
+  const method = "DELETE";
+  return fetch(endpoint, {
+    method: method,
+  }).then((r) => r.json());
+};
+
+const toastError = (message) => {
+  toast.error(message, {
+    position: "bottom-center",
+    autoClose: 2500,
+    hideProgressBar: false,
+    closeOnClick: true,
+    pauseOnHover: true,
+    draggable: true,
+    progress: undefined,
+  });
+};
+
 export default () => {
   const chatsState = useSelector((state) => state.chats);
-  const { data, error } = useSWR(
+  const location = useLocation();
+
+  const { data, error, mutate } = useSWR(
     chatsState && chatsState.isLoaded && chatsState.selected
       ? makeEndpoint(chatsState.selected)
       : null
@@ -101,18 +155,14 @@ export default () => {
   const handleTitleChange = (e) => setEditingTitle(e.target.value.trim());
   const handleAnswerROWChange = useCallback(
     (value, index) => {
-      const newAnswers = [];
-      // 如果编辑的不是第一个，插入数组头部
-      if (index > 0) newAnswers.push(...answers.slice(0, index));
-      // 插入编辑后的当前答案
-      newAnswers.push({ ...answers[index], row: value });
-      // 如果编辑的不是最后一个，追加数组尾部
-      if (index < answers.length - 1)
-        newAnswers.push(...answers.slice(index, answers.length - 1));
+      const newAnswer = { ...answers[index], row: value };
+      const newAnswers = updateInNewArray(answers, newAnswer, index);
+
       setAnswers(newAnswers);
     },
     [answers]
   );
+
   const handleAnswerAddOrDelete = useCallback(
     (index) => {
       if (index == answers.length - 1) {
@@ -128,14 +178,9 @@ export default () => {
 
   const handleAnswerTextChange = useCallback(
     (index, text) => {
-      const newAnswers = [];
-      // 如果编辑的不是第一个，插入数组头部
-      if (index > 0) newAnswers.push(...answers.slice(0, index));
-      // 插入编辑后的当前答案
-      newAnswers.push({ ...answers[index], text: text });
-      // 如果编辑的不是最后一个，追加数组尾部
-      if (index < answers.length - 1)
-        newAnswers.push(...answers.slice(index, answers.length - 1));
+      const newAnswer = { ...answers[index], text: text };
+      const newAnswers = updateInNewArray(answers, newAnswer, index);
+
       setAnswers(newAnswers);
     },
     [answers]
@@ -156,48 +201,64 @@ export default () => {
   const handleSave = useCallback(
     (e) => {
       e.preventDefault();
-      let endpoint = "/admin/api/customs";
-      let method = "POST";
-      if (editingId) {
-        endpoint = `/admin/api/customs/${editingId}`;
-        method = "PUT";
-      }
-      fetch(endpoint, {
-        method: method,
-        headers: {
-          "Content-Type": "application/json",
-        },
-        body: JSON.stringify({
-          chat_id: chatsState.selected,
-          title: editintTitle,
-          answers: answers.map(
-            (ans) => `${ans.row.value ? "+" : "-"}${ans.text.trim()}`
-          ),
-        }),
-      })
-        .then((r) => r.json())
-        .then((data) => {
-          if (data.errors) {
-            toast.error("保存出错，请检查内容有效性。", {
-              position: "bottom-center",
-              autoClose: 2500,
-              hideProgressBar: false,
-              closeOnClick: true,
-              pauseOnHover: true,
-              draggable: true,
-              progress: undefined,
-            });
-          } else {
-            // TODO: 保存成功，关闭编辑并更新自定义问题列表
-            setIsEditing(false);
-            setEditingTitle(initialEditingTitle);
-            setEditingId(initialEditingId);
-            setAnswers([initialAnswer]);
-          }
-        });
+      saveCustomKit({
+        chat_id: chatsState.selected,
+        id: editingId,
+        title: editintTitle,
+        answers: answers.map(
+          (ans) => `${ans.row.value ? "+" : "-"}${ans.text.trim()}`
+        ),
+      }).then((resp) => {
+        if (resp.errors) toastError("保存出错，请检查内容有效性。");
+        else {
+          // 保存成功
+          mutate();
+
+          // 关闭编辑
+          setIsEditing(false);
+          setEditingTitle(initialEditingTitle);
+          setEditingId(initialEditingId);
+          setAnswers([initialAnswer]);
+        }
+      });
     },
-    [editintTitle, answers]
+    [editingId, editintTitle, answers]
   );
+
+  const handleDelete = useCallback(
+    (id) => {
+      deleteCustomKit(id).then((resp) => {
+        if (resp.errors) toastError("删除失败了，尝试刷新看看。");
+        else {
+          // 删除成功
+          mutate();
+        }
+      });
+    },
+    [data]
+  );
+
+  const handleEdit = useCallback(
+    (index) => {
+      const customKit = data.custom_kits[index];
+      const editingId = customKit.id;
+      const editingTitle = customKit.title;
+      const answers = customKit.answers.map((ans) => {
+        const row = ans.startsWith("+") ? RIGHT_FLAG : WRONG_FLAG;
+        return { row: row, text: ans.substring(1, ans.length) };
+      });
+
+      setIsEditing(true);
+      setEditingId(editingId);
+      setEditingTitle(editingTitle);
+      setAnswers(answers);
+    },
+    [data]
+  );
+
+  useEffect(() => {
+    setIsEditing(false);
+  }, [location]);
 
   const editingCheckResult = checkEditintValid();
 
@@ -215,31 +276,48 @@ export default () => {
             </header>
             <main>
               {data.custom_kits.length > 0 ? (
-                <div>
-                  {data.custom_kits.map((customKit, index) => (
-                    <div tw="my-4" key={index}>
-                      <Paragraph tw="tracking-wide font-bold">
-                        {customKit.title}
-                      </Paragraph>
-                      <div tw="border border-solid border-0 border-gray-400 border-l-4 pl-2">
-                        {customKit.answers.map((ans, index) => (
-                          <Paragraph key={index} tw="border-l-4">
-                            {ans}
-                          </Paragraph>
-                        ))}
-                      </div>
-                      <div tw="text-sm">
-                        <span tw="text-blue-400 cursor-pointer">编辑</span>·
-                        <span tw="text-blue-400 cursor-pointer">删除</span>
-                      </div>
-                    </div>
-                  ))}
+                <div tw="mt-4">
                   <span
                     tw="text-blue-400 font-bold cursor-pointer"
                     onClick={handleIsEditing}
                   >
-                    添加
+                    + 添加新问题
                   </span>
+                  <table tw="w-full border border-solid border-0 border-b border-t border-gray-300 mt-1">
+                    <thead>
+                      <tr>
+                        <TableHeaderCell>标题</TableHeaderCell>
+                        <TableHeaderCell>答案数量</TableHeaderCell>
+                        <TableHeaderCell>编辑于</TableHeaderCell>
+                        <TableHeaderCell>操作</TableHeaderCell>
+                      </tr>
+                    </thead>
+                    <tbody>
+                      {data.custom_kits.map((customKit, index) => (
+                        <TableDataRow key={customKit.id}>
+                          <TableDataCell>{customKit.title}</TableDataCell>
+                          <TableDataCell>
+                            {customKit.answers.length}
+                          </TableDataCell>
+                          <TableDataCell>{customKit.updated_at}</TableDataCell>
+                          <TableDataCell>
+                            <span
+                              tw="text-xs text-blue-400 cursor-pointer"
+                              onClick={() => handleEdit(index)}
+                            >
+                              编辑
+                            </span>{" "}
+                            <span
+                              tw="text-xs text-blue-400 cursor-pointer"
+                              onClick={() => handleDelete(customKit.id)}
+                            >
+                              删除
+                            </span>
+                          </TableDataCell>
+                        </TableDataRow>
+                      ))}
+                    </tbody>
+                  </table>
                 </div>
               ) : (
                 <HintParagraph>
@@ -321,7 +399,7 @@ export default () => {
                       <FormButton
                         disabled={editingCheckResult !== EDITING_CHECK.VALID}
                         tw="w-full text-white bg-green-600 hover:bg-green-500"
-                        onClick={(e) => handleSave(e)}
+                        onClick={handleSave}
                       >
                         保存
                       </FormButton>

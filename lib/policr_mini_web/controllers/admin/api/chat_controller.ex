@@ -16,7 +16,7 @@ defmodule PolicrMiniWeb.Admin.API.ChatController do
   end
 
   def photo(conn, %{"id" => id}) do
-    with {:ok, chat} <- ChatBusiness.get(String.to_integer(id)),
+    with {:ok, chat} <- ChatBusiness.get(id),
          {:ok, %{file_path: file_path}} <- Telegex.get_file(chat.small_photo_id) do
       file_url = "https://api.telegram.org/file/bot#{Telegex.Config.token()}/#{file_path}"
 

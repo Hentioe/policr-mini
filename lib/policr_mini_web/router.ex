@@ -38,6 +38,8 @@ defmodule PolicrMiniWeb.Router do
     get "/chats/:id", ChatController, :show
 
     post "/customs", CustomKitController, :add
+    put "/customs/:id", CustomKitController, :update
+    delete "/customs/:id", CustomKitController, :delete
   end
 
   scope "/admin", PolicrMiniWeb.Admin do
