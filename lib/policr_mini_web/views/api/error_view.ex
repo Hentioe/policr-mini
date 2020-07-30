@@ -18,6 +18,10 @@ defmodule PolicrMiniWeb.API.ErrorView do
     %{errors: errors}
   end
 
+  def render("error.json", %{description: description}) do
+    %{errors: %{description: [description]}}
+  end
+
   def render("error.json", %{not_found: info}) do
     %{params: %{entry: entry}} = info
 

@@ -13,6 +13,12 @@ defmodule PolicrMiniWeb.API.FallbackController do
     |> render("error.json", %{changeset: changeset})
   end
 
+  def call(conn, {:error, %{description: description}}) do
+    conn
+    |> put_view(PolicrMiniWeb.API.ErrorView)
+    |> render("error.json", %{description: description})
+  end
+
   def call(conn, {:error, :not_found, info}) do
     conn
     |> put_view(PolicrMiniWeb.API.ErrorView)
