@@ -57,10 +57,15 @@ defmodule PolicrMiniWeb.Admin.API.ChatController do
     with {:ok, chat} <- ChatBusiness.get(id) do
       scheme = SchemeBusiness.find(chat_id: id)
 
-      render(conn, "scheme.json", %{
-        chat: chat,
-        scheme: scheme
-      })
+      render(conn, "scheme.json", %{chat: chat, scheme: scheme})
+    end
+  end
+
+  def update_scheme(conn, %{"chat_id" => chat_id} = params) do
+    with {:ok, chat} <- ChatBusiness.get(chat_id),
+         {:ok, scheme} <- SchemeBusiness.fetch(chat_id),
+         {:ok, scheme} <- SchemeBusiness.update(scheme, params) do
+      render(conn, "scheme.json", %{chat: chat, scheme: scheme})
     end
   end
 end

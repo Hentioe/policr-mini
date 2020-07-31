@@ -7,6 +7,8 @@ defmodule PolicrMini.SchemeBusiness do
 
   import Ecto.Query, only: [from: 2, dynamic: 2]
 
+  @type writed_result :: {:ok, Scheme.t()} | {:error, Ecto.Changeset.t()}
+
   def create(params) do
     %Scheme{} |> Scheme.changeset(params) |> Repo.insert()
   end
@@ -15,8 +17,8 @@ defmodule PolicrMini.SchemeBusiness do
     scheme |> Scheme.changeset(params) |> Repo.update()
   end
 
-  @spec find(integer()) :: Scheme.t() | nil
-  def find(chat_id) when is_integer(chat_id) do
+  @spec find(integer | binary) :: Scheme.t() | nil
+  def find(chat_id) when is_integer(chat_id) or is_binary(chat_id) do
     from(s in Scheme, where: s.chat_id == ^chat_id, limit: 1) |> Repo.one()
   end
 
@@ -24,15 +26,15 @@ defmodule PolicrMini.SchemeBusiness do
 
   # TODO: 添加测试
   @spec find(find_opts) :: Scheme.t() | nil
-  def find(options) do
+  def find(options) when is_list(options) do
     filter_chat_id =
       if chat_id = options[:chat_id], do: dynamic([s], s.chat_id == ^chat_id), else: true
 
     from(s in Scheme, where: ^filter_chat_id) |> Repo.one()
   end
 
-  @spec fetch(integer) :: {:ok, Scheme.t()} | {:error, Ecto.Changeset.t()}
-  def fetch(chat_id) when is_integer(chat_id) do
+  @spec fetch(integer | binary) :: writed_result()
+  def fetch(chat_id) when is_integer(chat_id) or is_binary(chat_id) do
     case find(chat_id) do
       nil ->
         create(%{

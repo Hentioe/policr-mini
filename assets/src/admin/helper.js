@@ -1,4 +1,5 @@
 import camelize from "camelcase-keys";
+import { toast } from "react-toastify";
 
 function getIdFromLocation(location) {
   const re = /^\/admin\/chats\/(-\d+)\//i;
@@ -36,4 +37,16 @@ function camelizeJson(resp) {
   );
 }
 
-export { getIdFromLocation, updateInNewArray, camelizeJson };
+function toastError(message) {
+  toast.error(message, {
+    position: "bottom-center",
+    autoClose: 2500,
+    hideProgressBar: false,
+    closeOnClick: true,
+    pauseOnHover: true,
+    draggable: true,
+    progress: undefined,
+  });
+}
+
+export { getIdFromLocation, updateInNewArray, camelizeJson, toastError };

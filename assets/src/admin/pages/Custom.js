@@ -280,7 +280,7 @@ export default () => {
                   </span>
                   {!data.isEnable && (
                     <RouteLink
-                      tw="ml-2 text-gray-500 font-bold"
+                      tw="ml-2 text-gray-400 font-bold"
                       to={`/admin/chats/${chatsState.selected}/scheme`}
                     >
                       切换到自定义验证
