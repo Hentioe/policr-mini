@@ -10,7 +10,12 @@ defmodule PolicrMiniWeb.Admin.API.ChatView do
     %{chats: render_many(chats, __MODULE__, "chat.json"), ending: ending}
   end
 
-  def render("customs.json", %{chat: chat, custom_kits: custom_kits, is_enable: is_enable}) do
+  def render("customs.json", %{
+        chat: chat,
+        custom_kits: custom_kits,
+        is_enabled: is_enabled,
+        writable: writable
+      }) do
     chat = render_one(chat, __MODULE__, "chat.json")
 
     custom_kits =
@@ -19,17 +24,19 @@ defmodule PolicrMiniWeb.Admin.API.ChatView do
     %{
       chat: chat,
       custom_kits: custom_kits,
-      is_enable: is_enable
+      is_enabled: is_enabled,
+      writable: writable
     }
   end
 
-  def render("scheme.json", %{chat: chat, scheme: scheme}) do
+  def render("scheme.json", %{chat: chat, scheme: scheme, writable: writable}) do
     chat = render_one(chat, __MODULE__, "chat.json")
     scheme = render_one(scheme, PolicrMiniWeb.Admin.API.SchemeView, "scheme.json")
 
     %{
       chat: chat,
-      scheme: scheme
+      scheme: scheme,
+      writable: writable
     }
   end
 

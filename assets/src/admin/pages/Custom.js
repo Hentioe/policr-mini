@@ -278,7 +278,7 @@ export default () => {
                   >
                     + 添加新问题
                   </span>
-                  {!data.isEnable && (
+                  {!data.isEnabled && (
                     <RouteLink
                       tw="ml-2 text-gray-400 font-bold"
                       to={`/admin/chats/${chatsState.selected}/scheme`}

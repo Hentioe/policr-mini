@@ -7,6 +7,8 @@ defmodule PolicrMiniWeb.Admin.API.ChatController do
 
   alias PolicrMini.{ChatBusiness, CustomKitBusiness, SchemeBusiness}
 
+  import PolicrMiniWeb.Helper
+
   action_fallback PolicrMiniWeb.API.FallbackController
 
   def index(%{assigns: %{user: user}} = conn, _prams) do
@@ -16,7 +18,8 @@ defmodule PolicrMiniWeb.Admin.API.ChatController do
   end
 
   def photo(conn, %{"id" => id}) do
-    with {:ok, chat} <- ChatBusiness.get(id),
+    with {:ok, _} <- check_permissions(conn, id),
+         {:ok, chat} <- ChatBusiness.get(id),
          {:ok, %{file_path: file_path}} <- Telegex.get_file(chat.small_photo_id) do
       file_url = "https://api.telegram.org/file/bot#{Telegex.Config.token()}/#{file_path}"
 
@@ -27,21 +30,17 @@ defmodule PolicrMiniWeb.Admin.API.ChatController do
     end
   end
 
-  def show(conn, %{"id" => id}) do
-    with {:ok, chat} <- ChatBusiness.get(id) do
-      render(conn, "show.json", %{chat: chat})
-    end
-  end
-
   def customs(conn, %{"id" => id}) do
-    with {:ok, chat} <- ChatBusiness.get(id) do
+    with {:ok, permissions} <- check_permissions(conn, id),
+         {:ok, chat} <- ChatBusiness.get(id) do
       custom_kits = CustomKitBusiness.find_list(id)
-      is_enable = custom_enabled?(id)
+      is_enabled = custom_enabled?(id)
 
       render(conn, "customs.json", %{
         chat: chat,
         custom_kits: custom_kits,
-        is_enable: is_enable
+        is_enabled: is_enabled,
+        writable: Enum.member?(permissions, :writable)
       })
     end
   end
@@ -54,18 +53,24 @@ defmodule PolicrMiniWeb.Admin.API.ChatController do
   end
 
   def scheme(conn, %{"id" => id}) do
-    with {:ok, chat} <- ChatBusiness.get(id) do
+    with {:ok, permissions} <- check_permissions(conn, id),
+         {:ok, chat} <- ChatBusiness.get(id) do
       scheme = SchemeBusiness.find(chat_id: id)
 
-      render(conn, "scheme.json", %{chat: chat, scheme: scheme})
+      render(conn, "scheme.json", %{
+        chat: chat,
+        scheme: scheme,
+        writable: Enum.member?(permissions, :writable)
+      })
     end
   end
 
   def update_scheme(conn, %{"chat_id" => chat_id} = params) do
-    with {:ok, chat} <- ChatBusiness.get(chat_id),
+    with {:ok, _} <- check_permissions(conn, chat_id, [:writable]),
+         {:ok, chat} <- ChatBusiness.get(chat_id),
          {:ok, scheme} <- SchemeBusiness.fetch(chat_id),
          {:ok, scheme} <- SchemeBusiness.update(scheme, params) do
-      render(conn, "scheme.json", %{chat: chat, scheme: scheme})
+      render(conn, "scheme.json", %{chat: chat, scheme: scheme, writable: true})
     end
   end
 end

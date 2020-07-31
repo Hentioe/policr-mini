@@ -169,14 +169,20 @@ defmodule PolicrMiniBot.SyncCommander do
         end)
 
         # 更新管理员列表
+        # 默认具有可读权限，科协权限由 `can_restrict_members` 决定。
+
         permissions =
           administrators
           |> Enum.map(fn member ->
+            is_owner = member.status == "creator"
+
             %Permission{
               user_id: member.user.id,
-              tg_is_owner: member.status == "creator",
+              tg_is_owner: is_owner,
               tg_can_restrict_members: member.can_restrict_members,
-              tg_can_promote_members: member.can_promote_members
+              tg_can_promote_members: member.can_promote_members,
+              readable: true,
+              writable: is_owner || member.can_restrict_members
             }
           end)
 
