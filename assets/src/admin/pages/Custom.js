@@ -5,10 +5,10 @@ import tw, { styled } from "twin.macro";
 import Select from "react-select";
 import fetch from "unfetch";
 import { toast } from "react-toastify";
-import { useLocation } from "react-router-dom";
+import { useLocation, Link as RouteLink } from "react-router-dom";
 
 import { PageHeader, PageBody, PageSection, PageLoading } from "../components";
-import { updateInNewArray } from "../helper";
+import { updateInNewArray, camelizeJson } from "../helper";
 
 const FormSection = styled.div`
   ${tw`flex flex-wrap items-center py-4`}
@@ -91,7 +91,7 @@ function makeEndpoint(chat_id) {
   return `/admin/api/chats/${chat_id}/customs`;
 }
 
-const saveCustomKit = async ({ id, chat_id, title, answers }) => {
+const saveCustomKit = async ({ id, chatId, title, answers }) => {
   let endpoint = "/admin/api/customs";
   let method = "POST";
   if (id) {
@@ -104,11 +104,11 @@ const saveCustomKit = async ({ id, chat_id, title, answers }) => {
       "Content-Type": "application/json",
     },
     body: JSON.stringify({
-      chat_id: chat_id,
+      chat_id: chatId,
       title: title,
       answers: answers,
     }),
-  }).then((r) => r.json());
+  }).then((r) => camelizeJson(r));
 };
 
 const deleteCustomKit = async (id) => {
@@ -116,7 +116,7 @@ const deleteCustomKit = async (id) => {
   const method = "DELETE";
   return fetch(endpoint, {
     method: method,
-  }).then((r) => r.json());
+  }).then((r) => camelizeJson(r));
 };
 
 const toastError = (message) => {
@@ -205,7 +205,7 @@ export default () => {
     (e) => {
       e.preventDefault();
       saveCustomKit({
-        chat_id: chatsState.selected,
+        chatId: chatsState.selected,
         id: editingId,
         title: editintTitle,
         answers: answers.map(
@@ -226,12 +226,9 @@ export default () => {
 
   const handleDelete = useCallback(
     (id) => {
-      deleteCustomKit(id).then((resp) => {
-        if (resp.errors) toastError("删除失败了，尝试刷新看看。");
-        else {
-          // 删除成功
-          mutate();
-        }
+      deleteCustomKit(id).then((result) => {
+        if (result.errors) toastError("删除失败了，尝试刷新看看。");
+        else mutate();
       });
     },
     [data]
@@ -239,7 +236,7 @@ export default () => {
 
   const handleEdit = useCallback(
     (index) => {
-      const customKit = data.custom_kits[index];
+      const customKit = data.customKits[index];
       const editingId = customKit.id;
       const editingTitle = customKit.title;
       const answers = customKit.answers.map((ans) => {
@@ -275,7 +272,7 @@ export default () => {
               <Title>已添加好的问题</Title>
             </header>
             <main>
-              {data.custom_kits.length > 0 ? (
+              {data.customKits.length > 0 ? (
                 <div tw="mt-4">
                   <span
                     tw="text-blue-400 font-bold cursor-pointer"
@@ -283,6 +280,14 @@ export default () => {
                   >
                     + 添加新问题
                   </span>
+                  {!data.isEnable && (
+                    <RouteLink
+                      tw="ml-2 text-gray-500 font-bold"
+                      to={`/admin/chats/${chatsState.selected}/scheme`}
+                    >
+                      切换到自定义验证
+                    </RouteLink>
+                  )}
                   <table tw="w-full border border-solid border-0 border-b border-t border-gray-300 mt-1">
                     <thead>
                       <tr>
@@ -293,13 +298,13 @@ export default () => {
                       </tr>
                     </thead>
                     <tbody>
-                      {data.custom_kits.map((customKit, index) => (
+                      {data.customKits.map((customKit, index) => (
                         <TableDataRow key={customKit.id}>
                           <TableDataCell>{customKit.title}</TableDataCell>
                           <TableDataCell>
                             {customKit.answers.length}
                           </TableDataCell>
-                          <TableDataCell>{customKit.updated_at}</TableDataCell>
+                          <TableDataCell>{customKit.updatedAt}</TableDataCell>
                           <TableDataCell>
                             <span
                               tw="text-xs text-blue-400 cursor-pointer"

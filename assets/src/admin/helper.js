@@ -1,3 +1,5 @@
+import camelize from "camelcase-keys";
+
 function getIdFromLocation(location) {
   const re = /^\/admin\/chats\/(-\d+)\//i;
   const found = location.pathname.match(re);
@@ -28,4 +30,10 @@ function updateInNewArray(array, element, index) {
   return newArray;
 }
 
-export { getIdFromLocation, updateInNewArray };
+function camelizeJson(resp) {
+  return new Promise((resolve) =>
+    resp.json().then((json) => resolve(camelize(json, { deep: true })))
+  );
+}
+
+export { getIdFromLocation, updateInNewArray, camelizeJson };

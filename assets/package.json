@@ -15,6 +15,7 @@
   },
   "dependencies": {
     "@reduxjs/toolkit": "^1.4.0",
+    "camelcase-keys": "^6.2.2",
     "classnames": "^2.2.6",
     "clsx": "^1.1.1",
     "mdn-polyfills": "^5.20.0",

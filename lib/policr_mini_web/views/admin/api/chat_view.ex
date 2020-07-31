@@ -10,11 +10,16 @@ defmodule PolicrMiniWeb.Admin.API.ChatView do
     %{chats: render_many(chats, __MODULE__, "chat.json"), ending: ending}
   end
 
-  def render("customs.json", %{chat: chat, custom_kits: custom_kits}) do
+  def render("customs.json", %{chat: chat, custom_kits: custom_kits, is_enable: is_enable}) do
+    chat = render_one(chat, __MODULE__, "chat.json")
+
+    custom_kits =
+      render_many(custom_kits, PolicrMiniWeb.Admin.API.CustomKitView, "custom_kit.json")
+
     %{
-      chat: render_one(chat, __MODULE__, "chat.json"),
-      custom_kits:
-        render_many(custom_kits, PolicrMiniWeb.Admin.API.CustomKitView, "custom_kit.json")
+      chat: chat,
+      custom_kits: custom_kits,
+      is_enable: is_enable
     }
   end
 

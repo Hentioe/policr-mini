@@ -12,6 +12,7 @@ import { BrowserRouter as Router, Switch, Route } from "react-router-dom";
 import { SWRConfig } from "swr";
 import { ToastContainer } from "react-toastify";
 
+import { camelizeJson } from "./admin/helper";
 import { Sidebar, Chats } from "./admin/components";
 import {
   StatisticsPage,
@@ -34,6 +35,8 @@ const store = configureStore({
   middleware: middlewares,
 });
 
+const fetcher = (...args) => fetch(...args).then((resp) => camelizeJson(resp));
+
 const App = () => {
   return (
     <React.StrictMode>
@@ -43,7 +46,7 @@ const App = () => {
             revalidateOnFocus: false,
             revalidateOnReconnect: false,
             focusThrottleInterval: 0,
-            fetcher: (...args) => fetch(...args).then((res) => res.json()),
+            fetcher: fetcher,
           }}
         >
           <Router>

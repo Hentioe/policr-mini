@@ -31,7 +31,7 @@ defmodule PolicrMini.CustomKitBusiness do
   end
 
   @spec find_list(integer) :: [CustomKit.t()]
-  def find_list(chat_id) when is_integer(chat_id) do
+  def find_list(chat_id) when is_integer(chat_id) or is_binary(chat_id) do
     from(c in CustomKit, where: c.chat_id == ^chat_id) |> Repo.all()
   end
 

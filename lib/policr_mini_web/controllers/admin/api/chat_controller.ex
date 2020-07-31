@@ -5,7 +5,7 @@ defmodule PolicrMiniWeb.Admin.API.ChatController do
 
   use PolicrMiniWeb, :controller
 
-  alias PolicrMini.{ChatBusiness, CustomKitBusiness}
+  alias PolicrMini.{ChatBusiness, CustomKitBusiness, SchemeBusiness}
 
   action_fallback PolicrMiniWeb.API.FallbackController
 
@@ -28,17 +28,22 @@ defmodule PolicrMiniWeb.Admin.API.ChatController do
   end
 
   def show(conn, %{"id" => id}) do
-    with {:ok, chat} <- ChatBusiness.get(String.to_integer(id)) do
+    with {:ok, chat} <- ChatBusiness.get(id) do
       render(conn, "show.json", %{chat: chat})
     end
   end
 
   def customs(conn, %{"id" => id}) do
-    chat_id = String.to_integer(id)
+    scheme = SchemeBusiness.find(chat_id: id)
+    is_enable = if scheme && scheme.verification_mode == :custom, do: true, else: false
 
-    with {:ok, chat} <- ChatBusiness.get(chat_id),
-         custom_kits <- CustomKitBusiness.find_list(chat_id) do
-      render(conn, "customs.json", %{chat: chat, custom_kits: custom_kits})
+    with {:ok, chat} <- ChatBusiness.get(id),
+         custom_kits <- CustomKitBusiness.find_list(id) do
+      render(conn, "customs.json", %{
+        chat: chat,
+        custom_kits: custom_kits,
+        is_enable: is_enable
+      })
     end
   end
 end
