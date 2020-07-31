@@ -37,5 +37,6 @@ defmodule PolicrMini.Schemas.Scheme do
     |> cast(attrs, @required_fields ++ @optional_fields)
     |> validate_required(@required_fields)
     |> assoc_constraint(:chat)
+    |> unique_constraint(:chat_id)
   end
 end

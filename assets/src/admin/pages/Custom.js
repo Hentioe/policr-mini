@@ -87,9 +87,7 @@ const initialEditingTitle = "";
 const initialEditingId = 0;
 const initialAnswer = { row: answerROWOptions[1], text: "" };
 
-function makeEndpoint(chat_id) {
-  return `/admin/api/chats/${chat_id}/customs`;
-}
+const makeEndpoint = (chat_id) => `/admin/api/chats/${chat_id}/customs`;
 
 const saveCustomKit = async ({ id, chatId, title, answers }) => {
   let endpoint = "/admin/api/customs";

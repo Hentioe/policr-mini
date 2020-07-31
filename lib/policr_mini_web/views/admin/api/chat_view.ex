@@ -23,6 +23,16 @@ defmodule PolicrMiniWeb.Admin.API.ChatView do
     }
   end
 
+  def render("scheme.json", %{chat: chat, scheme: scheme}) do
+    chat = render_one(chat, __MODULE__, "chat.json")
+    scheme = render_one(scheme, PolicrMiniWeb.Admin.API.SchemeView, "scheme.json")
+
+    %{
+      chat: chat,
+      scheme: scheme
+    }
+  end
+
   def render("show.json", %{chat: chat}) do
     %{chat: render_one(chat, __MODULE__, "chat.json")}
   end

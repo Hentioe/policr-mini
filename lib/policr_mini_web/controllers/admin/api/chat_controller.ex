@@ -34,15 +34,32 @@ defmodule PolicrMiniWeb.Admin.API.ChatController do
   end
 
   def customs(conn, %{"id" => id}) do
-    scheme = SchemeBusiness.find(chat_id: id)
-    is_enable = if scheme && scheme.verification_mode == :custom, do: true, else: false
+    with {:ok, chat} <- ChatBusiness.get(id) do
+      custom_kits = CustomKitBusiness.find_list(id)
+      is_enable = custom_enabled?(id)
 
-    with {:ok, chat} <- ChatBusiness.get(id),
-         custom_kits <- CustomKitBusiness.find_list(id) do
       render(conn, "customs.json", %{
         chat: chat,
         custom_kits: custom_kits,
         is_enable: is_enable
+      })
+    end
+  end
+
+  @spec custom_enabled?(integer() | String.t()) :: boolean()
+  defp custom_enabled?(chat_id) do
+    scheme = SchemeBusiness.find(chat_id: chat_id)
+
+    if scheme && scheme.verification_mode == :custom, do: true, else: false
+  end
+
+  def scheme(conn, %{"id" => id}) do
+    with {:ok, chat} <- ChatBusiness.get(id) do
+      scheme = SchemeBusiness.find(chat_id: id)
+
+      render(conn, "scheme.json", %{
+        chat: chat,
+        scheme: scheme
       })
     end
   end
