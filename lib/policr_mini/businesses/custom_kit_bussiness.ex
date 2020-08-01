@@ -35,7 +35,7 @@ defmodule PolicrMini.CustomKitBusiness do
     from(c in CustomKit, where: c.chat_id == ^chat_id) |> Repo.all()
   end
 
-  def random_one(chat_id) when is_integer(chat_id) do
+  def random_one(chat_id) do
     from(c in CustomKit, where: c.chat_id == ^chat_id, order_by: fragment("RANDOM()"), limit: 1)
     |> Repo.one()
   end

@@ -27,8 +27,7 @@ defmodule PolicrMiniBot.VerificationCaller do
   此版本的数据参数格式为「被选择答案索引:验证编号」。
   TODO: 应该根据验证记录中的入口动态决定的 chat_id（当前因为默认私聊的关系直接使用了 user_id）。
   """
-  @spec handle_data({String.t(), [String.t(), ...]}, Telegex.Model.CallbackQuery.t()) ::
-          :error | :ok
+  @spec handle_data({String.t(), [String.t(), ...]}, CallbackQuery.t()) :: :error | :ok
   def handle_data({"v1", [chosen, verification_id]}, callback_query) do
     %{id: callback_query_id, from: %{id: user_id} = from, message: %{message_id: message_id}} =
       callback_query
@@ -62,7 +61,7 @@ defmodule PolicrMiniBot.VerificationCaller do
       else
         # 如果还存在多条验证，更新入口消息
         max_seconds = scheme.seconds || UserJoinedHandler.countdown()
-        update_unity_verification_message(verification.chat_id, count, max_seconds)
+        update_unity_message(verification.chat_id, count, max_seconds)
       end
 
       :ok
@@ -190,14 +189,14 @@ defmodule PolicrMiniBot.VerificationCaller do
   @doc """
   更新统一验证入口消息
   """
-  @spec update_unity_verification_message(integer(), integer(), integer()) ::
-          :not_found | {:error, Telegex.Model.errors()} | {:ok, Telegex.Model.Message.t()}
-  def update_unity_verification_message(chat_id, count, max_seconds) do
+  @spec update_unity_message(integer(), integer(), integer()) ::
+          :not_found | {:error, Telegex.Model.errors()} | {:ok, Message.t()}
+  def update_unity_message(chat_id, count, max_seconds) do
     # 提及当前最新的等待验证记录中的用户
     if verification = VerificationBusiness.find_last_unity_waiting(chat_id) do
       user = %{id: verification.target_user_id, fullname: verification.target_user_name}
 
-      {text, markup} = UserJoinedHandler.make_unity_message(chat_id, user, count, max_seconds)
+      {text, markup} = UserJoinedHandler.make_unity_content(chat_id, user, count, max_seconds)
 
       # 获取最新的验证入口消息编号
       message_id = VerificationBusiness.find_last_unity_message_id(chat_id)

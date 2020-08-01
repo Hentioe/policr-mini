@@ -14,7 +14,7 @@ defmodule PolicrMiniBot.ImageCaptcha do
   @count 3
 
   @impl true
-  def make! do
+  def make!(_chat_id) do
     # 获得随机数量的系列图片
     series_images = PolicrMiniBot.ImageProvider.random(@count)
 

@@ -11,12 +11,13 @@ defmodule PolicrMiniBot.StartCommander do
 
   alias PolicrMini.{VerificationBusiness, SchemeBusiness, MessageSnapshotBusiness}
   alias PolicrMini.Schemas.Verification
-  alias PolicrMiniBot.{ArithmeticCaptcha, FallbackCaptcha, ImageCaptcha}
+  alias PolicrMiniBot.{ArithmeticCaptcha, CustomCaptcha, FallbackCaptcha, ImageCaptcha}
 
   @fallback_captcha_module FallbackCaptcha
 
-  @captchas_maping [
+  @captchas_mapping [
     image: ImageCaptcha,
+    custom: CustomCaptcha,
     arithmetic: ArithmeticCaptcha,
     # 当前的备用验证就是主动验证
     initiative: FallbackCaptcha
@@ -84,7 +85,7 @@ defmodule PolicrMiniBot.StartCommander do
       with {:ok, scheme} <- SchemeBusiness.fetch(target_chat_id),
            # 发送验证消息
            {:ok, {verification_message, markup, captcha_data}} <-
-             send_verification_message(verification, scheme, target_chat_id, from_user_id),
+             send_verify_message(verification, scheme, target_chat_id, from_user_id),
            # 创建消息快照
            {:ok, message_snapshot} <-
              MessageSnapshotBusiness.create(%{
@@ -127,30 +128,28 @@ defmodule PolicrMiniBot.StartCommander do
     send_message(chat_id, t("errors.dont_understand"))
   end
 
-  @spec send_verification_message(
+  @doc """
+  发送验证消息
+  """
+  @spec send_verify_message(
           Verification.t(),
           PolicrMini.Schemas.Scheme.t(),
           integer(),
           integer()
         ) ::
           {:error, Telegex.Model.errors()}
-          | {:ok,
-             {Telegex.Model.Message.t(), Telegex.Model.InlineKeyboardMarkup.t(),
-              PolicrMiniBot.Captcha.Data.t()}}
-  @doc """
-  发送验证消息
-  """
-  def send_verification_message(verification, scheme, chat_id, user_id) do
+          | {:ok, {Message.t(), InlineKeyboardMarkup.t(), PolicrMiniBot.Captcha.Data.t()}}
+  def send_verify_message(verification, scheme, chat_id, user_id) do
     mode = scheme.verification_mode || default!(:vmode)
 
-    cmodule = @captchas_maping[mode] || @fallback_captcha_module
+    captcha_maker = @captchas_mapping[mode] || @fallback_captcha_module
 
     # 获取验证数据。
     # 如果构造验证数据的过程中出现异常，会使用备用验证模块。
     # 所以最终采用的验证模块也需要重新返回。
-    {cmodule, cdata} =
+    {captcha_maker, data} =
       try do
-        {cmodule, cmodule.make!()}
+        {captcha_maker, captcha_maker.make!(chat_id)}
       rescue
         e ->
           Logger.error(
@@ -159,17 +158,17 @@ defmodule PolicrMiniBot.StartCommander do
             }"
           )
 
-          {@fallback_captcha_module, @fallback_captcha_module.make!()}
+          {@fallback_captcha_module, @fallback_captcha_module.make!(chat_id)}
       end
 
-    markup = PolicrMiniBot.Captcha.build_markup(cdata.candidates, verification.id)
+    markup = PolicrMiniBot.Captcha.build_markup(data.candidates, verification.id)
 
     {text, parse_mode} =
       if Application.get_env(:policr_mini, :marked_enabled) do
         text =
           t("verification.template_issue_33", %{
             chat_name: Telegex.Marked.escape_text(verification.chat.title),
-            question: cdata.question,
+            question: data.question,
             seconds: time_left(verification)
           })
 
@@ -177,7 +176,7 @@ defmodule PolicrMiniBot.StartCommander do
       else
         text =
           t("verification.template", %{
-            question: cdata.question,
+            question: data.question,
             seconds: time_left(verification)
           })
 
@@ -185,11 +184,20 @@ defmodule PolicrMiniBot.StartCommander do
       end
 
     send_fun =
-      case cmodule do
+      case captcha_maker do
         ImageCaptcha ->
           fn ->
-            send_photo(user_id, cdata.photo,
+            send_photo(user_id, data.photo,
               caption: text,
+              reply_markup: markup,
+              parse_mode: parse_mode
+            )
+          end
+
+        # 当前的自定义验证仅发文字消息
+        CustomCaptcha ->
+          fn ->
+            send_message(user_id, text,
               reply_markup: markup,
               parse_mode: parse_mode
             )
@@ -223,7 +231,7 @@ defmodule PolicrMiniBot.StartCommander do
     # 发送验证消息
     case send_fun.() do
       {:ok, sended_message} ->
-        {:ok, {sended_message, markup, cdata}}
+        {:ok, {sended_message, markup, data}}
 
       e ->
         e

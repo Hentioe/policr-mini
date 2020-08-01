@@ -1,6 +1,6 @@
 defmodule PolicrMiniBot.UserJoinedHandler do
   @moduledoc """
-  新用户加入处理模块。
+  处理新用户加入。
   """
 
   use PolicrMiniBot, plug: :handler
@@ -35,7 +35,12 @@ defmodule PolicrMiniBot.UserJoinedHandler do
   @doc """
   检查消息中包含的新加入用户是否有效。
 
-  如果群组未接管、拉人或进群的是管理员或机器人，都不匹配。除此之外包含新成员的消息都匹配。
+  ## 以下情况皆不匹配
+  - 群组未接管
+  - 拉人或进群的是管理员
+  - 拉人或进群的是机器人
+
+  除此之外包含新成员的消息都将匹配。
   """
   @impl true
   def match(_message, %{takeovered: false} = state), do: {:nomatch, state}
@@ -48,9 +53,6 @@ defmodule PolicrMiniBot.UserJoinedHandler do
   @impl true
   def match(_message, state), do: {:match, state}
 
-  @doc """
-  新成员处理函数。
-  """
   @impl true
   def handle(message, state) do
     %{chat: %{id: chat_id}, new_chat_members: new_chat_members} = message
@@ -109,8 +111,7 @@ defmodule PolicrMiniBot.UserJoinedHandler do
   处理过期验证。
   当前仅限制用户，并不发送验证消息。
   """
-  @spec handle_expired(atom(), Telegex.Model.Message.t(), State.t()) ::
-          {:error, State.t()} | {:ok, State.t()}
+  @spec handle_expired(atom(), Message.t(), State.t()) :: {:error, State.t()} | {:ok, State.t()}
   def handle_expired(entrance, message, state) do
     %{chat: %{id: chat_id}, new_chat_members: [new_chat_member]} = message
 
@@ -153,7 +154,7 @@ defmodule PolicrMiniBot.UserJoinedHandler do
     }
 
     with {:ok, verification} <- VerificationBusiness.fetch(verification_params),
-         {text, markup} <- make_verification_message(verification, seconds),
+         {text, markup} <- make_verify_content(verification, seconds),
          {:ok, reminder_message} <-
            Cleaner.send_verification_message(chat_id, text,
              reply_markup: markup,
@@ -163,7 +164,7 @@ defmodule PolicrMiniBot.UserJoinedHandler do
            VerificationBusiness.update(verification, %{message_id: reminder_message.message_id}),
          {:ok, scheme} <- SchemeBusiness.fetch(chat_id) do
       # 启动定时任务，读取验证记录并根据结果实施操作
-      start_scheduled_task(
+      start_timed_task(
         verification,
         scheme,
         seconds,
@@ -186,12 +187,13 @@ defmodule PolicrMiniBot.UserJoinedHandler do
 
   @doc """
   生成验证消息。
+
   注意：此函数需要在验证记录创建以后调用，否则会出现不正确的等待验证人数。
-  因为当前默认统一验证入口的关系，此函数生成的验证入口而不是验证消息。
+  因为当前默认统一验证入口的关系，此函数生成的是入口消息而不是验证消息。
   """
-  @spec make_verification_message(Verification.t(), integer()) ::
+  @spec make_verify_content(Verification.t(), integer()) ::
           {String.t(), InlineKeyboardMarkup.t()}
-  def make_verification_message(%Verification{} = verification, seconds) do
+  def make_verify_content(%Verification{} = verification, seconds) do
     %{chat_id: chat_id, target_user_id: target_user_id, target_user_name: target_user_name} =
       verification
 
@@ -200,18 +202,17 @@ defmodule PolicrMiniBot.UserJoinedHandler do
     # 读取等待验证的人数并根据人数分别响应不同的文本内容
     waiting_count = VerificationBusiness.get_unity_waiting_count(chat_id)
 
-    make_unity_message(chat_id, new_chat_member, waiting_count, seconds)
+    make_unity_content(chat_id, new_chat_member, waiting_count, seconds)
   end
 
-  @spec make_unity_message(integer(), map(), integer(), integer()) ::
-          {String.t(), InlineKeyboardMarkup.t()}
   @doc """
   生成统一验证入口消息。
-  参数 `user` 需要满足 `PolicrMiniBot.Helper.fullname/1` 函数子句的匹配，表示被提及的用户。
+
+  参数 `user` 需要满足 `PolicrMiniBot.Helper.fullname/1` 函数子句的匹配。
   """
-  def make_unity_message(chat_id, user, waiting_count, seconds)
-      when is_integer(chat_id) and is_map(user) and is_integer(waiting_count) and
-             is_integer(seconds) do
+  @spec make_unity_content(integer(), map(), integer(), integer()) ::
+          {String.t(), InlineKeyboardMarkup.t()}
+  def make_unity_content(chat_id, user, waiting_count, seconds) do
     # 读取等待验证的人数并根据人数分别响应不同的文本内容
     text =
       if waiting_count == 1,
@@ -241,17 +242,12 @@ defmodule PolicrMiniBot.UserJoinedHandler do
     {text, markup}
   end
 
-  @spec start_scheduled_task(Verification.t(), Scheme.t(), integer(), integer()) :: :ok
+  @spec start_timed_task(Verification.t(), Scheme.t(), integer(), integer()) :: :ok
   @doc """
   启动定时任务处理验证超时。
   # TODO: 根据 scheme 决定执行的动作
   """
-  def start_scheduled_task(
-        %Verification{} = verification,
-        %Scheme{} = scheme,
-        seconds,
-        reminder_message_id
-      )
+  def start_timed_task(verification, scheme, seconds, reminder_message_id)
       when is_integer(seconds) and is_integer(reminder_message_id) do
     %{chat_id: chat_id, target_user_id: target_user_id, target_user_name: target_user_name} =
       verification
@@ -292,7 +288,7 @@ defmodule PolicrMiniBot.UserJoinedHandler do
         # 如果还存在多条验证，更新入口消息
         max_seconds = scheme.seconds || countdown()
 
-        VerificationCaller.update_unity_verification_message(
+        VerificationCaller.update_unity_message(
           chat_id,
           waiting_count,
           max_seconds
