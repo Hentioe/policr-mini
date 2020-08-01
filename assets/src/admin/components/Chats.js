@@ -7,7 +7,7 @@ import { useHistory, useLocation } from "react-router-dom";
 import MoonLoader from "react-spinners/MoonLoader";
 
 import { getIdFromLocation } from "../helper";
-import { receiveChats, selectChat } from "../slices/chats";
+import { receiveChats, selectChat, loadSelected } from "../slices/chats";
 
 const ChatItemBox = styled.div(({ selected = false }) => [
   tw`p-3 flex flex-col`, // 布局
@@ -51,8 +51,10 @@ export default () => {
   const { data, error } = useSWR(endpoint);
   const chatsState = useSelector((state) => state.chats);
 
-  const handleSelect = (id) =>
-    history.push(`/admin/chats/${id}/${defaultMenu}`);
+  const handleSelect = (chat) => {
+    history.push(`/admin/chats/${chat.id}/${defaultMenu}`);
+    dispatch(loadSelected(chat));
+  };
 
   useEffect(() => {
     if (data) dispatch(receiveChats(data.chats));
@@ -87,7 +89,7 @@ export default () => {
                   key={chat.id}
                   chat={chat}
                   selected={chatsState.selected == chat.id}
-                  onSelect={() => handleSelect(chat.id)}
+                  onSelect={() => handleSelect(chat)}
                 />
               ))}
             </div>

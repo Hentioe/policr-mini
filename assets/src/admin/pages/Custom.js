@@ -5,8 +5,10 @@ import tw, { styled } from "twin.macro";
 import Select from "react-select";
 import fetch from "unfetch";
 import { toast } from "react-toastify";
+import { useDispatch } from "react-redux";
 import { useLocation, Link as RouteLink } from "react-router-dom";
 
+import { loadSelected } from "../slices/chats";
 import {
   PageHeader,
   PageBody,
@@ -129,6 +131,7 @@ const toastError = (message) => {
 export default () => {
   const chatsState = useSelector((state) => state.chats);
   const location = useLocation();
+  const dispatch = useDispatch();
 
   const { data, mutate } = useSWR(
     chatsState && chatsState.isLoaded && chatsState.selected
@@ -265,7 +268,10 @@ export default () => {
   if (isLoaded() && !isNoPermissions(data)) title += ` / ${data.chat.title}`;
 
   useEffect(() => {
-    if (isLoaded() && isNoPermissions(data)) toastError("您没有访问权限。");
+    if (isLoaded()) {
+      if (isNoPermissions(data)) toastError("您没有访问权限。");
+      else dispatch(loadSelected(data.chat));
+    }
   }, [data]);
 
   return (

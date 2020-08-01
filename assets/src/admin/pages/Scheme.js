@@ -1,9 +1,10 @@
 import React, { useEffect, useState, useCallback } from "react";
 import useSWR from "swr";
-import { useSelector } from "react-redux";
+import { useSelector, useDispatch } from "react-redux";
 import "twin.macro";
 import Select from "react-select";
 
+import { loadSelected } from "../slices/chats";
 import {
   PageHeader,
   PageBody,
@@ -34,7 +35,7 @@ const modeMapping = {
 
 const makeEndpoint = (chat_id) => `/admin/api/chats/${chat_id}/scheme`;
 
-const saveScheme = ({ chatId, modeValue }) => {
+const saveScheme = async ({ chatId, modeValue }) => {
   const endpoint = `/admin/api/chats/${chatId}/scheme`;
   let body = null;
   if (modeValue != undefined) {
@@ -52,6 +53,7 @@ const saveScheme = ({ chatId, modeValue }) => {
 };
 
 export default () => {
+  const dispatch = useDispatch();
   const chatsState = useSelector((state) => state.chats);
 
   const { data, mutate } = useSWR(
@@ -103,7 +105,10 @@ export default () => {
   if (isLoaded() && !isNoPermissions(data)) title += ` / ${data.chat.title}`;
 
   useEffect(() => {
-    if (isLoaded() && isNoPermissions(data)) toastError("您没有访问权限。");
+    if (isLoaded()) {
+      if (isNoPermissions(data)) toastError("您没有访问权限。");
+      else dispatch(loadSelected(data.chat));
+    }
   }, [data]);
 
   return (

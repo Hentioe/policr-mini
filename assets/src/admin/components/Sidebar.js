@@ -1,8 +1,12 @@
-import React from "react";
-import { useSelector } from "react-redux";
+import React, { useCallback, useState, useEffect } from "react";
+import { useSelector, useDispatch } from "react-redux";
 import { useLocation, Link as RouteLink } from "react-router-dom";
 import tw, { styled } from "twin.macro";
 import MoonLoader from "react-spinners/MoonLoader";
+import Switch from "react-switch";
+
+import { camelizeJson, toastError, updateInNewArray } from "../helper";
+import { loadSelected, receiveChats } from "../slices/chats";
 
 const NavItemLink = styled(
   RouteLink
@@ -40,10 +44,61 @@ const Loading = () => {
   );
 };
 
+const changeTakeover = async ({ chatId, isTakeOver }) => {
+  const endpoint = `/admin/api/chats/${chatId}/takeover?value=${isTakeOver}`;
+  return fetch(endpoint, {
+    method: "PUT",
+    headers: {
+      "Content-Type": "application/json",
+    },
+  }).then((r) => camelizeJson(r));
+};
+
 export default () => {
-  const chatsState = useSelector((state) => state.chats);
-  const { isLoaded, selected: currentChatId } = chatsState;
   const location = useLocation();
+  const dispatch = useDispatch();
+
+  const chatsState = useSelector((state) => state.chats);
+
+  const [isTakeOver, setIsTakeOver] = useState(false);
+
+  const handleTakeOverChange = useCallback(
+    (checked) => {
+      setIsTakeOver(checked);
+      changeTakeover({
+        chatId: chatsState.selected,
+        isTakeOver: checked,
+      }).then((result) => {
+        if (result.errors) {
+          toastError("接管状态修改接失败。");
+          setIsTakeOver(!checked);
+        } else {
+          // 更新 chats 状态中的 `loadedSelected` 和 `list` 数据。
+          if (result.chat.id == chatsState.selected) {
+            dispatch(loadSelected(result.chat));
+          }
+
+          const dirtyIndex = chatsState.list.findIndex(
+            (c) => c.id === result.chat.id
+          );
+          if (dirtyIndex > -1) {
+            const newList = updateInNewArray(
+              chatsState.list,
+              result.chat,
+              dirtyIndex
+            );
+            dispatch(receiveChats(newList));
+          }
+        }
+      });
+    },
+    [chatsState]
+  );
+
+  useEffect(() => {
+    if (chatsState.loadedSelected)
+      setIsTakeOver(chatsState.loadedSelected.isTakeOver);
+  }, [chatsState]);
 
   return (
     <nav>
@@ -52,49 +107,65 @@ export default () => {
           <span tw="hidden lg:inline text-xl text-black">管理员菜单</span>
           <span tw="lg:hidden block text-center text-xl text-black">菜单</span>
         </div>
-        {isLoaded ? (
+        {chatsState.isLoaded ? (
           <>
             <NavItem
               title="数据统计"
-              href={`/admin/chats/${currentChatId}/statistics`}
+              href={`/admin/chats/${chatsState.selected}/statistics`}
               selected={isSelect("statistics", location.pathname)}
             />
             <NavItem
               title="验证方案"
-              href={`/admin/chats/${currentChatId}/scheme`}
+              href={`/admin/chats/${chatsState.selected}/scheme`}
               selected={isSelect("scheme", location.pathname)}
             />
             <NavItem
               title="验证提示"
-              href={`/admin/chats/${currentChatId}/template`}
+              href={`/admin/chats/${chatsState.selected}/template`}
               selected={isSelect("template", location.pathname)}
             />
             <NavItem
               title="验证日志"
-              href={`/admin/chats/${currentChatId}/logs`}
+              href={`/admin/chats/${chatsState.selected}/logs`}
               selected={isSelect("logs", location.pathname)}
             />
             <NavItem
               title="封禁记录"
-              href={`/admin/chats/${currentChatId}/banned`}
+              href={`/admin/chats/${chatsState.selected}/banned`}
               selected={isSelect("banned", location.pathname)}
             />
             <NavItem
               title="管理员权限"
-              href={`/admin/chats/${currentChatId}/permissions`}
+              href={`/admin/chats/${chatsState.selected}/permissions`}
               selected={isSelect("permissions", location.pathname)}
             />
             <NavItem
               title="机器人属性"
-              href={`/admin/chats/${currentChatId}/properties`}
+              href={`/admin/chats/${chatsState.selected}/properties`}
               selected={isSelect("properties", location.pathname)}
             />
             <NavItem
               title="自定义"
-              href={`/admin/chats/${currentChatId}/custom`}
+              href={`/admin/chats/${chatsState.selected}/custom`}
               selected={isSelect("custom", location.pathname)}
-              ending="true"
             />
+            <div tw="py-3 px-6 text-lg text-gray-600 flex justify-between">
+              {chatsState.loadedSelected ? (
+                <>
+                  <span>
+                    {chatsState.loadedSelected.isTakeOver ? "已接管" : "未接管"}
+                  </span>
+                  <Switch
+                    checked={isTakeOver}
+                    checkedIcon={false}
+                    uncheckedIcon={false}
+                    onChange={handleTakeOverChange}
+                  />
+                </>
+              ) : (
+                <span>检查中…</span>
+              )}
+            </div>
           </>
         ) : (
           <Loading />

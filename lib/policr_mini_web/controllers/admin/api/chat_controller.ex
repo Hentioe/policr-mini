@@ -73,4 +73,45 @@ defmodule PolicrMiniWeb.Admin.API.ChatController do
       render(conn, "scheme.json", %{chat: chat, scheme: scheme, writable: true})
     end
   end
+
+  def change_takeover(conn, %{"chat_id" => chat_id, "value" => is_takeover} = _params) do
+    with {:ok, _} <- check_permissions(conn, chat_id, [:writable]),
+         {:ok, chat} <- ChatBusiness.get(chat_id),
+         {:ok, _} <- check_takeover_permissions(chat_id, is_takeover),
+         {:ok, chat} <- ChatBusiness.update(chat, %{is_take_over: is_takeover}) do
+      render(conn, "show.json", %{chat: chat})
+    end
+  end
+
+  @spec check_takeover_permissions(integer | binary, boolean | binary) ::
+          {:ok, [atom]} | {:error, map}
+  defp check_takeover_permissions(_chat_id, value) when value in ["false", false], do: {:ok, []}
+
+  defp check_takeover_permissions(chat_id, _value) do
+    case Telegex.get_chat_member(chat_id, PolicrMiniBot.id()) do
+      {:ok, member} ->
+        cond do
+          member.status != "administrator" ->
+            {:error, %{description: "bot is not an administrator"}}
+
+          member.can_restrict_members == false ->
+            {:error, %{description: "bot does not have permission to restrict members"}}
+
+          member.can_delete_messages == false ->
+            {:error, %{description: "bot does not have permission to delete messages"}}
+
+          member.can_send_messages == false ->
+            {:error, %{description: "bot does not have permission to send messages"}}
+
+          true ->
+            {:ok, []}
+        end
+
+      {:error, %Telegex.Model.Error{description: description}} ->
+        {:error, %{description: description}}
+
+      _ ->
+        {:error, %{description: "please try again"}}
+    end
+  end
 end
