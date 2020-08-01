@@ -1,5 +1,6 @@
 import camelize from "camelcase-keys";
 import { toast } from "react-toastify";
+import "lodash";
 
 function getIdFromLocation(location) {
   const re = /^\/admin\/chats\/(-\d+)\//i;
@@ -49,4 +50,19 @@ function toastError(message) {
   });
 }
 
-export { getIdFromLocation, updateInNewArray, camelizeJson, toastError };
+const noAnyPermissionsError = {
+  description: ["does not have any permissions"],
+};
+function isNoPermissions(data) {
+  if (!data.errors) return false;
+
+  return _.isEqual(noAnyPermissionsError, data.errors);
+}
+
+export {
+  getIdFromLocation,
+  updateInNewArray,
+  camelizeJson,
+  toastError,
+  isNoPermissions,
+};

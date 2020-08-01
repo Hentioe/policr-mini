@@ -15,7 +15,7 @@ import {
   LabelledButton,
 } from "../components";
 
-import { camelizeJson, toastError } from "../helper";
+import { camelizeJson, toastError, isNoPermissions } from "../helper";
 
 const defaultModeOption = { value: 4, label: "系统默认" };
 const modeOptions = [
@@ -100,12 +100,16 @@ export default () => {
   const isLoaded = () => chatsState.isLoaded && data;
 
   let title = "验证方案";
-  if (isLoaded()) title += ` / ${data.chat.title}`;
+  if (isLoaded() && !isNoPermissions(data)) title += ` / ${data.chat.title}`;
+
+  useEffect(() => {
+    if (isLoaded() && isNoPermissions(data)) toastError("您没有访问权限。");
+  }, [data]);
 
   return (
     <>
       <PageHeader title={title} />
-      {isLoaded() ? (
+      {isLoaded() && !isNoPermissions(data) ? (
         <PageBody>
           <PageSection>
             <PageSectionHeader>

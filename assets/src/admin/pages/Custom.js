@@ -8,7 +8,7 @@ import { toast } from "react-toastify";
 import { useLocation, Link as RouteLink } from "react-router-dom";
 
 import { PageHeader, PageBody, PageSection, PageLoading } from "../components";
-import { updateInNewArray, camelizeJson } from "../helper";
+import { updateInNewArray, camelizeJson, isNoPermissions } from "../helper";
 
 const FormSection = styled.div`
   ${tw`flex flex-wrap items-center py-4`}
@@ -133,7 +133,7 @@ export default () => {
   const chatsState = useSelector((state) => state.chats);
   const location = useLocation();
 
-  const { data, error, mutate } = useSWR(
+  const { data, mutate } = useSWR(
     chatsState && chatsState.isLoaded && chatsState.selected
       ? makeEndpoint(chatsState.selected)
       : null
@@ -188,6 +188,7 @@ export default () => {
   );
 
   const isLoaded = () => chatsState.isLoaded && data;
+
   const checkEditintValid = useCallback(() => {
     if (!isEditing) return EDITING_CHECK.NO_EDINTINT;
     if (editintTitle.trim() == "") return EDITING_CHECK.EMPTY_TITLE;
@@ -209,8 +210,8 @@ export default () => {
         answers: answers.map(
           (ans) => `${ans.row.value ? "+" : "-"}${ans.text.trim()}`
         ),
-      }).then((resp) => {
-        if (resp.errors) toastError("保存出错，请检查内容有效性。");
+      }).then((result) => {
+        if (result.errors) toastError("保存出错，请检查内容有效性。");
         else {
           // 保存成功
           mutate();
@@ -258,12 +259,16 @@ export default () => {
   const editingCheckResult = checkEditintValid();
 
   let title = "自定义";
-  if (isLoaded()) title += ` / ${data.chat.title}`;
+  if (isLoaded() && !isNoPermissions(data)) title += ` / ${data.chat.title}`;
+
+  useEffect(() => {
+    if (isLoaded() && isNoPermissions(data)) toastError("您没有访问权限。");
+  }, [data]);
 
   return (
     <>
       <PageHeader title={title} />
-      {isLoaded() ? (
+      {isLoaded() && !isNoPermissions(data) ? (
         <PageBody>
           <PageSection>
             <header>
@@ -283,7 +288,7 @@ export default () => {
                       tw="ml-2 text-gray-400 font-bold"
                       to={`/admin/chats/${chatsState.selected}/scheme`}
                     >
-                      切换到自定义验证
+                      切换到已定制的验证
                     </RouteLink>
                   )}
                   <table tw="w-full border border-solid border-0 border-b border-t border-gray-300 mt-1">
