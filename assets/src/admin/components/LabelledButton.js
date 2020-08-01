@@ -9,7 +9,7 @@ const ButtonBox = styled.button.attrs(({ disabled: disabled }) => ({
   ${({ label }) => label === "cancel" && `background-color: #ec4628;`}
   ${({ label }) => label === "ok" && `background-color: #2884ec;`}
   ${tw`py-2 w-full tracking-widest font-bold rounded-full cursor-pointer text-white hover:shadow`}
-  ${({ disabled: disabled }) => disabled && tw`cursor-not-allowed`}
+  ${({ disabled: disabled }) => disabled && tw`cursor-not-allowed bg-gray-400`}
 `;
 
 export default ({ disabled, children, label, onClick }) => (

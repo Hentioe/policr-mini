@@ -14,20 +14,23 @@ function getIdFromLocation(location) {
 }
 
 function updateInNewArray(array, element, index) {
-  // 如果要更新的元素不在中间，直接克隆并更新
-  if (index === 0 || index === array.length - 1) {
-    const newArray = [...array];
-    newArray[index] = element;
-    return newArray;
+  // 如果数组长度为 1，直接返回。
+  if (array.length == 1) return [element];
+  // 如果要更新的元素在最前面，插入到头部。
+  if (index === 0) {
+    return [element, ...array.slice(1, array.length)];
+  }
+  // 如果要更新的元素在最前面，插入到尾部。
+  if (index === array.length - 1) {
+    return [...array.slice(0, array.length - 1), element];
   }
   const newArray = [];
-  // 如果编辑的不是第一个，插入数组头部
-  if (index > 0) newArray.push(...array.slice(0, index));
-  // 插入要更新的元素
-  newArray.push({ ...array[index], ...element });
-  // 如果编辑的不是最后一个，追加数组尾部
-  if (index < array.length - 1)
-    newArray.push(...array.slice(index, array.length - 1));
+  // 插入数组头部
+  newArray.push(...array.slice(0, index));
+  // 插入已更新的元素
+  newArray.push(element);
+  // 追加数组尾部
+  newArray.push(...array.slice(index + 1, array.length));
 
   return newArray;
 }

@@ -7,7 +7,13 @@ import fetch from "unfetch";
 import { toast } from "react-toastify";
 import { useLocation, Link as RouteLink } from "react-router-dom";
 
-import { PageHeader, PageBody, PageSection, PageLoading } from "../components";
+import {
+  PageHeader,
+  PageBody,
+  PageSection,
+  PageLoading,
+  LabelledButton,
+} from "../components";
 import { updateInNewArray, camelizeJson, isNoPermissions } from "../helper";
 
 const FormSection = styled.div`
@@ -23,15 +29,6 @@ const FormInput = styled.input.attrs({
   border: 0 solid #e2e8f0;
   border-color: hsl(0, 0%, 80%);
   ${tw`h-8 px-2 box-border rounded appearance-none border focus:outline-none focus:shadow-outline`};
-`;
-
-const FormButton = styled.button.attrs(({ disabled: disabled }) => ({
-  disabled: disabled,
-}))`
-  border: 0 solid #e2e8f0;
-  border-color: hsl(0, 0%, 80%);
-  ${tw`py-2 tracking-widest font-bold rounded-full bg-white cursor-pointer border hover:border-gray-100 hover:shadow hover:bg-gray-100`}
-  ${({ disabled: disabled }) => disabled && tw`cursor-not-allowed`}
 `;
 
 const kitTypeOptions = [
@@ -156,8 +153,11 @@ export default () => {
   const handleTitleChange = (e) => setEditingTitle(e.target.value.trim());
   const handleAnswerROWChange = useCallback(
     (value, index) => {
-      const newAnswer = { ...answers[index], row: value };
-      const newAnswers = updateInNewArray(answers, newAnswer, index);
+      const newAnswers = updateInNewArray(
+        answers,
+        { ...answers[index], row: value },
+        index
+      );
 
       setAnswers(newAnswers);
     },
@@ -179,8 +179,11 @@ export default () => {
 
   const handleAnswerTextChange = useCallback(
     (index, text) => {
-      const newAnswer = { ...answers[index], text: text };
-      const newAnswers = updateInNewArray(answers, newAnswer, index);
+      const newAnswers = updateInNewArray(
+        answers,
+        { ...answers[index], text: text },
+        index
+      );
 
       setAnswers(newAnswers);
     },
@@ -310,13 +313,13 @@ export default () => {
                           <TableDataCell>{customKit.updatedAt}</TableDataCell>
                           <TableDataCell>
                             <span
-                              tw="text-xs text-blue-400 cursor-pointer"
+                              tw="text-xs text-blue-400 font-bold cursor-pointer"
                               onClick={() => handleEdit(index)}
                             >
                               编辑
                             </span>{" "}
                             <span
-                              tw="text-xs text-blue-400 cursor-pointer"
+                              tw="text-xs text-blue-400 font-bold cursor-pointer"
                               onClick={() => handleDelete(customKit.id)}
                             >
                               删除
@@ -396,21 +399,21 @@ export default () => {
                   ))}
                   <div tw="flex">
                     <div tw="flex-1 pr-10">
-                      <FormButton
-                        tw="w-full text-white bg-red-600 hover:bg-red-500"
+                      <LabelledButton
+                        label="cancel"
                         onClick={handleCancelEditing}
                       >
                         取消
-                      </FormButton>
+                      </LabelledButton>
                     </div>
                     <div tw="flex-1 pl-10">
-                      <FormButton
+                      <LabelledButton
+                        label="ok"
                         disabled={editingCheckResult !== EDITING_CHECK.VALID}
-                        tw="w-full text-white bg-green-600 hover:bg-green-500"
                         onClick={handleSave}
                       >
                         保存
-                      </FormButton>
+                      </LabelledButton>
                     </div>
                   </div>
                 </form>
