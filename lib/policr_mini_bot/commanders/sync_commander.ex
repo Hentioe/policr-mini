@@ -169,7 +169,7 @@ defmodule PolicrMiniBot.SyncCommander do
         end)
 
         # 更新管理员列表
-        # 默认具有可读权限，科协权限由 `can_restrict_members` 决定。
+        # 默认具有可读权限，可写权限由 `can_restrict_members` 决定。
 
         permissions =
           administrators

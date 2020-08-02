@@ -9,6 +9,8 @@ defmodule PolicrMini.Application do
     children = [
       # Start the Ecto repository
       PolicrMini.Repo,
+      # 缓存
+      PolicrMini.Cache,
       # 线上操作数据库服务
       PolicrMini.DBServer,
       # Start the Telemetry supervisor

@@ -55,7 +55,9 @@ defmodule PolicrMini.MixProject do
       {:exi18n, github: "Hentioe/exi18n"},
       {:yaml_elixir, "~> 2.4"},
       {:typed_struct, "~> 0.2.0"},
-      {:quantum, "~> 3.0"}
+      {:quantum, "~> 3.0"},
+      {:cachex, "~> 3.2"},
+      {:httpoison, "~> 1.7"}
     ]
   end
 

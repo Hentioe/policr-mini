@@ -19,14 +19,8 @@ defmodule PolicrMiniWeb.Admin.API.ChatController do
 
   def photo(conn, %{"id" => id}) do
     with {:ok, _} <- check_permissions(conn, id),
-         {:ok, chat} <- ChatBusiness.get(id),
-         {:ok, %{file_path: file_path}} <- Telegex.get_file(chat.small_photo_id) do
-      file_url = "https://api.telegram.org/file/bot#{Telegex.Config.token()}/#{file_path}"
-
-      Phoenix.Controller.redirect(conn, external: file_url)
-    else
-      _ ->
-        Phoenix.Controller.redirect(conn, to: "/images/telegram-x128.png")
+         {:ok, chat} <- ChatBusiness.get(id) do
+      Phoenix.Controller.redirect(conn, to: get_photo(chat.small_photo_id))
     end
   end
 
