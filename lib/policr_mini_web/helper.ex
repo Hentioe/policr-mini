@@ -5,28 +5,52 @@ defmodule PolicrMiniWeb.Helper do
 
   alias PolicrMini.Logger
 
+  @type perm :: PermissionBusiness.permission()
+
+  @doc """
+  检查当前连接中的用户是否具备系统权限。
+
+  如果是机器人拥有者，将返回完整的读写权。
+  """
+  @spec check_sys_permissions(Plug.Conn.t(), [perm]) :: {:error, map} | {:ok, [perm]}
+  def check_sys_permissions(%Plug.Conn{} = conn, requires \\ []) do
+    %{assigns: %{user: %{id: user_id}}} = conn
+
+    perms =
+      if user_id == Application.get_env(:policr_mini, PolicrMiniBot)[:owner_id] do
+        [:writable, :readable]
+      else
+        []
+      end
+
+    match_permissions(perms, requires)
+  end
+
   @doc """
   检查当前连接中的用户是否具备目标群组的权限。
   """
-  @spec check_permissions(Plug.Conn.t(), integer, [PermissionBusiness.permission()]) ::
-          {:ok, [atom]} | {:error, map}
-  def check_permissions(
-        %Plug.Conn{assigns: %{user: %{id: user_id}}} = _conn,
-        chat_id,
-        requires \\ []
-      ) do
-    permissions = PermissionBusiness.has_permissions(chat_id, user_id)
-    missings = Enum.filter(requires, fn p -> !Enum.member?(permissions, p) end)
+  @spec check_permissions(Plug.Conn.t(), integer, [perm]) :: {:ok, [perm]} | {:error, map}
+  def check_permissions(%Plug.Conn{} = conn, chat_id, requires \\ []) do
+    %{assigns: %{user: %{id: user_id}}} = conn
+
+    perms = PermissionBusiness.has_permissions(chat_id, user_id)
+
+    match_permissions(perms, requires)
+  end
+
+  @spec match_permissions([perm], [perm]) :: {:ok, [perm]} | {:error, map}
+  defp match_permissions(perms, requires) do
+    missing_perms = Enum.filter(requires, fn p -> !Enum.member?(perms, p) end)
 
     cond do
-      Enum.empty?(permissions) ->
+      Enum.empty?(perms) ->
         {:error, %{description: "does not have any permissions"}}
 
-      !Enum.empty?(missings) ->
+      !Enum.empty?(missing_perms) ->
         {:error, %{description: "required permissions are missing"}}
 
       true ->
-        {:ok, permissions}
+        {:ok, perms}
     end
   end
 
@@ -37,8 +61,8 @@ defmodule PolicrMiniWeb.Helper do
 
   通过此函数获取的图片会缓存到本地，并返回静态资源的路径。如果没有获取到远程图片，将返回后备图片。
   """
-  @spec get_photo(binary) :: String.t()
-  def get_photo(file_id) do
+  @spec get_photo_assets(binary) :: String.t()
+  def get_photo_assets(file_id) do
     photo =
       case Cachex.fetch(:photo, file_id, &photo_fetcher/1) do
         {:ok, assets_file} ->

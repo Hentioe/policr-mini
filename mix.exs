@@ -65,7 +65,8 @@ defmodule PolicrMini.MixProject do
       {:typed_struct, "~> 0.2.0"},
       {:quantum, "~> 3.0"},
       {:cachex, "~> 3.2"},
-      {:httpoison, "~> 1.7"}
+      {:httpoison, "~> 1.7"},
+      {:proper_case, "~> 1.3"}
     ]
   end
 

@@ -23,6 +23,7 @@ import {
   PermissionsPage,
   PropertiesPage,
   CustomPage,
+  SysLogPage,
 } from "./admin/pages";
 
 import Reducers from "./admin/reducers";
@@ -79,6 +80,9 @@ const App = () => {
                   </Route>
                   <Route path="/admin/chats/:id/custom">
                     <CustomPage />
+                  </Route>
+                  <Route path="/admin/sys/logs">
+                    <SysLogPage />
                   </Route>
                 </Switch>
               </div>

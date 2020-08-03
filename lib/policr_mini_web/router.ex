@@ -42,6 +42,8 @@ defmodule PolicrMiniWeb.Router do
     post "/customs", CustomKitController, :add
     put "/customs/:id", CustomKitController, :update
     delete "/customs/:id", CustomKitController, :delete
+
+    get "/logs", LogController, :index
   end
 
   scope "/admin", PolicrMiniWeb.Admin do

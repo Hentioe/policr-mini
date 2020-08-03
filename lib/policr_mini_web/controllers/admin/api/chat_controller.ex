@@ -20,7 +20,7 @@ defmodule PolicrMiniWeb.Admin.API.ChatController do
   def photo(conn, %{"id" => id}) do
     with {:ok, _} <- check_permissions(conn, id),
          {:ok, chat} <- ChatBusiness.get(id) do
-      Phoenix.Controller.redirect(conn, to: get_photo(chat.small_photo_id))
+      Phoenix.Controller.redirect(conn, to: get_photo_assets(chat.small_photo_id))
     end
   end
 

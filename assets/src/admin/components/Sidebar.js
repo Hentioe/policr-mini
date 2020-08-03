@@ -30,16 +30,44 @@ const NavItem = ({
   );
 };
 
-function isSelect(page, url) {
+function isSelect(page, path) {
   const re = new RegExp(`^/admin/chats/-\\d+/${page}`);
 
-  return re.test(url);
+  return re.test(path);
+}
+
+function isOwnerMenuLink(path) {
+  const logsRe = /^\/admin\/sys\/logs/;
+
+  return logsRe.test(path);
 }
 
 const Loading = () => {
   return (
     <div tw="flex justify-center my-6">
       <MoonLoader size={25} color="#47A8D8" />
+    </div>
+  );
+};
+
+const MenuBox = ({
+  visibility = true,
+  isLoaded = true,
+  title,
+  miniTitle,
+  children,
+}) => {
+  if (!visibility) return null;
+
+  return (
+    <div tw="flex flex-col bg-gray-100 rounded-lg mx-4 my-2 shadow">
+      <div tw="p-3 border border-solid border-0 border-b border-gray-200">
+        <span tw="hidden lg:inline text-xl text-black">{title}</span>
+        <span tw="lg:hidden block text-center text-xl text-black">
+          {miniTitle}
+        </span>
+      </div>
+      {isLoaded ? <>{children}</> : <Loading />}
     </div>
   );
 };
@@ -61,6 +89,9 @@ export default () => {
   const chatsState = useSelector((state) => state.chats);
 
   const [isTakeOver, setIsTakeOver] = useState(false);
+  const [isOnOwnerMenu, setIsOnOwnerMenu] = useState(
+    isOwnerMenuLink(location.pathname)
+  );
 
   const handleTakeOverChange = useCallback(
     (checked) => {
@@ -100,77 +131,84 @@ export default () => {
       setIsTakeOver(chatsState.loadedSelected.isTakeOver);
   }, [chatsState]);
 
+  useEffect(() => {
+    setIsOnOwnerMenu(isOwnerMenuLink(location.pathname));
+  }, [location]);
+
   return (
     <nav>
-      <div tw="flex flex-col bg-gray-100 rounded-lg mx-4 my-2 shadow">
-        <div tw="p-3 border border-solid border-0 border-b border-gray-200">
-          <span tw="hidden lg:inline text-xl text-black">管理员菜单</span>
-          <span tw="lg:hidden block text-center text-xl text-black">菜单</span>
-        </div>
-        {chatsState.isLoaded ? (
-          <>
-            <NavItem
-              title="数据统计"
-              href={`/admin/chats/${chatsState.selected}/statistics`}
-              selected={isSelect("statistics", location.pathname)}
+      <MenuBox
+        isLoaded={chatsState.isLoaded}
+        title="管理员菜单"
+        miniTitle="菜单"
+      >
+        <NavItem
+          title="数据统计"
+          href={`/admin/chats/${chatsState.selected}/statistics`}
+          selected={isSelect("statistics", location.pathname)}
+        />
+        <NavItem
+          title="验证方案"
+          href={`/admin/chats/${chatsState.selected}/scheme`}
+          selected={isSelect("scheme", location.pathname)}
+        />
+        <NavItem
+          title="验证提示"
+          href={`/admin/chats/${chatsState.selected}/template`}
+          selected={isSelect("template", location.pathname)}
+        />
+        <NavItem
+          title="验证日志"
+          href={`/admin/chats/${chatsState.selected}/logs`}
+          selected={isSelect("logs", location.pathname)}
+        />
+        <NavItem
+          title="封禁记录"
+          href={`/admin/chats/${chatsState.selected}/banned`}
+          selected={isSelect("banned", location.pathname)}
+        />
+        <NavItem
+          title="管理员权限"
+          href={`/admin/chats/${chatsState.selected}/permissions`}
+          selected={isSelect("permissions", location.pathname)}
+        />
+        <NavItem
+          title="机器人属性"
+          href={`/admin/chats/${chatsState.selected}/properties`}
+          selected={isSelect("properties", location.pathname)}
+        />
+        <NavItem
+          title="自定义"
+          href={`/admin/chats/${chatsState.selected}/custom`}
+          selected={isSelect("custom", location.pathname)}
+          ending={`${isOnOwnerMenu}`}
+        />
+        {chatsState.loadedSelected && !isOnOwnerMenu ? (
+          <div tw="py-3 px-6 text-lg text-gray-600 flex justify-between">
+            <span>
+              {chatsState.loadedSelected.isTakeOver ? "已接管" : "未接管"}
+            </span>
+            <Switch
+              checked={isTakeOver}
+              checkedIcon={false}
+              uncheckedIcon={false}
+              onChange={handleTakeOverChange}
             />
-            <NavItem
-              title="验证方案"
-              href={`/admin/chats/${chatsState.selected}/scheme`}
-              selected={isSelect("scheme", location.pathname)}
-            />
-            <NavItem
-              title="验证提示"
-              href={`/admin/chats/${chatsState.selected}/template`}
-              selected={isSelect("template", location.pathname)}
-            />
-            <NavItem
-              title="验证日志"
-              href={`/admin/chats/${chatsState.selected}/logs`}
-              selected={isSelect("logs", location.pathname)}
-            />
-            <NavItem
-              title="封禁记录"
-              href={`/admin/chats/${chatsState.selected}/banned`}
-              selected={isSelect("banned", location.pathname)}
-            />
-            <NavItem
-              title="管理员权限"
-              href={`/admin/chats/${chatsState.selected}/permissions`}
-              selected={isSelect("permissions", location.pathname)}
-            />
-            <NavItem
-              title="机器人属性"
-              href={`/admin/chats/${chatsState.selected}/properties`}
-              selected={isSelect("properties", location.pathname)}
-            />
-            <NavItem
-              title="自定义"
-              href={`/admin/chats/${chatsState.selected}/custom`}
-              selected={isSelect("custom", location.pathname)}
-            />
-            <div tw="py-3 px-6 text-lg text-gray-600 flex justify-between">
-              {chatsState.loadedSelected ? (
-                <>
-                  <span>
-                    {chatsState.loadedSelected.isTakeOver ? "已接管" : "未接管"}
-                  </span>
-                  <Switch
-                    checked={isTakeOver}
-                    checkedIcon={false}
-                    uncheckedIcon={false}
-                    onChange={handleTakeOverChange}
-                  />
-                </>
-              ) : (
-                <span>检查中…</span>
-              )}
-            </div>
-          </>
-        ) : (
-          <Loading />
-        )}
-      </div>
+          </div>
+        ) : !isOnOwnerMenu ? (
+          <div tw="py-3 px-6 text-lg text-gray-600 flex justify-between">
+            <span>检查中…</span>
+          </div>
+        ) : null}
+      </MenuBox>
+
+      <MenuBox visibility={_GLOBAL.isOwner} title="运营菜单" miniTitle="运营">
+        <NavItem
+          title="查阅日志"
+          href={`/admin/sys/logs`}
+          selected={/^\/admin\/sys\/logs/.test(location.pathname)}
+        />
+      </MenuBox>
     </nav>
   );
 };
