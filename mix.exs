@@ -20,7 +20,8 @@ defmodule PolicrMini.MixProject do
   def application do
     [
       mod: {PolicrMini.Application, []},
-      extra_applications: [:logger, :runtime_tools, :exi18n, :yaml_elixir]
+      extra_applications: [:logger, :runtime_tools],
+      included_applications: [:mnesia]
     ]
   end
 
