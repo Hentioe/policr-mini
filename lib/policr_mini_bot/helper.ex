@@ -7,7 +7,7 @@ defmodule PolicrMiniBot.Helper do
   - `PolicrMiniBot.Callbacker`
   """
 
-  require Logger
+  alias PolicrMini.Logger
 
   alias PolicrMini.ChatBusiness
 

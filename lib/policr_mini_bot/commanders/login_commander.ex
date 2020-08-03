@@ -5,7 +5,7 @@ defmodule PolicrMiniBot.LoginCommander do
 
   use PolicrMiniBot, plug: [commander: :login]
 
-  require Logger
+  alias PolicrMini.Logger
 
   alias PolicrMini.PermissionBusiness
 

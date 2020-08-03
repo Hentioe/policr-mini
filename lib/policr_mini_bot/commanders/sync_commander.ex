@@ -3,7 +3,7 @@ defmodule PolicrMiniBot.SyncCommander do
   `/sync` 命令的响应模块。
   """
 
-  require Logger
+  alias PolicrMini.Logger
 
   use PolicrMiniBot, plug: [commander: :sync]
 

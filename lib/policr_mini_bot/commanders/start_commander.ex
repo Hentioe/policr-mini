@@ -7,7 +7,7 @@ defmodule PolicrMiniBot.StartCommander do
 
   use PolicrMiniBot, plug: [commander: :start]
 
-  require Logger
+  alias PolicrMini.Logger
 
   alias PolicrMini.{VerificationBusiness, SchemeBusiness, MessageSnapshotBusiness}
   alias PolicrMini.Schemas.Verification

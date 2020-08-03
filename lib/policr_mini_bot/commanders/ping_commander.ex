@@ -5,7 +5,7 @@ defmodule PolicrMiniBot.PingCommander do
 
   use PolicrMiniBot, plug: [commander: :ping]
 
-  require Logger
+  alias PolicrMini.Logger
 
   @impl true
   def handle(message, state) do

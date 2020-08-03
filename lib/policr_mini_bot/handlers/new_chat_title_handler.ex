@@ -5,8 +5,6 @@ defmodule PolicrMiniBot.NewChatTitleHandler do
 
   use PolicrMiniBot, plug: :handler
 
-  require Logger
-
   alias PolicrMini.ChatBusiness
 
   @doc """

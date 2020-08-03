@@ -5,7 +5,7 @@ defmodule PolicrMiniBot.SelfJoinedHandler do
 
   use PolicrMiniBot, plug: :handler
 
-  require Logger
+  alias PolicrMini.Logger
 
   alias PolicrMiniBot.SyncCommander
 

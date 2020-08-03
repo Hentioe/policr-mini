@@ -5,7 +5,7 @@ defmodule PolicrMiniBot.UserJoinedHandler do
 
   use PolicrMiniBot, plug: :handler
 
-  require Logger
+  alias PolicrMini.Logger
 
   alias PolicrMini.Schemas.{Verification, Scheme}
   alias PolicrMini.{SchemeBusiness, VerificationBusiness}

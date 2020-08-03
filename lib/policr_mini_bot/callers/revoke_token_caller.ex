@@ -5,8 +5,6 @@ defmodule PolicrMiniBot.RevokeTokenCaller do
 
   use PolicrMiniBot, plug: [caller: [prefix: "revoke:"]]
 
-  require Logger
-
   alias PolicrMini.UserBusiness
 
   @doc """

@@ -3,7 +3,7 @@ defmodule PolicrMiniWeb.Helper do
 
   alias PolicrMini.PermissionBusiness
 
-  require Logger
+  alias PolicrMini.Logger
 
   @doc """
   检查当前连接中的用户是否具备目标群组的权限。

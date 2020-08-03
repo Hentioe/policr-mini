@@ -4,7 +4,7 @@ defmodule PolicrMiniBot.Runner do
   TODO: 执行任务时产生的 SSL 错误消息没有被 `SchedEx.Runner` 处理。可能需要修补上游问题或使用自己的 `Runner`。
   """
 
-  require Logger
+  alias PolicrMini.Logger
 
   alias PolicrMini.{VerificationBusiness, ChatBusiness}
   alias PolicrMini.Schemas.Chat

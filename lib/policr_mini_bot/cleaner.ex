@@ -4,7 +4,7 @@ defmodule PolicrMiniBot.Cleaner do
   TODO: 持久化缓存。
   """
 
-  require Logger
+  alias PolicrMini.Logger
 
   use GenServer
 

@@ -38,3 +38,6 @@ npm-debug.log
 
 # Secret configuration
 /config/*.secret.exs
+
+# Mnesia
+/Mnesia.*

@@ -5,7 +5,7 @@ defmodule PolicrMiniBot.UpdatesPoller do
 
   use GenServer
 
-  require Logger
+  alias PolicrMini.Logger
 
   alias PolicrMiniBot.Consumer
 
