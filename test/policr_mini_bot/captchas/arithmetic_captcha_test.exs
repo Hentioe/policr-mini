@@ -4,7 +4,7 @@ defmodule PolicrMiniBot.ArithmeticCaptchaTest do
   import PolicrMiniBot.ArithmeticCaptcha
 
   test "made/0" do
-    %{candidates: candidates, correct_indices: correct_indices, question: question} = make!()
+    %{candidates: candidates, correct_indices: correct_indices, question: question} = make!(-1)
 
     %{"ln" => ln, "rn" => rn} = Regex.named_captures(~r/(?<ln>\d+) \+ (?<rn>\d+) = ?/, question)
 
