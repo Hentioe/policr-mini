@@ -9,33 +9,20 @@ defmodule PolicrMini.Logger do
 
   @type query_cont :: [{:level, atom}, {:beginning, integer}, {:ending, integer}]
 
-  @spec query(keyword) :: [map]
+  @spec query(query_cont) :: [PolicrMini.Logger.Record.t()]
   def query(cont \\ []) do
-    conditions = []
-
-    conditions =
-      if level = Keyword.get(cont, :level) do
-        conditions ++ [{:==, :"$1", level}]
-      else
-        conditions
+    combiner = fn where, acc ->
+      case where do
+        {:level, level} -> acc ++ [{:==, :"$1", level}]
+        {:beginning, beginning} -> acc ++ [{:>=, :"$3", beginning}]
+        {:ending, ending} -> acc ++ [{:"=<", :"$3", ending}]
       end
+    end
 
-    conditions =
-      if beginning = Keyword.get(cont, :beginning) do
-        conditions ++ [{:>=, :"$3", beginning}]
-      else
-        conditions
-      end
-
-    conditions =
-      if ending = Keyword.get(cont, :ending) do
-        conditions ++ [{:"=<", :"$3", ending}]
-      else
-        conditions
-      end
+    guards = Enum.reduce(cont, [], combiner)
 
     matcher = fn ->
-      Mnesia.select(Log, [{{Log, :_, :"$1", :"$2", :"$3"}, conditions, [:"$$"]}])
+      Mnesia.select(Log, [{{Log, :_, :"$1", :"$2", :"$3"}, guards, [:"$$"]}])
     end
 
     case Mnesia.transaction(matcher) do
@@ -103,14 +90,14 @@ defmodule PolicrMini.Logger do
 
       created_check!(created_results)
 
-      Mnesia.wait_for_tables([Log], 5000)
+      Mnesia.wait_for_tables([MnesiaSequence, Log], 5000)
 
       :ok
     end
 
     @spec created_check!([tuple]) :: :ok
     defp created_check!(results) do
-      faile_finder = fn result ->
+      failure_finder = fn result ->
         case result do
           {:atomic, :ok} ->
             false
@@ -123,7 +110,7 @@ defmodule PolicrMini.Logger do
         end
       end
 
-      failed_result = Enum.find(results, faile_finder)
+      failed_result = Enum.find(results, failure_finder)
 
       if failed_result, do: raise(failed_result)
 
