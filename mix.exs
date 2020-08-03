@@ -10,7 +10,14 @@ defmodule PolicrMini.MixProject do
       compilers: [:phoenix, :gettext] ++ Mix.compilers(),
       start_permanent: Mix.env() == :prod,
       aliases: aliases(),
-      deps: deps()
+      deps: deps(),
+      dialyzer: dialyzer()
+    ]
+  end
+
+  def dialyzer do
+    [
+      plt_add_apps: [:mnesia]
     ]
   end
 
