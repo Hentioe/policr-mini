@@ -2,6 +2,7 @@ import React, { useState } from "react";
 import useSWR from "swr";
 import tw, { styled } from "twin.macro";
 import Select from "react-select";
+import { Link as RouteLink, useLocation } from "react-router-dom";
 import MoonLoader from "react-spinners/MoonLoader";
 import { fromUnixTime, format as formatDateTime } from "date-fns";
 
@@ -19,8 +20,9 @@ const levelOptions = [
   { value: "error", label: "错误" },
 ];
 
-const TimeLink = styled.a`
+const TimeLink = styled(RouteLink)`
   ${tw`no-underline text-orange-600 hover:text-orange-400`}
+  ${({ selected }) => (selected ? tw`text-black hover:text-black` : undefined)}
 `;
 
 const TerminalLoading = () => {
@@ -42,9 +44,19 @@ function logColor(log) {
   }
 }
 
+function parseTimeRange(timeRange) {
+  if (["1h", "6h", "1d", "1w", "2w"].includes(timeRange)) return timeRange;
+  return "1d";
+}
+
 export default () => {
+  const location = useLocation();
+
+  const searchParams = new URLSearchParams(location.search);
+  const timeRange = parseTimeRange(searchParams.get("timeRange"));
+
   const [levelOption, setLevelOption] = useState(defaultLevelOption);
-  const { data } = useSWR("/admin/api/logs");
+  const { data } = useSWR(`/admin/api/logs?timeRange=${timeRange}`);
 
   const handleLevelChange = (option) => setLevelOption(option);
 
@@ -72,12 +84,37 @@ export default () => {
                 </div>
               </div>
               <div tw="w-8/12 flex items-center justify-around">
-                <label>显示过去时间范围的情况：</label>
-                <TimeLink href="#">1 小时</TimeLink>
-                <TimeLink href="#">6 小时</TimeLink>
-                <TimeLink href="#">1 天</TimeLink>
-                <TimeLink href="#">1 周</TimeLink>
-                <TimeLink href="#">2 周</TimeLink>
+                <span>显示过去时间范围的情况：</span>
+                <TimeLink
+                  to="/admin/sys/logs?timeRange=1h"
+                  selected={timeRange == "1h"}
+                >
+                  1 小时
+                </TimeLink>
+                <TimeLink
+                  to="/admin/sys/logs?timeRange=6h"
+                  selected={timeRange == "6h"}
+                >
+                  6 小时
+                </TimeLink>
+                <TimeLink
+                  to="/admin/sys/logs?timeRange=1d"
+                  selected={timeRange == "1d"}
+                >
+                  1 天
+                </TimeLink>
+                <TimeLink
+                  to="/admin/sys/logs?timeRange=1w"
+                  selected={timeRange == "1w"}
+                >
+                  1 周
+                </TimeLink>
+                <TimeLink
+                  to="/admin/sys/logs?timeRange=2w"
+                  selected={timeRange == "2w"}
+                >
+                  2 周
+                </TimeLink>
                 {/* TODO：自定义时间区间支持 */}
                 {/* <TimeLink href="#">自定义</TimeLink> */}
               </div>
@@ -94,8 +131,9 @@ export default () => {
                 tw="flex-1 rounded-lg shadow font-mono"
                 css={{ backgroundColor: "#474747" }}
               >
-                {data.logs.map((log) => (
+                {data.logs.map((log, index) => (
                   <p
+                    key={index}
                     css={{ color: logColor(log) }}
                     tw="px-2 hover:text-black hover:bg-white hover:font-bold"
                   >
