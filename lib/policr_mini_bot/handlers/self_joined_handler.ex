@@ -72,7 +72,7 @@ defmodule PolicrMiniBot.SelfJoinedHandler do
         Telegex.leave_chat(chat_id)
 
       e ->
-        Logger.error("An error occurred after the bot was invited. Details: #{inspect(e)}")
+        Logger.unitized_error("Bot was invited to process", e)
         send_message(chat_id, t("self_joined.error"))
     end
   end

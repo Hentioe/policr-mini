@@ -84,7 +84,7 @@ defmodule PolicrMiniBot.Runner do
         cancel_takeover(chat, false)
 
       e ->
-        Logger.error("An error occurred while checking bot permissions. Details: #{inspect(e)}")
+        Logger.unitized_error("Bot permission check", e)
     end
   end
 

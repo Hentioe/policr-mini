@@ -473,9 +473,7 @@ defmodule PolicrMiniBot.Helper do
       ExI18n.t(locale, key, values)
     rescue
       e ->
-        Logger.error(
-          "An error occurred while searching for the translation, details: #{inspect(e)}"
-        )
+        Logger.unitized_error("Translation search", key: key, raises: e)
 
         "#{locale}:#{key}" |> String.replace("_", "\\_")
     end

@@ -27,7 +27,7 @@ defmodule PolicrMiniBot.LoginCommander do
           {:ok, state}
 
         e ->
-          Logger.error("Error in response to `/login` command. Details: #{inspect(e)}")
+          Logger.unitized_error("Command response", command: "/login", returns: e)
 
           {:error, state}
       end
@@ -53,7 +53,7 @@ defmodule PolicrMiniBot.LoginCommander do
         Cleaner.delete_message(chat_id, sended_message.message_id, delay_seconds: 8)
 
       e ->
-        Logger.error("Error in response to `/login` command. Details: #{inspect(e)}")
+        Logger.unitized_error("Command response", command: "/login", returns: e)
     end
 
     Cleaner.delete_message(chat_id, message_id)

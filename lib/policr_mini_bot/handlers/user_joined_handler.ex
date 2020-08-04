@@ -66,9 +66,7 @@ defmodule PolicrMiniBot.UserJoinedHandler do
         {:ok, %{state | done: true, deleted: true}}
 
       e ->
-        Logger.error(
-          "An error occurred while reading the verification scheme, details: #{inspect(e)}"
-        )
+        Logger.unitized_error("Verification scheme fetching", chat_id: chat_id, returns: e)
 
         send_message(chat_id, t("errors.scheme_fetch_failed"))
 
@@ -132,7 +130,11 @@ defmodule PolicrMiniBot.UserJoinedHandler do
         {:ok, state}
 
       e ->
-        Logger.error("An error occurred during fetch verification, details: #{inspect(e)}")
+        Logger.unitized_error("Verification acquisition",
+          chat_id: chat_id,
+          user_id: new_chat_member.id,
+          returns: e
+        )
 
         {:error, state}
     end
@@ -174,7 +176,7 @@ defmodule PolicrMiniBot.UserJoinedHandler do
       {:ok, %{state | done: true, deleted: true}}
     else
       e ->
-        Logger.error("Error creating verification entrance. Details: #{inspect(e)}")
+        Logger.unitized_error("Verification entrance creation", chat_id: chat_id, returns: e)
 
         text =
           t("errors.verification_created_failed", %{mentioned_user: mention(new_chat_member)})
@@ -271,8 +273,9 @@ defmodule PolicrMiniBot.UserJoinedHandler do
           end
 
         e ->
-          Logger.error(
-            "No verification of `#{e}` was found from the scheduled task, Details: #{inspect(e)}"
+          Logger.unitized_error("After the scheduled task is executed, the verification finding",
+            verification_id: verification.id,
+            returns: e
           )
       end
 
@@ -339,7 +342,12 @@ defmodule PolicrMiniBot.UserJoinedHandler do
         :ok
 
       e ->
-        Logger.error("Failed to send notification to kill a user. Details: #{inspect(e)}")
+        Logger.unitized_error("User killed notification",
+          chat_id: chat_id,
+          user_id: user.id,
+          returns: e
+        )
+
         e
     end
   end

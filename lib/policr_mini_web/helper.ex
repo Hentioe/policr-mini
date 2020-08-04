@@ -109,7 +109,7 @@ defmodule PolicrMiniWeb.Helper do
         end
 
       e ->
-        Logger.error("An error occurred while download the photo. Details: #{inspect(e)}")
+        Logger.unitized_error("Photo download", e)
 
         @fallback_photo
     end
@@ -127,7 +127,7 @@ defmodule PolicrMiniWeb.Helper do
           "/images/#{filename}"
 
         e ->
-          Logger.error("An error occurred while writing the photo. Details: #{inspect(e)}")
+          Logger.unitized_error("Photo writing", e)
 
           @fallback_photo
       end

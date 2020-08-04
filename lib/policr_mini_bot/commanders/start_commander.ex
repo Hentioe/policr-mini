@@ -108,8 +108,10 @@ defmodule PolicrMiniBot.StartCommander do
              }) do
       else
         e ->
-          Logger.error(
-            "An error occurred while creating the verification message. Details: #{inspect(e)}"
+          Logger.unitized_error("Verification creation",
+            chat_id: target_chat_id,
+            user_id: from_user_id,
+            returns: e
           )
 
           send_message(from_user_id, t("errors.unknown"))
@@ -152,11 +154,7 @@ defmodule PolicrMiniBot.StartCommander do
         {captcha_maker, captcha_maker.make!(chat_id)}
       rescue
         e ->
-          Logger.error(
-            "An error occurred in the verification data generation of group `#{chat_id}`, fallback to alternatives. Details: #{
-              inspect(e)
-            }"
-          )
+          Logger.unitized_error("Verification data generation", chat_id: chat_id, returns: e)
 
           {@fallback_captcha_module, @fallback_captcha_module.make!(chat_id)}
       end

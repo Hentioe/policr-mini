@@ -68,7 +68,7 @@ defmodule PolicrMiniBot.SyncCommander do
       end)
     else
       {:error, e} ->
-        Logger.error("An error occurred during synchronization. Details: #{inspect(e)}")
+        Logger.unitized_error("Group data synchronization", e)
         send_message(chat_id, t("errors.sync_failed"))
     end
 
@@ -160,10 +160,10 @@ defmodule PolicrMiniBot.SyncCommander do
               nil
 
             e ->
-              Logger.error(
-                "An error occurred while synchronizing the administrator `#{user.id}`. Details: #{
-                  inspect(e)
-                }"
+              Logger.unitized_error("Admin data synchronization",
+                chat_id: chat_id,
+                user_id: user.id,
+                returns: e
               )
           end
         end)

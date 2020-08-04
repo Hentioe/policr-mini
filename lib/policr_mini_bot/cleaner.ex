@@ -38,7 +38,7 @@ defmodule PolicrMiniBot.Cleaner do
           delete_message(chat_id, message_id, options)
 
         e ->
-          Logger.error("Failed to delete message from `#{chat_id}`. Details: #{inspect(e)}")
+          Logger.unitized_error("The message deletion", chat_id: chat_id, returns: e)
       end
     end)
 
@@ -59,7 +59,7 @@ defmodule PolicrMiniBot.Cleaner do
 
   @impl true
   def handle_cast(msg, state) do
-    Logger.error("Unknown cast message. Details: #{inspect(msg)}")
+    Logger.warn("The cleaner received an unknown case message, details: #{inspect(msg)}")
     {:noreply, state}
   end
 
@@ -70,7 +70,7 @@ defmodule PolicrMiniBot.Cleaner do
 
   @impl true
   def handle_info(msg, state) do
-    Logger.error("Unknown info message. Details: #{inspect(msg)}")
+    Logger.warn("The cleaner received an unknown info message, details: #{inspect(msg)}")
 
     {:noreply, state}
   end

@@ -67,9 +67,7 @@ defmodule PolicrMiniBot.VerificationCaller do
       :ok
     else
       {:error, %Ecto.Changeset{} = changeset} ->
-        Logger.error(
-          "A database error occurred while processing the answer. Details: #{inspect(changeset)}"
-        )
+        Logger.unitized_error("Answer verification processing", changeset)
 
         answer_callback_query(callback_query_id,
           text: t("errors.check_answer_failed"),
@@ -86,9 +84,7 @@ defmodule PolicrMiniBot.VerificationCaller do
       e ->
         answer_callback_query(callback_query_id, text: t("errors.unknown"), show_alert: true)
 
-        Logger.error(
-          "A Unknown error occurred while processing the answer. Details: #{inspect(e)}"
-        )
+        Logger.unitized_error("Answer verification processing", e)
     end
   end
 
@@ -135,11 +131,7 @@ defmodule PolicrMiniBot.VerificationCaller do
               )
 
             e ->
-              Logger.error(
-                "An error occurred while sending the verification correct notification. Details: #{
-                  inspect(e)
-                }"
-              )
+              Logger.unitized_error("Verification passed notification", e)
           end
         end)
 

@@ -54,7 +54,7 @@ defmodule PolicrMiniBot.UpdatesPoller do
             else: last_offset
 
         e ->
-          Logger.error("An error occurred while pulling updates, details: #{inspect(e)}")
+          Logger.unitized_error("Message pull", e)
           last_offset
       end
 
@@ -64,8 +64,8 @@ defmodule PolicrMiniBot.UpdatesPoller do
   end
 
   @impl true
-  def handle_info({:ssl_closed, _} = details, state) do
-    Logger.error("An SSL error occurred while pulling updates, details: #{inspect(details)}")
+  def handle_info({:ssl_closed, _} = msg, state) do
+    Logger.unitized_error("SSL connection", msg)
 
     {:noreply, state}
   end

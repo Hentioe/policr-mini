@@ -18,7 +18,7 @@ defmodule PolicrMiniBot.PingCommander do
         Cleaner.delete_message(chat_id, sended_message.message_id, delay_seconds: 8)
 
       e ->
-        Logger.error("Error in response to `/ping` command. Details: #{inspect(e)}")
+        Logger.unitized_error("Command response", command: "/ping", returns: e)
     end
 
     {:ok, %{state | deleted: true}}
