@@ -128,27 +128,34 @@ defmodule PolicrMini.Logger do
       Application.get_env(:logger, name, []) |> Enum.into(%{name: name, level: base_level})
     end
 
+    def dirty_write(level, msg, ts) when is_binary(msg) do
+      {{year, month, day}, {hour, minute, second, _msec}} = ts
+
+      ts =
+        {{year, month, day}, {hour, minute, second}}
+        |> NaiveDateTime.from_erl!()
+        # 注意：此处的实现表示日志必须使用 UTC 时间
+        |> DateTime.from_naive!("Etc/UTC")
+        |> DateTime.to_unix()
+
+      Mnesia.dirty_write({Log, increment(Log), level, msg, ts})
+    end
+
     def handle_event(:flush, state) do
       {:ok, state}
     end
 
-    # Handle any log messages that are sent across
-    def handle_event({level, _gl, {Logger, msg, ts, _md}}, %{level: min_level} = state) do
+    # 持久化存储字符串日志消息。
+    def handle_event({level, _gl, {Logger, msg, ts, _md}}, %{level: min_level} = state)
+        when is_binary(msg) do
       if right_log_level?(min_level, level) do
-        {{year, month, day}, {hour, minute, second, _msec}} = ts
-
-        ts =
-          {{year, month, day}, {hour, minute, second}}
-          |> NaiveDateTime.from_erl!()
-          # 注意：此处的实现表示日志必须使用 UTC 时间
-          |> DateTime.from_naive!("Etc/UTC")
-          |> DateTime.to_unix()
-
-        Mnesia.dirty_write({Log, increment(Log), level, msg, ts})
+        dirty_write(level, msg, ts)
       end
 
       {:ok, state}
     end
+
+    def handle_event(_, state), do: {:ok, state}
 
     def handle_call({:configure, opts}, %{name: name} = state) do
       {:ok, :ok, configure(name, opts, state)}
