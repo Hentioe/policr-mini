@@ -204,8 +204,14 @@ export default () => {
       <MenuBox visibility={_GLOBAL.isOwner} title="系统菜单" miniTitle="系统">
         <NavItem
           title="查阅日志"
-          href={`/admin/sys/logs`}
+          href="/admin/sys/logs"
           selected={isSysLink({ path: location.pathname, page: "logs" })}
+        />
+        <NavItem
+          title="使用条款"
+          href="/admin/sys/terms"
+          selected={isSysLink({ path: location.pathname, page: "terms" })}
+          ending="true"
         />
       </MenuBox>
     </nav>

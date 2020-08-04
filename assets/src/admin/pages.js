@@ -7,6 +7,7 @@ import PropertiesPage from "./pages/Properties";
 import PermissionsPage from "./pages/Permissions";
 import CustomPage from "./pages/Custom";
 import SysLogPage from "./pages/SysLog";
+import SysTermsPage from "./pages/SysTerms";
 
 export {
   StatisticsPage,
@@ -18,4 +19,5 @@ export {
   PropertiesPage,
   CustomPage,
   SysLogPage,
+  SysTermsPage,
 };

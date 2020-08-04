@@ -18,6 +18,7 @@
     "camelcase-keys": "^6.2.2",
     "classnames": "^2.2.6",
     "clsx": "^1.1.1",
+    "date-fns": "^2.15.0",
     "lodash": "^4.17.19",
     "mdn-polyfills": "^5.20.0",
     "react": "^16.13.1",

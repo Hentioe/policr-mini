@@ -24,6 +24,7 @@ import {
   PropertiesPage,
   CustomPage,
   SysLogPage,
+  SysTermsPage,
 } from "./admin/pages";
 
 import Reducers from "./admin/reducers";
@@ -51,11 +52,11 @@ const App = () => {
           }}
         >
           <Router>
-            <div tw="flex min-h-screen px-0 lg:px-12 xl:px-12">
+            <div tw="flex px-0 lg:px-12 xl:px-12">
               <div tw="hidden md:block w-2/12 md:w-2/12 xl:w-3/12">
                 <Sidebar />
               </div>
-              <div tw="w-full md:w-8/12 xl:w-6/12 border-solid border-0 border-l border-r border-gray-300">
+              <div tw="w-full min-h-screen flex flex-col md:w-8/12 xl:w-6/12 border-solid border-0 border-l border-r border-gray-300">
                 <Switch>
                   <Route path="/admin/chats/:id/statistics">
                     <StatisticsPage />
@@ -83,6 +84,9 @@ const App = () => {
                   </Route>
                   <Route path="/admin/sys/logs">
                     <SysLogPage />
+                  </Route>
+                  <Route path="/admin/sys/terms">
+                    <SysTermsPage />
                   </Route>
                 </Switch>
               </div>
