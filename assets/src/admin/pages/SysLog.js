@@ -4,7 +4,7 @@ import tw, { styled } from "twin.macro";
 import Select from "react-select";
 import { Link as RouteLink, useLocation } from "react-router-dom";
 import MoonLoader from "react-spinners/MoonLoader";
-import { fromUnixTime, format as formatDateTime } from "date-fns";
+import { fromUnixTime, format as formatDateTime, getUnixTime } from "date-fns";
 
 import {
   PageHeader,
@@ -131,7 +131,16 @@ export default () => {
                 tw="flex-1 rounded-lg shadow font-mono"
                 css={{ backgroundColor: "#474747" }}
               >
-                {data.logs.map((log, index) => (
+                {(data.logs.length == 0
+                  ? [
+                      {
+                        level: "info",
+                        message: "无日志记录",
+                        timestamp: getUnixTime(new Date()),
+                      },
+                    ]
+                  : data.logs
+                ).map((log, index) => (
                   <p
                     key={index}
                     css={{ color: logColor(log) }}
