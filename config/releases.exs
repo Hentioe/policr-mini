@@ -43,10 +43,12 @@ config :policr_mini, PolicrMiniWeb,
 # Configures the owner id of the bot
 config :policr_mini, PolicrMiniBot,
   owner_id:
-    System.get_env("POLICR_MINI_BOT_OWNER_ID") ||
-      raise("""
-      environment variable POLICR_MINI_BOT_OWNER_ID is missing.
-      """)
+    String.to_integer(
+      System.get_env("POLICR_MINI_BOT_OWNER_ID") ||
+        raise("""
+        environment variable POLICR_MINI_BOT_OWNER_ID is missing.
+        """)
+    )
 
 # Configures the image provider
 config :policr_mini, PolicrMiniBot.ImageProvider,
