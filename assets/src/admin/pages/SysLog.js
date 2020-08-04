@@ -21,7 +21,6 @@ const levelOptions = [
 
 const TimeLink = styled.a`
   ${tw`no-underline text-orange-600 hover:text-orange-400`}
-  ${tw`mx-2`}
 `;
 
 const TerminalLoading = () => {
@@ -72,7 +71,7 @@ export default () => {
                   />
                 </div>
               </div>
-              <div tw="w-8/12 flex items-center">
+              <div tw="w-8/12 flex items-center justify-around">
                 <label>显示过去时间范围的情况：</label>
                 <TimeLink href="#">1 小时</TimeLink>
                 <TimeLink href="#">6 小时</TimeLink>
@@ -102,7 +101,7 @@ export default () => {
                   >
                     {formatDateTime(
                       fromUnixTime(log.timestamp),
-                      "yyyy-MM-dd H:mm:ss"
+                      "MM/dd H:mm:ss"
                     )}{" "}
                     [{log.level}] {log.message}
                   </p>
