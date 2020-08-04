@@ -62,10 +62,28 @@ function isNoPermissions(data) {
   return _.isEqual(noAnyPermissionsError, data.errors);
 }
 
+const sysPages = ["logs", "terms"];
+
+function isSysLink({ path, page }) {
+  if (!path) throw "The `path` argument is missing";
+  if (page) {
+    const re = new RegExp(`^/admin/sys/${page}`);
+    return re.test(path);
+  } else {
+    for (let i = 0; i < sysPages.length; i++) {
+      const page = sysPages[i];
+      // 任其一匹配则为 `true`
+      if (isSysLink({ path: path, page: page })) return true;
+    }
+    return false;
+  }
+}
+
 export {
   getIdFromLocation,
   updateInNewArray,
   camelizeJson,
   toastError,
   isNoPermissions,
+  isSysLink,
 };

@@ -5,7 +5,12 @@ import tw, { styled } from "twin.macro";
 import MoonLoader from "react-spinners/MoonLoader";
 import Switch from "react-switch";
 
-import { camelizeJson, toastError, updateInNewArray } from "../helper";
+import {
+  camelizeJson,
+  toastError,
+  updateInNewArray,
+  isSysLink,
+} from "../helper";
 import { loadSelected, receiveChats } from "../slices/chats";
 
 const NavItemLink = styled(
@@ -34,12 +39,6 @@ function isSelect(page, path) {
   const re = new RegExp(`^/admin/chats/-\\d+/${page}`);
 
   return re.test(path);
-}
-
-function isOwnerMenuLink(path) {
-  const logsRe = /^\/admin\/sys\/logs/;
-
-  return logsRe.test(path);
 }
 
 const Loading = () => {
@@ -90,7 +89,7 @@ export default () => {
 
   const [isTakeOver, setIsTakeOver] = useState(false);
   const [isOnOwnerMenu, setIsOnOwnerMenu] = useState(
-    isOwnerMenuLink(location.pathname)
+    isSysLink({ path: location.pathname })
   );
 
   const handleTakeOverChange = useCallback(
@@ -132,7 +131,7 @@ export default () => {
   }, [chatsState]);
 
   useEffect(() => {
-    setIsOnOwnerMenu(isOwnerMenuLink(location.pathname));
+    setIsOnOwnerMenu(isSysLink({ path: location.pathname }));
   }, [location]);
 
   return (
@@ -202,11 +201,11 @@ export default () => {
         ) : null}
       </MenuBox>
 
-      <MenuBox visibility={_GLOBAL.isOwner} title="运营菜单" miniTitle="运营">
+      <MenuBox visibility={_GLOBAL.isOwner} title="系统菜单" miniTitle="系统">
         <NavItem
           title="查阅日志"
           href={`/admin/sys/logs`}
-          selected={/^\/admin\/sys\/logs/.test(location.pathname)}
+          selected={isSysLink({ path: location.pathname, page: "logs" })}
         />
       </MenuBox>
     </nav>

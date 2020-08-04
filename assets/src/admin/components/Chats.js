@@ -6,7 +6,7 @@ import { useDispatch } from "react-redux";
 import { useHistory, useLocation } from "react-router-dom";
 import MoonLoader from "react-spinners/MoonLoader";
 
-import { getIdFromLocation } from "../helper";
+import { getIdFromLocation, isSysLink } from "../helper";
 import { receiveChats, selectChat, loadSelected } from "../slices/chats";
 
 const ChatItemBox = styled.div(({ selected = false }) => [
@@ -62,7 +62,11 @@ export default () => {
 
   useEffect(() => {
     if (chatsState.selected == null && data) {
-      history.push(`/admin/chats/${data.chats[0].id}/${defaultMenu}`);
+      // 如果是系统菜单链接，执行群组的默认选中逻辑。否则重定向到默认页面。
+      if (isSysLink({ path: location.pathname })) {
+        dispatch(selectChat(data.chats[0].id));
+        dispatch(loadSelected(data.chats[0]));
+      } else history.push(`/admin/chats/${data.chats[0].id}/${defaultMenu}`);
     }
   }, [chatsState]);
 
