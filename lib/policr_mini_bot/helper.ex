@@ -1,10 +1,8 @@
 defmodule PolicrMiniBot.Helper do
   @moduledoc """
   机器人功能助手模块，提供和机器人实现相关的各种辅助函数。
-  所有 `use` 以下模块的模块会默认导入本模块：
-  - `PolicrMiniBot.Commander`
-  - `PolicrMiniBot.Handler`
-  - `PolicrMiniBot.Callbacker`
+
+  通过 `use PolicrMiniBot, plug: ...` 实现的插件会自动导入本模块的所有函数。
   """
 
   alias PolicrMini.Logger
@@ -12,16 +10,17 @@ defmodule PolicrMiniBot.Helper do
   alias PolicrMini.ChatBusiness
 
   @type tgerror :: {:error, Telegex.Model.errors()}
+  @type tgmsg :: Telegex.Model.Message.t()
 
   @doc """
   获取机器人自身的 `id` 字段。详情参照 `PolicrMiniBot.id/0` 函数。
   """
-  defdelegate bot_id(), to: PolicrMiniBot, as: :id
+  defdelegate bot_id, to: PolicrMiniBot, as: :id
 
   @doc """
   获取机器人自身的 `username` 字段。详情参照 `PolicrMiniBot.username/0` 函数。
   """
-  defdelegate bot_username(), to: PolicrMiniBot, as: :username
+  defdelegate bot_username, to: PolicrMiniBot, as: :username
 
   @doc """
   根据 map 数据构造用户全名。
@@ -38,10 +37,10 @@ defmodule PolicrMiniBot.Helper do
   def fullname(%{fullname: fullname}), do: fullname
   def fullname(%{id: id}), do: Integer.to_string(id)
 
-  @spec escape_markdown(String.t()) :: String.t()
   @doc """
   转义 Markdown 中不能被 Telegram 发送的字符。
   """
+  @spec escape_markdown(String.t()) :: String.t()
   def escape_markdown(text) do
     text
     |> String.replace(".", "\\.")
@@ -61,17 +60,17 @@ defmodule PolicrMiniBot.Helper do
 
   @type parsemode :: String.t()
 
-  @type sendmsgopts :: [
+  @type send_message_opts :: [
           {:disable_notification, boolean()},
           {:parse_mode, parsemode() | nil},
           {:disable_web_page_preview, boolean()},
           {:reply_markup, Telegex.Model.InlineKeyboardMarkup.t()},
           {:retry, integer()}
         ]
-  @spec send_message(integer(), String.t(), sendmsgopts()) ::
-          {:ok, Telegex.Model.Message.t()} | tgerror()
+
   @doc """
   发送文本消息。
+
   如果 `options` 参数中不包含以下配置，将为它们准备默认值：
   - `disable_notification`: `true`
   - `parse_mode`: `"MarkdownV2"`
@@ -79,6 +78,7 @@ defmodule PolicrMiniBot.Helper do
   - `retry`: 5
   附加的 `retry` 参数表示自动重试次数。一般来讲，重试会发生在网络问题导致发送不成功的情况下，重试次数使用完毕仍然失败则不会继续发送。
   """
+  @spec send_message(integer(), String.t(), send_message_opts) :: {:ok, tgmsg} | tgerror()
   def send_message(chat_id, text, options \\ []) do
     options =
       options
@@ -113,7 +113,11 @@ defmodule PolicrMiniBot.Helper do
         retry = options |> Keyword.get(:retry)
 
         if retry && retry > 0 do
-          Logger.warn("Send message timeout, ready to try again. Remaining times: #{retry - 1}")
+          Logger.unitized_warn("Message sending timed out, prepare to try again",
+            remaining_times: retry - 1,
+            chat_id: chat_id
+          )
+
           options = options |> Keyword.put(:retry, retry - 1)
           send_message(chat_id, text, options)
         else
@@ -125,7 +129,11 @@ defmodule PolicrMiniBot.Helper do
         retry = options |> Keyword.get(:retry)
 
         if retry && retry > 0 do
-          Logger.warn("Too many requests, restricted to send. Remaining times: #{retry - 1}")
+          Logger.unitized_warn("Too many requests are restricted to be sent",
+            remaining_times: retry - 1,
+            chat_id: chat_id
+          )
+
           options = options |> Keyword.put(:retry, retry - 1)
           :timer.sleep(trunc(800 * retry * Enum.random(@time_seeds)))
           send_message(chat_id, text, options)
@@ -138,7 +146,7 @@ defmodule PolicrMiniBot.Helper do
     end
   end
 
-  @type sendphotoopts :: [
+  @type send_photo_opts :: [
           {:caption, String.t()},
           {:disable_notification, boolean()},
           {:parse_mode, parsemode() | nil},
@@ -146,16 +154,16 @@ defmodule PolicrMiniBot.Helper do
           {:retry, integer()}
         ]
 
-  @spec send_photo(integer(), String.t(), sendphotoopts()) ::
-          {:ok, Telegex.Model.Message.t()} | tgerror()
   @doc """
   发送图片。
+
   如果 `options` 参数中不包含以下配置，将为它们准备默认值：
   - `disable_notification`: `true`
   - `parse_mode`: `"MarkdownV2"`
   - `retry`: 5
   附加的 `retry` 参数表示自动重试次数。一般来讲，重试会发生在网络问题导致发送不成功的情况下，重试次数使用完毕仍然失败则不会继续发送。
   """
+  @spec send_photo(integer(), String.t(), send_photo_opts) :: {:ok, tgmsg} | tgerror
   def send_photo(chat_id, photo, options \\ []) do
     options =
       options
@@ -196,7 +204,11 @@ defmodule PolicrMiniBot.Helper do
         retry = options |> Keyword.get(:retry)
 
         if retry && retry > 0 do
-          Logger.warn("Send message timeout, ready to try again. Remaining times: #{retry - 1}")
+          Logger.unitized_warn("Message sending timed out, prepare to try again",
+            remaining_times: retry - 1,
+            chat_id: chat_id
+          )
+
           options = options |> Keyword.put(:retry, retry - 1)
           send_photo(chat_id, photo, options)
         else
@@ -208,7 +220,11 @@ defmodule PolicrMiniBot.Helper do
         retry = options |> Keyword.get(:retry)
 
         if retry && retry > 0 do
-          Logger.warn("Too many requests, restricted to send. Remaining times: #{retry - 1}")
+          Logger.unitized_warn("Too many requests are restricted to be sent",
+            remaining_times: retry - 1,
+            chat_id: chat_id
+          )
+
           options = options |> Keyword.put(:retry, retry - 1)
           :timer.sleep(trunc(800 * retry * Enum.random(@time_seeds)))
           send_photo(chat_id, photo, options)
@@ -221,14 +237,14 @@ defmodule PolicrMiniBot.Helper do
     end
   end
 
-  @spec edit_message_text(String.t(), keyword()) ::
-          {:ok, Telegex.Model.Message.t()} | tgerror()
   @doc """
   编辑消息。
+
   如果 `options` 参数中不包含以下配置，将为它们准备默认值：
   - `parse_mode`: `"MarkdownV2"`
   - `disable_web_page_preview`: `false`
   """
+  @spec edit_message_text(String.t(), keyword) :: {:ok, tgmsg} | tgerror
   def edit_message_text(text, options \\ []) do
     options =
       options
@@ -267,12 +283,13 @@ defmodule PolicrMiniBot.Helper do
     can_pin_messages: false
   }
 
-  @spec delete_message(integer(), integer(), [{atom(), any()}]) :: {:ok, true} | tgerror
   @doc """
   删除消息。
+
   附加的 `options` 参数可配置 `delay_seconds` 实现延迟删除。
   注意，延迟删除无法直接获得请求结果，将直接返回 `:ok`。
   """
+  @spec delete_message(integer, integer, [{atom, any}]) :: {:ok, true} | tgerror
   def delete_message(chat_id, message_id, options \\ []) do
     delay_seconds =
       options
@@ -290,6 +307,7 @@ defmodule PolicrMiniBot.Helper do
 
   @doc """
   限制聊天成员。
+
   目前来讲，它会限制以下权限：
   - `can_send_messages`: `false`
   - `can_send_media_messages`: `false`
@@ -306,6 +324,7 @@ defmodule PolicrMiniBot.Helper do
 
   @doc """
   解除聊天成员限制。
+
   此调用产生的权限修改是动态的，它会将被限制用户的权限恢复为群组记录中的原始权限配置。
   """
   def derestrict_chat_member(chat_id, user_id) do
@@ -333,10 +352,10 @@ defmodule PolicrMiniBot.Helper do
     })
   end
 
-  @spec typing(integer()) :: {:ok, boolean()} | tgerror()
   @doc """
   让机器人显示正常打字的动作。
   """
+  @spec typing(integer) :: {:ok, boolean} | tgerror
   def typing(chat_id) do
     Telegex.send_chat_action(chat_id, "typing")
   end
@@ -356,7 +375,7 @@ defmodule PolicrMiniBot.Helper do
 
   注意：`parse_mode` 需要跟 `send_message/3` 中的配置一致，否则最终的消息形式不正确，并且无法对被提及用户产生通知。
   """
-  @spec mention(map(), mention_opts()) :: String.t()
+  @spec mention(map, mention_opts) :: String.t()
   def mention(%{id: id} = user, options \\ []) do
     options =
       options
@@ -435,15 +454,16 @@ defmodule PolicrMiniBot.Helper do
 
   @type default_keys :: :vmode | :ventrance | :voccasion | :kmethod
 
-  @spec default!(default_keys()) :: any()
   @doc """
   获取默认配置。
+
   当前 `key` 可以是以下值：
   - `:vmode` - 验证方式
   - `:ventrance` - 验证入口
   - `:voccasion` - 验证场合
   - `:kmethod` - 击杀方式
   """
+  @spec default!(default_keys) :: any()
   def default!(key) when is_atom(key) do
     if default = @defaults[key] do
       default
@@ -461,12 +481,13 @@ defmodule PolicrMiniBot.Helper do
     t(ExI18n.locale(), key, values)
   end
 
-  @spec t(String.t(), String.t(), map()) :: String.t()
   @doc """
   搜索国际化翻译。
+
   参数 `locale` 为 `priv/locals` 中 `yml` 文件的名称。
   参数 `values` 用于给翻译字符串中的变量赋值。
   """
+  @spec t(String.t(), String.t(), map()) :: String.t()
   def t(locale, key, values)
       when is_binary(locale) and is_binary(key) and is_map(values) do
     try do
@@ -479,22 +500,20 @@ defmodule PolicrMiniBot.Helper do
     end
   end
 
-  @spec async(function()) :: :ok
   @doc """
   异步执行函数，不指定延迟时间。
   """
+  @spec async(function()) :: :ok
   def async(callback) when is_function(callback) do
     TaskAfter.task_after(0, callback)
 
     :ok
   end
 
-  @spec async(function(), [{:seconds, integer}, ...]) :: :ok
   @doc """
   异步执行函数，可指定单位为秒的延迟时间。
-
-  iex> PolicrMiniBot.Helper.async(fn -> IO.puts("Hello") end, seconds: 3)
   """
+  @spec async(function, [{:seconds, integer}, ...]) :: :ok
   def async(callback, [{:seconds, seconds}]) when is_integer(seconds) and is_function(callback) do
     TaskAfter.task_after(seconds * 1000, callback)
 

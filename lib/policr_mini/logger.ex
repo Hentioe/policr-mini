@@ -34,11 +34,11 @@ defmodule PolicrMini.Logger do
   输出格式强制统一的错误日志。
 
   ## 参数
-  - action: 执行失败的动作。位于句首，例如 `The message deletion`（消息删除）。
-  - details: 失败的详情。一般是错误的返回值，如要自行定制详情内容推荐传递关键字列表。注意不需要在传递之前调用 `inspect`。
+  - `action`: 执行失败的动作。位于句首，例如 `Message deletion`（消息删除）。
+  - `details`: 失败的详情。一般是错误的返回值，如要自行定制详情内容请传递关键字列表。注意不需要在传递之前调用 `inspect`。
 
   ## 用例：
-      iex> PolicrMini.Logger.unitized_error("The message deletion", chat_id: chat_id, returns: e)
+      iex> PolicrMini.Logger.unitized_error("Message deletion", chat_id: chat_id, returns: e)
       :ok
       iex> PolicrMini.Logger.unitized_error("Translation search", key: key, raises: e)
       :ok
@@ -46,6 +46,18 @@ defmodule PolicrMini.Logger do
   @spec unitized_error(String.t(), any) :: :ok
   def unitized_error(action, details) do
     error("#{action} failed, details: #{inspect(details)}")
+  end
+
+  @doc """
+  输出格式强制统一的警告日志。
+
+  ## 参数
+  - `message`: 警告消息，语法结构自由，但不要以 `.` 结尾。
+  - `defails`: 警告内容的详情。一般是错误的返回值，如要自行定制详情内容请传递关键字列表。注意不需要在传递之前调用 `inspect`。
+  """
+  @spec unitized_warn(String.t(), any) :: :ok
+  def unitized_warn(message, details) do
+    warn("#{message}, details: #{inspect(details)}")
   end
 
   defdelegate warn(chardata_or_fun, metadata \\ []), to: Logger
