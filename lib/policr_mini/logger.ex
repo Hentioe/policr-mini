@@ -7,12 +7,27 @@ defmodule PolicrMini.Logger do
 
   alias :mnesia, as: Mnesia
 
-  @type query_cont :: [{:level, atom}, {:beginning, integer}, {:ending, integer}]
+  @type query_cont :: [
+          {:level, atom | nil},
+          {:beginning, integer | nil},
+          {:ending, integer | nil}
+        ]
 
-  @spec query(query_cont) :: [PolicrMini.Logger.Record.t()]
+  @doc """
+  查询已持久化存储的日志。
+
+  参数 `query_cont` 表示查询条件，支持以下可选项：
+  - `level`: 日志的级别。例如 `:error` 或 `:warn`。
+  - `beginning`: 起始时间（时间戳）。
+  - `ending`: 结束时间（时间戳）。
+
+  注意：如果不指定时间区间相关的参数，将返回所有的日志记录，这个数据量可能会很庞大。
+  """
+  @spec query(query_cont) :: {:ok, [PolicrMini.Logger.Record.t()]} | {:error, any}
   def query(cont \\ []) do
     combiner = fn where, acc ->
       case where do
+        {_, nil} -> acc
         {:level, level} -> acc ++ [{:==, :"$1", level}]
         {:beginning, beginning} -> acc ++ [{:>=, :"$3", beginning}]
         {:ending, ending} -> acc ++ [{:"=<", :"$3", ending}]
@@ -26,7 +41,12 @@ defmodule PolicrMini.Logger do
     end
 
     case Mnesia.transaction(matcher) do
-      {:atomic, records} -> records |> Enum.map(&PolicrMini.Logger.Record.new/1) |> Enum.reverse()
+      {:atomic, records} ->
+        records = records |> Enum.map(&PolicrMini.Logger.Record.new/1) |> Enum.reverse()
+        {:ok, records}
+
+      {:aborted, reason} ->
+        {:error, reason}
     end
   end
 
@@ -35,13 +55,7 @@ defmodule PolicrMini.Logger do
 
   ## 参数
   - `action`: 执行失败的动作。位于句首，例如 `Message deletion`（消息删除）。
-  - `details`: 失败的详情。一般是错误的返回值，如要自行定制详情内容请传递关键字列表。注意不需要在传递之前调用 `inspect`。
-
-  ## 用例：
-      iex> PolicrMini.Logger.unitized_error("Message deletion", chat_id: chat_id, returns: e)
-      :ok
-      iex> PolicrMini.Logger.unitized_error("Translation search", key: key, raises: e)
-      :ok
+  - `details`: 失败的详情。一般是错误的返回值，如要自行定制详情内容推荐使用关键字列表。注意不需要在传递之前调用 `inspect`。
   """
   @spec unitized_error(String.t(), any) :: :ok
   def unitized_error(action, details) do
@@ -53,7 +67,7 @@ defmodule PolicrMini.Logger do
 
   ## 参数
   - `message`: 警告消息，语法结构自由，但不要以 `.` 结尾。
-  - `defails`: 警告内容的详情。一般是错误的返回值，如要自行定制详情内容请传递关键字列表。注意不需要在传递之前调用 `inspect`。
+  - `defails`: 警告的详情。一般是错误的返回值，如要自行定制详情内容推荐使用关键字列表。注意不需要在传递之前调用 `inspect`。
   """
   @spec unitized_warn(String.t(), any) :: :ok
   def unitized_warn(message, details) do
