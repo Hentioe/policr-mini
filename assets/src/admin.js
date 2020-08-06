@@ -23,7 +23,7 @@ import {
   PermissionsPage,
   PropertiesPage,
   CustomPage,
-  SysLogPage,
+  SysLogsPage,
   SysTermsPage,
 } from "./admin/pages";
 
@@ -83,7 +83,7 @@ const App = () => {
                     <CustomPage />
                   </Route>
                   <Route path="/admin/sys/logs">
-                    <SysLogPage />
+                    <SysLogsPage />
                   </Route>
                   <Route path="/admin/sys/terms">
                     <SysTermsPage />

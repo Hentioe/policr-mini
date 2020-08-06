@@ -2,7 +2,7 @@ import React, { useState } from "react";
 import useSWR from "swr";
 import tw, { styled } from "twin.macro";
 import Select from "react-select";
-import { Link as RouteLink, useLocation } from "react-router-dom";
+import { Link as RouteLink, useLocation, useHistory } from "react-router-dom";
 import MoonLoader from "react-spinners/MoonLoader";
 import { fromUnixTime, format as formatDateTime, getUnixTime } from "date-fns";
 
@@ -19,6 +19,13 @@ const levelOptions = [
   { value: "warn", label: "警告" },
   { value: "error", label: "错误" },
 ];
+
+function findLevelOption(value) {
+  const options = levelOptions.filter((option) => option.value === value);
+
+  if (options.length == 0) return defaultLevelOption;
+  else return options[0];
+}
 
 const TimeLink = styled(RouteLink)`
   ${tw`no-underline text-orange-600 hover:text-orange-400`}
@@ -46,19 +53,41 @@ function logColor(log) {
 
 function parseTimeRange(timeRange) {
   if (["1h", "6h", "1d", "1w", "2w"].includes(timeRange)) return timeRange;
-  return "1d";
+  else return "1d";
+}
+function parseLevel(level) {
+  if (["all", "warn", "error"].includes(level)) return level;
+  else return "all";
+}
+
+function makeQueryString(level, timeRange) {
+  level = parseLevel(level);
+  timeRange = parseTimeRange(timeRange);
+
+  let queryString = `?timeRange=${timeRange}`;
+  if (level != "all") queryString += `&level=${level}`;
+
+  return queryString;
 }
 
 export default () => {
   const location = useLocation();
+  const history = useHistory();
 
   const searchParams = new URLSearchParams(location.search);
+
+  const level = searchParams.get("level");
   const timeRange = parseTimeRange(searchParams.get("timeRange"));
+  const apiQueryString = makeQueryString(level, timeRange);
+  const [levelOption, setLevelOption] = useState(findLevelOption(level));
 
-  const [levelOption, setLevelOption] = useState(defaultLevelOption);
-  const { data } = useSWR(`/admin/api/logs?timeRange=${timeRange}`);
+  const { data } = useSWR(`/admin/api/logs${apiQueryString}`);
 
-  const handleLevelChange = (option) => setLevelOption(option);
+  const handleLevelChange = (option) => {
+    setLevelOption(option);
+    const queryString = makeQueryString(option.value, timeRange);
+    history.push(`/admin/sys/logs${queryString}`);
+  };
 
   const isLoaded = () => data;
 
@@ -86,31 +115,46 @@ export default () => {
               <div tw="w-8/12 flex items-center justify-around">
                 <span>显示过去时间范围的情况：</span>
                 <TimeLink
-                  to="/admin/sys/logs?timeRange=1h"
+                  to={`/admin/sys/logs${makeQueryString(
+                    levelOption.value,
+                    "1h"
+                  )}`}
                   selected={timeRange == "1h"}
                 >
                   1 小时
                 </TimeLink>
                 <TimeLink
-                  to="/admin/sys/logs?timeRange=6h"
+                  to={`/admin/sys/logs${makeQueryString(
+                    levelOption.value,
+                    "6h"
+                  )}`}
                   selected={timeRange == "6h"}
                 >
                   6 小时
                 </TimeLink>
                 <TimeLink
-                  to="/admin/sys/logs?timeRange=1d"
+                  to={`/admin/sys/logs${makeQueryString(
+                    levelOption.value,
+                    "1d"
+                  )}`}
                   selected={timeRange == "1d"}
                 >
                   1 天
                 </TimeLink>
                 <TimeLink
-                  to="/admin/sys/logs?timeRange=1w"
+                  to={`/admin/sys/logs${makeQueryString(
+                    levelOption.value,
+                    "1w"
+                  )}`}
                   selected={timeRange == "1w"}
                 >
                   1 周
                 </TimeLink>
                 <TimeLink
-                  to="/admin/sys/logs?timeRange=2w"
+                  to={`/admin/sys/logs${makeQueryString(
+                    levelOption.value,
+                    "2w"
+                  )}`}
                   selected={timeRange == "2w"}
                 >
                   2 周
@@ -123,7 +167,7 @@ export default () => {
         </PageSection>
         <PageSection tw="flex-1">
           <PageSectionHeader>
-            <PageSectionTitle>模拟终端</PageSectionTitle>
+            <PageSectionTitle>模拟输出</PageSectionTitle>
           </PageSectionHeader>
           <main tw="flex-1 flex flex-col mt-2">
             {isLoaded() ? (

@@ -6,7 +6,7 @@ import BannedPage from "./pages/Banned";
 import PropertiesPage from "./pages/Properties";
 import PermissionsPage from "./pages/Permissions";
 import CustomPage from "./pages/Custom";
-import SysLogPage from "./pages/SysLog";
+import SysLogsPage from "./pages/SysLogs";
 import SysTermsPage from "./pages/SysTerms";
 
 export {
@@ -18,6 +18,6 @@ export {
   PermissionsPage,
   PropertiesPage,
   CustomPage,
-  SysLogPage,
+  SysLogsPage,
   SysTermsPage,
 };
