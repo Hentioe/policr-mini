@@ -1,6 +1,6 @@
 defmodule PolicrMiniBot.NewChatTitleHandler do
   @moduledoc """
-  群组标题修改的处理器。
+  新群组标题处理器。
   """
 
   use PolicrMiniBot, plug: :handler
@@ -8,7 +8,7 @@ defmodule PolicrMiniBot.NewChatTitleHandler do
   alias PolicrMini.ChatBusiness
 
   @doc """
-  匹配消息是否为群组标题修改。
+  匹配消息是否包含群组标题修改。
 
   消息中的 `new_chat_title` 为 `nil` 时，表示不匹配。否则匹配。
   """
@@ -20,7 +20,7 @@ defmodule PolicrMiniBot.NewChatTitleHandler do
   @doc """
   处理群组标题修改。
 
-  更新数据库中对应的群组的标题数据。
+  更新数据库中对应的群组记录的标题数据。
   """
   @impl true
   def handle(message, state) do

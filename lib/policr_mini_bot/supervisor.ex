@@ -14,6 +14,7 @@ defmodule PolicrMiniBot.Supervisor do
     SelfLeftedHandler,
     UserJoinedHandler,
     NewChatTitleHandler,
+    NewChatPhotoHandler,
     VerificationCaller,
     RevokeTokenCaller
   }
@@ -26,7 +27,15 @@ defmodule PolicrMiniBot.Supervisor do
   def init(_init_arg) do
     install_plugs([TakeoverCheckPreheater, FromCheckPreheater])
     install_plugs([StartCommander, PingCommander, SyncCommander, LoginCommander])
-    install_plugs([SelfJoinedHandler, SelfLeftedHandler, UserJoinedHandler, NewChatTitleHandler])
+
+    install_plugs([
+      SelfJoinedHandler,
+      SelfLeftedHandler,
+      UserJoinedHandler,
+      NewChatTitleHandler,
+      NewChatPhotoHandler
+    ])
+
     install_plugs([VerificationCaller, RevokeTokenCaller])
 
     children = [
