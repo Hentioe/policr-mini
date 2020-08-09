@@ -143,34 +143,34 @@ defmodule PolicrMiniBot.VerificationCaller do
   end
 
   @doc """
-  处理回答错误。
+  处理错误回答。
+
+  将根据验证方案中的配置选择击杀方式对应的处理逻辑。
   """
-  @spec handle_wrong(Verification.t(), atom(), integer(), Telegex.Model.User.t()) ::
-          {:ok, Verification.t()} | {:error, any()}
-  def handle_wrong(
-        %Verification{} = verification,
-        killing_method,
-        message_id,
-        %Telegex.Model.User{} = from_user
-      ) do
-    # 回答错误：更新验证记录的状态、根据方案实施操作并发送通知消息
+  @spec handle_wrong(Verification.t(), atom, integer, Telegex.Model.User.t()) ::
+          {:ok, Verification.t()} | {:error, any}
+  def handle_wrong(verification, killing_method, message_id, from_user) do
+    cleaner_fun = fn notice_text ->
+      async(fn ->
+        Cleaner.delete_message(verification.target_user_id, message_id)
+        send_message(verification.target_user_id, notice_text)
+      end)
+    end
+
     case verification |> VerificationBusiness.update(%{status: :wronged}) do
       {:ok, verification} ->
         case killing_method do
           :kick ->
             text = t("verification.wronged.kick.private")
 
-            async(fn ->
-              Cleaner.delete_message(verification.target_user_id, message_id)
-              send_message(verification.target_user_id, text)
-            end)
+            cleaner_fun.(text)
 
             UserJoinedHandler.kick(verification.chat_id, from_user, :wronged)
 
             {:ok, verification}
 
           other ->
-            {:error, "Unknown killmethod, details: #{inspect(other)}"}
+            {:error, "unknown killing method: `#{other}`"}
         end
 
       e ->
