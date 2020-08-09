@@ -7,7 +7,7 @@ defmodule PolicrMiniBot.ImageProvider do
 
   defmodule SeriesImage do
     @moduledoc """
-    系列图片。
+    一个图片系列。
     """
 
     use TypedStruct
@@ -48,22 +48,10 @@ defmodule PolicrMiniBot.ImageProvider do
         |> Enum.filter(fn path -> image_count(File.ls!(path), include_formats) > 0 end)
 
       # 遍历每个目录中的图片和元数据文件，生成 `SeriesImage` 结构
+
       series_images =
         series_dirs
-        |> Enum.map(fn path ->
-          files =
-            path
-            |> File.ls!()
-            |> Enum.filter(fn f -> f |> image?(include_formats) end)
-            |> Enum.map(fn f -> path |> Path.join(f) end)
-
-          metadata = path |> Path.join(@metadata_fname) |> File.read!() |> Jason.decode!()
-
-          %SeriesImage{
-            files: files,
-            name_zh_hans: metadata["name_zh_hans"]
-          }
-        end)
+        |> Enum.map(&parse_dir(&1, include_formats))
         |> Enum.filter(fn si -> si.name_zh_hans end)
 
       series_images
@@ -72,28 +60,47 @@ defmodule PolicrMiniBot.ImageProvider do
     Agent.start_link(scan_images, name: __MODULE__)
   end
 
-  @spec random(integer()) :: [SeriesImage.t()]
   @doc """
-  随机提供指定数量的系列图片。
+  解析目录中的文件，生成 `PolicrMiniBot.ImageProvider.SeriesImage` 结构。
   """
+  @spec parse_dir(Path.t(), [String.t()]) :: SeriesImage.t()
+  def parse_dir(path, include_formats) do
+    files =
+      path
+      |> File.ls!()
+      |> Enum.filter(fn f -> f |> image?(include_formats) end)
+      |> Enum.map(fn f -> path |> Path.join(f) end)
+
+    metadata = path |> Path.join(@metadata_fname) |> File.read!() |> Jason.decode!()
+
+    %SeriesImage{
+      files: files,
+      name_zh_hans: metadata["name_zh_hans"]
+    }
+  end
+
+  @doc """
+  随机提供指定数量的图片系列。
+  """
+  @spec random(integer()) :: [SeriesImage.t()]
   def random(count) do
     Agent.get(__MODULE__, fn state -> state |> Enum.take_random(count) end)
   end
 
-  @spec image_count([String.t() | Path.t()], [String.t()]) :: integer()
   @doc """
   根据文件的名称和格式限定计算图片文件的数量。
   """
+  @spec image_count([Path.t()], [String.t()]) :: integer
   def image_count(files, include_formats) do
     files
     |> Enum.filter(fn f -> image?(f, include_formats) end)
     |> length()
   end
 
-  @spec image?(String.t(), [String.t()]) :: boolean()
   @doc """
   根据文件名称和限定格式判断是否为图片。
   """
+  @spec image?(String.t(), [String.t()]) :: boolean
   def image?(fname, include_formats) do
     Enum.member?(include_formats, String.slice(Path.extname(fname), 1..-1))
   end

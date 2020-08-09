@@ -75,11 +75,11 @@ defmodule PolicrMiniBot.SyncCommander do
     {:ok, state}
   end
 
-  @spec synchronize_chat(integer(), boolean()) :: {:ok, Chat.t()} | {:error, Ecto.Changeset.t()}
   @doc """
   同步群信息数据。
   """
-  def synchronize_chat(chat_id, init \\ false) when is_integer(chat_id) do
+  @spec synchronize_chat(integer, boolean) :: {:ok, Chat.t()} | {:error, Ecto.Changeset.t()}
+  def synchronize_chat(chat_id, init \\ false) do
     case Telegex.get_chat(chat_id) do
       {:ok, chat} ->
         {small_photo_id, big_photo_id} =
@@ -129,13 +129,34 @@ defmodule PolicrMiniBot.SyncCommander do
     end
   end
 
-  @spec synchronize_administrators(Chat.t()) ::
-          {:ok, Chat.t()} | {:error, Ecto.Changeset.t()}
   @doc """
   同步管理员数据。
   """
-  def synchronize_administrators(chat = %Chat{id: chat_id})
-      when is_integer(chat_id) do
+  @spec synchronize_administrators(Chat.t()) :: {:ok, Chat.t()} | {:error, Ecto.Changeset.t()}
+  def synchronize_administrators(chat = %{id: chat_id}) when is_integer(chat_id) do
+    user_sync_fun = fn member ->
+      user = member.user
+
+      user_params = %{
+        id: user.id,
+        first_name: user.first_name,
+        last_name: user.last_name,
+        username: user.username
+      }
+
+      case UserBusiness.fetch(user.id, user_params) do
+        {:ok, _} ->
+          nil
+
+        e ->
+          Logger.unitized_error("Admin data synchronization",
+            chat_id: chat_id,
+            user_id: user.id,
+            returns: e
+          )
+      end
+    end
+
     case Telegex.get_chat_administrators(chat_id) do
       {:ok, administrators} ->
         # 过滤自身
@@ -144,29 +165,7 @@ defmodule PolicrMiniBot.SyncCommander do
           |> Enum.filter(fn member -> !member.user.is_bot end)
 
         # 更新用户列表
-        administrators
-        |> Enum.each(fn member ->
-          user = member.user
-
-          user_params = %{
-            id: user.id,
-            first_name: user.first_name,
-            last_name: user.last_name,
-            username: user.username
-          }
-
-          case UserBusiness.fetch(user.id, user_params) do
-            {:ok, _} ->
-              nil
-
-            e ->
-              Logger.unitized_error("Admin data synchronization",
-                chat_id: chat_id,
-                user_id: user.id,
-                returns: e
-              )
-          end
-        end)
+        Enum.each(administrators, user_sync_fun)
 
         # 更新管理员列表
         # 默认具有可读权限，可写权限由 `can_restrict_members` 决定。

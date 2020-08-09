@@ -97,16 +97,22 @@ defmodule PolicrMiniWeb.Helper do
 
   @spec fetch_assets_file(binary) :: String.t()
   defp fetch_assets_file(file_url) do
-    case HTTPoison.get(file_url, [], @download_options) do
-      {:ok, %HTTPoison.Response{headers: headers, body: body}} ->
-        if etag = Enum.find(headers, fn {header, _} -> header == "ETag" end) do
-          filename =
-            "photo_cache_" <> (etag |> elem(1) |> String.slice(1..-2)) <> Path.extname(file_url)
+    etag_finder = fn {header, _} -> header == "ETag" end
 
-          fetch_from_local(filename, body)
-        else
-          @fallback_photo
-        end
+    fetch_fun = fn %{headers: headers, body: body} ->
+      if etag = Enum.find(headers, etag_finder) do
+        filename =
+          "photo_cache_" <> (etag |> elem(1) |> String.slice(1..-2)) <> Path.extname(file_url)
+
+        fetch_from_local(filename, body)
+      else
+        @fallback_photo
+      end
+    end
+
+    case HTTPoison.get(file_url, [], @download_options) do
+      {:ok, %HTTPoison.Response{} = response} ->
+        fetch_fun.(response)
 
       e ->
         Logger.unitized_error("Photo download", e)

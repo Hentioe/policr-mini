@@ -93,12 +93,27 @@ defmodule PolicrMiniBot.VerificationCaller do
   """
   @spec handle_correct(Verification.t(), integer(), Telegex.Model.User.t()) ::
           {:ok, Verification.t()} | {:error, any()}
-  def handle_correct(
-        %Verification{} = verification,
-        message_id,
-        %Telegex.Model.User{} = from_user
-      )
-      when is_integer(message_id) do
+  def handle_correct(verification, message_id, from_user) do
+    # 发送通知消息并延迟删除
+    notice_fun = fn ->
+      marked_enabled = Application.get_env(:policr_mini, :marked_enabled)
+      seconds = DateTime.diff(DateTime.utc_now(), verification.inserted_at)
+
+      text =
+        t("verification.passed.notice", %{
+          mentioned_user: mention(from_user, anonymization: !marked_enabled),
+          seconds: seconds
+        })
+
+      case send_message(verification.chat_id, text, parse_mode: "MarkdownV2ToHTML") do
+        {:ok, sended_message} ->
+          Cleaner.delete_message(verification.chat_id, sended_message.message_id, delay_seconds: 8)
+
+        e ->
+          Logger.unitized_error("Verification passed notification", e)
+      end
+    end
+
     case verification |> VerificationBusiness.update(%{status: :passed}) do
       {:ok, verification} ->
         # 解除限制
@@ -109,31 +124,10 @@ defmodule PolicrMiniBot.VerificationCaller do
           send_message(verification.target_user_id, t("verification.passed.private"))
         end)
 
-        # 发送通知消息并延迟删除
-        seconds = DateTime.diff(DateTime.utc_now(), verification.inserted_at)
-
         async(fn -> verification.chat_id |> typing() end)
 
-        marked_enabled = Application.get_env(:policr_mini, :marked_enabled)
-
-        text =
-          t("verification.passed.notice", %{
-            mentioned_user: mention(from_user, anonymization: !marked_enabled),
-            seconds: seconds
-          })
-
         # 发送通知
-        async(fn ->
-          case send_message(verification.chat_id, text, parse_mode: "MarkdownV2ToHTML") do
-            {:ok, sended_message} ->
-              Cleaner.delete_message(verification.chat_id, sended_message.message_id,
-                delay_seconds: 8
-              )
-
-            e ->
-              Logger.unitized_error("Verification passed notification", e)
-          end
-        end)
+        async(notice_fun)
 
         {:ok, verification}
 
