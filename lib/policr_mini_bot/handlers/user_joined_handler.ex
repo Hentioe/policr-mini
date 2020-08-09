@@ -256,21 +256,29 @@ defmodule PolicrMiniBot.UserJoinedHandler do
 
     target_user = %{id: target_user_id, fullname: target_user_name}
 
-    task = fn ->
+    unban_fun = fn ->
+      async(fn -> Telegex.unban_chat_member(chat_id, target_user_id) end,
+        seconds: allow_join_again_seconds()
+      )
+    end
+
+    ban_fun = fn latest_verification ->
+      if latest_verification.status == :waiting do
+        # 更新状态为超时
+        latest_verification |> VerificationBusiness.update(%{status: :timeout})
+        # TODO: 此处需要根据 scheme
+        # 实施操作（踢出）
+        kick(chat_id, target_user, :timeout)
+        # 解除限制以允许再次加入
+        unban_fun.()
+      end
+    end
+
+    timed_task = fn ->
       # 读取验证记录，为等待状态则实施操作
       case VerificationBusiness.get(verification.id) do
         {:ok, latest_verification} ->
-          if latest_verification.status == :waiting do
-            # 更新状态为超时
-            latest_verification |> VerificationBusiness.update(%{status: :timeout})
-            # TODO: 此处需要根据 scheme
-            # 实施操作（踢出）
-            kick(chat_id, target_user, :timeout)
-            # 解除限制以允许再次加入
-            async(fn -> Telegex.unban_chat_member(chat_id, target_user_id) end,
-              seconds: allow_join_again_seconds()
-            )
-          end
+          ban_fun.(latest_verification)
 
         e ->
           Logger.unitized_error("After the scheduled task is executed, the verification finding",
@@ -299,7 +307,7 @@ defmodule PolicrMiniBot.UserJoinedHandler do
       end
     end
 
-    async(task, seconds: seconds)
+    async(timed_task, seconds: seconds)
   end
 
   @type reason :: :wronged | :timeout
