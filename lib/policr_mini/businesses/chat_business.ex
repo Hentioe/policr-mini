@@ -10,19 +10,19 @@ defmodule PolicrMini.ChatBusiness do
   alias PolicrMini.Schemas.Permission
   alias PolicrMini.PermissionBusiness
 
-  @typep modelwrited :: {:ok, Chat.t()} | {:error, Ecto.Changeset.t()}
+  @typep written_returns :: {:ok, Chat.t()} | {:error, Ecto.Changeset.t()}
 
-  @spec create(map()) :: modelwrited()
+  @spec create(map()) :: written_returns()
   def create(params) do
     %Chat{} |> Chat.changeset(params) |> Repo.insert()
   end
 
-  @spec update(Chat.t(), map()) :: modelwrited()
+  @spec update(Chat.t(), map()) :: written_returns()
   def update(%Chat{} = chat, attrs) do
     chat |> Chat.changeset(attrs) |> Repo.update()
   end
 
-  @spec fetch(integer(), map()) :: modelwrited()
+  @spec fetch(integer(), map()) :: written_returns()
   def fetch(id, params) when is_integer(id) do
     case id |> get() do
       {:error, :not_found, _} -> create(params |> Map.put(:id, id))
@@ -30,7 +30,7 @@ defmodule PolicrMini.ChatBusiness do
     end
   end
 
-  @spec takeover_cancelled(Chat.t()) :: modelwrited()
+  @spec takeover_cancelled(Chat.t()) :: written_returns()
   def takeover_cancelled(%Chat{} = chat) do
     chat |> update(%{is_take_over: false})
   end
@@ -82,5 +82,23 @@ defmodule PolicrMini.ChatBusiness do
   @spec find_takeovered :: [Chat.t()]
   def find_takeovered do
     from(c in Chat, where: c.is_take_over == true) |> Repo.all()
+  end
+
+  @keywords_separator_re ~r/ +/
+
+  # TODO: 缺乏测试。
+  @doc """
+  搜索群组列表。
+
+  参数 `keywords` 会参与 `title` 和 `description` 两个字段的模糊查询，以空格分隔的多个关键字可以满足关键字之间的 `and` 关系。
+
+  注意：当前使用空格分隔的关键字仍然具备从左至右的关系，以后可能会顺序无关。
+  """
+  @spec search(String.t()) :: [Chat.t()]
+  def search(keywords) do
+    searching_str = "%" <> (keywords |> String.replace(@keywords_separator_re, "%")) <> "%"
+
+    from(c in Chat, where: ilike(c.title, ^searching_str) or ilike(c.description, ^searching_str))
+    |> Repo.all()
   end
 end

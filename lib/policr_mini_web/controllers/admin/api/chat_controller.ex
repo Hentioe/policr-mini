@@ -108,4 +108,11 @@ defmodule PolicrMiniWeb.Admin.API.ChatController do
         {:error, %{description: "please try again"}}
     end
   end
+
+  def search(conn, %{"keywords" => keywords} = _params) do
+    with {:ok, _} <- check_sys_permissions(conn) do
+      chats = ChatBusiness.search(keywords)
+      render(conn, "search.json", %{chats: chats})
+    end
+  end
 end
