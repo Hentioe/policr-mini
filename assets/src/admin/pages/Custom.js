@@ -14,6 +14,7 @@ import {
   PageBody,
   PageSection,
   PageLoading,
+  PageReLoading,
   LabelledButton,
 } from "../components";
 import { updateInNewArray, camelizeJson, isNoPermissions } from "../helper";
@@ -133,7 +134,7 @@ export default () => {
   const location = useLocation();
   const dispatch = useDispatch();
 
-  const { data, mutate } = useSWR(
+  const { data, mutate, error } = useSWR(
     chatsState && chatsState.isLoaded && chatsState.selected
       ? makeEndpoint(chatsState.selected)
       : null
@@ -193,7 +194,7 @@ export default () => {
     [answers]
   );
 
-  const isLoaded = () => chatsState.isLoaded && data;
+  const isLoaded = () => !error && chatsState.isLoaded && data;
 
   const checkEditintValid = useCallback(() => {
     if (!isEditing) return EDITING_CHECK.NO_EDINTINT;
@@ -477,6 +478,8 @@ export default () => {
             </main>
           </PageSection>
         </PageBody>
+      ) : error ? (
+        <PageReLoading mutate={mutate} />
       ) : (
         <PageLoading />
       )}

@@ -8,6 +8,7 @@ import MoonLoader from "react-spinners/MoonLoader";
 
 import { getIdFromLocation, isSysLink } from "../helper";
 import { receiveChats, selectChat, loadSelected } from "../slices/chats";
+import RetryButton from "../components/RetryButton";
 
 const ChatItemBox = styled.div(({ selected = false }) => [
   tw`p-3 flex flex-col`, // 布局
@@ -39,6 +40,13 @@ const Loading = () => {
     </div>
   );
 };
+const ReLoading = ({ mutate }) => {
+  return (
+    <div tw="flex justify-center my-6">
+      <RetryButton onClick={() => mutate(undefined)} />
+    </div>
+  );
+};
 
 const endpoint = "/admin/api/chats";
 const defaultMenu = "custom";
@@ -48,7 +56,7 @@ export default () => {
   const history = useHistory();
   const location = useLocation();
 
-  const { data, error } = useSWR(endpoint);
+  const { data, error, mutate } = useSWR(endpoint);
   const chatsState = useSelector((state) => state.chats);
 
   const handleSelect = (chat) => {
@@ -76,7 +84,7 @@ export default () => {
     if (chatId) dispatch(selectChat(chatId));
   }, [location]);
 
-  if (error) return <div>载入出错</div>;
+  const isLoaded = () => !error && chatsState.isLoaded;
 
   return (
     <div>
@@ -85,7 +93,7 @@ export default () => {
           <span tw="hidden lg:inline text-xl text-black">您的群组</span>
           <span tw="lg:hidden block text-center text-xl text-black">群组</span>
         </div>
-        {chatsState.isLoaded ? (
+        {isLoaded() ? (
           <>
             <div>
               {chatsState.list.map((chat) => (
@@ -114,6 +122,8 @@ export default () => {
               )}
             </div>
           </>
+        ) : error ? (
+          <ReLoading mutate={mutate} />
         ) : (
           <Loading />
         )}

@@ -12,6 +12,7 @@ import {
   PageSectionHeader,
   PageSectionTitle,
   PageLoading,
+  PageReLoading,
   NotImplemented,
   LabelledButton,
 } from "../components";
@@ -56,7 +57,7 @@ export default () => {
   const dispatch = useDispatch();
   const chatsState = useSelector((state) => state.chats);
 
-  const { data, mutate } = useSWR(
+  const { data, error, mutate } = useSWR(
     chatsState && chatsState.isLoaded && chatsState.selected
       ? makeEndpoint(chatsState.selected)
       : null
@@ -99,7 +100,7 @@ export default () => {
     });
   }, [modeValue]);
 
-  const isLoaded = () => chatsState.isLoaded && data;
+  const isLoaded = () => !error && chatsState.isLoaded && data;
 
   let title = "验证方案";
   if (isLoaded() && !isNoPermissions(data)) title += ` / ${data.chat.title}`;
@@ -172,6 +173,8 @@ export default () => {
             </main>
           </PageSection>
         </PageBody>
+      ) : error ? (
+        <PageReLoading mutate={mutate} />
       ) : (
         <PageLoading />
       )}
