@@ -30,6 +30,7 @@ defmodule PolicrMini.ChatBusiness do
     end
   end
 
+  # TODO：重命名函数名称为 `cancel_takeover`。
   @spec takeover_cancelled(Chat.t()) :: written_returns()
   def takeover_cancelled(%Chat{} = chat) do
     chat |> update(%{is_take_over: false})
@@ -63,12 +64,57 @@ defmodule PolicrMini.ChatBusiness do
     end)
   end
 
+  # TODO：与 `PolicrMini.ChatBusiness.find_list2/1` 函数合并。
   @spec find_list(integer()) :: [Chat.t()]
   def find_list(user_id) when is_integer(user_id) do
     from(p in Permission, where: p.user_id == ^user_id)
     |> Repo.all()
     |> Repo.preload([:chat])
     |> Enum.map(fn p -> p.chat end)
+  end
+
+  @max_limit 35
+
+  @type column :: atom
+  @type find_list_opts :: [
+          {:limit, integer},
+          {:offset, integer},
+          {:order_by, [{:asc | :desc, column}]}
+        ]
+
+  @spec preprocess_find_list_options(find_list_opts) :: find_list_opts
+  defp preprocess_find_list_options(options) do
+    options =
+      if limit = Keyword.get(options, :limit) do
+        if limit <= @max_limit, do: options, else: Keyword.put(options, :limit, @max_limit)
+      else
+        Keyword.put(options, :limit, @max_limit)
+      end
+
+    options
+    |> Keyword.put_new(:offset, 0)
+    |> Keyword.put_new(:order_by, desc: :inserted_at)
+  end
+
+  # TODO：添加测试。
+  @doc """
+  查找群列表。
+
+  ## 可选参数
+  - `limit`: 数量限制。默认值为 `35`，并且最大值也是 `35`。
+  - `offset`: 偏移位置。默认值为 `0`。
+  - `order_by`: 排序方式。默认值为 `[desc: :inserted_at]`（按插入时间降序）。
+  """
+  @spec find_list2(find_list_opts) :: [Chat.t()]
+  def find_list2(options \\ []) when is_list(options) do
+    options = preprocess_find_list_options(options)
+
+    from(c in Chat,
+      limit: ^options[:limit],
+      offset: ^options[:offset],
+      order_by: ^options[:order_by]
+    )
+    |> Repo.all()
   end
 
   @spec find_administrators(integer()) :: [Chat.t()]
@@ -86,19 +132,26 @@ defmodule PolicrMini.ChatBusiness do
 
   @keywords_separator_re ~r/ +/
 
-  # TODO: 缺乏测试。
+  # TODO: 添加测试。
   @doc """
   搜索群组列表。
 
-  参数 `keywords` 会参与 `title` 和 `description` 两个字段的模糊查询，以空格分隔的多个关键字可以满足关键字之间的 `and` 关系。
+  参数 `keywords` 会参与 `title` 和 `description` 两个字段的模糊查询，如以空格分隔即表示具有 `and` 关系的多个关键字条件。
+  可选参数 `options` 请参考 `PolicrMini.ChatBusiness.find_list2/1` 函数。
 
   注意：当前使用空格分隔的关键字仍然具备从左至右的关系，以后可能会顺序无关。
   """
-  @spec search(String.t()) :: [Chat.t()]
-  def search(keywords) do
-    searching_str = "%" <> (keywords |> String.replace(@keywords_separator_re, "%")) <> "%"
+  @spec search(String.t(), find_list_opts) :: [Chat.t()]
+  def search(keywords, options \\ []) do
+    options = preprocess_find_list_options(options)
+    search_str = "%" <> (keywords |> String.replace(@keywords_separator_re, "%")) <> "%"
 
-    from(c in Chat, where: ilike(c.title, ^searching_str) or ilike(c.description, ^searching_str))
+    from(c in Chat,
+      where: ilike(c.title, ^search_str) or ilike(c.description, ^search_str),
+      limit: ^options[:limit],
+      offset: ^options[:offset],
+      order_by: ^options[:order_by]
+    )
     |> Repo.all()
   end
 end

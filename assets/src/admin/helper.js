@@ -62,7 +62,7 @@ function isNoPermissions(data) {
   return _.isEqual(noAnyPermissionsError, data.errors);
 }
 
-const sysPages = ["logs", "terms"];
+const sysPages = ["managements", "logs", "tasks", "terms", "terminal"];
 
 function isSysLink({ path, page }) {
   if (!path) throw "The `path` argument is missing";

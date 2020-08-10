@@ -109,10 +109,55 @@ defmodule PolicrMiniWeb.Admin.API.ChatController do
     end
   end
 
-  def search(conn, %{"keywords" => keywords} = _params) do
+  defp gen_find_list_options(params) do
+    to_atom = fn str, default ->
+      if str == nil do
+        default
+      else
+        try do
+          String.to_existing_atom(str)
+        rescue
+          _ -> default
+        end
+      end
+    end
+
+    to_integer = fn str, default ->
+      if str == nil do
+        default
+      else
+        try do
+          String.to_integer(str)
+        rescue
+          _ -> default
+        end
+      end
+    end
+
+    [
+      limit: to_integer.(params["limit"], 35),
+      offset: to_integer.(params["offset"], 0),
+      order_by: [
+        {to_atom.(params["order_direction"], :desc), to_atom.(params["order_by"], :inserted_at)}
+      ]
+    ]
+  end
+
+  def search(conn, %{"keywords" => keywords} = params) do
+    options = gen_find_list_options(params)
+
     with {:ok, _} <- check_sys_permissions(conn) do
-      chats = ChatBusiness.search(keywords)
+      chats = ChatBusiness.search(keywords, options)
       render(conn, "search.json", %{chats: chats})
+    end
+  end
+
+  def list(conn, params) do
+    options = gen_find_list_options(params)
+
+    with {:ok, _} <- check_sys_permissions(conn) do
+      chats = ChatBusiness.find_list2(options)
+      render(conn, "list.json", %{chats: chats})
     end
   end
 end
