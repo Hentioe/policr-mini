@@ -60,26 +60,18 @@ defmodule PolicrMiniBot.Helper do
 
   @type parsemode :: String.t()
 
+  @type message_text :: String.t()
   @type send_message_opts :: [
-          {:disable_notification, boolean()},
-          {:parse_mode, parsemode() | nil},
-          {:disable_web_page_preview, boolean()},
+          {:disable_notification, boolean},
+          {:parse_mode, parsemode | nil},
+          {:disable_web_page_preview, boolean},
           {:reply_markup, Telegex.Model.InlineKeyboardMarkup.t()},
-          {:retry, integer()}
+          {:retry, integer}
         ]
 
-  @doc """
-  发送文本消息。
-
-  如果 `options` 参数中不包含以下配置，将为它们准备默认值：
-  - `disable_notification`: `true`
-  - `parse_mode`: `"MarkdownV2"`
-  - `disable_web_page_preview`: `false`
-  - `retry`: 5
-  附加的 `retry` 参数表示自动重试次数。一般来讲，重试会发生在网络问题导致发送不成功的情况下，重试次数使用完毕仍然失败则不会继续发送。
-  """
-  @spec send_message(integer(), String.t(), send_message_opts) :: {:ok, tgmsg} | tgerror()
-  def send_message(chat_id, text, options \\ []) do
+  @spec preprocess_send_message_args(message_text, send_message_opts) ::
+          {message_text, send_message_opts}
+  defp preprocess_send_message_args(text, options) do
     options =
       options
       |> Keyword.put_new(:disable_notification, true)
@@ -90,19 +82,33 @@ defmodule PolicrMiniBot.Helper do
 
     parse_mode = Keyword.get(options, :parse_mode)
 
-    {text, options} =
-      case parse_mode do
-        @markdown_parse_mode ->
-          text = escape_markdown(text)
-          {text, options}
+    case parse_mode do
+      @markdown_parse_mode ->
+        text = escape_markdown(text)
+        {text, options}
 
-        @markdown_to_html_parse_mode ->
-          text = Telegex.Marked.as_html(text)
-          {text, Keyword.put(options, :parse_mode, "HTML")}
+      @markdown_to_html_parse_mode ->
+        text = Telegex.Marked.as_html(text)
+        {text, Keyword.put(options, :parse_mode, "HTML")}
 
-        _ ->
-          {text, options}
-      end
+      _ ->
+        {text, options}
+    end
+  end
+
+  @doc """
+  发送文本消息。
+
+  参数 `options` 参考 `Telegex.send_message/3` 的 `optinal` 说明。除此之外，还有一些附加参数支持以及默认值。
+  ## 附加可选参数和默认值
+  - `disable_notification`: 默认值为 `true`。
+  - `parse_mode`: 默认值为 `MarkdownV2`。
+  - `disable_web_page_preview`: 默认值为 `false`。
+  - `retry`: 附加参数，表示发送失败时自动重试的最大次数，默认值为 `5`。
+  """
+  @spec send_message(integer, String.t(), send_message_opts) :: {:ok, tgmsg} | tgerror()
+  def send_message(chat_id, text, options \\ []) do
+    {text, options} = preprocess_send_message_args(text, options)
 
     case Telegex.send_message(chat_id, text, options) do
       {:ok, message} ->
@@ -148,23 +154,14 @@ defmodule PolicrMiniBot.Helper do
 
   @type send_photo_opts :: [
           {:caption, String.t()},
-          {:disable_notification, boolean()},
-          {:parse_mode, parsemode() | nil},
+          {:disable_notification, boolean},
+          {:parse_mode, parsemode | nil},
           {:reply_markup, Telegex.Model.InlineKeyboardMarkup.t()},
-          {:retry, integer()}
+          {:retry, integer}
         ]
 
-  @doc """
-  发送图片。
-
-  如果 `options` 参数中不包含以下配置，将为它们准备默认值：
-  - `disable_notification`: `true`
-  - `parse_mode`: `"MarkdownV2"`
-  - `retry`: 5
-  附加的 `retry` 参数表示自动重试次数。一般来讲，重试会发生在网络问题导致发送不成功的情况下，重试次数使用完毕仍然失败则不会继续发送。
-  """
-  @spec send_photo(integer(), String.t(), send_photo_opts) :: {:ok, tgmsg} | tgerror
-  def send_photo(chat_id, photo, options \\ []) do
+  @spec preprocess_send_photo_options(send_photo_opts) :: send_photo_opts
+  defp preprocess_send_photo_options(options) do
     options =
       options
       |> Keyword.put_new(:disable_notification, true)
@@ -174,26 +171,39 @@ defmodule PolicrMiniBot.Helper do
 
     parse_mode = Keyword.get(options, :parse_mode)
 
-    options =
-      if caption = options[:caption] do
-        case parse_mode do
-          @markdown_parse_mode ->
-            caption = escape_markdown(caption)
-            Keyword.put(options, :caption, caption)
+    if caption = options[:caption] do
+      case parse_mode do
+        @markdown_parse_mode ->
+          caption = escape_markdown(caption)
+          Keyword.put(options, :caption, caption)
 
-          @markdown_to_html_parse_mode ->
-            caption = Telegex.Marked.as_html(caption)
+        @markdown_to_html_parse_mode ->
+          caption = Telegex.Marked.as_html(caption)
 
-            options
-            |> Keyword.put(:caption, caption)
-            |> Keyword.put(:parse_mode, "HTML")
+          options
+          |> Keyword.put(:caption, caption)
+          |> Keyword.put(:parse_mode, "HTML")
 
-          _ ->
-            options
-        end
-      else
-        options
+        _ ->
+          options
       end
+    else
+      options
+    end
+  end
+
+  @doc """
+  发送图片。
+
+  参数 `options` 参考 `Telegex.send_photo/3` 的 `optinal` 说明。除此之外，还有一些附加参数支持以及默认值。
+  ## 附加可选参数和默认值
+  - `disable_notification`: 默认值为 `true`。
+  - `parse_mode`: 默认值为 `MarkdownV2`。
+  - `retry`: 附加参数，表示发送失败时自动重试的最大次数，默认值为 `5`。
+  """
+  @spec send_photo(integer, String.t(), send_photo_opts) :: {:ok, tgmsg} | tgerror
+  def send_photo(chat_id, photo, options \\ []) do
+    options = preprocess_send_photo_options(options)
 
     case Telegex.send_photo(chat_id, photo, options) do
       {:ok, message} ->

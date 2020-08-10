@@ -1,7 +1,8 @@
 defmodule PolicrMiniBot.StartCommander do
   @moduledoc """
-  `/start` 命令的响应模块。
-  与其它命令不同，`/start` 命令不需要完整匹配，以 `/start` 开头的**私聊文本消息**都能进入处理函数。
+  `/start` 命令。
+
+  与其它命令不同，`/start` 命令不需要保证完整的匹配，以 `/start` 开头的**私聊文本消息**都能进入处理函数。
   这是因为 `/start` 是当前设计中唯一一个需要携带参数的命令。
   """
 
@@ -130,16 +131,13 @@ defmodule PolicrMiniBot.StartCommander do
     send_message(chat_id, t("errors.dont_understand"))
   end
 
+  @type tgerror_returns :: {:error, Telegex.Model.errors()}
+
   @doc """
-  发送验证消息
+  发送验证消息。
   """
-  @spec send_verify_message(
-          Verification.t(),
-          PolicrMini.Schemas.Scheme.t(),
-          integer(),
-          integer()
-        ) ::
-          {:error, Telegex.Model.errors()}
+  @spec send_verify_message(Verification.t(), PolicrMini.Schemas.Scheme.t(), integer, integer) ::
+          tgerror_returns
           | {:ok, {Message.t(), InlineKeyboardMarkup.t(), PolicrMiniBot.Captcha.Data.t()}}
   def send_verify_message(verification, scheme, chat_id, user_id) do
     mode = scheme.verification_mode || default!(:vmode)
@@ -181,50 +179,7 @@ defmodule PolicrMiniBot.StartCommander do
         {text, "MarkdownV2"}
       end
 
-    send_fun =
-      case captcha_maker do
-        ImageCaptcha ->
-          fn ->
-            send_photo(user_id, data.photo,
-              caption: text,
-              reply_markup: markup,
-              parse_mode: parse_mode
-            )
-          end
-
-        # 当前的自定义验证仅发文字消息
-        CustomCaptcha ->
-          fn ->
-            send_message(user_id, text,
-              reply_markup: markup,
-              parse_mode: parse_mode
-            )
-          end
-
-        ArithmeticCaptcha ->
-          fn ->
-            send_message(user_id, text,
-              reply_markup: markup,
-              parse_mode: parse_mode
-            )
-          end
-
-        FallbackCaptcha ->
-          fn ->
-            send_message(user_id, text,
-              reply_markup: markup,
-              parse_mode: parse_mode
-            )
-          end
-
-        _ ->
-          fn ->
-            send_message(user_id, text,
-              reply_markup: markup,
-              parse_mode: parse_mode
-            )
-          end
-      end
+    send_fun = make_send_fun(captcha_maker, user_id, text, data, parse_mode, markup)
 
     # 发送验证消息
     case send_fun.() do
@@ -233,6 +188,68 @@ defmodule PolicrMiniBot.StartCommander do
 
       e ->
         e
+    end
+  end
+
+  @type captchas :: ImageCaptcha | CustomCaptcha | ArithmeticCaptcha | FallbackCaptcha
+  @type send_returns :: {:ok, Message.t()} | {:error, Telegex.Model.errors()}
+
+  @doc """
+  制作一个发送消息的函数。
+
+  此函数的主要目的是为不同的验证方式生成不同类型的消息的发送函数。
+  """
+  @spec make_send_fun(
+          captchas,
+          integer,
+          String.t(),
+          PolicrMiniBot.Captcha.Data.t(),
+          String.t(),
+          InlineKeyboardMarkup.t()
+        ) :: (() -> send_returns)
+  def make_send_fun(ImageCaptcha, chat_id, text, data, parse_mode, markup) do
+    fn ->
+      send_photo(chat_id, data.photo,
+        caption: text,
+        reply_markup: markup,
+        parse_mode: parse_mode
+      )
+    end
+  end
+
+  def make_send_fun(CustomCaptcha, chat_id, text, _data, parse_mode, markup) do
+    fn ->
+      send_message(chat_id, text,
+        reply_markup: markup,
+        parse_mode: parse_mode
+      )
+    end
+  end
+
+  def make_send_fun(ArithmeticCaptcha, chat_id, text, _data, parse_mode, markup) do
+    fn ->
+      send_message(chat_id, text,
+        reply_markup: markup,
+        parse_mode: parse_mode
+      )
+    end
+  end
+
+  def make_send_fun(FallbackCaptcha, chat_id, text, _data, parse_mode, markup) do
+    fn ->
+      send_message(chat_id, text,
+        reply_markup: markup,
+        parse_mode: parse_mode
+      )
+    end
+  end
+
+  def make_send_fun(_, chat_id, text, _data, parse_mode, markup) do
+    fn ->
+      send_message(chat_id, text,
+        reply_markup: markup,
+        parse_mode: parse_mode
+      )
     end
   end
 
