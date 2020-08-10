@@ -10,15 +10,16 @@ defmodule PolicrMiniWeb.Helper do
   @doc """
   检查当前连接中的用户是否具备系统权限。
 
-  如果是机器人拥有者，将返回完整的读写权。
+  如果用户是机器人的拥有者，将返回完整的权限列表（读/写）。
   """
   @spec check_sys_permissions(Plug.Conn.t(), [perm]) :: {:error, map} | {:ok, [perm]}
   def check_sys_permissions(%Plug.Conn{} = conn, requires \\ []) do
     %{assigns: %{user: %{id: user_id}}} = conn
 
+    # 如果当前用户是机器人拥有者，赋予 `:readable` 和 `:writable` 权限。
     perms =
-      if user_id == Application.get_env(:policr_mini, PolicrMiniBot)[:owner_id] do
-        [:writable, :readable]
+      if user_id == owner_id() do
+        [:readable, :writable]
       else
         []
       end
@@ -28,6 +29,8 @@ defmodule PolicrMiniWeb.Helper do
 
   @doc """
   检查当前连接中的用户是否具备目标群组的权限。
+
+  如果用户是机器人的拥有者，至少会存在一个 `:readable` 权限。
   """
   @spec check_permissions(Plug.Conn.t(), integer, [perm]) :: {:ok, [perm]} | {:error, map}
   def check_permissions(%Plug.Conn{} = conn, chat_id, requires \\ []) do
@@ -35,8 +38,19 @@ defmodule PolicrMiniWeb.Helper do
 
     perms = PermissionBusiness.has_permissions(chat_id, user_id)
 
+    # 如果当前用户是机器人拥有者，赋予 `:readable` 权限。
+    perms =
+      if user_id == owner_id() && !Enum.member?(perms, :readable) do
+        [:readable] ++ perms
+      else
+        perms
+      end
+
     match_permissions(perms, requires)
   end
+
+  @spec owner_id() :: integer
+  defp owner_id, do: Application.get_env(:policr_mini, PolicrMiniBot)[:owner_id]
 
   @spec match_permissions([perm], [perm]) :: {:ok, [perm]} | {:error, map}
   defp match_permissions(perms, requires) do
