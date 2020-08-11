@@ -192,7 +192,7 @@ export default () => {
                   >
                     {formatDateTime(
                       fromUnixTime(log.timestamp),
-                      "MM/dd H:mm:ss"
+                      "MM/dd HH:mm:ss"
                     )}{" "}
                     [{log.level}] {log.message}
                   </p>
