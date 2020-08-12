@@ -7,6 +7,7 @@ import fetch from "unfetch";
 import { toast } from "react-toastify";
 import { useDispatch } from "react-redux";
 import { useLocation, Link as RouteLink } from "react-router-dom";
+import { parseISO, format as formatDateTime } from "date-fns";
 
 import { loadSelected } from "../slices/chats";
 import {
@@ -86,6 +87,7 @@ const answerROWOptions = [RIGHT_FLAG, WRONG_FLAG];
 const initialEditingTitle = "";
 const initialEditingId = 0;
 const initialAnswer = { row: answerROWOptions[1], text: "" };
+const dateTimeFormat = "yyyy-MM-dd HH:mm:ss";
 
 const makeEndpoint = (chat_id) => `/admin/api/chats/${chat_id}/customs`;
 
@@ -317,7 +319,12 @@ export default () => {
                           <TableDataCell>
                             {customKit.answers.length}
                           </TableDataCell>
-                          <TableDataCell>{customKit.updatedAt}</TableDataCell>
+                          <TableDataCell>
+                            {formatDateTime(
+                              parseISO(customKit.updatedAt),
+                              dateTimeFormat
+                            )}
+                          </TableDataCell>
                           <TableDataCell>
                             <span
                               tw="text-xs text-blue-400 font-bold cursor-pointer"
