@@ -9,7 +9,7 @@ defmodule PolicrMini.Schemas.Verification do
   alias PolicrMini.Schemas.{Chat, MessageSnapshot}
 
   @required_fields ~w(chat_id target_user_id entrance seconds status)a
-  @optional_fields ~w(message_snapshot_id target_user_name message_id indices chosen)a
+  @optional_fields ~w(message_snapshot_id target_user_name target_user_language_code message_id indices chosen)a
 
   schema "verifications" do
     belongs_to :chat, Chat
@@ -17,6 +17,7 @@ defmodule PolicrMini.Schemas.Verification do
 
     field :target_user_id, :integer
     field :target_user_name, :string
+    field :target_user_language_code, :string
     field :entrance, VerificationEntranceEnum
     field :message_id, :integer
     field :indices, {:array, :integer}

@@ -7,19 +7,19 @@ defmodule PolicrMini.UserBusiness do
 
   import Ecto.Query, only: [from: 2]
 
-  @type writed_result :: {:ok, User.t()} | {:error, Ecto.Changeset.t()}
+  @type written_returns :: {:ok, User.t()} | {:error, Ecto.Changeset.t()}
 
-  @spec create(map) :: writed_result
+  @spec create(map) :: written_returns
   def create(params) do
     %User{token_ver: 0} |> User.changeset(params) |> Repo.insert()
   end
 
-  @spec update(User.t(), map) :: writed_result
+  @spec update(User.t(), map) :: written_returns
   def update(user, attrs) do
     user |> User.changeset(attrs) |> Repo.update()
   end
 
-  @spec fetch(integer, map) :: writed_result
+  @spec fetch(integer, map) :: written_returns
   def fetch(id, params) when is_integer(id) do
     case id |> get() do
       {:error, :not_found, _} -> create(params |> Map.put(:id, id))

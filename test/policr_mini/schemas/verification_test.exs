@@ -15,6 +15,7 @@ defmodule PolicrMini.Schemas.VerificationTest do
                  :message_snapshot_id,
                  :target_user_id,
                  :target_user_name,
+                 :target_user_language_code,
                  :entrance,
                  :message_id,
                  :indices,

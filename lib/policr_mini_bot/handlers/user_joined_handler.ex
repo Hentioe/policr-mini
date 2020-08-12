@@ -117,6 +117,7 @@ defmodule PolicrMiniBot.UserJoinedHandler do
       chat_id: chat_id,
       target_user_id: new_chat_member.id,
       target_user_name: fullname(new_chat_member),
+      target_user_language_code: new_chat_member.language_code,
       entrance: entrance,
       seconds: 0,
       status: :expired
@@ -150,6 +151,7 @@ defmodule PolicrMiniBot.UserJoinedHandler do
       chat_id: chat_id,
       target_user_id: new_chat_member.id,
       target_user_name: fullname(new_chat_member),
+      target_user_language_code: new_chat_member.language_code,
       entrance: :unity,
       seconds: seconds,
       status: :waiting
