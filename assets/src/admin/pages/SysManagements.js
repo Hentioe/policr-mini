@@ -1,6 +1,6 @@
-import React, { useState, useEffect } from "react";
+import React, { useState, useEffect, useCallback } from "react";
 import tw, { styled } from "twin.macro";
-import { Link as RouteLink, useLocation } from "react-router-dom";
+import { Link as RouteLink, useLocation, useHistory } from "react-router-dom";
 import useSWR from "swr";
 import { parseISO, format as formatDateTime } from "date-fns";
 
@@ -62,7 +62,7 @@ function parseOffset(offset) {
   } else return 0;
 }
 
-function makeAPIQueryString({ offset, keywords }) {
+function makeAPIQueryString({ offset = 0, keywords }) {
   let queryString = `offset=${offset}`;
   if (keywords) queryString += `&keywords=${keywords}`;
 
@@ -87,6 +87,7 @@ function makeEndpoint({ offset, keywords }) {
 
 export default () => {
   const location = useLocation();
+  const history = useHistory();
 
   const searchParams = new URLSearchParams(location.search);
   const offsetParam = parseOffset(searchParams.get("offset"));
@@ -103,7 +104,22 @@ export default () => {
   const [isShowClearText, setIsShowClearText] = useState(false);
 
   const handleSearchTextChange = (e) => setSearchText(e.target.value);
-  const handleClearSearchText = () => setSearchText("");
+  const handleSearchInputKeyDown = useCallback(
+    (e) => {
+      const keyCode = e.keyCode;
+      if (keyCode != 13 || searchText.trim() == "") return;
+      const queryString = makeAPIQueryString({ keywords: searchText });
+
+      history.push(`/admin/sys/managements?${queryString}`);
+    },
+    [searchText, offset]
+  );
+  const handleClearSearchText = useCallback(() => {
+    setSearchText("");
+    const queryString = makeAPIQueryString({ offset: 0 });
+
+    history.push(`/admin/sys/managements?${queryString}`);
+  }, [offset]);
 
   useEffect(() => {
     if (searchText && searchText.trim() != "") setIsShowClearText(true);
@@ -132,6 +148,7 @@ export default () => {
                   value={searchText}
                   onChange={handleSearchTextChange}
                   placeholder="可输入群标题或群组描述中的关键字"
+                  onKeyDown={handleSearchInputKeyDown}
                 />
                 {isShowClearText ? (
                   <ClearText onClick={handleClearSearchText}>清空</ClearText>
@@ -166,7 +183,19 @@ export default () => {
                           {chat.title}
                         </TitleLink>
                       </TableDataCell>
-                      <TableDataCell>{chat.username || "空"}</TableDataCell>
+                      <TableDataCell>
+                        {chat.username ? (
+                          <a
+                            tw="text-gray-600 no-underline hover:text-blue-400"
+                            target="blank"
+                            href={`https://t.me/${chat.username}`}
+                          >
+                            @{chat.username}
+                          </a>
+                        ) : (
+                          "无"
+                        )}
+                      </TableDataCell>
                       <TableDataCell>
                         {formatDateTime(
                           parseISO(chat.updatedAt),
@@ -198,10 +227,10 @@ export default () => {
                 </PaginationLink>
                 <span>
                   {data.chats.length == 0
-                    ? `没有第 ${offset + 1} 条往后的记录`
+                    ? `没有第 ${offset + 1} 条及往后的记录`
                     : `从 ${offset + 1} 条起到第 ${
                         offset + data.chats.length
-                      } 条记录`}
+                      } 条的记录`}
                 </span>
                 <PaginationLink
                   disabled={data.chats.length == 0}
