@@ -12,6 +12,7 @@ defmodule PolicrMiniBot.Supervisor do
     LoginCommander,
     SelfJoinedHandler,
     SelfLeftedHandler,
+    UserLeftedHandler,
     UserJoinedHandler,
     NewChatTitleHandler,
     NewChatPhotoHandler,
@@ -31,6 +32,7 @@ defmodule PolicrMiniBot.Supervisor do
     install_plugs([
       SelfJoinedHandler,
       SelfLeftedHandler,
+      UserLeftedHandler,
       UserJoinedHandler,
       NewChatTitleHandler,
       NewChatPhotoHandler

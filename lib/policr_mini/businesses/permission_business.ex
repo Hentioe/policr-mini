@@ -7,6 +7,9 @@ defmodule PolicrMini.PermissionBusiness do
 
   import Ecto.Query, only: [from: 2, dynamic: 2]
 
+  @doc """
+  查找群组内指定用户的权限。
+  """
   @spec find(integer, integer) :: Permission.t() | nil
   def find(chat_id, user_id)
       when (is_integer(chat_id) or is_binary(chat_id)) and is_integer(user_id) do
@@ -16,7 +19,7 @@ defmodule PolicrMini.PermissionBusiness do
 
   @type permission :: :writable | :readable
 
-  # TODO: 添加测试
+  # TODO: 添加测试。
   @doc """
   获取指定用户在指定群组内的权限列表。
   """
@@ -66,7 +69,11 @@ defmodule PolicrMini.PermissionBusiness do
     from(p in Permission, where: ^filter_chat_id, where: ^filter_user_id) |> Repo.all()
   end
 
-  def delete(chat_id, user_id) when is_integer(chat_id) and is_integer(user_id) do
+  @doc """
+  删除群组内指定用户的权限。
+  """
+  def delete(chat_id, user_id)
+      when (is_integer(chat_id) or is_binary(chat_id)) and is_integer(user_id) do
     from(p in Permission, where: p.chat_id == ^chat_id, where: p.user_id == ^user_id)
     |> Repo.delete_all()
   end
