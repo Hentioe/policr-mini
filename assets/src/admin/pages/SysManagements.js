@@ -31,7 +31,7 @@ const TableHeaderCell = styled.th`
 const TableDataRow = styled.tr``;
 const TableDataCell = styled.td(() => [
   tw`border border-dashed border-0 border-t border-gray-300`,
-  tw`py-2`,
+  tw`py-2 text-sm`,
 ]);
 
 const OperatingText = styled.span`
