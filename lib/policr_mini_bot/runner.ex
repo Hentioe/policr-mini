@@ -6,7 +6,7 @@ defmodule PolicrMiniBot.Runner do
 
   alias PolicrMini.Logger
 
-  alias PolicrMini.{VerificationBusiness, ChatBusiness}
+  alias PolicrMini.{VerificationBusiness, ChatBusiness, PermissionBusiness}
   alias PolicrMini.Schemas.Chat
   alias PolicrMiniBot.Helper, as: BotHelper
 
@@ -57,7 +57,7 @@ defmodule PolicrMiniBot.Runner do
   defp handle_check_result(%{is_take_over: true} = chat) do
     case Telegex.get_chat_member(chat.id, PolicrMiniBot.id()) do
       {:ok, member} ->
-        # 检查权限并执行相应修正：
+        # 检查权限并执行相应修正。
 
         # 如果不是管理员，取消接管
         unless member.status == "administrator", do: cancel_takeover(chat)
@@ -71,22 +71,44 @@ defmodule PolicrMiniBot.Runner do
           Logger.info("Unable to send message in group `#{chat.id}`, has left automatically.")
         end
 
-      # 机器人被封禁
-      {:error,
-       %Telegex.Model.Error{description: "Forbidden: bot was kicked from the supergroup chat"}} ->
-        cancel_takeover(chat, false)
-
-      # 机器人已不在群中
-      {:error,
-       %Telegex.Model.Error{
-         description: "Forbidden: bot is not a member of the supergroup chat"
-       }} ->
-        cancel_takeover(chat, false)
-
-      e ->
-        Logger.unitized_error("Bot permission check", e)
+      {:error, error} ->
+        handle_permission_check_error(error, chat)
     end
   end
+
+  @error_description_bot_was_kicked "Forbidden: bot was kicked from the supergroup chat"
+  @error_description_bot_is_not_member "Forbidden: bot is not a member of the supergroup chat"
+  @error_description_chat_not_found "Bad Request: chat not found"
+
+  # 机器人被封禁。
+  # 取消接管。
+  defp handle_permission_check_error(
+         %Telegex.Model.Error{description: @error_description_bot_was_kicked},
+         chat
+       ),
+       do: cancel_takeover(chat, false)
+
+  # 机器人已不在群中。
+  # 取消接管。
+  defp handle_permission_check_error(
+         %Telegex.Model.Error{description: @error_description_bot_is_not_member},
+         chat
+       ),
+       do: cancel_takeover(chat, false)
+
+  # 群组已不存在。
+  # 取消接管，并删除与之相关的用户权限。
+  defp handle_permission_check_error(
+         %Telegex.Model.Error{description: @error_description_chat_not_found},
+         chat
+       ) do
+    cancel_takeover(chat, false)
+    PermissionBusiness.delete_all(chat.id)
+  end
+
+  # 未知错误
+  defp handle_permission_check_error(%Telegex.Model.Error{} = e, chat),
+    do: Logger.unitized_error("Bot permission check", chat_id: chat.id, error: e)
 
   @spec cancel_takeover(Chat.t(), boolean()) :: :ok
   # 取消接管

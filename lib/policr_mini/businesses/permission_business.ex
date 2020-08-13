@@ -77,4 +77,14 @@ defmodule PolicrMini.PermissionBusiness do
     from(p in Permission, where: p.chat_id == ^chat_id, where: p.user_id == ^user_id)
     |> Repo.delete_all()
   end
+
+  # TODO：添加测试。
+  @doc """
+  删除指定群组的所有用户权限记录。
+  """
+  @spec delete_all(integer | binary) :: {integer, any}
+  def delete_all(chat_id) when is_integer(chat_id) or is_binary(chat_id) do
+    from(p in Permission, where: p.chat_id == ^chat_id)
+    |> Repo.delete_all()
+  end
 end
