@@ -58,7 +58,7 @@ const InlineKeybordButton = styled.div`
 `;
 
 const TableHeaderCell = styled.th`
-  ${tw`font-normal text-gray-500 text-left pr-6`}
+  ${tw`font-normal text-gray-500 text-left`}
 `;
 
 const TableDataRow = styled.tr``;
@@ -297,7 +297,7 @@ export default () => {
                   </span>
                   {!data.isEnabled && (
                     <RouteLink
-                      tw="ml-2 text-gray-400 font-bold"
+                      tw="ml-2 text-gray-500"
                       to={`/admin/chats/${chatsState.selected}/scheme`}
                     >
                       切换到已定制的验证
@@ -306,38 +306,44 @@ export default () => {
                   <table tw="w-full border border-solid border-0 border-b border-t border-gray-300 mt-1">
                     <thead>
                       <tr>
-                        <TableHeaderCell>标题</TableHeaderCell>
-                        <TableHeaderCell>答案数量</TableHeaderCell>
-                        <TableHeaderCell>编辑于</TableHeaderCell>
-                        <TableHeaderCell>操作</TableHeaderCell>
+                        <TableHeaderCell tw="w-5/12">标题</TableHeaderCell>
+                        <TableHeaderCell tw="w-2/12">答案数量</TableHeaderCell>
+                        <TableHeaderCell tw="w-2/12">编辑于</TableHeaderCell>
+                        <TableHeaderCell tw="w-3/12">
+                          <span tw="float-right pr-6">操作</span>
+                        </TableHeaderCell>
                       </tr>
                     </thead>
                     <tbody>
                       {data.customKits.map((customKit, index) => (
                         <TableDataRow key={customKit.id}>
-                          <TableDataCell>{customKit.title}</TableDataCell>
-                          <TableDataCell>
+                          <TableDataCell tw="w-5/12 break-all">
+                            {customKit.title}
+                          </TableDataCell>
+                          <TableDataCell tw="w-2/12">
                             {customKit.answers.length}
                           </TableDataCell>
-                          <TableDataCell>
+                          <TableDataCell tw="w-3/12">
                             {formatDateTime(
                               parseISO(customKit.updatedAt),
                               dateTimeFormat
                             )}
                           </TableDataCell>
-                          <TableDataCell>
-                            <span
-                              tw="text-xs text-blue-400 font-bold cursor-pointer"
-                              onClick={() => handleEdit(index)}
-                            >
-                              编辑
-                            </span>{" "}
-                            <span
-                              tw="text-xs text-blue-400 font-bold cursor-pointer"
-                              onClick={() => handleDelete(customKit.id)}
-                            >
-                              删除
-                            </span>
+                          <TableDataCell tw="w-2/12">
+                            <div tw="float-right pr-6">
+                              <span
+                                tw="text-xs text-blue-400 font-bold cursor-pointer"
+                                onClick={() => handleEdit(index)}
+                              >
+                                编辑
+                              </span>{" "}
+                              <span
+                                tw="text-xs text-blue-400 font-bold cursor-pointer"
+                                onClick={() => handleDelete(customKit.id)}
+                              >
+                                删除
+                              </span>
+                            </div>
                           </TableDataCell>
                         </TableDataRow>
                       ))}

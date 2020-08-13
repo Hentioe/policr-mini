@@ -25,7 +25,7 @@ const ClearText = styled.span`
 `;
 
 const TableHeaderCell = styled.th`
-  ${tw`font-normal text-gray-500 text-left uppercase pr-6`}
+  ${tw`font-normal text-gray-500 text-left uppercase`}
 `;
 
 const TableDataRow = styled.tr``;
@@ -101,6 +101,7 @@ export default () => {
 
   const [offset, setOffset] = useState(offsetParam);
   const [searchText, setSearchText] = useState(keywordsParam);
+  const [isSearching, setIsSearching] = useState(keywordsParam !== "");
   const [isShowClearText, setIsShowClearText] = useState(false);
 
   const handleSearchTextChange = (e) => setSearchText(e.target.value);
@@ -116,10 +117,11 @@ export default () => {
   );
   const handleClearSearchText = useCallback(() => {
     setSearchText("");
+    if (!isSearching) return;
     const queryString = makeAPIQueryString({ offset: 0 });
 
     history.push(`/admin/sys/managements?${queryString}`);
-  }, [offset]);
+  }, [offset, isSearching]);
 
   useEffect(() => {
     if (searchText && searchText.trim() != "") setIsShowClearText(true);
@@ -128,6 +130,7 @@ export default () => {
 
   useEffect(() => {
     setOffset(offsetParam);
+    setIsSearching(keywordsParam !== "");
   }, [location]);
 
   const isLoaded = () => !error && data;
@@ -164,17 +167,18 @@ export default () => {
               <table tw="w-full border border-solid border-0 border-b border-t border-gray-300 mt-1">
                 <thead>
                   <tr>
-                    <TableHeaderCell>标题</TableHeaderCell>
-                    <TableHeaderCell>username</TableHeaderCell>
-                    <TableHeaderCell>上次修改</TableHeaderCell>
-                    <TableHeaderCell>加入于</TableHeaderCell>
-                    <TableHeaderCell>操作</TableHeaderCell>
+                    <TableHeaderCell tw="w-4/12">标题</TableHeaderCell>
+                    <TableHeaderCell tw="w-3/12">username</TableHeaderCell>
+                    <TableHeaderCell tw="w-3/12">加入于</TableHeaderCell>
+                    <TableHeaderCell tw="w-2/12">
+                      <span tw="float-right mr-6">操作</span>
+                    </TableHeaderCell>
                   </tr>
                 </thead>
                 <tbody>
                   {data.chats.map((chat) => (
                     <TableDataRow key={chat.id}>
-                      <TableDataCell>
+                      <TableDataCell tw="w-4/12 break-all">
                         {/* TODO: 此处切换群组会造成一个多余的请求发送，需解决（可能采取和 Chats 组件部分相同的逻辑替代 RouteLink） */}
                         <TitleLink
                           takeovered={chat.isTakeOver ? 1 : 0}
@@ -183,7 +187,7 @@ export default () => {
                           {chat.title}
                         </TitleLink>
                       </TableDataCell>
-                      <TableDataCell>
+                      <TableDataCell tw="w-3/12 break-all">
                         {chat.username ? (
                           <a
                             tw="text-gray-600 no-underline hover:text-blue-400"
@@ -196,21 +200,17 @@ export default () => {
                           "无"
                         )}
                       </TableDataCell>
-                      <TableDataCell>
-                        {formatDateTime(
-                          parseISO(chat.updatedAt),
-                          dateTimeFormat
-                        )}
-                      </TableDataCell>
-                      <TableDataCell>
+                      <TableDataCell tw="w-3/12">
                         {formatDateTime(
                           parseISO(chat.insertedAt),
                           dateTimeFormat
                         )}
                       </TableDataCell>
-                      <TableDataCell>
-                        <OperatingText tw="mr-1">同步</OperatingText>
-                        <OperatingText>退出</OperatingText>
+                      <TableDataCell tw="w-2/12">
+                        <div tw="float-right mr-6">
+                          <OperatingText tw="mr-1">同步</OperatingText>
+                          <OperatingText>退出</OperatingText>
+                        </div>
                       </TableDataCell>
                     </TableDataRow>
                   ))}
@@ -219,9 +219,10 @@ export default () => {
               <div tw="mt-2 flex justify-between">
                 <PaginationLink
                   disabled={offset == 0}
-                  to={`/admin/sys/managements?offset=${
-                    offset <= 25 ? 0 : offset - 25
-                  }`}
+                  to={`/admin/sys/managements?${makeAPIQueryString({
+                    offset: offset <= 35 ? 0 : offset - 35,
+                    keywords: isSearching ? searchText : null,
+                  })}`}
                 >
                   上一页
                 </PaginationLink>
@@ -234,7 +235,10 @@ export default () => {
                 </span>
                 <PaginationLink
                   disabled={data.chats.length == 0}
-                  to={`/admin/sys/managements?offset=${offset + 25}`}
+                  to={`/admin/sys/managements?${makeAPIQueryString({
+                    offset: offset + 35,
+                    keywords: isSearching ? searchText : null,
+                  })}`}
                 >
                   下一页
                 </PaginationLink>
