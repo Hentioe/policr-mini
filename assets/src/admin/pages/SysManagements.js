@@ -138,31 +138,31 @@ export default () => {
   return (
     <>
       <PageHeader title="批量管理" />
-      {isLoaded() ? (
-        <PageBody>
-          <PageSection>
-            <PageSectionHeader>
-              <PageSectionTitle>搜索栏</PageSectionTitle>
-            </PageSectionHeader>
-            <main tw="py-4 px-6">
-              <div tw="p-3 border border-solid border-gray-400 hover:shadow rounded-full flex items-center">
-                <SearchInput
-                  tw="flex-1"
-                  value={searchText}
-                  onChange={handleSearchTextChange}
-                  placeholder="可输入群标题或群组描述中的关键字"
-                  onKeyDown={handleSearchInputKeyDown}
-                />
-                {isShowClearText ? (
-                  <ClearText onClick={handleClearSearchText}>清空</ClearText>
-                ) : null}
-              </div>
-            </main>
-          </PageSection>
-          <PageSection>
-            <PageSectionHeader>
-              <PageSectionTitle>群组列表</PageSectionTitle>
-            </PageSectionHeader>
+      <PageBody>
+        <PageSection>
+          <PageSectionHeader>
+            <PageSectionTitle>搜索栏</PageSectionTitle>
+          </PageSectionHeader>
+          <main tw="py-4 px-6">
+            <div tw="p-3 border border-solid border-gray-400 hover:shadow rounded-full flex items-center">
+              <SearchInput
+                tw="flex-1"
+                value={searchText}
+                onChange={handleSearchTextChange}
+                placeholder="可输入群标题或群组描述中的关键字"
+                onKeyDown={handleSearchInputKeyDown}
+              />
+              {isShowClearText ? (
+                <ClearText onClick={handleClearSearchText}>清空</ClearText>
+              ) : null}
+            </div>
+          </main>
+        </PageSection>
+        <PageSection>
+          <PageSectionHeader>
+            <PageSectionTitle>群组列表</PageSectionTitle>
+          </PageSectionHeader>
+          {isLoaded() ? (
             <main>
               <table tw="w-full border border-solid border-0 border-b border-t border-gray-300 mt-1">
                 <thead>
@@ -244,13 +244,13 @@ export default () => {
                 </PaginationLink>
               </div>
             </main>
-          </PageSection>
-        </PageBody>
-      ) : error ? (
-        <PageReLoading />
-      ) : (
-        <PageLoading />
-      )}
+          ) : error ? (
+            <PageReLoading />
+          ) : (
+            <PageLoading />
+          )}
+        </PageSection>
+      </PageBody>
     </>
   );
 };
