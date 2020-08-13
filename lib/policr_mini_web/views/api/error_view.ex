@@ -25,6 +25,8 @@ defmodule PolicrMiniWeb.API.ErrorView do
   def render("error.json", %{not_found: info}) do
     %{params: %{entry: entry}} = info
 
+    entry = entry |> to_string() |> String.split(".") |> List.last() |> Macro.underscore()
+
     %{errors: %{entry => ["not found"]}}
   end
 end

@@ -37,29 +37,31 @@ function updateInNewArray(array, element, index) {
 
 function camelizeJson(resp) {
   return new Promise((resolve) =>
-    resp.json().then((json) => resolve(camelize(json, { deep: true })))
+    resp
+      .json()
+      .then((json) =>
+        json.errors ? resolve(json) : resolve(camelize(json, { deep: true }))
+      )
   );
 }
 
-function toastError(message) {
-  toast.error(message, {
-    position: "bottom-center",
-    autoClose: 2500,
-    hideProgressBar: false,
-    closeOnClick: true,
-    pauseOnHover: true,
-    draggable: true,
-    progress: undefined,
-  });
-}
+function toastMessage(message, { type = "error" }) {
+  switch (type) {
+    case "error":
+      toast.error(message, {
+        position: "bottom-center",
+        autoClose: 2500,
+        hideProgressBar: false,
+        closeOnClick: true,
+        pauseOnHover: true,
+        draggable: true,
+        progress: undefined,
+      });
+      break;
 
-const noAnyPermissionsError = {
-  description: ["does not have any permissions"],
-};
-function isNoPermissions(data) {
-  if (!data.errors) return false;
-
-  return _.isEqual(noAnyPermissionsError, data.errors);
+    default:
+      break;
+  }
 }
 
 const sysPages = ["managements", "logs", "tasks", "terms", "terminal"];
@@ -79,11 +81,30 @@ function isSysLink({ path, page }) {
   }
 }
 
+function errorsToString(errors) {
+  if (Object.keys(errors).length == 1 && errors.hasOwnProperty("description")) {
+    return errors.description.join(",") + ".";
+  }
+
+  let message = "";
+
+  Object.entries(errors).forEach(([key, value]) => {
+    message += key + " " + value.join(",");
+  });
+
+  return message + ".";
+}
+
+function toastErrors(errors) {
+  toastMessage(errorsToString(errors), { type: "error" });
+}
+
 export {
   getIdFromLocation,
   updateInNewArray,
   camelizeJson,
-  toastError,
-  isNoPermissions,
   isSysLink,
+  toastMessage,
+  toastErrors,
+  errorsToString,
 };

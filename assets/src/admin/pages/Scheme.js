@@ -17,7 +17,7 @@ import {
   LabelledButton,
 } from "../components";
 
-import { camelizeJson, toastError, isNoPermissions } from "../helper";
+import { camelizeJson, toastErrors } from "../helper";
 
 const defaultModeOption = { value: 4, label: "系统默认" };
 const modeOptions = [
@@ -92,7 +92,7 @@ export default () => {
       chatId: chatsState.selected,
       modeValue: modeValue,
     }).then((result) => {
-      if (result.errors) toastError("修改失败了。");
+      if (result.errors) toastErrors(result.errors);
       else {
         setIsModeEditing(false);
         mutate();
@@ -100,22 +100,20 @@ export default () => {
     });
   }, [modeValue]);
 
-  const isLoaded = () => !error && chatsState.isLoaded && data;
+  const isLoaded = () => !error && chatsState.isLoaded && data && !data.errors;
 
   let title = "验证方案";
-  if (isLoaded() && !isNoPermissions(data)) title += ` / ${data.chat.title}`;
+  if (isLoaded()) title += ` / ${data.chat.title}`;
 
   useEffect(() => {
-    if (isLoaded()) {
-      if (isNoPermissions(data)) toastError("您没有访问权限。");
-      else dispatch(loadSelected(data.chat));
-    }
+    if (data && data.errors) toastErrors(data.errors);
+    if (isLoaded()) dispatch(loadSelected(data.chat));
   }, [data]);
 
   return (
     <>
       <PageHeader title={title} />
-      {isLoaded() && !isNoPermissions(data) ? (
+      {isLoaded() ? (
         <PageBody>
           <PageSection>
             <PageSectionHeader>
@@ -127,6 +125,7 @@ export default () => {
                   options={modeOptions}
                   value={modeOptions[modeValue]}
                   onChange={handleModeSelectChange}
+                  isSearchable={false}
                 />
               </div>
               {isModeEditing && (

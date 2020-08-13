@@ -7,7 +7,7 @@ import Switch from "react-switch";
 
 import {
   camelizeJson,
-  toastError,
+  toastErrors,
   updateInNewArray,
   isSysLink,
 } from "../helper";
@@ -100,7 +100,7 @@ export default () => {
         isTakeOver: checked,
       }).then((result) => {
         if (result.errors) {
-          toastError("接管状态修改接失败。");
+          toastErrors(result.errors);
           setIsTakeOver(!checked);
         } else {
           // 更新 chats 状态中的 `loadedSelected` 和 `list` 数据。

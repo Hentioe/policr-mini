@@ -4,7 +4,6 @@ import { useSelector } from "react-redux";
 import tw, { styled } from "twin.macro";
 import Select from "react-select";
 import fetch from "unfetch";
-import { toast } from "react-toastify";
 import { useDispatch } from "react-redux";
 import { useLocation, Link as RouteLink } from "react-router-dom";
 import { parseISO, format as formatDateTime } from "date-fns";
@@ -18,7 +17,7 @@ import {
   PageReLoading,
   LabelledButton,
 } from "../components";
-import { updateInNewArray, camelizeJson, isNoPermissions } from "../helper";
+import { updateInNewArray, camelizeJson, toastErrors } from "../helper";
 
 const FormSection = styled.div`
   ${tw`flex flex-wrap items-center py-4`}
@@ -119,18 +118,6 @@ const deleteCustomKit = async (id) => {
   }).then((r) => camelizeJson(r));
 };
 
-const toastError = (message) => {
-  toast.error(message, {
-    position: "bottom-center",
-    autoClose: 2500,
-    hideProgressBar: false,
-    closeOnClick: true,
-    pauseOnHover: true,
-    draggable: true,
-    progress: undefined,
-  });
-};
-
 export default () => {
   const chatsState = useSelector((state) => state.chats);
   const location = useLocation();
@@ -196,7 +183,7 @@ export default () => {
     [answers]
   );
 
-  const isLoaded = () => !error && chatsState.isLoaded && data;
+  const isLoaded = () => !error && chatsState.isLoaded && data && !data.errors;
 
   const checkEditintValid = useCallback(() => {
     if (!isEditing) return EDITING_CHECK.NO_EDINTINT;
@@ -220,7 +207,7 @@ export default () => {
           (ans) => `${ans.row.value ? "+" : "-"}${ans.text.trim()}`
         ),
       }).then((result) => {
-        if (result.errors) toastError("保存出错，请检查内容有效性。");
+        if (result.errors) toastErrors(result.errors);
         else {
           // 保存成功
           mutate();
@@ -235,7 +222,7 @@ export default () => {
   const handleDelete = useCallback(
     (id) => {
       deleteCustomKit(id).then((result) => {
-        if (result.errors) toastError("删除失败了，尝试刷新看看。");
+        if (result.errors) toastErrors(result.errors);
         else mutate();
       });
     },
@@ -268,19 +255,17 @@ export default () => {
   const editingCheckResult = checkEditintValid();
 
   let title = "自定义";
-  if (isLoaded() && !isNoPermissions(data)) title += ` / ${data.chat.title}`;
+  if (isLoaded()) title += ` / ${data.chat.title}`;
 
   useEffect(() => {
-    if (isLoaded()) {
-      if (isNoPermissions(data)) toastError("您没有访问权限。");
-      else dispatch(loadSelected(data.chat));
-    }
+    if (data && data.errors) toastErrors(data.errors);
+    if (isLoaded()) dispatch(loadSelected(data.chat));
   }, [data]);
 
   return (
     <>
       <PageHeader title={title} />
-      {isLoaded() && !isNoPermissions(data) ? (
+      {isLoaded() ? (
         <PageBody>
           <PageSection>
             <header>
@@ -375,6 +360,7 @@ export default () => {
                         value={editingKitType}
                         options={kitTypeOptions}
                         onChange={handleKitTypeChange}
+                        isSearchable={false}
                       />
                     </div>
                   </FormSection>
@@ -397,6 +383,7 @@ export default () => {
                             onChange={(value) =>
                               handleAnswerROWChange(value, index)
                             }
+                            isSearchable={false}
                           />
                         </div>
                         <div tw="flex-1 px-4 flex items-center">
