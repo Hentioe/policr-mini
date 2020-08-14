@@ -20,18 +20,28 @@ defmodule PolicrMiniBot.VerificationCaller do
     %{id: callback_query_id, message: %{message_id: message_id, chat: %{id: chat_id}}} =
       callback_query
 
-    disposable_key = "#{chat_id}_#{message_id}"
+    processing_key = "#{chat_id}_#{message_id}"
 
-    case Disposable.processing(disposable_key) do
+    case Disposable.processing(processing_key) do
       :ok ->
-        data |> parse_callback_data() |> handle_data(callback_query)
-        Disposable.done(disposable_key)
+        result =
+          data
+          |> parse_callback_data()
+          |> handle_data(callback_query)
+
+        Disposable.done(processing_key)
+
+        result
 
       {:repeat, :processing} ->
         Telegex.answer_callback_query(callback_query_id, text: "有请求正在处理中……", show_alert: true)
 
+        :error
+
       {:repeat, :done} ->
         Telegex.answer_callback_query(callback_query_id, text: "此任务已被处理过了～", show_alert: true)
+
+        :error
     end
   end
 
