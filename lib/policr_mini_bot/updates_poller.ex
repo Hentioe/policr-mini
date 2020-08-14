@@ -58,7 +58,7 @@ defmodule PolicrMiniBot.UpdatesPoller do
           last_offset
       end
 
-    if offset == last_offset, do: :timer.sleep(500), else: :timer.sleep(200)
+    if offset == last_offset, do: :timer.sleep(50), else: :timer.sleep(20)
     schedule_pull_updates()
     {:noreply, %{state | offset: offset}}
   end

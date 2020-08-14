@@ -1,6 +1,8 @@
 defmodule PolicrMiniBot.Disposable do
   @moduledoc false
 
+  # TODO：定时清理 `:done` 状态的数据。
+
   use GenServer
 
   @type status :: :processing | :done
