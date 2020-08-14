@@ -6,10 +6,9 @@ defmodule PolicrMiniBot.VerificationCaller do
   use PolicrMiniBot, plug: [caller: [prefix: "verification:"]]
 
   alias PolicrMini.Logger
-
   alias PolicrMini.Schemas.Verification
   alias PolicrMini.{VerificationBusiness, SchemeBusiness}
-  alias PolicrMiniBot.UserJoinedHandler
+  alias PolicrMiniBot.{UserJoinedHandler, Disposable}
 
   @doc """
   回调处理函数。
@@ -18,7 +17,22 @@ defmodule PolicrMiniBot.VerificationCaller do
   """
   @impl true
   def handle(%{data: data} = callback_query, _state) do
-    data |> parse_callback_data() |> handle_data(callback_query)
+    %{id: callback_query_id, message: %{message_id: message_id, chat: %{id: chat_id}}} =
+      callback_query
+
+    disposable_key = "#{chat_id}_#{message_id}"
+
+    case Disposable.processing(disposable_key) do
+      :ok ->
+        data |> parse_callback_data() |> handle_data(callback_query)
+        Disposable.done(disposable_key)
+
+      {:repeat, :processing} ->
+        Telegex.answer_callback_query(callback_query_id, text: "有请求正在处理中……", show_alert: true)
+
+      {:repeat, :done} ->
+        Telegex.answer_callback_query(callback_query_id, text: "此任务已被处理过了～", show_alert: true)
+    end
   end
 
   @doc """
@@ -197,8 +211,7 @@ defmodule PolicrMiniBot.VerificationCaller do
   检查验证数据是否有效。
   """
   @spec validity_check(integer(), integer()) :: {:ok, Verification.t()} | {:error, String.t()}
-  def validity_check(user_id, verification_id)
-      when is_integer(user_id) and is_integer(verification_id) do
+  def validity_check(user_id, verification_id) do
     with {:ok, verification} <- VerificationBusiness.get(verification_id),
          {:check_user, true} <- {:check_user, verification.target_user_id == user_id},
          {:check_status, true} <- {:check_status, verification.status == :waiting} do
