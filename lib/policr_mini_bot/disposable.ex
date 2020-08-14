@@ -1,7 +1,7 @@
 defmodule PolicrMiniBot.Disposable do
   @moduledoc false
 
-  # TODO：定时清理 `:done` 状态的数据。
+  # TODO：增加超时时间支持，并定时扫描和清理已超时的保证。
 
   use GenServer
 
@@ -17,10 +17,16 @@ defmodule PolicrMiniBot.Disposable do
   end
 
   @type key :: integer | binary
+
+  @doc """
+  添加一个一次性处理保证。
+
+  如果指定的 key 没有已存在的状态，则设置为 `:processing` 状态并返回 `:ok`。否则将返回 `{:repeat, status}`，其中的 status 表示已存在的状态。
+  """
   @spec processing(key) :: :ok | {:repeat, status}
   def processing(key) do
-    case GenServer.call(__MODULE__, {:get_status, key}) do
-      nil -> GenServer.cast(__MODULE__, {:set_status, key, :processing})
+    case GenServer.call(__MODULE__, {:get_and_put_new_status, key, :processing}) do
+      nil -> :ok
       status -> {:repeat, status}
     end
   end
@@ -33,6 +39,21 @@ defmodule PolicrMiniBot.Disposable do
   @impl true
   def handle_call({:get_status, key}, _from, state) do
     {:reply, Map.get(state, key), state}
+  end
+
+  # 获取并更新不存在的状态（如果状态已存在则不更新）。
+  @impl true
+  def handle_call({:get_and_put_new_status, key, new_status}, _from, state) do
+    status = Map.get(state, key)
+
+    state =
+      if status == nil do
+        Map.put(state, key, new_status)
+      else
+        state
+      end
+
+    {:reply, status, state}
   end
 
   @impl true
