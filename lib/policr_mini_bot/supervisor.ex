@@ -45,7 +45,7 @@ defmodule PolicrMiniBot.Supervisor do
       PolicrMiniBot.ImageProvider,
       # 消息清理服务
       PolicrMiniBot.Cleaner,
-      # 一次性消费保证
+      # 一次性处理保证
       PolicrMiniBot.Disposable,
       # 拉取更新消息
       PolicrMiniBot.UpdatesPoller,
