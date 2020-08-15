@@ -11,7 +11,7 @@ defmodule PolicrMiniWeb.API.IndexController do
   def index(conn, _params) do
     totals = %{
       verification_all: Counter.get(:verification_total),
-      verification_no_pass: Counter.get(:verification_no_pass_total),
+      verification_passed: Counter.get(:verification_passed_total),
       verification_timeout: Counter.get(:verification_timeout_total)
     }
 

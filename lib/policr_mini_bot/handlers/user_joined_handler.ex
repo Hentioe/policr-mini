@@ -125,9 +125,8 @@ defmodule PolicrMiniBot.UserJoinedHandler do
 
     case VerificationBusiness.fetch(verification_params) do
       {:ok, _} ->
-        # 计数器自增（验证总数和非通过总数）
+        # 计数器自增（验证总数）
         PolicrMini.Counter.increment(:verification_total)
-        PolicrMini.Counter.increment(:verification_no_pass_total)
         # 异步限制新用户
         async(fn -> restrict_chat_member(chat_id, new_chat_member.id) end)
 
@@ -273,8 +272,7 @@ defmodule PolicrMiniBot.UserJoinedHandler do
     verification_handle_fun = fn latest_verification ->
       # 为等待状态则实施操作
       if latest_verification.status == :waiting do
-        # 计数器自增（非通过总数和超时总数）
-        PolicrMini.Counter.increment(:verification_no_pass_total)
+        # 计数器自增（超时总数）
         PolicrMini.Counter.increment(:verification_timeout_total)
         # 更新状态为超时
         latest_verification |> VerificationBusiness.update(%{status: :timeout})

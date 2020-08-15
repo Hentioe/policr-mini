@@ -142,7 +142,7 @@ defmodule PolicrMini.VerificationBusiness do
     from(v in Verification, select: count(v.id)) |> Repo.one()
   end
 
-  @type find_total_cont_status :: :no_pass | :timeout
+  @type find_total_cont_status :: :passed | :timeout
   @type find_total_cont :: [{:status, find_total_cont_status}]
 
   # TODO：添加测试。
@@ -161,8 +161,8 @@ defmodule PolicrMini.VerificationBusiness do
     from(v in Verification, select: count(v.id), where: ^filter_status) |> Repo.one()
   end
 
-  defp build_find_total_status_filter(:no_pass) do
-    dynamic([v], v.status != ^VerificationStatusEnum.__enum_map__()[:passed])
+  defp build_find_total_status_filter(:passed) do
+    dynamic([v], v.status == ^VerificationStatusEnum.__enum_map__()[:passed])
   end
 
   defp build_find_total_status_filter(:timeout) do

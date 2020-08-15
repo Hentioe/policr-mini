@@ -3,28 +3,28 @@ defmodule PolicrMini.Counter do
   计数器缓存实现。
   """
 
+  use GenServer
+
   import PolicrMini.Helper
 
   alias PolicrMini.VerificationBusiness
   alias :mnesia, as: Mnesia
 
-  use GenServer
-
   def start_link(_opts) do
     state = %{
       verification_total: VerificationBusiness.find_total(),
-      verification_no_pass_total: VerificationBusiness.find_total(status: :no_pass),
+      verification_passed_total: VerificationBusiness.find_total(status: :passed),
       verification_timeout_total: VerificationBusiness.find_total(status: :timeout)
     }
 
-    GenServer.start(__MODULE__, state, name: __MODULE__)
+    GenServer.start_link(__MODULE__, state, name: __MODULE__)
   end
 
   @impl true
   def init(state) do
     %{
       verification_total: verification_total,
-      verification_no_pass_total: verification_no_pass_total,
+      verification_passed_total: verification_passed_total,
       verification_timeout_total: verification_timeout_total
     } = state
 
@@ -40,13 +40,13 @@ defmodule PolicrMini.Counter do
 
     Mnesia.wait_for_tables([Counter], 2000)
     Mnesia.dirty_write({Counter, :verification_total, verification_total})
-    Mnesia.dirty_write({Counter, :verification_no_pass_total, verification_no_pass_total})
+    Mnesia.dirty_write({Counter, :verification_passed_total, verification_passed_total})
     Mnesia.dirty_write({Counter, :verification_timeout_total, verification_timeout_total})
 
     {:ok, state}
   end
 
-  @type key :: :verification_total | :verification_no_pass_total | :verification_timeout_total
+  @type key :: :verification_total | :verification_passed_total | :verification_timeout_total
   @spec get(key) :: integer
   def get(key) do
     GenServer.call(__MODULE__, {:get_value, key})

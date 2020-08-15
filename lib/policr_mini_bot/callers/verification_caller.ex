@@ -118,6 +118,8 @@ defmodule PolicrMiniBot.VerificationCaller do
   @spec handle_correct(Verification.t(), integer(), Telegex.Model.User.t()) ::
           {:ok, Verification.t()} | {:error, any()}
   def handle_correct(verification, message_id, from_user) do
+    # 计数器自增（通过总数）
+    PolicrMini.Counter.increment(:verification_passed_total)
     # 发送通知消息并延迟删除
     notice_fun = fn ->
       marked_enabled = Application.get_env(:policr_mini, :marked_enabled)
@@ -168,9 +170,6 @@ defmodule PolicrMiniBot.VerificationCaller do
   @spec handle_wrong(Verification.t(), atom, integer, Telegex.Model.User.t()) ::
           {:ok, Verification.t()} | {:error, any}
   def handle_wrong(verification, killing_method, message_id, from_user) do
-    # 计数器自增（非通过总数）
-    PolicrMini.Counter.increment(:verification_no_pass_total)
-
     cleaner_fun = fn notice_text ->
       async(fn ->
         Cleaner.delete_message(verification.target_user_id, message_id)

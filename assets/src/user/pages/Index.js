@@ -28,14 +28,14 @@ const fetcher = (url) => fetch(url).then((r) => r.json());
 const initialIndexData = {
   totals: {
     verification_all: 0,
-    verification_no_pass: 0,
+    verification_passed: 0,
     verification_timeout: 0,
   },
 };
 
 function calculatePassRate({ totals }) {
-  const { verification_no_pass, verification_all } = totals;
-  return ((1.0 - verification_no_pass / verification_all) * 100).toFixed(2);
+  const { verification_passed, verification_all } = totals;
+  return ((verification_passed / verification_all) * 100).toFixed(2);
 }
 
 export default () => {
@@ -82,18 +82,22 @@ export default () => {
                     次验证」
                   </span>
                 </div>
-                <div tw="flex flex-wrap mt-6 lg:mt-0 justify-between">
+                <div tw="flex flex-wrap mt-6 lg:mt-0">
                   <Paragraph>
                     <span tw="text-green-400 font-bold">【通过率：</span>
                     <span tw="text-pink-500 font-bold">{passRate}%</span>
                   </Paragraph>
-                  <Paragraph>
-                    <span tw="text-gray-700 font-bold line-through">拦截</span>{" "}
-                    <span tw="text-pink-500 font-bold">
-                      {indexData.totals.verification_timeout}
-                    </span>{" "}
-                    <span tw="text-gray-700 font-bold">次垃圾账号侵入】</span>
-                  </Paragraph>
+                  <div tw="flex-1">
+                    <Paragraph tw="float-right">
+                      <span tw="text-gray-700 font-bold line-through">
+                        拦截
+                      </span>{" "}
+                      <span tw="text-pink-500 font-bold">
+                        {indexData.totals.verification_timeout}
+                      </span>{" "}
+                      <span tw="text-gray-700 font-bold">次垃圾账号侵入】</span>
+                    </Paragraph>
+                  </div>
                 </div>
               </div>
             </div>
