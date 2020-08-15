@@ -7,9 +7,9 @@ defmodule PolicrMiniWeb.API.IndexView do
   渲染数据为 JSON。
   """
   @spec render(String.t(), map()) :: map()
-  def render("index.json", %{total: total}) do
+  def render("index.json", %{totals: totals}) do
     %{
-      total: total
+      totals: totals
     }
   end
 end

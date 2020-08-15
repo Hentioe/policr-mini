@@ -26,7 +26,11 @@ const Avatar = () => {
 
 const fetcher = (url) => fetch(url).then((r) => r.json());
 const initialIndexData = {
-  total: 0,
+  totals: {
+    verification_all: 0,
+    verification_no_pass: 0,
+    verification_timeout: 0,
+  },
 };
 
 export default () => {
@@ -39,6 +43,13 @@ export default () => {
       </ErrorParagraph>
     );
   const indexData = data || initialIndexData;
+
+  const passRate =
+    (indexData.totals.verification_no_pass === 0
+      ? 1
+      : indexData.totals.verification_no_pass /
+        indexData.totals.verification_all
+    ).toFixed(4) * 100;
 
   return (
     <>
@@ -56,21 +67,34 @@ export default () => {
           <div tw="mt-10 lg:mt-24 flex flex-wrap">
             {/* 验证数据 */}
             <div tw="w-full lg:w-7/12 flex">
-              <div tw="flex-1 flex lg:pr-10">
+              <div tw="flex-1 flex flex-col lg:pr-10">
                 <div tw="flex-1 self-start">
-                  <span tw="text-green-600 font-bold tracking-wider">
+                  <span tw="text-blue-600 font-bold tracking-wider">
                     「已进行
                   </span>
                 </div>
                 <div tw="flex-1 self-center">
                   <Paragraph tw="text-6xl font-extrabold text-red-400 text-center underline">
-                    {indexData.total}
+                    {indexData.totals.verification_all}
                   </Paragraph>
                 </div>
                 <div tw="flex-1 self-end">
-                  <span tw="float-right text-green-600 font-bold tracking-wider">
+                  <span tw="float-right text-blue-600 font-bold tracking-wider">
                     次验证」
                   </span>
+                </div>
+                <div tw="flex flex-wrap mt-6 lg:mt-0 justify-between">
+                  <Paragraph>
+                    <span tw="text-green-400 font-bold">【通过率：</span>
+                    <span tw="text-pink-500 font-bold">{passRate}%</span>
+                  </Paragraph>
+                  <Paragraph>
+                    <span tw="text-gray-700 font-bold line-through">拦截</span>{" "}
+                    <span tw="text-pink-500 font-bold">
+                      {indexData.totals.verification_timeout}
+                    </span>{" "}
+                    <span tw="text-gray-700 font-bold">次垃圾账号侵入】</span>
+                  </Paragraph>
                 </div>
               </div>
             </div>
