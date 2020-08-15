@@ -118,45 +118,22 @@ defmodule PolicrMini.Logger do
 
     @spec init_mnesia!(atom) :: :ok
     defp init_mnesia!(_name) do
-      Mnesia.create_schema([node()])
-      :ok = Mnesia.start()
+      node_list = PolicrMini.Helper.init_mnesia!()
 
-      created_results = [
+      table_results = [
         Mnesia.create_table(MnesiaSequence,
           attributes: [:name, :value],
-          disc_only_copies: [node()]
+          disc_only_copies: node_list
         ),
         Mnesia.create_table(Log,
           attributes: [:id, :level, :message, :timestamp],
-          disc_only_copies: [node()]
+          disc_only_copies: node_list
         )
       ]
 
-      created_check!(created_results)
+      PolicrMini.Helper.check_mnesia_created_table!(table_results)
 
       Mnesia.wait_for_tables([MnesiaSequence, Log], 5000)
-
-      :ok
-    end
-
-    @spec created_check!([tuple]) :: :ok
-    defp created_check!(results) do
-      failure_finder = fn result ->
-        case result do
-          {:atomic, :ok} ->
-            false
-
-          {:aborted, {:already_exists, _}} ->
-            false
-
-          _ ->
-            true
-        end
-      end
-
-      failed_result = Enum.find(results, failure_finder)
-
-      if failed_result, do: raise(failed_result)
 
       :ok
     end

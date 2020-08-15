@@ -13,6 +13,8 @@ defmodule PolicrMini.Application do
       PolicrMini.Cache,
       # 线上操作数据库服务
       PolicrMini.DBServer,
+      # 计数器
+      PolicrMini.Counter,
       # Start the Telemetry supervisor
       PolicrMiniWeb.Telemetry,
       # Start the PubSub system

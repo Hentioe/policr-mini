@@ -4,12 +4,12 @@ defmodule PolicrMiniWeb.API.IndexController do
   """
   use PolicrMiniWeb, :controller
 
-  alias PolicrMini.VerificationBusiness
+  alias PolicrMini.Counter
 
   action_fallback PolicrMiniWeb.API.FallbackController
 
   def index(conn, _params) do
-    total = VerificationBusiness.get_total()
+    total = Counter.get(:verification_total)
 
     render(conn, "index.json", %{total: total})
   end

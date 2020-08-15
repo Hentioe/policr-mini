@@ -7,7 +7,7 @@ defmodule PolicrMini.VerificationBusiness do
 
   alias PolicrMini.EctoEnums.{VerificationEntranceEnum, VerificationStatusEnum}
 
-  import Ecto.Query, only: [from: 2]
+  import Ecto.Query, only: [from: 2, dynamic: 2]
 
   @typep modelwrited :: {:ok, Verification.t()} | {:error, Ecto.Changeset.t()}
 
@@ -133,11 +133,39 @@ defmodule PolicrMini.VerificationBusiness do
     |> Repo.all()
   end
 
+  # TODO：使用 `find_total/1` 替代并删除。
   @doc """
   获取验证总数。
   """
   @spec get_total :: integer()
   def get_total do
     from(v in Verification, select: count(v.id)) |> Repo.one()
+  end
+
+  @type find_total_cont_status :: :no_pass | :timeout
+  @type find_total_cont :: [{:status, find_total_cont_status}]
+
+  # TODO：添加测试。
+  @doc """
+  查找验证的总次数。
+  """
+  @spec find_total(find_total_cont) :: integer
+  def find_total(cont \\ []) do
+    filter_status =
+      if status = Keyword.get(cont, :status) do
+        build_find_total_status_filter(status)
+      else
+        true
+      end
+
+    from(v in Verification, select: count(v.id), where: ^filter_status) |> Repo.one()
+  end
+
+  defp build_find_total_status_filter(:no_pass) do
+    dynamic([v], v.status != ^VerificationStatusEnum.__enum_map__()[:passed])
+  end
+
+  defp build_find_total_status_filter(:timeout) do
+    dynamic([v], v.status == ^VerificationStatusEnum.__enum_map__()[:timeout])
   end
 end

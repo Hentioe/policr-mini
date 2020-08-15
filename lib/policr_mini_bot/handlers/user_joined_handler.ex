@@ -128,6 +128,8 @@ defmodule PolicrMiniBot.UserJoinedHandler do
         # 异步限制新用户
         async(fn -> restrict_chat_member(chat_id, new_chat_member.id) end)
 
+        PolicrMini.Counter.increment(:verification_total)
+
         {:ok, state}
 
       e ->
@@ -174,6 +176,8 @@ defmodule PolicrMiniBot.UserJoinedHandler do
         seconds,
         reminder_message.message_id
       )
+
+      PolicrMini.Counter.increment(:verification_total)
 
       {:ok, %{state | done: true, deleted: true}}
     else
