@@ -125,10 +125,11 @@ defmodule PolicrMiniBot.UserJoinedHandler do
 
     case VerificationBusiness.fetch(verification_params) do
       {:ok, _} ->
+        # 计数器自增（验证总数和非通过总数）
+        PolicrMini.Counter.increment(:verification_total)
+        PolicrMini.Counter.increment(:verification_no_pass_total)
         # 异步限制新用户
         async(fn -> restrict_chat_member(chat_id, new_chat_member.id) end)
-
-        PolicrMini.Counter.increment(:verification_total)
 
         {:ok, state}
 
@@ -169,6 +170,9 @@ defmodule PolicrMiniBot.UserJoinedHandler do
          {:ok, _} <-
            VerificationBusiness.update(verification, %{message_id: reminder_message.message_id}),
          {:ok, scheme} <- SchemeBusiness.fetch(chat_id) do
+      # 计数器自增（验证总数）
+      PolicrMini.Counter.increment(:verification_total)
+
       # 启动定时任务，读取验证记录并根据结果实施操作
       start_timed_task(
         verification,
@@ -176,8 +180,6 @@ defmodule PolicrMiniBot.UserJoinedHandler do
         seconds,
         reminder_message.message_id
       )
-
-      PolicrMini.Counter.increment(:verification_total)
 
       {:ok, %{state | done: true, deleted: true}}
     else
@@ -268,8 +270,12 @@ defmodule PolicrMiniBot.UserJoinedHandler do
       )
     end
 
-    ban_fun = fn latest_verification ->
+    verification_handle_fun = fn latest_verification ->
+      # 为等待状态则实施操作
       if latest_verification.status == :waiting do
+        # 计数器自增（非通过总数和超时总数）
+        PolicrMini.Counter.increment(:verification_no_pass_total)
+        PolicrMini.Counter.increment(:verification_timeout_total)
         # 更新状态为超时
         latest_verification |> VerificationBusiness.update(%{status: :timeout})
         # TODO: 此处需要根据 scheme
@@ -281,10 +287,10 @@ defmodule PolicrMiniBot.UserJoinedHandler do
     end
 
     timed_task = fn ->
-      # 读取验证记录，为等待状态则实施操作
+      # 读取验证记录，并根据状态实时操作
       case VerificationBusiness.get(verification.id) do
         {:ok, latest_verification} ->
-          ban_fun.(latest_verification)
+          verification_handle_fun.(latest_verification)
 
         e ->
           Logger.unitized_error("After the scheduled task is executed, the verification finding",

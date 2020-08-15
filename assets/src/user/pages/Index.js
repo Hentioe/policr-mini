@@ -33,6 +33,11 @@ const initialIndexData = {
   },
 };
 
+function calculatePassRate({ totals }) {
+  const { verification_no_pass, verification_all } = totals;
+  return ((1.0 - verification_no_pass / verification_all) * 100).toFixed(2);
+}
+
 export default () => {
   const { data, error } = useSWR("/api/index", fetcher);
 
@@ -43,13 +48,7 @@ export default () => {
       </ErrorParagraph>
     );
   const indexData = data || initialIndexData;
-
-  const passRate =
-    (indexData.totals.verification_no_pass === 0
-      ? 1
-      : indexData.totals.verification_no_pass /
-        indexData.totals.verification_all
-    ).toFixed(4) * 100;
+  const passRate = calculatePassRate(indexData);
 
   return (
     <>
