@@ -188,7 +188,7 @@ export default () => {
                   <p
                     key={index}
                     css={{ color: logColor(log) }}
-                    tw="px-2 hover:text-black hover:bg-white hover:font-bold"
+                    tw="px-2 hover:text-black hover:bg-white hover:font-bold break-all"
                   >
                     {formatDateTime(
                       fromUnixTime(log.timestamp),
