@@ -52,10 +52,17 @@ defmodule PolicrMiniBot.UpdatesPoller do
             # 获取新的 offset
             else: List.last(updates).update_id + 1
 
+        {:error, %Telegex.Model.Error{description: "Bad Gateway"}} ->
+          # 出现 TG 服务故障，大幅度降低请求频率
+          :timer.sleep(500)
+
+          last_offset
+
         e ->
           Logger.unitized_error("Message pull", e)
           # 发生错误，降低请求频率
           :timer.sleep(50)
+
           last_offset
       end
 
