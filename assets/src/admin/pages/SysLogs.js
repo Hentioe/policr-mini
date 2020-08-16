@@ -53,7 +53,7 @@ function logColor(log) {
 
 function parseTimeRange(timeRange) {
   if (["1h", "6h", "1d", "1w", "2w"].includes(timeRange)) return timeRange;
-  else return "1d";
+  else return "1h";
 }
 function parseLevel(level) {
   if (["all", "warn", "error"].includes(level)) return level;
