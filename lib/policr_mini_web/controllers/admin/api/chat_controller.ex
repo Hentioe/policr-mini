@@ -5,7 +5,7 @@ defmodule PolicrMiniWeb.Admin.API.ChatController do
 
   use PolicrMiniWeb, :controller
 
-  alias PolicrMini.{ChatBusiness, CustomKitBusiness, SchemeBusiness}
+  alias PolicrMini.{ChatBusiness, CustomKitBusiness, SchemeBusiness, PermissionBusiness}
 
   import PolicrMiniWeb.Helper
 
@@ -106,6 +106,19 @@ defmodule PolicrMiniWeb.Admin.API.ChatController do
 
       _ ->
         {:error, %{description: "please try again"}}
+    end
+  end
+
+  def permissions(conn, %{"chat_id" => chat_id} = _params) do
+    with {:ok, perms} <- check_permissions(conn, chat_id),
+         {:ok, chat} <- ChatBusiness.get(chat_id) do
+      permissions = PermissionBusiness.find_list(chat_id: chat_id, preload: [:user])
+
+      render(conn, "permissions.json", %{
+        chat: chat,
+        permissions: permissions,
+        writable: Enum.member?(perms, :writable)
+      })
     end
   end
 

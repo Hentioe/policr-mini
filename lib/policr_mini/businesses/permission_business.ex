@@ -53,20 +53,60 @@ defmodule PolicrMini.PermissionBusiness do
     end
   end
 
-  @type find_list_conds :: [{:chat_id, integer()}, {:user_id, integer()}]
-  @spec find_list(find_list_conds()) :: [Permission.t()]
-  def find_list(conds) when is_list(conds) do
+  @default_limit 25
+  @max_limit @default_limit
+  @type find_list_cont :: [
+          {:chat_id, integer | binary},
+          {:user_id, integer},
+          {:limit, integer},
+          {:offset, integer},
+          {:preload, [:chat | :user]}
+        ]
+  @doc """
+  查找权限列表。
+
+  可选参数 `cont` 表示查询条件。可指定用户或指定群组来过滤列表（亦或组合起来），以及数量限制和偏移量。
+
+  *注意*：即使不限制数量也存在最大数量限制，参数无法突破这个限制。
+
+  ## 条件参数
+  - `chat_id`: 群组的 ID。
+  - `user_id`: 用户的 ID。
+  - `limit`: 数量限制。默认值为 `25`，可允许的最大值也是 `25`。如果值大于最大限制会被重写为 `25`。
+  - `offset`: 偏移量，默认值为 `0`。
+
+  无参数表示表示。
+  """
+  @spec find_list(find_list_cont) :: [Permission.t()]
+  def find_list(cont \\ []) when is_list(cont) do
     filter_chat_id =
-      if chat_id = conds[:chat_id],
+      if chat_id = cont[:chat_id],
         do: dynamic([p], p.chat_id == ^chat_id),
         else: true
 
     filter_user_id =
-      if user_id = conds[:user_id],
+      if user_id = cont[:user_id],
         do: dynamic([p], p.user_id == ^user_id),
         else: true
 
-    from(p in Permission, where: ^filter_chat_id, where: ^filter_user_id) |> Repo.all()
+    limit =
+      if limit = cont[:limit] do
+        if limit > @max_limit, do: @max_limit, else: limit
+      else
+        @max_limit
+      end
+
+    offset = Keyword.get(cont, :offset, 0)
+    preload = Keyword.get(cont, :preload, [])
+
+    from(p in Permission,
+      where: ^filter_chat_id,
+      where: ^filter_user_id,
+      limit: ^limit,
+      offset: ^offset
+    )
+    |> Repo.all()
+    |> Repo.preload(preload)
   end
 
   @doc """
