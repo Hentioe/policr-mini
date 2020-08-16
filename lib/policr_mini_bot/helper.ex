@@ -413,21 +413,28 @@ defmodule PolicrMiniBot.Helper do
   end
 
   @doc """
-  给名字打马赛克（模拟）。
+  给名字打马赛克。
 
-  将名字中的部分字符替换成 `░` 符号。如果名字过长（超过五个字符），则只保留前后四个字符，中间使用两个 `█` 填充。
+  将名字中的部分字符替换成 `░` 符号。如果名字过长（超过五个字符），则只保留前后两个字符，中间使用三个 `█` 填充。
+
+  ## 例子
+      iex> PolicrMiniBot.Helper.mosaic_name("小明")
+      "小░"
+      iex> PolicrMiniBot.Helper.mosaic_name("Hello")
+      "H░░░o"
+      iex> PolicrMiniBot.Helper.mosaic_name("Hentioe")
+      "H███e"
+
   """
   @spec mosaic_name(String.t()) :: String.t()
-  def mosaic_name(name) do
-    len = String.length(name)
-    mosaic_name(name, len)
-  end
+  def mosaic_name(name), do: mosaic_name_by_len(name, String.length(name))
 
-  def mosaic_name(name, len) when is_integer(len) and len == 1 do
+  @spec mosaic_name_by_len(String.t(), integer) :: String.t()
+  defp mosaic_name_by_len(name, len) when is_integer(len) and len == 1 do
     name
   end
 
-  def mosaic_name(name, len) when is_integer(len) and len == 2 do
+  defp mosaic_name_by_len(name, len) when is_integer(len) and len == 2 do
     name
     |> String.graphemes()
     |> Enum.with_index()
@@ -437,7 +444,7 @@ defmodule PolicrMiniBot.Helper do
     |> Enum.join("")
   end
 
-  def mosaic_name(name, len) when is_integer(len) and len >= 3 and len <= 5 do
+  defp mosaic_name_by_len(name, len) when is_integer(len) and len >= 3 and len <= 5 do
     last_index = len - 1
 
     name
@@ -449,11 +456,7 @@ defmodule PolicrMiniBot.Helper do
     |> Enum.join("")
   end
 
-  def mosaic_name(name, len) do
-    last_index = len - 1
-
-    "#{String.slice(name, 0..1)}██#{String.slice(name, (last_index - 1)..last_index)}"
-  end
+  defp mosaic_name_by_len(name, _len), do: "#{String.at(name, 0)}███#{String.at(name, -1)}"
 
   @defaults [
     vmode: :image,
