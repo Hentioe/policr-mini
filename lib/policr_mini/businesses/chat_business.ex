@@ -57,7 +57,7 @@ defmodule PolicrMini.ChatBusiness do
       # 将所有管理员权限信息写入（添加或更新）
       permission_params_list
       |> Enum.each(fn params ->
-        {:ok, _} = PermissionBusiness.fetch(chat.id, params.user_id, params)
+        {:ok, _} = PermissionBusiness.sync(chat.id, params.user_id, params)
       end)
 
       :ok

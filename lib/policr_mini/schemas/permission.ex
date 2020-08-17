@@ -8,7 +8,7 @@ defmodule PolicrMini.Schemas.Permission do
   alias PolicrMini.Schemas.{Chat, User}
 
   @required_fields ~w(chat_id user_id tg_is_owner)a
-  @optional_fields ~w(tg_can_restrict_members tg_can_promote_members readable writable)a
+  @optional_fields ~w(tg_can_restrict_members tg_can_promote_members readable writable customized)a
 
   schema "permissions" do
     belongs_to :chat, Chat
@@ -19,6 +19,7 @@ defmodule PolicrMini.Schemas.Permission do
     field :tg_can_promote_members, :boolean
     field :readable, :boolean
     field :writable, :boolean
+    field :customized, :boolean
 
     timestamps()
   end

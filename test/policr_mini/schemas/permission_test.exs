@@ -18,6 +18,7 @@ defmodule PolicrMini.Schemas.PermissionTest do
                  :tg_can_promote_members,
                  :readable,
                  :writable,
+                 :customized,
                  :inserted_at,
                  :updated_at
                ]

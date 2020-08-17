@@ -81,11 +81,11 @@ defmodule PolicrMini.PermissionBusinessTest do
     assert permission2.writable == updated_writable
   end
 
-  test "fetch/3" do
+  test "sync/3" do
     permission_params = build_params()
 
     {:ok, permission} =
-      PermissionBusiness.fetch(
+      PermissionBusiness.sync(
         permission_params.chat_id,
         permission_params.user_id,
         permission_params
@@ -100,13 +100,45 @@ defmodule PolicrMini.PermissionBusinessTest do
     assert permission.writable == permission_params.writable
   end
 
-  test "fetch/3 and existing data" do
+  test "sync/3 and customized" do
+    permission_params = build_params(customized: true)
+
+    {:ok, permission} = PermissionBusiness.create(permission_params)
+
+    assert permission.customized
+    assert permission.readable == permission_params.readable
+    assert permission.writable == permission_params.writable
+
+    {:ok, permission} =
+      PermissionBusiness.sync(
+        permission_params.chat_id,
+        permission_params.user_id,
+        %{permission_params | readable: false, writable: false}
+      )
+
+    assert permission.readable == permission_params.readable
+    assert permission.writable == permission_params.writable
+
+    {:ok, _} = PermissionBusiness.update(permission, %{customized: false})
+
+    {:ok, permission} =
+      PermissionBusiness.sync(
+        permission_params.chat_id,
+        permission_params.user_id,
+        %{readable: false, writable: false}
+      )
+
+    assert permission.readable == false
+    assert permission.writable == false
+  end
+
+  test "sync/3 and existing data" do
     permission_params = build_params()
     {:ok, _} = PermissionBusiness.create(permission_params)
     updated_tg_is_owner = false
 
     {:ok, permission} =
-      PermissionBusiness.fetch(
+      PermissionBusiness.sync(
         permission_params.chat_id,
         permission_params.user_id,
         permission_params |> Map.put(:tg_is_owner, updated_tg_is_owner)

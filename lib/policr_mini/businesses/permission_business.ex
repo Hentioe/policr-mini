@@ -43,13 +43,35 @@ defmodule PolicrMini.PermissionBusiness do
     permission |> Permission.changeset(attrs) |> Repo.update()
   end
 
-  def fetch(chat_id, user_id, params) when is_integer(chat_id) and is_integer(user_id) do
+  @doc """
+  同步用户权限。
+
+  如果相关权限记录不存在则创建，否则更新旧记录。
+  创建或更新都将忽略 `customized` 字段，并且 `chat_id` 和 `user_id` 会使用前两个参数的值重写。
+
+  *注意*：如果已存在的权限记录上 `customized` 的值为 `true`，则只更新
+  """
+  @spec sync(integer | binary, integer, map) :: {:ok, Permission.t()}
+  def sync(chat_id, user_id, params) do
+    params = Map.drop(params, [:customized, "customized"])
+
     case find(chat_id, user_id) do
       nil ->
-        create(params |> Map.put(:chat_id, chat_id) |> Map.put(:user_id, user_id))
+        params
+        |> Map.put(:chat_id, chat_id)
+        |> Map.put(:user_id, user_id)
+        |> create()
 
       permission ->
-        permission |> update(params)
+        # 如果已定制过了，不更新读写权限
+        params =
+          if permission.customized == true do
+            Map.drop(params, [:readable, :writable, "readable", "writable"])
+          else
+            params
+          end
+
+        update(permission, params)
     end
   end
 
