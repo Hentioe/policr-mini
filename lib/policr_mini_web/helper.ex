@@ -15,6 +15,7 @@ defmodule PolicrMiniWeb.Helper do
   @spec check_sys_permissions(Plug.Conn.t(), [perm]) :: {:error, map} | {:ok, [perm]}
   def check_sys_permissions(%Plug.Conn{} = conn, requires \\ []) do
     %{assigns: %{user: %{id: user_id}}} = conn
+    requires = if Enum.member?(requires, :readable), do: requires, else: [:readable] ++ requires
 
     # 如果当前用户是机器人拥有者，赋予 `:readable` 和 `:writable` 权限。
     perms =
@@ -35,6 +36,7 @@ defmodule PolicrMiniWeb.Helper do
   @spec check_permissions(Plug.Conn.t(), integer, [perm]) :: {:ok, [perm]} | {:error, map}
   def check_permissions(%Plug.Conn{} = conn, chat_id, requires \\ []) do
     %{assigns: %{user: %{id: user_id}}} = conn
+    requires = if Enum.member?(requires, :readable), do: requires, else: [:readable] ++ requires
 
     perms = PermissionBusiness.has_permissions(chat_id, user_id)
 

@@ -1,7 +1,8 @@
-import React, { useEffect, useCallback } from "react";
+import React, { useEffect, useCallback, useState } from "react";
 import useSWR from "swr";
 import tw, { styled } from "twin.macro";
 import Switch from "react-switch";
+import fetch from "unfetch";
 
 import {
   PageHeader,
@@ -11,6 +12,7 @@ import {
   PageSectionHeader,
   PageSectionTitle,
 } from "../components";
+import { camelizeJson, toastErrors, updateInNewArray } from "../helper";
 import { useDispatch, useSelector } from "react-redux";
 import { loadSelected } from "../slices/chats";
 import PageBody from "../components/PageBody";
@@ -41,6 +43,21 @@ function makeFullname({ firstName, lastName }) {
   return name;
 }
 
+async function changeReadable({ field, chatId, id, value }) {
+  const endpoint = `/admin/api/permissions/${id}/${field}`;
+
+  return fetch(endpoint, {
+    method: "PUT",
+    headers: {
+      "Content-Type": "application/json",
+    },
+    body: JSON.stringify({
+      chat_id: chatId,
+      value: value,
+    }),
+  }).then((r) => camelizeJson(r));
+}
+
 export default () => {
   const dispatch = useDispatch();
   const chatsState = useSelector((state) => state.chats);
@@ -51,7 +68,35 @@ export default () => {
       : null
   );
 
-  const handleReadableChange = useCallback((permission) => {}, [data]);
+  const handleBoolFieldChange = useCallback(
+    async (field, index, value) => {
+      const result = await changeReadable({
+        field,
+        chatId: chatsState.selected,
+        id: data.permissions[index].id,
+        value,
+      });
+
+      if (result.errors) {
+        toastErrors(result.errors);
+        return;
+      }
+
+      const permissions = updateInNewArray(
+        data.permissions,
+        result.permission,
+        index
+      );
+
+      setPermissions(permissions);
+    },
+    [data]
+  );
+
+  const [permissions, setPermissions] = useState([]);
+  useEffect(() => {
+    if (data && data.permissions) setPermissions(data.permissions);
+  }, [data]);
 
   const isLoaded = () => !error && chatsState.isLoaded && data && !data.errors;
 
@@ -78,10 +123,10 @@ export default () => {
                   <tr>
                     <TableHeaderCell tw="w-3/12">用户名称</TableHeaderCell>
                     <TableHeaderCell tw="w-2/12 text-center">
-                      设置可读
+                      设置 / 可读
                     </TableHeaderCell>
                     <TableHeaderCell tw="w-2/12 text-center">
-                      设置可写
+                      设置 / 可写
                     </TableHeaderCell>
                     <TableHeaderCell tw="w-2/12 text-center">
                       保持同步
@@ -92,7 +137,7 @@ export default () => {
                   </tr>
                 </thead>
                 <tbody>
-                  {data.permissions.map((permission) => (
+                  {permissions.map((permission, index) => (
                     <TableDataRow key={permission.id}>
                       <TableDataCell tw="w-3/12 break-all">
                         {makeFullname(permission.user)}
@@ -103,7 +148,9 @@ export default () => {
                             height={switchHeight}
                             width={switchWidth}
                             checked={permission.readable}
-                            onChange={handleReadableChange}
+                            onChange={(v) =>
+                              handleBoolFieldChange("readable", index, v)
+                            }
                           />
                         </div>
                       </TableDataCell>
@@ -113,7 +160,9 @@ export default () => {
                             height={switchHeight}
                             width={switchWidth}
                             checked={permission.writable}
-                            onChange={handleReadableChange}
+                            onChange={(v) =>
+                              handleBoolFieldChange("writable", index, v)
+                            }
                           />
                         </div>
                       </TableDataCell>
@@ -123,7 +172,9 @@ export default () => {
                             height={switchHeight}
                             width={switchWidth}
                             checked={!permission.customized}
-                            onChange={handleReadableChange}
+                            onChange={(v) =>
+                              handleBoolFieldChange("customized", index, !v)
+                            }
                           />
                         </div>
                       </TableDataCell>

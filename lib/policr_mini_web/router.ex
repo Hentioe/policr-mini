@@ -46,6 +46,10 @@ defmodule PolicrMiniWeb.Router do
     put "/customs/:id", CustomKitController, :update
     delete "/customs/:id", CustomKitController, :delete
 
+    put "/permissions/:id/readable", PermissionController, :change_readable
+    put "/permissions/:id/writable", PermissionController, :change_writable
+    put "/permissions/:id/customized", PermissionController, :change_customized
+
     get "/logs", LogController, :index
   end
 

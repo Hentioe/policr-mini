@@ -17,7 +17,7 @@ defmodule PolicrMini.PermissionBusiness do
     |> Repo.one()
   end
 
-  @type permission :: :writable | :readable
+  @type permission :: :writable | :readable | :owner
 
   # TODO: 添加测试。
   @doc """
@@ -28,6 +28,7 @@ defmodule PolicrMini.PermissionBusiness do
     if permission = find(chat_id, user_id) do
       permissions = if permission.writable, do: [:writable], else: []
       permissions = if permission.readable, do: permissions ++ [:readable], else: permissions
+      permissions = if permission.tg_is_owner, do: permissions ++ [:owner], else: permissions
 
       permissions
     else

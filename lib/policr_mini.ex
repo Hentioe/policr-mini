@@ -12,8 +12,11 @@ defmodule PolicrMini do
       alias unquote(schema_module)
       alias PolicrMini.Repo
 
-      def get(id) do
-        case unquote(schema_module) |> Repo.get(id) do
+      def get(id, options \\ []) do
+        preload = Keyword.get(options, :preload, [])
+        record = unquote(schema_module) |> Repo.get(id) |> Repo.preload(preload)
+
+        case record do
           nil -> {:error, :not_found, %{params: %{entry: unquote(schema_module), id: id}}}
           r -> {:ok, r}
         end
