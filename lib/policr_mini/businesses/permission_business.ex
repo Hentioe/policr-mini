@@ -75,7 +75,7 @@ defmodule PolicrMini.PermissionBusiness do
     end
   end
 
-  @default_limit 25
+  @default_limit 50
   @max_limit @default_limit
   @type find_list_cont :: [
           {:chat_id, integer | binary},
@@ -94,7 +94,7 @@ defmodule PolicrMini.PermissionBusiness do
   ## 条件参数
   - `chat_id`: 群组的 ID。
   - `user_id`: 用户的 ID。
-  - `limit`: 数量限制。默认值为 `25`，可允许的最大值也是 `25`。如果值大于最大限制会被重写为 `25`。
+  - `limit`: 数量限制。默认值为 `50`，可允许的最大值也是 `50`。如果值大于最大限制会被重写为 `50`。
   - `offset`: 偏移量，默认值为 `0`。
 
   无参数表示表示。
