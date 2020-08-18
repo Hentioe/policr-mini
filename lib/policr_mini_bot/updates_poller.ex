@@ -53,7 +53,7 @@ defmodule PolicrMiniBot.UpdatesPoller do
             else: List.last(updates).update_id + 1
 
         {:error, %Telegex.Model.Error{description: "Bad Gateway"}} ->
-          # 出现 TG 服务故障，大幅度降低请求频率
+          # Telegram 服务器故障，大幅度降低请求频率
           :timer.sleep(500)
 
           last_offset
@@ -61,11 +61,13 @@ defmodule PolicrMiniBot.UpdatesPoller do
         e ->
           Logger.unitized_error("Message pull", e)
           # 发生错误，降低请求频率
-          :timer.sleep(50)
+          :timer.sleep(200)
 
           last_offset
       end
 
+    # 每 35ms 一个拉取请求，避免 429 错误
+    :timer.sleep(35)
     schedule_pull_updates()
     {:noreply, %{state | offset: offset}}
   end
