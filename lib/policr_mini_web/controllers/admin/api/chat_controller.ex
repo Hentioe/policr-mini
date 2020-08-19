@@ -122,6 +122,9 @@ defmodule PolicrMiniWeb.Admin.API.ChatController do
     end
   end
 
+  def logs(_conn, _params) do
+  end
+
   defp gen_find_list_options(params) do
     to_atom = fn str, default ->
       if str == nil do
