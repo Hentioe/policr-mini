@@ -43,7 +43,7 @@ function makeFullname({ firstName, lastName }) {
   return name;
 }
 
-async function changeReadable({ field, chatId, id, value }) {
+async function changeBoolField({ field, chatId, id, value }) {
   const endpoint = `/admin/api/permissions/${id}/${field}`;
 
   return fetch(endpoint, {
@@ -67,13 +67,14 @@ export default () => {
       ? makeEndpoint(chatsState.selected)
       : null
   );
+  const [permissions, setPermissions] = useState([]);
 
   const handleBoolFieldChange = useCallback(
     async (field, index, value) => {
-      const result = await changeReadable({
+      const result = await changeBoolField({
         field,
         chatId: chatsState.selected,
-        id: data.permissions[index].id,
+        id: permissions[index].id,
         value,
       });
 
@@ -82,18 +83,17 @@ export default () => {
         return;
       }
 
-      const permissions = updateInNewArray(
-        data.permissions,
+      const newPermissions = updateInNewArray(
+        permissions,
         result.permission,
         index
       );
 
-      setPermissions(permissions);
+      setPermissions(newPermissions);
     },
-    [data]
+    [permissions]
   );
 
-  const [permissions, setPermissions] = useState([]);
   useEffect(() => {
     if (data && data.permissions) setPermissions(data.permissions);
   }, [data]);
@@ -192,7 +192,7 @@ export default () => {
           </PageSection>
         </PageBody>
       ) : error ? (
-        <PageReLoading />
+        <PageReLoading mutate={mutate} />
       ) : (
         <PageLoading />
       )}
