@@ -1,7 +1,7 @@
 import StatisticsPage from "./pages/Statistics";
 import SchemePage from "./pages/Scheme";
 import TemplatePage from "./pages/Template";
-import LogsPage from "./pages/Logs";
+import VerificationsPage from "./pages/Verifications";
 import BannedPage from "./pages/Banned";
 import PropertiesPage from "./pages/Properties";
 import PermissionsPage from "./pages/Permissions";
@@ -16,7 +16,7 @@ export {
   StatisticsPage,
   SchemePage,
   TemplatePage,
-  LogsPage,
+  VerificationsPage,
   BannedPage,
   PermissionsPage,
   PropertiesPage,

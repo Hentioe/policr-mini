@@ -98,7 +98,7 @@ export default () => {
     if (data && data.permissions) setPermissions(data.permissions);
   }, [data]);
 
-  const isLoaded = () => !error && chatsState.isLoaded && data && !data.errors;
+  const isLoaded = () => chatsState.isLoaded && !error && data && !data.errors;
 
   let title = "管理员权限";
   if (isLoaded()) title += ` / ${data.chat.title}`;

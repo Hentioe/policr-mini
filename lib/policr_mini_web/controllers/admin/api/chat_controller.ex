@@ -5,7 +5,13 @@ defmodule PolicrMiniWeb.Admin.API.ChatController do
 
   use PolicrMiniWeb, :controller
 
-  alias PolicrMini.{ChatBusiness, CustomKitBusiness, SchemeBusiness, PermissionBusiness}
+  alias PolicrMini.{
+    ChatBusiness,
+    CustomKitBusiness,
+    SchemeBusiness,
+    PermissionBusiness,
+    VerificationBusiness
+  }
 
   import PolicrMiniWeb.Helper
 
@@ -122,7 +128,17 @@ defmodule PolicrMiniWeb.Admin.API.ChatController do
     end
   end
 
-  def logs(_conn, _params) do
+  def verifications(conn, %{"chat_id" => chat_id} = _params) do
+    with {:ok, perms} <- check_permissions(conn, chat_id),
+         {:ok, chat} <- ChatBusiness.get(chat_id) do
+      verifications = VerificationBusiness.find_list(chat_id: chat_id)
+
+      render(conn, "verifications.json", %{
+        chat: chat,
+        verifications: verifications,
+        writable: Enum.member?(perms, :writable)
+      })
+    end
   end
 
   defp gen_find_list_options(params) do

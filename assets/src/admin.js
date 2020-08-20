@@ -18,7 +18,7 @@ import {
   StatisticsPage,
   SchemePage,
   TemplatePage,
-  LogsPage,
+  VerificationsPage,
   BannedPage,
   PermissionsPage,
   PropertiesPage,
@@ -70,8 +70,8 @@ const App = () => {
                   <Route path="/admin/chats/:id/template">
                     <TemplatePage />
                   </Route>
-                  <Route path="/admin/chats/:id/logs">
-                    <LogsPage />
+                  <Route path="/admin/chats/:id/verifications">
+                    <VerificationsPage />
                   </Route>
                   <Route path="/admin/chats/:id/banned">
                     <BannedPage />

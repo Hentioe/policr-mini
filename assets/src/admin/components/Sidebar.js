@@ -18,7 +18,8 @@ const NavItemLink = styled(
 )(({ selected = false, ending: ending }) => [
   tw`py-3 px-6 no-underline text-black tracking-wider`,
   tw`hover:bg-blue-100 hover:text-blue-500`,
-  selected && tw`text-blue-500`,
+  tw`border-0 border-l-2 border-solid border-transparent`,
+  selected && tw`text-blue-500 border-current`,
   ending && tw`rounded-b`,
 ]);
 
@@ -157,9 +158,9 @@ export default () => {
           selected={isSelect("template", location.pathname)}
         />
         <NavItem
-          title="验证日志"
-          href={`/admin/chats/${chatsState.selected}/logs`}
-          selected={isSelect("logs", location.pathname)}
+          title="验证记录"
+          href={`/admin/chats/${chatsState.selected}/verifications`}
+          selected={isSelect("verifications", location.pathname)}
         />
         <NavItem
           title="封禁记录"
@@ -180,7 +181,7 @@ export default () => {
           title="自定义"
           href={`/admin/chats/${chatsState.selected}/custom`}
           selected={isSelect("custom", location.pathname)}
-          ending={`${isOnOwnerMenu}`}
+          ending={isOnOwnerMenu ? 1 : 0}
         />
         {chatsState.loadedSelected && !isOnOwnerMenu ? (
           <div tw="py-3 px-6 text-lg text-gray-600 flex justify-between">
