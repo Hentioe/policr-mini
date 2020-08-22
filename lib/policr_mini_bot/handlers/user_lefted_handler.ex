@@ -1,6 +1,6 @@
 defmodule PolicrMiniBot.UserLeftedHandler do
   @moduledoc """
-  用户离开群组的处理器。
+  群成员离开的处理器。
   """
 
   use PolicrMiniBot, plug: :handler
@@ -8,9 +8,9 @@ defmodule PolicrMiniBot.UserLeftedHandler do
   alias PolicrMini.PermissionBusiness
 
   @doc """
-  匹配消息中是否包含离开群组的用户。
+  匹配消息中是否包含已离开的群成员。
 
-  如果离开群组的用户是机器人自己，则不匹配。否则皆匹配。
+  如果离开的群成员是机器人自己，则不匹配。否则皆匹配。
   """
   @impl true
   def match(%{left_chat_member: nil} = _message, state), do: {:nomatch, state}
