@@ -181,7 +181,8 @@ export default () => {
                       <TableDataCell>
                         <div tw="float-right mr-6">
                           <OperatingText tw="mr-1">同步</OperatingText>
-                          <OperatingText>禁用</OperatingText>
+                          <OperatingText tw="mr-1">禁用</OperatingText>
+                          <OperatingText>撤销</OperatingText>
                         </div>
                       </TableDataCell>
                     </TableDataRow>
