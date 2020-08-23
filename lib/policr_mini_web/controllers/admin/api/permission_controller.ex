@@ -11,27 +11,27 @@ defmodule PolicrMiniWeb.Admin.API.PermissionController do
 
   action_fallback PolicrMiniWeb.API.FallbackController
 
-  def change_readable(conn, %{"chat_id" => chat_id, "id" => id, "value" => value} = _params) do
-    with {:ok, _} <- check_permissions(conn, chat_id, [:writable, :owner]),
-         {:ok, permission} <- PermissionBusiness.get(id, preload: [:user]),
+  def change_readable(conn, %{"id" => id, "value" => value} = _params) do
+    with {:ok, permission} <- PermissionBusiness.get(id, preload: [:user]),
+         {:ok, _} <- check_permissions(conn, permission.chat_id, [:writable, :owner]),
          {:ok, _} <- safely_check(conn, permission),
          {:ok, permission} <- PermissionBusiness.update(permission, %{readable: value}) do
       render(conn, "updated.json", %{permission: permission})
     end
   end
 
-  def change_writable(conn, %{"chat_id" => chat_id, "id" => id, "value" => value} = _params) do
-    with {:ok, _} <- check_permissions(conn, chat_id, [:writable, :owner]),
-         {:ok, permission} <- PermissionBusiness.get(id, preload: [:user]),
+  def change_writable(conn, %{"id" => id, "value" => value} = _params) do
+    with {:ok, permission} <- PermissionBusiness.get(id, preload: [:user]),
+         {:ok, _} <- check_permissions(conn, permission.chat_id, [:writable, :owner]),
          {:ok, _} <- safely_check(conn, permission),
          {:ok, permission} <- PermissionBusiness.update(permission, %{writable: value}) do
       render(conn, "updated.json", %{permission: permission})
     end
   end
 
-  def change_customized(conn, %{"chat_id" => chat_id, "id" => id, "value" => value} = _params) do
-    with {:ok, _} <- check_permissions(conn, chat_id, [:writable, :owner]),
-         {:ok, permission} <- PermissionBusiness.get(id, preload: [:user]),
+  def change_customized(conn, %{"id" => id, "value" => value} = _params) do
+    with {:ok, permission} <- PermissionBusiness.get(id, preload: [:user]),
+         {:ok, _} <- check_permissions(conn, permission.chat_id, [:writable, :owner]),
          {:ok, _} <- safely_check(conn, permission),
          {:ok, permission} <- PermissionBusiness.update(permission, %{customized: value}) do
       render(conn, "updated.json", %{permission: permission})

@@ -43,19 +43,10 @@ function makeFullname({ firstName, lastName }) {
   return name;
 }
 
-async function changeBoolField({ field, chatId, id, value }) {
-  const endpoint = `/admin/api/permissions/${id}/${field}`;
+async function changeBoolField({ field, id, value }) {
+  const endpoint = `/admin/api/permissions/${id}/${field}?value=${value}`;
 
-  return fetch(endpoint, {
-    method: "PUT",
-    headers: {
-      "Content-Type": "application/json",
-    },
-    body: JSON.stringify({
-      chat_id: chatId,
-      value: value,
-    }),
-  }).then((r) => camelizeJson(r));
+  return fetch(endpoint, { method: "PUT" }).then((r) => camelizeJson(r));
 }
 
 export default () => {
@@ -73,7 +64,6 @@ export default () => {
     async (field, index, value) => {
       const result = await changeBoolField({
         field,
-        chatId: chatsState.selected,
         id: permissions[index].id,
         value,
       });
