@@ -18,7 +18,7 @@ defmodule PolicrMiniWeb.Admin.API.ChatController do
   action_fallback PolicrMiniWeb.API.FallbackController
 
   def index(%{assigns: %{user: user}} = conn, _prams) do
-    chats = ChatBusiness.find_list(user.id)
+    chats = ChatBusiness.find_list_by_user(user.id)
 
     render(conn, "index.json", %{chats: chats, ending: true})
   end

@@ -64,10 +64,15 @@ defmodule PolicrMini.ChatBusiness do
     end)
   end
 
-  # TODO：与 `PolicrMini.ChatBusiness.find_list2/1` 函数合并。
-  @spec find_list(integer()) :: [Chat.t()]
-  def find_list(user_id) when is_integer(user_id) do
-    from(p in Permission, where: p.user_id == ^user_id)
+  # TODO：添加测试。
+  @doc """
+  通过用户查询群组列表。
+
+  将返回指定用户下具有可读权限的群组列表，并按照添加时间排序。
+  """
+  @spec find_list_by_user(integer) :: [Chat.t()]
+  def find_list_by_user(user_id) when is_integer(user_id) do
+    from(p in Permission, where: p.user_id == ^user_id and p.readable == true)
     |> Repo.all()
     |> Repo.preload([:chat])
     |> Enum.map(fn p -> p.chat end)
@@ -76,14 +81,15 @@ defmodule PolicrMini.ChatBusiness do
   @max_limit 35
 
   @type column :: atom
-  @type find_list_opts :: [
+  @type find_list_cont :: [
           {:limit, integer},
           {:offset, integer},
-          {:order_by, [{:asc | :desc, column}]}
+          {:order_by, [{:asc | :desc, column | [column]}]}
         ]
 
-  @spec preprocess_find_list_options(find_list_opts) :: find_list_opts
-  defp preprocess_find_list_options(options) do
+  # 预处理列表查询条件。
+  @spec preprocess_find_list_cont(find_list_cont) :: find_list_cont
+  defp preprocess_find_list_cont(options) do
     options =
       if limit = Keyword.get(options, :limit) do
         if limit <= @max_limit, do: options, else: Keyword.put(options, :limit, @max_limit)
@@ -94,25 +100,28 @@ defmodule PolicrMini.ChatBusiness do
     options
     |> Keyword.put_new(:offset, 0)
     |> Keyword.put_new(:order_by, desc: :inserted_at)
+
+    options
   end
 
   # TODO：添加测试。
   @doc """
   查找群列表。
 
-  ## 可选参数
-  - `limit`: 数量限制。默认值为 `35`，并且最大值也是 `35`。
+
+  ## 可选查询条件
+  - `limit`: 数量限制。默认值为 `35`，最大值为 `35`，超过最大值将被最大值重写。
   - `offset`: 偏移位置。默认值为 `0`。
   - `order_by`: 排序方式。默认值为 `[desc: :inserted_at]`（按插入时间降序）。
   """
-  @spec find_list2(find_list_opts) :: [Chat.t()]
-  def find_list2(options \\ []) when is_list(options) do
-    options = preprocess_find_list_options(options)
+  @spec find_list2(find_list_cont) :: [Chat.t()]
+  def find_list2(cont \\ []) when is_list(cont) do
+    cont = preprocess_find_list_cont(cont)
 
     from(c in Chat,
-      limit: ^options[:limit],
-      offset: ^options[:offset],
-      order_by: ^options[:order_by]
+      limit: ^cont[:limit],
+      offset: ^cont[:offset],
+      order_by: ^cont[:order_by]
     )
     |> Repo.all()
   end
@@ -141,16 +150,16 @@ defmodule PolicrMini.ChatBusiness do
 
   注意：当前使用空格分隔的关键字仍然具备从左至右的关系，以后可能会顺序无关。
   """
-  @spec search(String.t(), find_list_opts) :: [Chat.t()]
-  def search(keywords, options \\ []) do
-    options = preprocess_find_list_options(options)
+  @spec search(String.t(), find_list_cont) :: [Chat.t()]
+  def search(keywords, cont \\ []) do
+    cont = preprocess_find_list_cont(cont)
     search_str = "%" <> (keywords |> String.replace(@keywords_separator_re, "%")) <> "%"
 
     from(c in Chat,
       where: ilike(c.title, ^search_str) or ilike(c.description, ^search_str),
-      limit: ^options[:limit],
-      offset: ^options[:offset],
-      order_by: ^options[:order_by]
+      limit: ^cont[:limit],
+      offset: ^cont[:offset],
+      order_by: ^cont[:order_by]
     )
     |> Repo.all()
   end

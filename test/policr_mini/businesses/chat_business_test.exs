@@ -115,7 +115,7 @@ defmodule PolicrMini.ChatBusinessTest do
     assert Enum.empty?(users)
   end
 
-  test "find_list/1" do
+  test "find_list_by_user/1" do
     chat_params = build_params()
     {:ok, chat1} = ChatBusiness.create(chat_params)
     {:ok, chat2} = ChatBusiness.create(chat_params |> Map.put(:id, 1_987_654_321))
@@ -133,12 +133,12 @@ defmodule PolicrMini.ChatBusinessTest do
         Factory.build(:permission, user_id: user.id)
       ])
 
-    chats = ChatBusiness.find_list(user.id)
+    chats = ChatBusiness.find_list_by_user(user.id)
     assert length(chats) == 2
 
     {_, _} = PermissionBusiness.delete(chat1.id, user.id)
 
-    chats = ChatBusiness.find_list(user.id)
+    chats = ChatBusiness.find_list_by_user(user.id)
     assert length(chats) == 1
     assert hd(chats) == chat2
   end
