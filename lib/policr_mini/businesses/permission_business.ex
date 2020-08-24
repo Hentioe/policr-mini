@@ -141,6 +141,10 @@ defmodule PolicrMini.PermissionBusiness do
     |> Repo.delete_all()
   end
 
+  def delete(%Permission{} = permission) do
+    Repo.delete(permission)
+  end
+
   # TODO：添加测试。
   @doc """
   删除指定群组的所有用户权限记录。

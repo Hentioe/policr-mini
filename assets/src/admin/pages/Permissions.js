@@ -43,10 +43,16 @@ function makeFullname({ firstName, lastName }) {
   return name;
 }
 
-async function changeBoolField({ field, id, value }) {
+async function changeBoolField(field, id, value) {
   const endpoint = `/admin/api/permissions/${id}/${field}?value=${value}`;
 
   return fetch(endpoint, { method: "PUT" }).then((r) => camelizeJson(r));
+}
+
+async function withdraw(id) {
+  const endpoint = `/admin/api/permissions/${id}/withdraw`;
+
+  return fetch(endpoint, { method: "DELETE" }).then((r) => camelizeJson(r));
 }
 
 export default () => {
@@ -62,11 +68,7 @@ export default () => {
 
   const handleBoolFieldChange = useCallback(
     async (field, index, value) => {
-      const result = await changeBoolField({
-        field,
-        id: permissions[index].id,
-        value,
-      });
+      const result = await changeBoolField(field, permissions[index].id, value);
 
       if (result.errors) {
         toastErrors(result.errors);
@@ -78,6 +80,22 @@ export default () => {
         result.permission,
         index
       );
+
+      setPermissions(newPermissions);
+    },
+    [permissions]
+  );
+
+  const handleWithdraw = useCallback(
+    async (index) => {
+      const result = await withdraw(permissions[index].id);
+
+      if (result.errors) {
+        toastErrors(result.errors);
+        return;
+      }
+
+      const newPermissions = permissions.filter((_, i) => i !== index);
 
       setPermissions(newPermissions);
     },
@@ -172,7 +190,9 @@ export default () => {
                         <div tw="float-right mr-6">
                           <OperatingText tw="mr-1">同步</OperatingText>
                           <OperatingText tw="mr-1">禁用</OperatingText>
-                          <OperatingText>撤销</OperatingText>
+                          <OperatingText onClick={() => handleWithdraw(index)}>
+                            撤销
+                          </OperatingText>
                         </div>
                       </TableDataCell>
                     </TableDataRow>
