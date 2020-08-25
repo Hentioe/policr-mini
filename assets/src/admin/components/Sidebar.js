@@ -148,7 +148,7 @@ export default () => {
           selected={isSelect("statistics", location.pathname)}
         />
         <NavItem
-          title="验证方案"
+          title="验证方案*"
           href={`/admin/chats/${chatsState.selected}/scheme`}
           selected={isSelect("scheme", location.pathname)}
         />
@@ -168,7 +168,7 @@ export default () => {
           selected={isSelect("banned", location.pathname)}
         />
         <NavItem
-          title="管理员权限"
+          title="管理员权限*"
           href={`/admin/chats/${chatsState.selected}/permissions`}
           selected={isSelect("permissions", location.pathname)}
         />
@@ -178,7 +178,7 @@ export default () => {
           selected={isSelect("properties", location.pathname)}
         />
         <NavItem
-          title="自定义"
+          title="自定义*"
           href={`/admin/chats/${chatsState.selected}/custom`}
           selected={isSelect("custom", location.pathname)}
           ending={isOnOwnerMenu ? 1 : 0}
@@ -204,12 +204,12 @@ export default () => {
 
       <MenuBox visibility={_GLOBAL.isOwner} title="系统菜单" miniTitle="系统">
         <NavItem
-          title="批量管理"
+          title="批量管理*"
           href="/admin/sys/managements"
           selected={isSysLink({ path: location.pathname, page: "managements" })}
         />
         <NavItem
-          title="查阅日志"
+          title="查阅日志*"
           href="/admin/sys/logs"
           selected={isSysLink({ path: location.pathname, page: "logs" })}
         />
