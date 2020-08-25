@@ -9,12 +9,12 @@ defmodule PolicrMini.VerificationBusiness do
 
   import Ecto.Query, only: [from: 2, dynamic: 2]
 
-  @typep modelwrited :: {:ok, Verification.t()} | {:error, Ecto.Changeset.t()}
+  @typep written_returns :: {:ok, Verification.t()} | {:error, Ecto.Changeset.t()}
 
   @doc """
   创建验证记录。
   """
-  @spec create(%{optional(atom() | String.t()) => any()}) :: modelwrited()
+  @spec create(%{optional(atom() | String.t()) => any()}) :: written_returns()
   def create(params) when is_map(params) do
     %Verification{} |> Verification.changeset(params) |> Repo.insert()
   end
@@ -23,8 +23,7 @@ defmodule PolicrMini.VerificationBusiness do
   获取或创建验证记录。
   尝试获取已存在的验证记录时，仅获取统一入口下的等待验证记录。
   """
-
-  @spec fetch(%{optional(atom() | String.t()) => any()}) :: modelwrited()
+  @spec fetch(%{optional(atom() | String.t()) => any()}) :: written_returns()
   def fetch(%{chat_id: chat_id, target_user_id: target_user_id} = params) do
     case find_unity_waiting(chat_id, target_user_id) do
       nil -> create(params)
@@ -32,10 +31,10 @@ defmodule PolicrMini.VerificationBusiness do
     end
   end
 
-  @spec update(Verification.t(), %{optional(atom() | binary()) => any()}) :: modelwrited()
   @doc """
   更新验证记录。
   """
+  @spec update(Verification.t(), %{optional(atom() | binary()) => any()}) :: written_returns()
   def update(%Verification{} = verification, params) do
     verification |> Verification.changeset(params) |> Repo.update()
   end
@@ -176,19 +175,19 @@ defmodule PolicrMini.VerificationBusiness do
           {:order_by, [{:desc | :asc, atom | [atom]}]}
         ]
 
-  @default_find_list_limit 25
+  @default_find_list_limit 999
   @max_find_list_limit @default_find_list_limit
 
   @doc """
   查找验证记录列表。
 
-  可选参数表示查询条件，并且部分条件存在默认和最大值限制。
+  可选参数表示查询条件，部分条件存在默认和最大值限制。
 
   ## 查询条件
   - `chat_id`: 群组的 ID。
-  - `limit`: 数量限制。默认值为 `25`，最大值为 `25`。如果条件中的值大于最大值将会被最大值重写。
+  - `limit`: 数量限制。默认值为 `999`，最大值为 `999`。如果条件中的值大于最大值将会被最大值重写。
   - `offset`: 偏移量。默认值为 `0`。
-  - `order_by`: 排序方式。
+  - `order_by`: 排序方式，默认值为 `[desc: :updated_at]`。
   """
   @spec find_list(find_list_cont) :: [Verification.t()]
   def find_list(cont \\ []) do

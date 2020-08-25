@@ -45,7 +45,7 @@ function camelizeJson(resp) {
   );
 }
 
-function toastMessage(message, { type = "error" }) {
+function toastMessage(message, { type } = {}) {
   switch (type) {
     case "error":
       toast.error(message, {
@@ -58,8 +58,16 @@ function toastMessage(message, { type = "error" }) {
         progress: undefined,
       });
       break;
-
     default:
+      toast.info(message, {
+        position: "bottom-center",
+        autoClose: 1500,
+        hideProgressBar: false,
+        closeOnClick: true,
+        pauseOnHover: true,
+        draggable: true,
+        progress: undefined,
+      });
       break;
   }
 }

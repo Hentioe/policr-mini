@@ -100,8 +100,6 @@ defmodule PolicrMini.ChatBusiness do
     options
     |> Keyword.put_new(:offset, 0)
     |> Keyword.put_new(:order_by, desc: :inserted_at)
-
-    options
   end
 
   # TODO：添加测试。

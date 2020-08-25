@@ -52,6 +52,8 @@ defmodule PolicrMiniWeb.Router do
     put "/permissions/:id/customized", PermissionController, :change_customized
     delete "/permissions/:id/withdraw", PermissionController, :withdraw
 
+    put "/verifications/:id/kick", VerificationController, :kick
+
     get "/logs", LogController, :index
   end
 

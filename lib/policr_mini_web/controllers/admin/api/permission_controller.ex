@@ -60,8 +60,6 @@ defmodule PolicrMiniWeb.Admin.API.PermissionController do
   ]
   @spec demote_administrator(PolicrMini.Schemas.Permission.t()) :: {:ok, boolean} | {:error, map}
   defp demote_administrator(%{chat_id: chat_id, user_id: user_id} = _permission) do
-    IO.inspect(chat_id: chat_id, user_id: user_id)
-
     case Telegex.promote_chat_member(chat_id, user_id, @demoted_all_permissions) do
       {:ok, true} ->
         {:ok, true}
