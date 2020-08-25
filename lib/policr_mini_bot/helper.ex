@@ -471,10 +471,10 @@ defmodule PolicrMiniBot.Helper do
   获取默认配置。
 
   当前 `key` 可以是以下值：
-  - `:vmode` - 验证方式
+  - `:vmode` - 验证方法
   - `:ventrance` - 验证入口
   - `:voccasion` - 验证场合
-  - `:kmethod` - 击杀方式
+  - `:kmethod` - 击杀方法
   """
   @spec default!(default_keys) :: any()
   def default!(key) when is_atom(key) do

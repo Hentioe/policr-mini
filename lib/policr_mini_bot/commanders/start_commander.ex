@@ -197,7 +197,7 @@ defmodule PolicrMiniBot.StartCommander do
   @doc """
   制作一个发送消息的函数。
 
-  此函数的主要目的是为不同的验证方式生成不同类型的消息的发送函数。
+  此函数的主要目的是为不同的验证方法生成不同类型的消息的发送函数。
   """
   @spec make_send_fun(
           captchas,

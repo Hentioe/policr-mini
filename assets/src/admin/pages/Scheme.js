@@ -117,7 +117,7 @@ export default () => {
         <PageBody>
           <PageSection>
             <PageSectionHeader>
-              <PageSectionTitle>验证方式</PageSectionTitle>
+              <PageSectionTitle>验证方法</PageSectionTitle>
             </PageSectionHeader>
             <main>
               <div tw="my-2">
@@ -165,7 +165,7 @@ export default () => {
           </PageSection>
           <PageSection>
             <PageSectionHeader>
-              <PageSectionTitle>击杀方式</PageSectionTitle>
+              <PageSectionTitle>击杀方法</PageSectionTitle>
             </PageSectionHeader>
             <main>
               <NotImplemented />
