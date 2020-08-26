@@ -1,6 +1,6 @@
 import React, { useEffect, useCallback, useState } from "react";
 import useSWR from "swr";
-import tw, { styled } from "twin.macro";
+import "twin.macro";
 import Switch from "react-switch";
 import fetch from "unfetch";
 
@@ -11,25 +11,13 @@ import {
   PageSection,
   PageSectionHeader,
   PageSectionTitle,
+  ActionButton,
 } from "../components";
+import { Table, Thead, Tr, Th, Tbody, Td } from "../components/Tables";
 import { camelizeJson, toastErrors, updateInNewArray } from "../helper";
 import { useDispatch, useSelector } from "react-redux";
 import { loadSelected } from "../slices/chats";
 import PageBody from "../components/PageBody";
-
-const OperatingText = styled.span`
-  ${tw`text-xs text-blue-400 font-bold cursor-pointer`}
-`;
-
-const TableHeaderCell = styled.th`
-  ${tw`font-normal text-gray-500 text-left uppercase`}
-`;
-
-const TableDataRow = styled.tr``;
-const TableDataCell = styled.td(() => [
-  tw`border border-dashed border-0 border-t border-gray-300`,
-  tw`py-2 text-sm`,
-]);
 
 const makeEndpoint = (chat_id) => `/admin/api/chats/${chat_id}/permissions`;
 
@@ -66,27 +54,35 @@ export default () => {
   );
   const [permissions, setPermissions] = useState([]);
 
-  const handleBoolFieldChange = useCallback(
+  const handleSwitchChange = useCallback(
     async (field, index, value) => {
-      const result = await changeBoolField(field, permissions[index].id, value);
-
-      if (result.errors) {
-        toastErrors(result.errors);
-        return;
-      }
-
+      // 先切换开关
       const newPermissions = updateInNewArray(
         permissions,
-        result.permission,
+        { ...permissions[index], [field]: value },
         index
       );
 
       setPermissions(newPermissions);
+
+      const result = await changeBoolField(field, permissions[index].id, value);
+
+      if (result.errors) {
+        // 失败再回滚开关
+        const newPermissions = updateInNewArray(
+          permissions,
+          { ...permissions[index], [field]: !value },
+          index
+        );
+        setPermissions(newPermissions);
+        toastErrors(result.errors);
+        return;
+      }
     },
     [permissions]
   );
 
-  const handleWithdraw = useCallback(
+  const handleWithdrawClick = useCallback(
     async (index) => {
       const result = await withdraw(permissions[index].id);
 
@@ -126,79 +122,71 @@ export default () => {
               <PageSectionTitle>权限列表</PageSectionTitle>
             </PageSectionHeader>
             <main>
-              <table tw="w-full border border-solid border-0 border-b border-t border-gray-300 mt-1">
-                <thead>
-                  <tr>
-                    <TableHeaderCell tw="w-3/12">用户名称</TableHeaderCell>
-                    <TableHeaderCell tw="w-2/12 text-center">
-                      设置 / 可读
-                    </TableHeaderCell>
-                    <TableHeaderCell tw="w-2/12 text-center">
-                      设置 / 可写
-                    </TableHeaderCell>
-                    <TableHeaderCell tw="w-2/12 text-center">
-                      保持同步
-                    </TableHeaderCell>
-                    <TableHeaderCell tw="w-3/12">
-                      <span tw="float-right mr-6">操作</span>
-                    </TableHeaderCell>
-                  </tr>
-                </thead>
-                <tbody>
+              <Table tw="shadow rounded">
+                <Thead>
+                  <Tr>
+                    <Th tw="w-3/12">用户名称</Th>
+                    <Th tw="w-2/12 text-center">设置 / 可读</Th>
+                    <Th tw="w-2/12 text-center">设置 / 可写</Th>
+                    <Th tw="w-2/12 text-center">保持同步</Th>
+                    <Th tw="w-3/12 text-right">操作</Th>
+                  </Tr>
+                </Thead>
+                <Tbody>
                   {permissions.map((permission, index) => (
-                    <TableDataRow key={permission.id}>
-                      <TableDataCell tw="w-3/12 break-all">
+                    <Tr key={permission.id}>
+                      <Td tw="w-3/12 break-all">
                         {makeFullname(permission.user)}
-                      </TableDataCell>
-                      <TableDataCell tw="w-2/12">
+                      </Td>
+                      <Td tw="w-2/12">
                         <div tw="flex justify-center">
                           <Switch
                             height={switchHeight}
                             width={switchWidth}
                             checked={permission.readable}
                             onChange={(v) =>
-                              handleBoolFieldChange("readable", index, v)
+                              handleSwitchChange("readable", index, v)
                             }
                           />
                         </div>
-                      </TableDataCell>
-                      <TableDataCell tw="w-2/12 text-center">
+                      </Td>
+                      <Td tw="w-2/12 text-center">
                         <div tw="flex justify-center">
                           <Switch
                             height={switchHeight}
                             width={switchWidth}
                             checked={permission.writable}
                             onChange={(v) =>
-                              handleBoolFieldChange("writable", index, v)
+                              handleSwitchChange("writable", index, v)
                             }
                           />
                         </div>
-                      </TableDataCell>
-                      <TableDataCell tw="w-2/12 text-center">
+                      </Td>
+                      <Td tw="w-2/12 text-center">
                         <div tw="flex justify-center">
                           <Switch
                             height={switchHeight}
                             width={switchWidth}
                             checked={!permission.customized}
                             onChange={(v) =>
-                              handleBoolFieldChange("customized", index, !v)
+                              handleSwitchChange("customized", index, !v)
                             }
                           />
                         </div>
-                      </TableDataCell>
-                      <TableDataCell>
-                        <div tw="float-right mr-6">
-                          <OperatingText tw="mr-1">同步</OperatingText>
-                          <OperatingText tw="mr-1">禁用</OperatingText>
-                          <OperatingText onClick={() => handleWithdraw(index)}>
-                            撤销
-                          </OperatingText>
-                        </div>
-                      </TableDataCell>
-                    </TableDataRow>
+                      </Td>
+                      <Td tw="text-right">
+                        <ActionButton tw="mr-1">同步</ActionButton>
+                        <ActionButton tw="mr-1">禁用</ActionButton>
+                        <ActionButton
+                          onClick={() => handleWithdrawClick(index)}
+                        >
+                          撤销
+                        </ActionButton>
+                      </Td>
+                    </Tr>
                   ))}
-                </tbody>
-              </table>
+                </Tbody>
+              </Table>
             </main>
           </PageSection>
         </PageBody>
