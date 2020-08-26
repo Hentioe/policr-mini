@@ -131,7 +131,7 @@ defmodule PolicrMiniWeb.Admin.API.ChatController do
   def verifications(conn, params) do
     chat_id = params["chat_id"]
     offset = params["offset"]
-    _timeRange = params["timeRange"]
+    _time_range = params["timeRange"]
 
     status =
       try do

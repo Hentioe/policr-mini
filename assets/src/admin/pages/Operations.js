@@ -8,7 +8,7 @@ export default () => {
 
   return (
     <>
-      <PageHeader title="封禁记录" />
+      <PageHeader title="操作记录" />
       {isLoaded ? <NotImplemented /> : <PageLoading />}
     </>
   );

@@ -16,4 +16,6 @@ defmodule PolicrMini.EctoEnums do
   defenum VerificationEntranceEnum, unity: 0, independent: 1
   defenum VerificationOccasionEnum, private: 0, public: 1
   defenum KillingMethodEnum, ban: 0, kick: 1
+  defenum OperationActionEnum, kick: 0, ban: 1
+  defenum OperationRoleEnum, system: 0, admin: 1
 end

@@ -75,6 +75,14 @@ defmodule PolicrMini.Factory do
     }
   end
 
+  def build(:operation) do
+    %PolicrMini.Schemas.Operation{
+      verification_id: 10_000,
+      action: :kick,
+      role: :system
+    }
+  end
+
   def build(factory_name, attrs) when is_atom(factory_name) and is_list(attrs) do
     factory_name |> build() |> struct(attrs)
   end

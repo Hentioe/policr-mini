@@ -7,7 +7,7 @@ defmodule PolicrMiniBot.VerificationCaller do
 
   alias PolicrMini.Logger
   alias PolicrMini.Schemas.Verification
-  alias PolicrMini.{VerificationBusiness, SchemeBusiness}
+  alias PolicrMini.{VerificationBusiness, SchemeBusiness, OperationBusiness}
   alias PolicrMiniBot.{UserJoinedHandler, Disposable}
 
   @doc """
@@ -177,13 +177,29 @@ defmodule PolicrMiniBot.VerificationCaller do
       end)
     end
 
+    operation_create_fun = fn verification ->
+      case OperationBusiness.create(%{
+             verification_id: verification.id,
+             action: :kick,
+             role: :system
+           }) do
+        {:ok, _} = r ->
+          r
+
+        e ->
+          Logger.unitized_error("Operation creation", e)
+          e
+      end
+    end
+
     case verification |> VerificationBusiness.update(%{status: :wronged}) do
       {:ok, verification} ->
         case killing_method do
           :kick ->
-            text = t("verification.wronged.kick.private")
+            # 添加操作记录（系统）
+            operation_create_fun.(verification)
 
-            cleaner_fun.(text)
+            cleaner_fun.(t("verification.wronged.kick.private"))
 
             UserJoinedHandler.kick(verification.chat_id, from_user, :wronged)
 

@@ -5,7 +5,8 @@ defmodule PolicrMiniWeb.Admin.API.VerificationController do
 
   use PolicrMiniWeb, :controller
 
-  alias PolicrMini.{VerificationBusiness}
+  alias PolicrMini.{VerificationBusiness, OperationBusiness}
+  alias PolicrMini.Logger
 
   import PolicrMiniWeb.Helper
 
@@ -17,13 +18,28 @@ defmodule PolicrMiniWeb.Admin.API.VerificationController do
     with {:ok, verification} <- VerificationBusiness.get(id, preload: [:chat]),
          {:ok, _} <- check_permissions(conn, verification.chat.id, [:writable]),
          {:ok, ok} <- kick_by_verification(verification, is_ban: is_ban) do
+      action = if is_ban, do: :ban, else: :kick
+      # 添加操作记录（管理员）
+      case OperationBusiness.create(%{
+             verification_id: verification.id,
+             action: action,
+             role: :admin
+           }) do
+        {:ok, _} = r ->
+          r
+
+        e ->
+          Logger.unitized_error("Operation creation", e)
+          e
+      end
+
       render(conn, "kick.json", %{ok: ok, verification: verification})
     end
   end
 
   @type kick_by_verification_opts :: [{:is_ban, boolean}]
 
-  @spec kick_by_verification(PolicrMini.Schemes.Verification.t(), kick_by_verification_opts) ::
+  @spec kick_by_verification(PolicrMini.Schemas.Verification.t(), kick_by_verification_opts) ::
           {:ok, boolean} | {:error, map}
   defp kick_by_verification(verification, options) do
     %{chat: %{id: chat_id}, target_user_id: target_user_id} = verification

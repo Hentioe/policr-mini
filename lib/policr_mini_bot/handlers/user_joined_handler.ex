@@ -8,7 +8,7 @@ defmodule PolicrMiniBot.UserJoinedHandler do
   alias PolicrMini.Logger
 
   alias PolicrMini.Schemas.{Verification, Scheme}
-  alias PolicrMini.{SchemeBusiness, VerificationBusiness}
+  alias PolicrMini.{SchemeBusiness, VerificationBusiness, OperationBusiness}
   alias PolicrMiniBot.VerificationCaller
 
   # 过期时间：15 分钟
@@ -269,9 +269,27 @@ defmodule PolicrMiniBot.UserJoinedHandler do
       )
     end
 
+    operation_create_fun = fn verification ->
+      case OperationBusiness.create(%{
+             verification_id: verification.id,
+             action: :kick,
+             role: :system
+           }) do
+        {:ok, _} = r ->
+          r
+
+        e ->
+          Logger.unitized_error("Operation creation", e)
+          e
+      end
+    end
+
     verification_handle_fun = fn latest_verification ->
       # 为等待状态则实施操作
       if latest_verification.status == :waiting do
+        # 添加操作记录（系统）
+        operation_create_fun.(latest_verification)
+
         # 计数器自增（超时总数）
         PolicrMini.Counter.increment(:verification_timeout_total)
         # 更新状态为超时

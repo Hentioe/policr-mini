@@ -163,9 +163,9 @@ export default () => {
           selected={isSelect("verifications", location.pathname)}
         />
         <NavItem
-          title="封禁记录"
-          href={`/admin/chats/${chatsState.selected}/banned`}
-          selected={isSelect("banned", location.pathname)}
+          title="操作记录"
+          href={`/admin/chats/${chatsState.selected}/operations`}
+          selected={isSelect("operations", location.pathname)}
         />
         <NavItem
           title="管理员权限*"
