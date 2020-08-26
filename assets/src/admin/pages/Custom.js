@@ -16,7 +16,9 @@ import {
   PageLoading,
   PageReLoading,
   LabelledButton,
+  ActionButton,
 } from "../components";
+import { Table, Thead, Tr, Th, Tbody, Td } from "../components/Tables";
 import { updateInNewArray, camelizeJson, toastErrors } from "../helper";
 
 const FormSection = styled.div`
@@ -55,16 +57,6 @@ const HintParagraph = styled(Paragraph)`
 const InlineKeybordButton = styled.div`
   ${tw`shadow-sm bg-blue-400 text-white rounded-md px-4 py-2 text-sm mt-1 flex justify-center bg-opacity-75 cursor-pointer`}
 `;
-
-const TableHeaderCell = styled.th`
-  ${tw`font-normal text-gray-500 text-left`}
-`;
-
-const TableDataRow = styled.tr``;
-const TableDataCell = styled.td(() => [
-  tw`border border-dashed border-0 border-t border-gray-300`,
-  tw`py-2 text-sm`,
-]);
 
 const EDITING_CHECK = {
   VALID: 1,
@@ -274,12 +266,9 @@ export default () => {
             <main>
               {data.customKits.length > 0 ? (
                 <div tw="mt-4">
-                  <span
-                    tw="text-blue-400 font-bold cursor-pointer"
-                    onClick={handleIsEditing}
-                  >
+                  <ActionButton onClick={handleIsEditing}>
                     + 添加新问题
-                  </span>
+                  </ActionButton>
                   {!data.isEnabled && (
                     <RouteLink
                       tw="ml-2 text-gray-500"
@@ -288,52 +277,45 @@ export default () => {
                       切换到已定制的验证
                     </RouteLink>
                   )}
-                  <table tw="w-full border border-solid border-0 border-b border-t border-gray-300 mt-1">
-                    <thead>
-                      <tr>
-                        <TableHeaderCell tw="w-5/12">标题</TableHeaderCell>
-                        <TableHeaderCell tw="w-2/12">答案数量</TableHeaderCell>
-                        <TableHeaderCell tw="w-2/12">编辑于</TableHeaderCell>
-                        <TableHeaderCell tw="w-3/12">
-                          <span tw="float-right pr-6">操作</span>
-                        </TableHeaderCell>
-                      </tr>
-                    </thead>
-                    <tbody>
+                  <Table tw="shadow rounded">
+                    <Thead>
+                      <Tr>
+                        <Th tw="w-5/12 pr-0">标题</Th>
+                        <Th tw="w-2/12 text-center px-0">答案个数</Th>
+                        <Th tw="w-3/12">编辑于</Th>
+                        <Th tw="w-2/12 text-right">操作</Th>
+                      </Tr>
+                    </Thead>
+                    <Tbody>
                       {data.customKits.map((customKit, index) => (
-                        <TableDataRow key={customKit.id}>
-                          <TableDataCell tw="w-5/12 break-all">
-                            {customKit.title}
-                          </TableDataCell>
-                          <TableDataCell tw="w-2/12">
+                        <Tr key={customKit.id}>
+                          <Td tw="break-all pr-0">{customKit.title}</Td>
+                          <Td tw="text-center px-0">
                             {customKit.answers.length}
-                          </TableDataCell>
-                          <TableDataCell tw="w-3/12">
+                          </Td>
+                          <Td>
                             {formatDateTime(
                               parseISO(customKit.updatedAt),
                               dateTimeFormat
                             )}
-                          </TableDataCell>
-                          <TableDataCell tw="w-2/12">
-                            <div tw="float-right pr-6">
-                              <span
-                                tw="text-xs text-blue-400 font-bold cursor-pointer"
-                                onClick={() => handleEdit(index)}
-                              >
-                                编辑
-                              </span>{" "}
-                              <span
-                                tw="text-xs text-blue-400 font-bold cursor-pointer"
-                                onClick={() => handleDelete(customKit.id)}
-                              >
-                                删除
-                              </span>
-                            </div>
-                          </TableDataCell>
-                        </TableDataRow>
+                          </Td>
+                          <Td tw="text-right">
+                            <ActionButton
+                              tw="mr-1"
+                              onClick={() => handleEdit(index)}
+                            >
+                              编辑
+                            </ActionButton>
+                            <ActionButton
+                              onClick={() => handleDelete(customKit.id)}
+                            >
+                              删除
+                            </ActionButton>
+                          </Td>
+                        </Tr>
                       ))}
-                    </tbody>
-                  </table>
+                    </Tbody>
+                  </Table>
                 </div>
               ) : (
                 <HintParagraph>
