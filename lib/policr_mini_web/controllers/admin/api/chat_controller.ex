@@ -128,10 +128,23 @@ defmodule PolicrMiniWeb.Admin.API.ChatController do
     end
   end
 
-  def verifications(conn, %{"chat_id" => chat_id} = _params) do
+  def verifications(conn, params) do
+    chat_id = params["chat_id"]
+    offset = params["offset"]
+    _timeRange = params["timeRange"]
+
+    status =
+      try do
+        String.to_existing_atom(params["status"])
+      rescue
+        _ -> :all
+      end
+
+    cont = [chat_id: chat_id, offset: offset, status: status]
+
     with {:ok, perms} <- check_permissions(conn, chat_id),
          {:ok, chat} <- ChatBusiness.get(chat_id) do
-      verifications = VerificationBusiness.find_list(chat_id: chat_id)
+      verifications = VerificationBusiness.find_list(cont)
 
       render(conn, "verifications.json", %{
         chat: chat,

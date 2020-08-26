@@ -172,10 +172,11 @@ defmodule PolicrMini.VerificationBusiness do
           {:chat_id, integer | binary},
           {:limit, integer},
           {:offset, integer},
+          {:status, :passed | :not_passed | :all},
           {:order_by, [{:desc | :asc, atom | [atom]}]}
         ]
 
-  @default_find_list_limit 999
+  @default_find_list_limit 25
   @max_find_list_limit @default_find_list_limit
 
   @doc """
@@ -185,9 +186,9 @@ defmodule PolicrMini.VerificationBusiness do
 
   ## 查询条件
   - `chat_id`: 群组的 ID。
-  - `limit`: 数量限制。默认值为 `999`，最大值为 `999`。如果条件中的值大于最大值将会被最大值重写。
+  - `limit`: 数量限制。默认值为 `25`，最大值为 `25`。如果条件中的值大于最大值将会被最大值重写。
   - `offset`: 偏移量。默认值为 `0`。
-  - `order_by`: 排序方式，默认值为 `[desc: :updated_at]`。
+  - `order_by`: 排序方式，默认值为 `[desc: :inserted_at]`。
   """
   @spec find_list(find_list_cont) :: [Verification.t()]
   def find_list(cont \\ []) do
@@ -206,14 +207,27 @@ defmodule PolicrMini.VerificationBusiness do
       end
 
     offset = Keyword.get(cont, :offset, 0)
-    order_by = Keyword.get(cont, :order_by, desc: :updated_at)
+    order_by = Keyword.get(cont, :order_by, desc: :inserted_at)
+
+    filter_status = build_find_list_status_filter(Keyword.get(cont, :status))
 
     from(v in Verification,
       where: ^filter_chat_id,
+      where: ^filter_status,
       limit: ^limit,
       offset: ^offset,
       order_by: ^order_by
     )
     |> Repo.all()
   end
+
+  defp build_find_list_status_filter(:passed) do
+    dynamic([v], v.status == ^VerificationStatusEnum.__enum_map__()[:passed])
+  end
+
+  defp build_find_list_status_filter(:not_passed) do
+    dynamic([v], v.status != ^VerificationStatusEnum.__enum_map__()[:passed])
+  end
+
+  defp build_find_list_status_filter(_), do: true
 end

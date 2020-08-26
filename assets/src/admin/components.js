@@ -12,6 +12,7 @@ import PageReLoading from "./components/PageReLoading";
 import LabelledButton from "./components/LabelledButton";
 import RetryButton from "./components/RetryButton";
 import ActionButton from "./components/ActionButton";
+import Pagination from "./components/Pagination";
 
 export {
   Sidebar,
@@ -28,4 +29,5 @@ export {
   LabelledButton,
   RetryButton,
   ActionButton,
+  Pagination,
 };

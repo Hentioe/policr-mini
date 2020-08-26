@@ -20,6 +20,7 @@ import {
   PageSectionTitle,
   PageBody,
   ActionButton,
+  Pagination,
 } from "../components";
 import { Table, Thead, Tr, Th, Tbody, Td } from "../components/Tables";
 import { loadSelected } from "../slices/chats";
@@ -44,6 +45,16 @@ function findStatusOption(value) {
   else return options[0];
 }
 
+function parseOffset(offset) {
+  if (offset) {
+    try {
+      return parseInt(offset);
+    } catch (error) {
+      return 0;
+    }
+  } else return 0;
+}
+
 function parseTimeRange(timeRange) {
   if (["1d", "1w", "2w", "1m"].includes(timeRange)) return timeRange;
   else return "1d";
@@ -53,12 +64,13 @@ function parseStatus(status) {
   else return "all";
 }
 
-function makeQueryString(status, timeRange) {
+function makeQueryString({ status, timeRange, offset }) {
   status = parseStatus(status);
   timeRange = parseTimeRange(timeRange);
+  offset = parseOffset(offset);
 
-  let queryString = `?timeRange=${timeRange}`;
-  if (status != "all") queryString += `&status=${level}`;
+  let queryString = `?timeRange=${timeRange}&offset=${offset}`;
+  if (status != "all") queryString += `&status=${status}`;
 
   return queryString;
 }
@@ -110,13 +122,14 @@ const makeEndpoint = (chatId, queryString) =>
 export default () => {
   const dispatch = useDispatch();
   const location = useLocation();
-  const chatsState = useSelector((state) => state.chats);
 
+  const chatsState = useSelector((state) => state.chats);
   const searchParams = new URLSearchParams(location.search);
 
   const status = searchParams.get("status");
   const timeRange = parseTimeRange(searchParams.get("timeRange"));
-  const apiQueryString = makeQueryString(status, timeRange);
+  const offset = parseOffset(searchParams.get("offset"));
+  const apiQueryString = makeQueryString({ status, timeRange, offset });
 
   const [statusOption, setStatusOption] = useState(findStatusOption(status));
 
@@ -136,7 +149,9 @@ export default () => {
     } else if (result.ok) {
       toastMessage(`踢出「${result.verification.targetUserName}」成功。`);
     } else {
-      toastErrors("出现了一个不太确定的结果。");
+      toastErrors(
+        `不太确定踢出「${result.verification.targetUserName}」是否成功。`
+      );
     }
   };
 
@@ -148,7 +163,9 @@ export default () => {
     } else if (result.ok) {
       toastMessage(`封禁「${result.verification.targetUserName}」成功。`);
     } else {
-      toastErrors("出现了一个不太确定的结果。");
+      toastErrors(
+        `不太确定封禁「${result.verification.targetUserName}」是否成功。`
+      );
     }
   };
 
@@ -186,25 +203,41 @@ export default () => {
               <div tw="w-8/12 flex items-center justify-around">
                 <span>显示过去时间范围的情况：</span>
                 <TimeLink
-                  to={`${makeQueryString(statusOption.value, "1d")}`}
+                  to={makeQueryString({
+                    status: statusOption.value,
+                    timeRange: "1d",
+                    offset: offset,
+                  })}
                   selected={timeRange == "1d"}
                 >
                   1 天
                 </TimeLink>
                 <TimeLink
-                  to={`${makeQueryString(statusOption.value, "1w")}`}
+                  to={makeQueryString({
+                    status: statusOption.value,
+                    timeRange: "1w",
+                    offset: offset,
+                  })}
                   selected={timeRange == "1w"}
                 >
                   1 周
                 </TimeLink>
                 <TimeLink
-                  to={`${makeQueryString(statusOption.value, "2w")}`}
+                  to={makeQueryString({
+                    status: statusOption.value,
+                    timeRange: "2w",
+                    offset: offset,
+                  })}
                   selected={timeRange == "2w"}
                 >
                   2 周
                 </TimeLink>
                 <TimeLink
-                  to={`${makeQueryString(statusOption.value, "1m")}`}
+                  to={makeQueryString({
+                    status: statusOption.value,
+                    timeRange: "1m",
+                    offset: offset,
+                  })}
                   selected={timeRange == "1m"}
                 >
                   1 月
@@ -219,47 +252,67 @@ export default () => {
           </PageSectionHeader>
           <main>
             {isLoaded() ? (
-              <Table tw="mt-3">
-                <Thead>
-                  <Tr>
-                    <Th tw="w-2/12">用户名称</Th>
-                    <Th tw="w-2/12">语言代码</Th>
-                    <Th tw="w-3/12">加入时间</Th>
-                    <Th tw="w-1/12 text-center">用时</Th>
-                    <Th tw="w-2/12">状态</Th>
-                    <Th tw="w-2/12 text-right">操作</Th>
-                  </Tr>
-                </Thead>
-                <Tbody>
-                  {data.verifications.map((v, i) => (
-                    <Tr key={v.id}>
-                      <Td tw="truncate">{v.targetUserName}</Td>
-                      <Td>{v.targetUserLanguageCode || "unknown"}</Td>
-                      <Td>
-                        {formatDateTime(parseISO(v.insertedAt), dateTimeFormat)}
-                      </Td>
-                      <Td tw="text-center">
-                        {differenceInSeconds(
-                          parseISO(v.updatedAt),
-                          parseISO(v.insertedAt)
-                        )}
-                      </Td>
-                      <Td>{statusUI(v.status)}</Td>
-                      <Td tw="text-right">
-                        <ActionButton
-                          onClick={() => handleBanClick(v.id)}
-                          tw="mr-1"
-                        >
-                          封禁
-                        </ActionButton>
-                        <ActionButton onClick={() => handleKickClick(v.id)}>
-                          踢出
-                        </ActionButton>
-                      </Td>
+              <div tw="shadow rounded">
+                <Table tw="mt-3">
+                  <Thead>
+                    <Tr>
+                      <Th tw="w-2/12">用户名称</Th>
+                      <Th tw="w-2/12">语言代码</Th>
+                      <Th tw="w-3/12">加入时间</Th>
+                      <Th tw="w-1/12 text-center">用时</Th>
+                      <Th tw="w-2/12">状态</Th>
+                      <Th tw="w-2/12 text-right">操作</Th>
                     </Tr>
-                  ))}
-                </Tbody>
-              </Table>
+                  </Thead>
+                  <Tbody>
+                    {data.verifications.map((v, i) => (
+                      <Tr key={v.id}>
+                        <Td tw="truncate">{v.targetUserName}</Td>
+                        <Td>{v.targetUserLanguageCode || "unknown"}</Td>
+                        <Td>
+                          {formatDateTime(
+                            parseISO(v.insertedAt),
+                            dateTimeFormat
+                          )}
+                        </Td>
+                        <Td tw="text-center">
+                          {differenceInSeconds(
+                            parseISO(v.updatedAt),
+                            parseISO(v.insertedAt)
+                          )}
+                        </Td>
+                        <Td>{statusUI(v.status)}</Td>
+                        <Td tw="text-right">
+                          <ActionButton
+                            onClick={() => handleBanClick(v.id)}
+                            tw="mr-1"
+                          >
+                            封禁
+                          </ActionButton>
+                          <ActionButton onClick={() => handleKickClick(v.id)}>
+                            踢出
+                          </ActionButton>
+                        </Td>
+                      </Tr>
+                    ))}
+                  </Tbody>
+                </Table>
+                <Pagination
+                  begin={offset + 1}
+                  ending={offset + data.verifications.length}
+                  linkify={true}
+                  upTo={makeQueryString({
+                    status,
+                    timeRange,
+                    offset: offset < 25 ? 0 : offset - 25,
+                  })}
+                  downTo={makeQueryString({
+                    status,
+                    timeRange,
+                    offset: offset + 25,
+                  })}
+                />
+              </div>
             ) : error ? (
               <PageReLoading mutate={mutate} />
             ) : (
