@@ -13,11 +13,14 @@ const MenuText = styled.span`
   ${tw`px-5`}
 `;
 
-const BetaMarkup = styled.span`
+const LogoMarkup = styled.span`
   font-size: 0.5rem;
   margin-bottom: 0.5rem;
-  ${tw`text-yellow-500 font-semibold`}
+  ${tw`text-orange-500 font-semibold`}
 `;
+
+const version = "beta";
+const thirdParty = "T-party";
 
 // 参考来源：https://tailwindcomponents.com/component/simple-responsive-navigation-bar-1
 export default () => {
@@ -26,9 +29,11 @@ export default () => {
       {/* LOGO&主页链接 */}
       <Link href="/" tw="p-0 md:p-1 lg:p-2 mr-4 inline-flex items-center">
         <span tw="text-lg md:text-xl font-bold text-blue-500 tracking-wide uppercase">
-          policr mini
+          {_GLOBAL.botName || _GLOBAL.botFirstName}
         </span>
-        <BetaMarkup tw="self-end">beta</BetaMarkup>
+        <LogoMarkup tw="self-end">
+          {_GLOBAL.botUsername === "policr_mini_bot" ? version : thirdParty}
+        </LogoMarkup>
       </Link>
       {/* 参考按钮实现：https://tailwindui.com/components/application-ui/navigation/navbars */}
       {/* 展开/隐藏菜单按钮 */}

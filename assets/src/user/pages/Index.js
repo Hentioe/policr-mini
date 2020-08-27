@@ -57,7 +57,7 @@ export default () => {
         {/* 左边主要内容区域 */}
         <div tw="w-full lg:w-8/12">
           <p tw="text-blue-500 text-2xl text-center md:text-3xl lg:text-4xl lg:text-left font-bold tracking-widest">
-            由社区驱动的开源验证机器人，致力于自主部署和使用。
+            致力于自主部署使用的，由社区驱动的开源验证机器人。
           </p>
           <p tw="text-sm text-center md:text-base lg:text-left text-gray-600">
             本项目从 Policr
@@ -136,7 +136,7 @@ export default () => {
             <div tw="w-10/12">
               <div tw="shadow rounded-md p-4 text-sm">
                 <span tw="text-red-700 font-semibold cursor-pointer">
-                  Policr Mini (Internal beta)
+                  {_GLOBAL.botFirstName}
                 </span>
                 <Divider />
                 <Paragraph>
@@ -161,9 +161,9 @@ export default () => {
               <Avatar />
             </div>
             <div tw="w-10/12">
-              <div tw="shadow rounded-md text-sm">
+              <div tw="shadow rounded-md text-sm pb-4">
                 <img src="/images/et-x400.jpg" tw="w-full rounded-t" />
-                <div tw="px-4 py-1">
+                <div tw="px-4 pt-1">
                   <Paragraph tw="italic">
                     来自『<span tw="font-bold">POLICR · 中文社区</span>
                     』的验证，请确认问题并选择您认为正确的答案。

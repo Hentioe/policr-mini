@@ -30,7 +30,7 @@ defmodule PolicrMiniBot do
   @doc """
   获取机器人的 ID。
   """
-  @spec id :: integer()
+  @spec id :: integer
   def id() do
     [{:id, id}] = :ets.lookup(:bot_info, :id)
 
@@ -45,5 +45,15 @@ defmodule PolicrMiniBot do
     [{:username, username}] = :ets.lookup(:bot_info, :username)
 
     username
+  end
+
+  @doc """
+  获取机器人的名称。
+  """
+  @spec name :: String.t()
+  def name() do
+    [{:name, name}] = :ets.lookup(:bot_info, :name)
+
+    name
   end
 end

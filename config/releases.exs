@@ -48,7 +48,8 @@ config :policr_mini, PolicrMiniBot,
         raise("""
         environment variable POLICR_MINI_BOT_OWNER_ID is missing.
         """)
-    )
+    ),
+  name: System.get_env("POLICR_MINI_BOT_NAME")
 
 # Configures the image provider
 config :policr_mini, PolicrMiniBot.ImageProvider,

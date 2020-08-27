@@ -16,7 +16,9 @@ defmodule PolicrMiniBot.UpdatesPoller do
   def start_link(default \\ []) when is_list(default) do
     # 获取机器人必要信息
     Logger.info("Checking bot information…")
-    {:ok, %Telegex.Model.User{id: id, username: username}} = Telegex.get_me()
+
+    {:ok, %Telegex.Model.User{id: id, username: username, first_name: name}} = Telegex.get_me()
+
     Logger.info("Bot (@#{username}) is working")
     # 更新 Plug 中缓存的用户名
     Telegex.Plug.update_username(username)
@@ -24,6 +26,7 @@ defmodule PolicrMiniBot.UpdatesPoller do
     :ets.new(:bot_info, [:set, :named_table])
     :ets.insert(:bot_info, {:id, id})
     :ets.insert(:bot_info, {:username, username})
+    :ets.insert(:bot_info, {:name, name})
 
     GenServer.start_link(__MODULE__, %{offset: 0}, name: __MODULE__)
   end
