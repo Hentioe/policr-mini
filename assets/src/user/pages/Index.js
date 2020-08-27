@@ -202,9 +202,13 @@ export default () => {
               Linux 服务器上。
             </p>
 
-            <button tw="mt-6 bg-green-500 border-0 text-white px-6 py-4">
+            <a
+              tw="mt-6 inline-block bg-green-500 border-0 text-white px-6 py-4 no-underline"
+              href="https://github.com/Hentioe/policr-mini/wiki/%E8%87%AA%E8%A1%8C%E9%83%A8%E7%BD%B2%EF%BC%88%E6%9E%84%E5%BB%BA%E7%AC%AC%E4%B8%89%E6%96%B9%E5%AE%9E%E4%BE%8B%EF%BC%89"
+              target="_blank"
+            >
               让我们开始吧
-            </button>
+            </a>
           </div>
           <div tw="w-full lg:w-5/12">
             <p tw="text-gray-200 italic tracking-wider">
