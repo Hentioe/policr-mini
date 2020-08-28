@@ -163,7 +163,7 @@ export default () => {
           selected={isSelect("verifications", location.pathname)}
         />
         <NavItem
-          title="操作记录"
+          title="操作记录*"
           href={`/admin/chats/${chatsState.selected}/operations`}
           selected={isSelect("operations", location.pathname)}
         />

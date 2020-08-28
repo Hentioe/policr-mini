@@ -66,6 +66,18 @@ defmodule PolicrMiniWeb.Admin.API.ChatView do
     }
   end
 
+  def render("operations.json", %{chat: chat, operations: operations, writable: writable}) do
+    chat = render_one(chat, __MODULE__, "chat.json")
+
+    operations = render_many(operations, PolicrMiniWeb.Admin.API.OperationView, "operation.json")
+
+    %{
+      chat: chat,
+      operations: operations,
+      writable: writable
+    }
+  end
+
   def render("search.json", %{chats: chats}) do
     %{chats: render_many(chats, __MODULE__, "chat.json")}
   end

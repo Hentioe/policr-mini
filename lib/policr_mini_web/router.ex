@@ -40,6 +40,7 @@ defmodule PolicrMiniWeb.Router do
     put "/chats/:chat_id/takeover", ChatController, :change_takeover
     get "/chats/:chat_id/permissions", ChatController, :permissions
     get "/chats/:chat_id/verifications", ChatController, :verifications
+    get "/chats/:chat_id/operations", ChatController, :operations
     get "/chats/list", ChatController, :list
     get "/chats/search", ChatController, :search
 

@@ -10,7 +10,8 @@ defmodule PolicrMiniWeb.Admin.API.ChatController do
     CustomKitBusiness,
     SchemeBusiness,
     PermissionBusiness,
-    VerificationBusiness
+    VerificationBusiness,
+    OperationBusiness
   }
 
   import PolicrMiniWeb.Helper
@@ -128,8 +129,7 @@ defmodule PolicrMiniWeb.Admin.API.ChatController do
     end
   end
 
-  def verifications(conn, params) do
-    chat_id = params["chat_id"]
+  def verifications(conn, %{"chat_id" => chat_id} = params) do
     offset = params["offset"]
     _time_range = params["timeRange"]
 
@@ -149,6 +149,44 @@ defmodule PolicrMiniWeb.Admin.API.ChatController do
       render(conn, "verifications.json", %{
         chat: chat,
         verifications: verifications,
+        writable: Enum.member?(perms, :writable)
+      })
+    end
+  end
+
+  def operations(conn, %{"chat_id" => chat_id} = params) do
+    offset = params["offset"]
+    _time_range = params["timeRange"]
+
+    role =
+      try do
+        String.to_existing_atom(params["role"])
+      rescue
+        _ -> :all
+      end
+
+    action =
+      try do
+        String.to_existing_atom(params["action"])
+      rescue
+        _ -> :all
+      end
+
+    cont = [
+      chat_id: chat_id,
+      offset: offset,
+      role: role,
+      action: action,
+      preload: [:verification]
+    ]
+
+    with {:ok, perms} <- check_permissions(conn, chat_id),
+         {:ok, chat} <- ChatBusiness.get(chat_id) do
+      operations = OperationBusiness.find_list(cont)
+
+      render(conn, "operations.json", %{
+        chat: chat,
+        operations: operations,
         writable: Enum.member?(perms, :writable)
       })
     end
