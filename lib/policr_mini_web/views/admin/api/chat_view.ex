@@ -86,6 +86,12 @@ defmodule PolicrMiniWeb.Admin.API.ChatView do
     %{chats: render_many(chats, __MODULE__, "chat.json")}
   end
 
+  def render("leave.json", %{ok: ok, chat: chat}) do
+    chat = render_one(chat, __MODULE__, "chat.json")
+
+    %{ok: ok, chat: chat}
+  end
+
   def render("show.json", %{chat: chat}) do
     %{chat: render_one(chat, __MODULE__, "chat.json")}
   end

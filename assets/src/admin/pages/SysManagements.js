@@ -3,6 +3,7 @@ import tw, { styled } from "twin.macro";
 import { Link as RouteLink, useLocation, useHistory } from "react-router-dom";
 import useSWR from "swr";
 import { parseISO, format as formatDateTime } from "date-fns";
+import fetch from "unfetch";
 
 import {
   PageHeader,
@@ -16,6 +17,7 @@ import {
   Pagination,
 } from "../components";
 import { Table, Thead, Tr, Th, Tbody, Td } from "../components/Tables";
+import { toastErrors, toastMessage, camelizeJson } from "../helper";
 
 const SearchInput = styled.input.attrs({
   type: "text",
@@ -66,6 +68,12 @@ function makeEndpoint({ offset, keywords }) {
   return `${endpoint}${queryString}`;
 }
 
+async function leaveChat(id) {
+  const endpoint = `/admin/api/chats/${id}/leave`;
+
+  return fetch(endpoint, { method: "PUT" }).then((r) => camelizeJson(r));
+}
+
 export default () => {
   const location = useLocation();
   const history = useHistory();
@@ -103,6 +111,21 @@ export default () => {
 
     history.push(`/admin/sys/managements${queryString}`);
   }, [offset, isSearching]);
+
+  const handleLeaveChat = async (id) => {
+    const result = await leaveChat(id);
+
+    if (result.errors) {
+      toastErrors(result.errors);
+      return;
+    }
+
+    if (result.ok) toastMessage(`退出「${result.chat.title}」成功。`);
+    else
+      toastMessage("不太确定「${result.chat.title}」的退出结果。", {
+        type: "warn",
+      });
+  };
 
   useEffect(() => {
     if (searchText && searchText.trim() != "") setIsShowClearText(true);
@@ -188,7 +211,11 @@ export default () => {
                         </Td>
                         <Td tw="text-right">
                           <ActionButton tw="mr-1">同步</ActionButton>
-                          <ActionButton>退出</ActionButton>
+                          <ActionButton
+                            onClick={() => handleLeaveChat(chat.id)}
+                          >
+                            退出
+                          </ActionButton>
                         </Td>
                       </Tr>
                     ))}

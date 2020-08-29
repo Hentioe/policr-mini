@@ -56,6 +56,9 @@ defmodule PolicrMiniWeb.Admin.API.VerificationController do
       {:error, %Telegex.Model.Error{description: <<"Bad Request: " <> reason>>}} ->
         {:error, %{description: reason}}
 
+      {:error, %Telegex.Model.Error{description: <<"Forbidden: " <> reason>>}} ->
+        {:error, %{description: reason}}
+
       {:error, %Telegex.Model.Error{description: description}} ->
         {:error, %{description: description}}
 

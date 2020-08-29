@@ -36,6 +36,7 @@ defmodule PolicrMiniWeb.Router do
     get "/chats/:id/photo", ChatController, :photo
     get "/chats/:id/customs", ChatController, :customs
     get "/chats/:id/scheme", ChatController, :scheme
+    put "/chats/:id/leave", ChatController, :leave
     put "/chats/:chat_id/scheme", ChatController, :update_scheme
     put "/chats/:chat_id/takeover", ChatController, :change_takeover
     get "/chats/:chat_id/permissions", ChatController, :permissions

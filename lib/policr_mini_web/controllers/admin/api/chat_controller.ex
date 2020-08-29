@@ -243,4 +243,32 @@ defmodule PolicrMiniWeb.Admin.API.ChatController do
       render(conn, "list.json", %{chats: chats})
     end
   end
+
+  def leave(conn, %{"id" => id} = _params) do
+    with {:ok, _} <- check_sys_permissions(conn, [:writable]),
+         {:ok, chat} <- ChatBusiness.get(id),
+         {:ok, ok} <- leave_chat(id) do
+      render(conn, "leave.json", %{ok: ok, chat: chat})
+    end
+  end
+
+  @spec leave_chat(integer | binary) :: {:ok, boolean} | {:error, map}
+  defp leave_chat(chat_id) do
+    case Telegex.leave_chat(chat_id) do
+      {:ok, ok} ->
+        {:ok, ok}
+
+      {:error, %{reason: _reason}} ->
+        %{description: "please try again"}
+
+      {:error, %{description: <<"Bad Request: " <> reason>>}} ->
+        {:error, %{description: reason}}
+
+      {:error, %{description: <<"Forbidden: " <> reason>>}} ->
+        {:error, %{description: reason}}
+
+      {:error, %{description: description}} ->
+        {:error, %{description: description}}
+    end
+  end
 end

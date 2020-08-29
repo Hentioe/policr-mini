@@ -58,6 +58,17 @@ function toastMessage(message, { type } = {}) {
         progress: undefined,
       });
       break;
+    case "warn":
+      toast.warn(message, {
+        position: "bottom-center",
+        autoClose: 2000,
+        hideProgressBar: false,
+        closeOnClick: true,
+        pauseOnHover: true,
+        draggable: true,
+        progress: undefined,
+      });
+      break;
     default:
       toast.info(message, {
         position: "bottom-center",
