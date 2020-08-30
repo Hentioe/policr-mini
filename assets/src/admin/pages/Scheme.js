@@ -22,7 +22,7 @@ import { camelizeJson, toastErrors } from "../helper";
 const defaultModeOption = { value: 4, label: "系统默认" };
 const modeOptions = [
   { value: 0, label: "图片验证" },
-  { value: 1, label: "定制验证" },
+  { value: 1, label: "定制验证（自定义）" },
   { value: 2, label: "算术验证" },
   { value: 3, label: "主动验证" },
   defaultModeOption,
@@ -102,7 +102,7 @@ export default () => {
 
   const isLoaded = () => !error && chatsState.isLoaded && data && !data.errors;
 
-  let title = "验证方案";
+  let title = "方案定制";
   if (isLoaded()) title += ` / ${data.chat.title}`;
 
   useEffect(() => {
@@ -117,7 +117,7 @@ export default () => {
         <PageBody>
           <PageSection>
             <PageSectionHeader>
-              <PageSectionTitle>验证方法</PageSectionTitle>
+              <PageSectionTitle>验证方式</PageSectionTitle>
             </PageSectionHeader>
             <main>
               <div tw="my-2">
@@ -166,6 +166,14 @@ export default () => {
           <PageSection>
             <PageSectionHeader>
               <PageSectionTitle>击杀方法</PageSectionTitle>
+            </PageSectionHeader>
+            <main>
+              <NotImplemented />
+            </main>
+          </PageSection>
+          <PageSection>
+            <PageSectionHeader>
+              <PageSectionTitle>等待时间</PageSectionTitle>
             </PageSectionHeader>
             <main>
               <NotImplemented />
