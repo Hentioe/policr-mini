@@ -1,7 +1,7 @@
 import React, { useEffect, useState, useCallback } from "react";
+import "twin.macro";
 import useSWR from "swr";
 import { useSelector, useDispatch } from "react-redux";
-import "twin.macro";
 import Select from "react-select";
 
 import { loadSelected } from "../slices/chats";
@@ -15,6 +15,7 @@ import {
   PageReLoading,
   NotImplemented,
   LabelledButton,
+  HintParagraph,
 } from "../components";
 
 import { camelizeJson, toastErrors } from "../helper";
@@ -22,7 +23,7 @@ import { camelizeJson, toastErrors } from "../helper";
 const defaultModeOption = { value: 4, label: "系统默认" };
 const modeOptions = [
   { value: 0, label: "图片验证" },
-  { value: 1, label: "定制验证" },
+  { value: 1, label: "定制验证（自定义）" },
   { value: 2, label: "算术验证" },
   { value: 3, label: "主动验证" },
   defaultModeOption,
@@ -71,6 +72,7 @@ export default () => {
 
   const [modeValue, setModeValue] = useState(defaultModeOption.value);
   const [isModeEditing, setIsModeEditing] = useState(false);
+  const [isSecondsEditing, setIsSecondsEditing] = useState(true);
 
   useEffect(() => {
     setModeValue(getModeValueFromData());
@@ -87,22 +89,22 @@ export default () => {
   });
 
   const handleSaveMode = useCallback(() => {
-    saveScheme({
+    const result = saveScheme({
       id: data.scheme ? data.scheme.id : -1,
       chatId: chatsState.selected,
       modeValue: modeValue,
-    }).then((result) => {
-      if (result.errors) toastErrors(result.errors);
-      else {
-        setIsModeEditing(false);
-        mutate();
-      }
     });
+    if (result.errors) {
+      toastErrors(result.errors);
+      return;
+    }
+    setIsModeEditing(false);
+    mutate();
   }, [modeValue]);
 
   const isLoaded = () => !error && chatsState.isLoaded && data && !data.errors;
 
-  let title = "验证方案";
+  let title = "方案定制";
   if (isLoaded()) title += ` / ${data.chat.title}`;
 
   useEffect(() => {
@@ -117,7 +119,7 @@ export default () => {
         <PageBody>
           <PageSection>
             <PageSectionHeader>
-              <PageSectionTitle>验证方法</PageSectionTitle>
+              <PageSectionTitle>验证方式</PageSectionTitle>
             </PageSectionHeader>
             <main>
               <div tw="my-2">
@@ -130,7 +132,7 @@ export default () => {
               </div>
               {isModeEditing && (
                 <div tw="flex mt-4">
-                  <div tw="flex-1 pr-10">
+                  <div tw="flex-1 pr-2 lg:pr-10">
                     <LabelledButton
                       label="cancel"
                       onClick={() => handleModeEditingCanceling()}
@@ -138,7 +140,7 @@ export default () => {
                       取消
                     </LabelledButton>
                   </div>
-                  <div tw="flex-1 pl-10">
+                  <div tw="flex-1 pl-2 lg:pl-10">
                     <LabelledButton label="ok" onClick={handleSaveMode}>
                       确定
                     </LabelledButton>
@@ -169,6 +171,29 @@ export default () => {
             </PageSectionHeader>
             <main>
               <NotImplemented />
+            </main>
+          </PageSection>
+          <PageSection>
+            <PageSectionHeader>
+              <PageSectionTitle>超时时长</PageSectionTitle>
+            </PageSectionHeader>
+            <main>
+              {data.scheme.seconds || isSecondsEditing ? (
+                <NotImplemented />
+              ) : (
+                <div>
+                  <HintParagraph>
+                    当前为系统默认，
+                    <span
+                      tw="underline cursor-pointer select-none"
+                      onClick={() => setIsSecondsEditing(true)}
+                    >
+                      点此修改
+                    </span>
+                    。
+                  </HintParagraph>
+                </div>
+              )}
             </main>
           </PageSection>
         </PageBody>

@@ -148,12 +148,12 @@ export default () => {
           selected={isSelect("statistics", location.pathname)}
         />
         <NavItem
-          title="验证方案*"
+          title="方案定制*"
           href={`/admin/chats/${chatsState.selected}/scheme`}
           selected={isSelect("scheme", location.pathname)}
         />
         <NavItem
-          title="验证提示"
+          title="消息模板"
           href={`/admin/chats/${chatsState.selected}/template`}
           selected={isSelect("template", location.pathname)}
         />
