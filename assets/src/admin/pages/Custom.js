@@ -377,12 +377,11 @@ export default () => {
                             }
                           />
                         </div>
-                        <span
-                          tw="text-blue-400 font-bold cursor-pointer"
+                        <ActionButton
                           onClick={() => handleAnswerAddOrDelete(index)}
                         >
                           {answers.length - 1 == index ? "添加" : "删除"}
-                        </span>
+                        </ActionButton>
                       </div>
                     </FormSection>
                   ))}
