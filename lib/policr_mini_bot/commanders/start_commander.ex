@@ -37,21 +37,16 @@ defmodule PolicrMiniBot.StartCommander do
   end
 
   @doc """
-  群组消息，忽略。
+  - 群组消息，忽略。
+  - 群组（超级群）消息，忽略。
+  - 如果命令没有携带参数，则发送包含链接的项目介绍。否则将参数整体传递给 `dispatch/1` 函数进一步拆分和分发。
   """
   @impl true
   def handle(%{chat: %{type: "group"}}, state), do: {:ignored, state}
 
-  @doc """
-  群组（超级群）消息，忽略。
-  """
   @impl true
   def handle(%{chat: %{type: "supergroup"}}, state), do: {:ignored, state}
 
-  @doc """
-  响应命令。
-  如果命令没有携带参数，则发送包含链接的项目介绍。否则将参数整体传递给 `dispatch/1` 函数进一步拆分和分发。
-  """
   @impl true
   def handle(message, state) do
     %{chat: %{id: chat_id}, text: text} = message
@@ -122,9 +117,7 @@ defmodule PolicrMiniBot.StartCommander do
     end
   end
 
-  @doc """
-  响应未知参数。
-  """
+  # 响应未知参数。
   def handle_args(_, message) do
     %{chat: %{id: chat_id}} = message
 
