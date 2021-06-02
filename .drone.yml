@@ -11,7 +11,7 @@ steps:
       - mix compile
 
   - name: assets-build
-    image: node:buster
+    image: node:lts-buster
     commands:
       - npm install --prefix assets
       - npm run deploy --prefix assets
