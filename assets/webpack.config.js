@@ -1,7 +1,6 @@
 const path = require("path");
 const glob = require("glob");
 const MiniCssExtractPlugin = require("mini-css-extract-plugin");
-const TerserPlugin = require("terser-webpack-plugin");
 const OptimizeCSSAssetsPlugin = require("optimize-css-assets-webpack-plugin");
 const CopyWebpackPlugin = require("copy-webpack-plugin");
 
@@ -10,8 +9,16 @@ module.exports = (env, options) => {
 
   return {
     optimization: {
+      minimize: true,
       minimizer: [
-        new TerserPlugin({ cache: true, parallel: true, sourceMap: devMode }),
+        (compiler) => {
+          const TerserPlugin = require("terser-webpack-plugin");
+          new TerserPlugin({
+            terserOptions: {
+              compress: {},
+            },
+          }).apply(compiler);
+        },
         new OptimizeCSSAssetsPlugin({}),
       ],
     },
@@ -26,6 +33,12 @@ module.exports = (env, options) => {
     devtool: devMode ? "source-map" : undefined,
     module: {
       rules: [
+        {
+          test: /\.m?js/,
+          resolve: {
+            fullySpecified: false,
+          },
+        },
         {
           test: /\.js$/,
           exclude: /node_modules/,
