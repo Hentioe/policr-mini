@@ -6,13 +6,14 @@ defmodule PolicrMiniBot.Supervisor do
   alias PolicrMiniBot.{
     TakeoverCheckPreheater,
     FromCheckPreheater,
+    UserJoinedGroupPreheater,
+    UserLeftedPreheater,
     StartCommander,
     PingCommander,
     SyncCommander,
     LoginCommander,
     SelfJoinedHandler,
     SelfLeftedHandler,
-    UserLeftedHandler,
     UserJoinedHandler,
     MemberRemovedHandler,
     NewChatTitleHandler,
@@ -27,13 +28,18 @@ defmodule PolicrMiniBot.Supervisor do
 
   @impl true
   def init(_init_arg) do
-    install_plugs([TakeoverCheckPreheater, FromCheckPreheater])
+    install_plugs([
+      TakeoverCheckPreheater,
+      FromCheckPreheater,
+      UserJoinedGroupPreheater,
+      UserLeftedPreheater
+    ])
+
     install_plugs([StartCommander, PingCommander, SyncCommander, LoginCommander])
 
     install_plugs([
       SelfJoinedHandler,
       SelfLeftedHandler,
-      UserLeftedHandler,
       UserJoinedHandler,
       NewChatTitleHandler,
       NewChatPhotoHandler,

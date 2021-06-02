@@ -3,6 +3,8 @@ defmodule PolicrMiniBot.UserJoinedHandler do
   处理新用户加入。
   """
 
+  # TODO: 修改模块含义并迁移代码。因为设计改动，此 `handler` 已无实际验证处理流程，仅作删除消息之用。
+
   use PolicrMiniBot, plug: :handler
 
   alias PolicrMini.Logger
@@ -55,34 +57,23 @@ defmodule PolicrMiniBot.UserJoinedHandler do
 
   @impl true
   def handle(message, state) do
-    %{chat: %{id: chat_id}, new_chat_members: new_chat_members} = message
+    %{chat: %{id: chat_id}} = message
 
-    case SchemeBusiness.fetch(chat_id) do
-      {:ok, scheme} ->
-        # 异步删除服务消息
-        Cleaner.delete_message(chat_id, message.message_id)
-        Enum.each(new_chat_members, &handle_one(&1, scheme, message, state))
+    # 异步删除服务消息
+    Cleaner.delete_message(chat_id, message.message_id)
 
-        {:ok, %{state | done: true, deleted: true}}
-
-      e ->
-        Logger.unitized_error("Verification scheme fetching", chat_id: chat_id, returns: e)
-
-        send_message(chat_id, t("errors.scheme_fetch_failed"))
-
-        {:error, state}
-    end
+    {:ok, %{state | done: true, deleted: true}}
   end
 
   # 忽略 bot 类型的用户。
-  defp handle_one(%{is_bot: true} = _new_chat_member, _scheme, _message, state) do
+  @spec handle_one(integer, Telegex.Model.User.t(), integer, Scheme.t(), State.t()) ::
+          {:error, State.t()} | {:ok, State.t()}
+  def handle_one(_chat_id, %{is_bot: true} = _new_chat_member, _date, _scheme, state) do
     {:ignored, state}
   end
 
   # 处理单个新成员的加入。
-  defp handle_one(new_chat_member, scheme, message, state) do
-    %{chat: %{id: chat_id}, date: date} = message
-
+  def handle_one(chat_id, new_chat_member, date, scheme, state) do
     joined_datetime =
       case date |> DateTime.from_unix() do
         {:ok, datetime} -> datetime
@@ -96,12 +87,12 @@ defmodule PolicrMiniBot.UserJoinedHandler do
 
     if DateTime.diff(DateTime.utc_now(), joined_datetime) >= @expired_seconds do
       # 处理过期验证
-      handle_expired(entrance, message, state)
+      handle_expired(entrance, chat_id, new_chat_member, state)
     else
       # 异步限制新用户
       async(fn -> restrict_chat_member(chat_id, new_chat_member.id) end)
 
-      handle_it(mode, entrance, occasion, seconds, message, state)
+      handle_it(mode, entrance, occasion, seconds, chat_id, new_chat_member, state)
     end
   end
 
@@ -109,10 +100,8 @@ defmodule PolicrMiniBot.UserJoinedHandler do
   处理过期验证。
   当前仅限制用户，并不发送验证消息。
   """
-  @spec handle_expired(atom(), Message.t(), State.t()) :: {:error, State.t()} | {:ok, State.t()}
-  def handle_expired(entrance, message, state) do
-    %{chat: %{id: chat_id}, new_chat_members: [new_chat_member]} = message
-
+  @spec handle_expired(atom, integer, map, State.t()) :: {:error, State.t()} | {:ok, State.t()}
+  def handle_expired(entrance, chat_id, new_chat_member, state) do
     verification_params = %{
       chat_id: chat_id,
       target_user_id: new_chat_member.id,
@@ -146,9 +135,7 @@ defmodule PolicrMiniBot.UserJoinedHandler do
   @doc """
   统一入口 + 私聊方案的细节实现。
   """
-  def handle_it(_, :unity, :private, seconds, message, state) do
-    %{chat: %{id: chat_id}, new_chat_members: [new_chat_member]} = message
-
+  def handle_it(_, :unity, :private, seconds, chat_id, new_chat_member, state) do
     verification_params = %{
       chat_id: chat_id,
       target_user_id: new_chat_member.id,
