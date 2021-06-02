@@ -40,4 +40,6 @@ npm-debug.log
 /config/*.secret.exs
 
 # Mnesia
-/Mnesia.*
+/Mnesia.*/
+
+/data/

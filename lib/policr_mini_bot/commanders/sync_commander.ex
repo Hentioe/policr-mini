@@ -11,7 +11,8 @@ defmodule PolicrMiniBot.SyncCommander do
   alias PolicrMini.Schemas.{Permission, Chat}
 
   @doc """
-  非管理员发送指令直接删除。
+  - 非管理员发送指令直接删除。
+  - 同步群组数据：群组信息、管理员列表。
   """
   @impl true
   def handle(message, %{from_admin: false} = state) do
@@ -22,10 +23,6 @@ defmodule PolicrMiniBot.SyncCommander do
     {:ok, %{state | deleted: true}}
   end
 
-  @doc """
-  同步群组数据。
-  包括群组信息、管理员数据。
-  """
   @impl true
   def handle(message, state) do
     %{chat: %{id: chat_id}} = message
