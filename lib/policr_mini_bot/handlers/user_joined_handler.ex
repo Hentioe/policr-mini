@@ -39,8 +39,6 @@ defmodule PolicrMiniBot.UserJoinedHandler do
 
   ## 以下情况皆不匹配
   - 群组未接管
-  - 拉人或进群的是管理员
-  - 拉人或进群的是机器人
 
   除此之外包含新成员的消息都将匹配。
   """
@@ -49,12 +47,11 @@ defmodule PolicrMiniBot.UserJoinedHandler do
   @impl true
   def match(%{new_chat_members: nil} = _message, state), do: {:nomatch, state}
   @impl true
-  def match(_message, %{from_admin: true} = state), do: {:nomatch, state}
-  @impl true
-  def match(%{new_chat_members: [%{is_bot: true}]} = _message, state), do: {:nomatch, state}
-  @impl true
   def match(_message, state), do: {:match, state}
 
+  @doc """
+  删除进群服务消息。
+  """
   @impl true
   def handle(message, state) do
     %{chat: %{id: chat_id}} = message
@@ -63,13 +60,6 @@ defmodule PolicrMiniBot.UserJoinedHandler do
     Cleaner.delete_message(chat_id, message.message_id)
 
     {:ok, %{state | done: true, deleted: true}}
-  end
-
-  # 忽略 bot 类型的用户。
-  @spec handle_one(integer, Telegex.Model.User.t(), integer, Scheme.t(), State.t()) ::
-          {:error, State.t()} | {:ok, State.t()}
-  def handle_one(_chat_id, %{is_bot: true} = _new_chat_member, _date, _scheme, state) do
-    {:ignored, state}
   end
 
   # 处理单个新成员的加入。

@@ -14,16 +14,22 @@ defmodule PolicrMiniBot.UserLeftedPreheater do
   @doc """
   根据更新消息中的 `chat_member` 字段，清理离开数据。
 
-  ## 以下情况将不进入验证流程（按顺序匹配）：
+  ## 以下情况将不进入清理流程（按顺序匹配）：
+  - 更新来自频道。
   - 成员现在的状态不是 `restricted`、`left`、`kicked` 三者之一。
   - 成员现在的状态如果是 `restricted`，但 `is_member` 为 `true`。
   - 成员之前的状态是 `left`、`kicked` 二者之一。
   - 成员之前的状态如果是 `restricted`，但 `is_member` 为 `false`。
-  - 离开的群成员是机器人自己。
+  - 离开的群成员用户类型是机器人。
   """
 
   @impl true
   def call(%{chat_member: nil} = _update, state) do
+    {:ignored, state}
+  end
+
+  @impl true
+  def call(%{chat_member: %{chat: %{type: "channel"}}}, state) do
     {:ignored, state}
   end
 
@@ -48,6 +54,11 @@ defmodule PolicrMiniBot.UserLeftedPreheater do
   @impl true
   def call(%{chat_member: %{old_chat_member: %{is_member: is_member, status: status}}}, state)
       when status == "restricted" and is_member == false do
+    {:ignored, state}
+  end
+
+  @impl true
+  def call(%{chat_member: %{new_chat_member: %{user: %{is_bot: true}}}}, state) do
     {:ignored, state}
   end
 

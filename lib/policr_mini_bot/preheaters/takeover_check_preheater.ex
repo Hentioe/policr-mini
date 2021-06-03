@@ -41,6 +41,11 @@ defmodule PolicrMiniBot.TakeoverCheckPreheater do
 
         chat_id
 
+      update.chat_member != nil ->
+        %{chat: %{id: chat_id}} = update.chat_member
+
+        chat_id
+
       # 注意：未来此处可能要补充对数据的匹配
       true ->
         nil
