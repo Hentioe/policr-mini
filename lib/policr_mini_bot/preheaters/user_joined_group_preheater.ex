@@ -18,10 +18,10 @@ defmodule PolicrMiniBot.UserJoinedGroupPreheater do
 
   ## 以下情况将不进入验证流程（按顺序匹配）：
   - 群组未接管。
-  - 成员现在的状态是 `left`、`kicked` 二者之一。
+  - 成员现在的状态不是 `restricted` 或 `member` 二者之一。
   - 成员现在的状态如果是 `restricted`，但 `is_member` 为 `false`。
+  - 成员之前的状态如果是 `member`、`creator`、`administrator` 三者之一。
   - 成员之前的状态如果是 `restricted`，但 `is_member` 为 `true`。
-  - 成员之前的状态不是 `left`、`kicked` 二者之一。
   - 拉人或进群的是管理员。
   - 拉人或进群的是机器人。
   """
@@ -34,7 +34,7 @@ defmodule PolicrMiniBot.UserJoinedGroupPreheater do
 
   @impl true
   def call(%{chat_member: %{new_chat_member: %{status: status}}}, state)
-      when status in ["left", "kicked"] do
+      when status not in ["restricted", "member"] do
     {:ignored, state}
   end
 
@@ -45,14 +45,14 @@ defmodule PolicrMiniBot.UserJoinedGroupPreheater do
   end
 
   @impl true
-  def call(%{chat_member: %{old_chat_member: %{is_member: is_member, status: status}}}, state)
-      when status == "restricted" and is_member == true do
+  def call(%{chat_member: %{old_chat_member: %{status: status}}}, state)
+      when status in ["member", "creator", "administrator"] do
     {:ignored, state}
   end
 
   @impl true
-  def call(%{chat_member: %{old_chat_member: %{status: status}}}, state)
-      when status not in ["left", "kicked"] do
+  def call(%{chat_member: %{old_chat_member: %{is_member: is_member, status: status}}}, state)
+      when status == "restricted" and is_member == true do
     {:ignored, state}
   end
 
@@ -71,6 +71,8 @@ defmodule PolicrMiniBot.UserJoinedGroupPreheater do
   @impl true
   def call(%{chat_member: chat_member} = _update, state) do
     %{chat: %{id: chat_id}, new_chat_member: %{user: new_user}, date: date} = chat_member
+
+    Logger.debug("A new member (#{new_user.id}) has joined the group (#{chat_id}).")
 
     case SchemeBusiness.fetch(chat_id) do
       {:ok, scheme} ->
