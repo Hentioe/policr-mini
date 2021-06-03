@@ -1,7 +1,6 @@
 defmodule PolicrMiniBot.UserJoinedGroupPreheater do
   @moduledoc """
   用户加入群组的处理器。
-
   """
 
   # TODO: 弃用此模块。由于 TG 上游的变动，加群已放弃对 `message` 的处理。因此 `telegex_plug` 库的预制的抽象模块已无法适应此需求，需改进库设计。

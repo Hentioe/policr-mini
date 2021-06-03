@@ -8,11 +8,11 @@ defmodule PolicrMiniBot.Supervisor do
     FromCheckPreheater,
     UserJoinedGroupPreheater,
     UserLeftedPreheater,
+    SelfJoinedPreheater,
     StartCommander,
     PingCommander,
     SyncCommander,
     LoginCommander,
-    SelfJoinedHandler,
     SelfLeftedHandler,
     UserJoinedHandler,
     MemberRemovedHandler,
@@ -32,13 +32,14 @@ defmodule PolicrMiniBot.Supervisor do
       TakeoverCheckPreheater,
       FromCheckPreheater,
       UserJoinedGroupPreheater,
-      UserLeftedPreheater
+      UserLeftedPreheater,
+      SelfJoinedPreheater
     ])
 
     install_plugs([StartCommander, PingCommander, SyncCommander, LoginCommander])
 
     install_plugs([
-      SelfJoinedHandler,
+      SelfJoinedPreheater,
       SelfLeftedHandler,
       UserJoinedHandler,
       NewChatTitleHandler,
