@@ -65,7 +65,7 @@ defmodule PolicrMiniBot.UserLeftedGroupPreheater do
 
   @impl true
   def call(%{chat_member: chat_member} = _update, state) do
-    %{chat: %{id: chat_id}, new_chat_member: %{user: %{id: lefted_user_id}}} = chat_member
+    %{chat: %{id: chat_id}, new_chat_member: %{user: %{id: lefted_user_id} = user}} = chat_member
 
     Logger.debug("A member (#{lefted_user_id}) has lefted the group (#{chat_id}).")
     state = State.set_action(state, :user_lefted)
@@ -79,6 +79,14 @@ defmodule PolicrMiniBot.UserLeftedGroupPreheater do
       if perm = PermissionBusiness.find(chat_id, lefted_user_id) do
         unless perm.tg_is_owner do
           PermissionBusiness.delete(chat_id, lefted_user_id)
+
+          text = """
+          已将曾经的管理员 #{mention(user, anonymization: false, parse_mode: "HTML")} 的后台权限移除。
+
+          <i>提示：由于此特性的加入，在管理员已离开群组的场景下将不再需要手动调用 <code>/sync</code> 命令。</i>
+          """
+
+          send_message(chat_id, text, parse_mode: "HTML")
         end
       end
     end

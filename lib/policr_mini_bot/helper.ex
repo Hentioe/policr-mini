@@ -408,7 +408,7 @@ defmodule PolicrMiniBot.Helper do
 
     case options[:parse_mode] do
       "MarkdownV2" -> "[#{Telegex.Marked.escape_text(name)}](tg://user?id=#{id})"
-      "HTML" -> ~s(<a href="tg://user?id=#{id}">#{name}</a>)
+      "HTML" -> ~s(<a href="tg://user?id=#{id}">#{Telegex.Tools.safe_html(name)}</a>)
     end
   end
 
