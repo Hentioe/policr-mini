@@ -1,4 +1,4 @@
-defmodule PolicrMiniBot.TakeoverCheckPreheater do
+defmodule PolicrMiniBot.InitTakeoveredPreheater do
   @moduledoc """
   检查接管状态的预热器。
   """

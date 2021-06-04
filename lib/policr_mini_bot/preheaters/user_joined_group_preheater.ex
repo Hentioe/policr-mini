@@ -15,18 +15,16 @@ defmodule PolicrMiniBot.UserJoinedGroupPreheater do
   @doc """
   根据更新消息中的 `chat_member` 字段，验证用户。
 
-  ## 以下情况将不进入验证流程（按顺序匹配）：
+  ## 以下情况将不进入处理流程（按顺序匹配）：
   - 更新来自频道。
   - 群组未接管。
-  - 成员现在的状态不是 `restricted` 或 `member` 二者之一。
-  - 成员现在的状态如果是 `restricted`，但 `is_member` 为 `false`。
-  - 成员之前的状态如果是 `member`、`creator`、`administrator` 三者之一。
-  - 成员之前的状态如果是 `restricted`，但 `is_member` 为 `true`。
+  - 状态中的动作不是 `:user_joined`。
   - 拉人或进群的是管理员。
   - 拉人或进群的是机器人。
   """
 
-  # !注意! 因为以上的验证排除条件，此模块需要保证在填充以上条件的模块的处理流程的后面。
+  # !注意! 由于匹配过程依赖状态中的 `action` 字段，此模块需要位于管道中的涉及填充相关状态字段、相关值的插件后面。
+  # 当前此模块需要保证位于 `PolicrMiniBot.InitUserJoinedActionPreheater` 模块的后面。
   @impl true
   def call(%{chat_member: nil} = _update, state) do
     {:ignored, state}
@@ -43,26 +41,7 @@ defmodule PolicrMiniBot.UserJoinedGroupPreheater do
   end
 
   @impl true
-  def call(%{chat_member: %{new_chat_member: %{status: status}}}, state)
-      when status not in ["restricted", "member"] do
-    {:ignored, state}
-  end
-
-  @impl true
-  def call(%{chat_member: %{new_chat_member: %{is_member: is_member, status: status}}}, state)
-      when status == "restricted" and is_member == false do
-    {:ignored, state}
-  end
-
-  @impl true
-  def call(%{chat_member: %{old_chat_member: %{status: status}}}, state)
-      when status in ["member", "creator", "administrator"] do
-    {:ignored, state}
-  end
-
-  @impl true
-  def call(%{chat_member: %{old_chat_member: %{is_member: is_member, status: status}}}, state)
-      when status == "restricted" and is_member == true do
+  def call(_update, %{action: action} = state) when action != :user_joined do
     {:ignored, state}
   end
 

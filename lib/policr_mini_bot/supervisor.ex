@@ -4,12 +4,14 @@ defmodule PolicrMiniBot.Supervisor do
   use Supervisor
 
   alias PolicrMiniBot.{
-    TakeoverCheckPreheater,
-    FromCheckPreheater,
+    InitTakeoveredPreheater,
+    InitFromPreheater,
+    InitUserJoinedActionPreheater,
     UserJoinedGroupPreheater,
-    UserLeftedPreheater,
+    UserLeftedGroupPreheater,
     SelfJoinedPreheater,
     SelfLeftedPreheater,
+    AdminPermissionsChangePreheater,
     StartCommander,
     PingCommander,
     SyncCommander,
@@ -29,12 +31,14 @@ defmodule PolicrMiniBot.Supervisor do
   @impl true
   def init(_init_arg) do
     install_plugs([
-      TakeoverCheckPreheater,
-      FromCheckPreheater,
+      InitTakeoveredPreheater,
+      InitFromPreheater,
+      InitUserJoinedActionPreheater,
       UserJoinedGroupPreheater,
-      UserLeftedPreheater,
+      UserLeftedGroupPreheater,
       SelfJoinedPreheater,
-      SelfLeftedPreheater
+      SelfLeftedPreheater,
+      AdminPermissionsChangePreheater
     ])
 
     install_plugs([StartCommander, PingCommander, SyncCommander, LoginCommander])

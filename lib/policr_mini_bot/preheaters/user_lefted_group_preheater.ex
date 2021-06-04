@@ -1,4 +1,4 @@
-defmodule PolicrMiniBot.UserLeftedPreheater do
+defmodule PolicrMiniBot.UserLeftedGroupPreheater do
   @moduledoc """
   群成员离开的处理器。
   """
@@ -10,6 +10,7 @@ defmodule PolicrMiniBot.UserLeftedPreheater do
   use PolicrMiniBot, plug: :preheater
 
   alias PolicrMini.{Logger, PermissionBusiness}
+  alias PolicrMiniBot.State
 
   @doc """
   根据更新消息中的 `chat_member` 字段，清理离开数据。
@@ -67,6 +68,7 @@ defmodule PolicrMiniBot.UserLeftedPreheater do
     %{chat: %{id: chat_id}, new_chat_member: %{user: %{id: lefted_user_id}}} = chat_member
 
     Logger.debug("A member (#{lefted_user_id}) has lefted the group (#{chat_id}).")
+    state = State.set_action(state, :user_lefted)
 
     if lefted_user_id == bot_id() do
       # 跳过机器人自身
