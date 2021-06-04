@@ -1,6 +1,8 @@
 defmodule PolicrMiniBot.SyncCommander do
   @moduledoc """
   `/sync` 命令的响应模块。
+
+  此命令存在速度限制，15 秒内只能调用一次。
   """
 
   alias PolicrMini.Logger
@@ -9,64 +11,75 @@ defmodule PolicrMiniBot.SyncCommander do
 
   alias PolicrMini.{ChatBusiness, UserBusiness}
   alias PolicrMini.Schemas.{Permission, Chat}
+  alias PolicrMiniBot.SpeedLimiter
 
   @doc """
-  - 非管理员发送指令直接删除。
-  - 同步群组数据：群组信息、管理员列表。
+  同步群组数据：群组信息、管理员列表。
   """
-  @impl true
-  def handle(message, %{from_admin: false} = state) do
-    %{message_id: message_id, chat: %{id: chat_id}} = message
-
-    Cleaner.delete_message(chat_id, message_id)
-
-    {:ok, %{state | deleted: true}}
-  end
 
   @impl true
   def handle(message, state) do
-    %{chat: %{id: chat_id}} = message
+    %{chat: %{id: chat_id}, message_id: message_id} = message
 
-    async(fn -> chat_id |> typing() end)
+    speed_limit_key = "sync-#{chat_id}"
 
-    # 同步群组和管理员信息，并自动设置接管状态
-    with {:ok, chat} <- synchronize_chat(chat_id),
-         {:ok, _} <- synchronize_administrators(chat),
-         # 获取自身权限
-         {:ok, member} <- Telegex.get_chat_member(chat_id, PolicrMiniBot.id()) do
-      is_admin = member.status == "administrator"
+    wainting_time = SpeedLimiter.get(speed_limit_key)
 
-      last_is_take_over = chat.is_take_over
+    cond do
+      wainting_time > 0 ->
+        send_message(chat_id, "同步过于频繁，请在 #{wainting_time} 秒后重试。")
 
-      if is_admin do
-        chat |> ChatBusiness.update(%{is_take_over: true})
-      else
-        chat |> ChatBusiness.takeover_cancelled()
-      end
+      no_permissions?(message) ->
+        # 添加 10 秒的速度限制记录。
+        :ok = SpeedLimiter.put(speed_limit_key, 10)
 
-      message_text = t("sync.success")
+        Cleaner.delete_message(chat_id, message_id)
 
-      message_text =
-        if is_admin do
-          message_text <>
-            t("sync.have_permissions") <>
-            if last_is_take_over, do: t("sync.already_takeover"), else: t("sync.has_takeover")
+      true ->
+        # 添加 15 秒的速度限制记录。
+        :ok = SpeedLimiter.put(speed_limit_key, 15)
+
+        async(fn -> chat_id |> typing() end)
+
+        # 同步群组和管理员信息，并自动设置接管状态
+        with {:ok, chat} <- synchronize_chat(chat_id),
+             {:ok, _} <- synchronize_administrators(chat),
+             # 获取自身权限
+             {:ok, member} <- Telegex.get_chat_member(chat_id, PolicrMiniBot.id()) do
+          is_admin = member.status == "administrator"
+
+          last_is_take_over = chat.is_take_over
+
+          if is_admin do
+            chat |> ChatBusiness.update(%{is_take_over: true})
+          else
+            chat |> ChatBusiness.takeover_cancelled()
+          end
+
+          message_text = t("sync.success")
+
+          message_text =
+            if is_admin do
+              message_text <>
+                t("sync.have_permissions") <>
+                if last_is_take_over, do: t("sync.already_takeover"), else: t("sync.has_takeover")
+            else
+              message_text <>
+                t("sync.no_permission") <>
+                if(last_is_take_over,
+                  do: t("sync.cancelled_takeover"),
+                  else: t("sync.unable_takeover")
+                )
+            end
+
+          async(fn ->
+            send_message(chat_id, message_text)
+          end)
         else
-          message_text <>
-            t("sync.no_permission") <>
-            if(last_is_take_over,
-              do: t("sync.cancelled_takeover"),
-              else: t("sync.unable_takeover")
-            )
+          {:error, e} ->
+            Logger.unitized_error("Group data synchronization", e)
+            send_message(chat_id, t("errors.sync_failed"))
         end
-
-      async(fn ->
-        send_message(chat_id, message_text)
-      end)
-    else
-      {:error, e} ->
-        Logger.unitized_error("Group data synchronization", e)
-        send_message(chat_id, t("errors.sync_failed"))
     end
 
     {:ok, state}
@@ -192,6 +205,15 @@ defmodule PolicrMiniBot.SyncCommander do
 
       e ->
         e
+    end
+  end
+
+  defp no_permissions?(message) do
+    %{chat: %{id: chat_id}, from: %{id: user_id}} = message
+
+    case Telegex.get_chat_member(chat_id, user_id) do
+      {:ok, %{status: status}} -> status not in ["creator", "administrator"]
+      _ -> true
     end
   end
 end

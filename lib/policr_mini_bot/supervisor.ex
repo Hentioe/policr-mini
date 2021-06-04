@@ -55,6 +55,8 @@ defmodule PolicrMiniBot.Supervisor do
       PolicrMiniBot.Cleaner,
       # 一次性处理保证
       PolicrMiniBot.Disposable,
+      # 速度限制。
+      PolicrMiniBot.SpeedLimiter,
       # 拉取更新消息
       PolicrMiniBot.UpdatesPoller,
       # 消费消息的动态主管
