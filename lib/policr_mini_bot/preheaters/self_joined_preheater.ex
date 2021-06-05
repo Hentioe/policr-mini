@@ -15,20 +15,22 @@ defmodule PolicrMiniBot.SelfJoinedPreheater do
   @doc """
   根据更新消息中的 `my_chat_member` 字段，处理自身加入。
 
-  ## 以下情况将不进入处理流程（按顺序匹配）：
-  - 更新来自频道。
+  ## 以下情况将不进入流程（按顺序匹配）：
+  - 更新来自频道或私聊。
   - 成员现在的状态不是 `restricted` 或 `member` 二者之一。
   - 成员现在的状态如果是 `restricted`，但 `is_member` 为 `false`。
   - 成员之前的状态如果是 `member`、`administrator` 二者之一。
   - 成员之前的状态如果是 `restricted`，但 `is_member` 为 `true`。
   """
+
   @impl true
   def call(%{my_chat_member: nil} = _update, state) do
     {:ignored, state}
   end
 
   @impl true
-  def call(%{my_chat_member: %{chat: %{type: "channel"}}}, state) do
+  def call(%{my_chat_member: %{chat: %{type: chat_type}}}, state)
+      when chat_type in ["channel", "private"] do
     {:ignored, state}
   end
 

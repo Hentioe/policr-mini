@@ -14,8 +14,8 @@ defmodule PolicrMiniBot.SelfLeftedPreheater do
   @doc """
   根据更新消息中的 `my_chat_member` 字段，执行退出流程。
 
-  ## 以下情况将不进入退出流程（按顺序匹配）：
-  - 更新来自频道。
+  ## 以下情况将不进入流程（按顺序匹配）：
+  - 更新来自频道或私聊。
   - 成员现在的状态不是 `restricted`、`left`、`kicked` 三者之一。
   - 成员现在的状态如果是 `restricted`，但 `is_member` 为 `true`。
   - 成员之前的状态是 `left`、`kicked` 二者之一。
@@ -28,7 +28,8 @@ defmodule PolicrMiniBot.SelfLeftedPreheater do
   end
 
   @impl true
-  def call(%{my_chat_member: %{chat: %{type: "channel"}}}, state) do
+  def call(%{my_chat_member: %{chat: %{type: chat_type}}}, state)
+      when chat_type in ["channel", "private"] do
     {:ignored, state}
   end
 
