@@ -10,7 +10,7 @@ defmodule PolicrMiniBot.SelfJoinedPreheater do
   use PolicrMiniBot, plug: :preheater
   alias PolicrMini.Logger
 
-  alias PolicrMiniBot.SyncCommander
+  alias PolicrMiniBot.{SyncCommander, State}
 
   @doc """
   根据更新消息中的 `my_chat_member` 字段，处理自身加入。
@@ -63,6 +63,7 @@ defmodule PolicrMiniBot.SelfJoinedPreheater do
     %{chat: %{id: chat_id, type: chat_type}} = my_chat_member
 
     Logger.debug("The bot is invited to a group (#{chat_id}).")
+    state = State.set_action(state, :self_joined)
 
     # 非超级群直接退出。
     if chat_type != "supergroup", do: exits(chat_type, chat_id), else: handle_it(chat_id)
@@ -120,7 +121,7 @@ defmodule PolicrMiniBot.SelfJoinedPreheater do
       ]
     }
 
-    case send_message(chat_id, text, reply_markup: markup, parse_mode: nil) do
+    case send_message(chat_id, text, reply_markup: markup, parse_mode: "HTML") do
       {:ok, _} -> :ok
       e -> e
     end

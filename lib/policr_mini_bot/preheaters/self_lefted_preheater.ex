@@ -10,6 +10,7 @@ defmodule PolicrMiniBot.SelfLeftedPreheater do
   use PolicrMiniBot, plug: :preheater
 
   alias PolicrMini.{Logger, ChatBusiness}
+  alias PolicrMiniBot.State
 
   @doc """
   根据更新消息中的 `my_chat_member` 字段，执行退出流程。
@@ -62,6 +63,7 @@ defmodule PolicrMiniBot.SelfLeftedPreheater do
     %{chat: %{id: chat_id}} = my_chat_member
 
     Logger.debug("The bot has left a group (#{chat_id}).")
+    state = State.set_action(state, :self_lefted)
 
     # 取消接管
     case ChatBusiness.get(chat_id) do

@@ -12,6 +12,7 @@ defmodule PolicrMiniBot.Supervisor do
     SelfJoinedPreheater,
     SelfLeftedPreheater,
     AdminPermissionsChangePreheater,
+    SelfPermissionsChangePreheater,
     StartCommander,
     PingCommander,
     SyncCommander,
@@ -21,7 +22,9 @@ defmodule PolicrMiniBot.Supervisor do
     NewChatTitleHandler,
     NewChatPhotoHandler,
     VerificationCaller,
-    RevokeTokenCaller
+    RevokeTokenCaller,
+    EnableCaller,
+    LeaveCaller
   }
 
   def start_link(_opts) do
@@ -38,7 +41,8 @@ defmodule PolicrMiniBot.Supervisor do
       UserLeftedGroupPreheater,
       SelfJoinedPreheater,
       SelfLeftedPreheater,
-      AdminPermissionsChangePreheater
+      AdminPermissionsChangePreheater,
+      SelfPermissionsChangePreheater
     ])
 
     install_plugs([StartCommander, PingCommander, SyncCommander, LoginCommander])
@@ -50,7 +54,7 @@ defmodule PolicrMiniBot.Supervisor do
       MemberRemovedHandler
     ])
 
-    install_plugs([VerificationCaller, RevokeTokenCaller])
+    install_plugs([VerificationCaller, RevokeTokenCaller, EnableCaller, LeaveCaller])
 
     children = [
       # 图片供应服务
