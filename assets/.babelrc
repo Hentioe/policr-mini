@@ -4,6 +4,12 @@
         "react-app"
     ],
     "plugins": [
-        "emotion"
+        "emotion",
+        [
+            "@babel/plugin-proposal-private-methods",
+            {
+                "loose": true
+            }
+        ]
     ]
 }
