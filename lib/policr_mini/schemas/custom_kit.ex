@@ -8,14 +8,14 @@ defmodule PolicrMini.Schemas.CustomKit do
   alias PolicrMini.Schemas.Chat
 
   @required_fields ~w(chat_id title answers)a
-  @optional_fields ~w(photos)a
+  @optional_fields ~w(attachments)a
 
   schema "custom_kits" do
     belongs_to :chat, Chat
 
     field :title, :string
     field :answers, {:array, :string}
-    field :photos, {:array, :string}
+    field :attachments, {:array, :string}
 
     timestamps()
   end
