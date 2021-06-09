@@ -15,7 +15,7 @@ defmodule PolicrMini.Schemas.CustomKitTest do
                  :chat_id,
                  :title,
                  :answers,
-                 :attachments,
+                 :attachment,
                  :inserted_at,
                  :updated_at
                ]

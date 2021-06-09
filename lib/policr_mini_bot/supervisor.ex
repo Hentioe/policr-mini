@@ -21,6 +21,7 @@ defmodule PolicrMiniBot.Supervisor do
     MemberRemovedHandler,
     NewChatTitleHandler,
     NewChatPhotoHandler,
+    PrivateAttachmentHandler,
     VerificationCaller,
     RevokeTokenCaller,
     EnableCaller,
@@ -51,7 +52,8 @@ defmodule PolicrMiniBot.Supervisor do
       UserJoinedHandler,
       NewChatTitleHandler,
       NewChatPhotoHandler,
-      MemberRemovedHandler
+      MemberRemovedHandler,
+      PrivateAttachmentHandler
     ])
 
     install_plugs([VerificationCaller, RevokeTokenCaller, EnableCaller, LeaveCaller])

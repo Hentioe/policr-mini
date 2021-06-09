@@ -18,6 +18,7 @@ defmodule PolicrMiniBot.Captcha do
     typedstruct do
       field :question, String.t()
       field :photo, String.t() | nil
+      field :attachment, [String.t()] | nil
       field :candidates, [[candidate(), ...], ...]
       field :markup, InlineKeyboardMarkup.t() | nil
       field :correct_indices, [integer(), ...]

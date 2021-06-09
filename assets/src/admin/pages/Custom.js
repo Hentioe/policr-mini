@@ -36,10 +36,11 @@ const FormInput = styled.input.attrs({
   ${tw`h-8 px-2 box-border rounded appearance-none border focus:outline-none focus:shadow-outline`};
 `;
 
-const kitTypeOptions = [
-  { value: "Text", label: "文字提问" },
-  { value: "Photo", label: "图片提问", isDisabled: true },
-];
+const FormTextarea = styled.textarea`
+  border: 0 solid #e2e8f0;
+  border-color: hsl(0, 0%, 80%);
+  ${tw`h-8 px-2 box-border rounded appearance-none border focus:outline-none focus:shadow-outline`};
+`;
 
 const Title = styled.span`
   color: #2f3235;
@@ -63,6 +64,7 @@ const EDITING_CHECK = {
   NO_EDINTINT: 0,
   EMPTY_TITLE: -1,
   MISSING_CORRECT: -2,
+  CONTENT_WRONG: -3,
 };
 
 const ROW = {
@@ -82,7 +84,7 @@ const dateTimeFormat = "yyyy-MM-dd HH:mm:ss";
 
 const makeEndpoint = (chat_id) => `/admin/api/chats/${chat_id}/customs`;
 
-const saveCustomKit = async ({ id, chatId, title, answers }) => {
+const saveCustomKit = async ({ id, chatId, title, answers, attachment }) => {
   let endpoint = "/admin/api/customs";
   let method = "POST";
   if (id) {
@@ -96,8 +98,9 @@ const saveCustomKit = async ({ id, chatId, title, answers }) => {
     },
     body: JSON.stringify({
       chat_id: chatId,
-      title: title,
-      answers: answers,
+      title,
+      answers,
+      attachment,
     }),
   }).then((r) => camelizeJson(r));
 };
@@ -108,6 +111,24 @@ const deleteCustomKit = async (id) => {
   return fetch(endpoint, {
     method: method,
   }).then((r) => camelizeJson(r));
+};
+
+const checkAttachmentTextError = (attachmentText) => {
+  const attachment = attachmentText.trim();
+
+  if (
+    attachment != "" &&
+    !(
+      attachment.startsWith("photo/") ||
+      attachment.startsWith("video/") ||
+      attachment.startsWith("audio/") ||
+      attachment.startsWith("document/")
+    )
+  ) {
+    return "无效的附件，每一行必须以 <附件类型>/ 开头，例如 photo/。";
+  }
+
+  return null;
 };
 
 export default () => {
@@ -121,21 +142,36 @@ export default () => {
       : null
   );
   const [isEditing, setIsEditing] = useState(false);
+  const [isIncludesAttachment, setIsIncludesAttachment] = useState(false);
   const [editingId, setEditingId] = useState(initialEditingId);
-  const [editingKitType, setEditingKitType] = useState(kitTypeOptions[0]);
   const [editintTitle, setEditingTitle] = useState(initialEditingTitle);
+  const [editingAttachment, setEditingAttachment] = useState("");
   const [answers, setAnswers] = useState([initialAnswer]);
+  const [attachmentError, setAttachmentError] = useState(null);
 
   const handleIsEditing = () => setIsEditing(!isEditing);
-  const handleKitTypeChange = (value) => setEditingKitType(value);
   const initEditingContent = () => {
     setIsEditing(false);
+    setIsIncludesAttachment(false);
     setEditingTitle(initialEditingTitle);
     setEditingId(initialEditingId);
     setAnswers([initialAnswer]);
+    setEditingAttachment("");
   };
   const handleCancelEditing = () => initEditingContent();
   const handleTitleChange = (e) => setEditingTitle(e.target.value.trim());
+  const handleAttachmentTextChange = (e) => {
+    setEditingAttachment(e.target.value);
+
+    const errorText = checkAttachmentTextError(e.target.value);
+
+    if (errorText) {
+      setAttachmentError(errorText);
+    } else {
+      setAttachmentError(null);
+    }
+  };
+
   const handleAnswerROWChange = useCallback(
     (value, index) => {
       const newAnswers = updateInNewArray(
@@ -184,31 +220,34 @@ export default () => {
       .filter((ans) => ans.text.trim() != "")
       .filter((ans) => ans.row.value == ROW.RIGHT);
     if (rightAnswers.length == 0) return EDITING_CHECK.MISSING_CORRECT;
+    if (attachmentError != null) return EDITING_CHECK.CONTENT_WRONG;
 
     return EDITING_CHECK.VALID;
-  }, [isEditing, editintTitle, answers]);
+  }, [isEditing, editintTitle, answers, attachmentError]);
 
   const handleSave = useCallback(
-    (e) => {
+    async (e) => {
       e.preventDefault();
-      saveCustomKit({
+
+      const result = await saveCustomKit({
         chatId: chatsState.selected,
         id: editingId,
         title: editintTitle,
         answers: answers.map(
           (ans) => `${ans.row.value ? "+" : "-"}${ans.text.trim()}`
         ),
-      }).then((result) => {
-        if (result.errors) toastErrors(result.errors);
-        else {
-          // 保存成功
-          mutate();
-          // 初始化编辑内容
-          initEditingContent();
-        }
+        attachment: editingAttachment,
       });
+
+      if (result.errors) toastErrors(result.errors);
+      else {
+        // 保存成功
+        mutate();
+        // 初始化编辑内容
+        initEditingContent();
+      }
     },
-    [editingId, editintTitle, answers]
+    [editingId, editintTitle, editingAttachment, answers]
   );
 
   const handleDelete = useCallback(
@@ -226,18 +265,31 @@ export default () => {
       const customKit = data.customKits[index];
       const editingId = customKit.id;
       const editingTitle = customKit.title;
+      const editingAttachment = customKit.attachment || "";
       const answers = customKit.answers.map((ans) => {
         const row = ans.startsWith("+") ? RIGHT_FLAG : WRONG_FLAG;
         return { row: row, text: ans.substring(1, ans.length) };
       });
-
       setIsEditing(true);
+      setIsIncludesAttachment(
+        customKit.attachment != null && customKit.attachment.trim() != ""
+      );
       setEditingId(editingId);
       setEditingTitle(editingTitle);
+      setEditingAttachment(editingAttachment);
       setAnswers(answers);
     },
     [data]
   );
+
+  const handleAddOrDeleteAttachment = useCallback(() => {
+    if (isIncludesAttachment) {
+      // 删除附件。
+      setEditingAttachment("");
+    }
+
+    setIsIncludesAttachment(!isIncludesAttachment);
+  }, [isIncludesAttachment]);
 
   useEffect(() => {
     // 初始化编辑内容
@@ -320,7 +372,10 @@ export default () => {
               ) : (
                 <HintParagraph>
                   当前未添加任何问题，
-                  <span tw="underline cursor-pointer" onClick={handleIsEditing}>
+                  <span
+                    tw="underline cursor-pointer text-blue-300"
+                    onClick={handleIsEditing}
+                  >
                     点此添加
                   </span>
                   。
@@ -336,17 +391,6 @@ export default () => {
               {isEditing ? (
                 <form>
                   <FormSection>
-                    <FormLable>类型</FormLable>
-                    <div tw="w-full lg:w-9/12">
-                      <Select
-                        value={editingKitType}
-                        options={kitTypeOptions}
-                        onChange={handleKitTypeChange}
-                        isSearchable={false}
-                      />
-                    </div>
-                  </FormSection>
-                  <FormSection>
                     <FormLable>标题</FormLable>
                     <FormInput
                       tw="w-full lg:w-9/12"
@@ -354,6 +398,16 @@ export default () => {
                       onChange={handleTitleChange}
                     />
                   </FormSection>
+                  {isIncludesAttachment ? (
+                    <FormSection>
+                      <FormLable>附件</FormLable>
+                      <FormInput
+                        tw="w-full lg:w-9/12"
+                        value={editingAttachment}
+                        onChange={handleAttachmentTextChange}
+                      />
+                    </FormSection>
+                  ) : undefined}
                   {answers.map((answer, index) => (
                     <FormSection key={index}>
                       <FormLable>答案{index + 1}</FormLable>
@@ -385,7 +439,17 @@ export default () => {
                       </div>
                     </FormSection>
                   ))}
-                  <div tw="flex">
+
+                  <div tw="flex flex-wrap items-center justify-between">
+                    <ActionButton
+                      tw="mr-2"
+                      onClick={handleAddOrDeleteAttachment}
+                    >
+                      {isIncludesAttachment ? "删除" : "添加"}附件
+                    </ActionButton>
+                    <span tw="text-sm text-red-600">{attachmentError}</span>
+                  </div>
+                  <div tw="flex mt-2">
                     <div tw="flex-1 pr-10">
                       <LabelledButton
                         label="cancel"
@@ -424,6 +488,9 @@ export default () => {
               {editingCheckResult == EDITING_CHECK.MISSING_CORRECT && (
                 <HintParagraph>请添加至少一个正确答案</HintParagraph>
               )}
+              {editingCheckResult == EDITING_CHECK.CONTENT_WRONG && (
+                <HintParagraph>请修正内容上的错误</HintParagraph>
+              )}
               {editingCheckResult == EDITING_CHECK.VALID && (
                 <div tw="flex justify-between">
                   <div tw="w-12 self-end">
@@ -433,18 +500,26 @@ export default () => {
                     />
                   </div>
                   <div tw="pl-4 pt-4 pr-4">
-                    <div tw="shadow rounded border border-solid border-gray-200 p-2 text-black">
-                      <Paragraph tw="italic">
-                        来自『<span tw="font-bold">{data.chat.title}</span>
-                        』的验证，请确认问题并选择您认为正确的答案。
-                      </Paragraph>
-                      <br />
-                      <Paragraph tw="font-bold">{editintTitle}</Paragraph>
-                      <br />
-                      <Paragraph>
-                        您还剩 <span tw="underline">300</span>{" "}
-                        秒，通过可解除封印。
-                      </Paragraph>
+                    <div tw="shadow rounded border border-solid border-gray-200 text-black">
+                      {isIncludesAttachment &&
+                      editingAttachment.trim() != "" ? (
+                        <div tw="flex justify-center w-full py-12 bg-blue-400 rounded-t">
+                          <span tw="text-white text-lg">附件</span>
+                        </div>
+                      ) : undefined}
+                      <div tw="p-2">
+                        <Paragraph tw="italic">
+                          来自『<span tw="font-bold">{data.chat.title}</span>
+                          』的验证，请确认问题并选择您认为正确的答案。
+                        </Paragraph>
+                        <br />
+                        <Paragraph tw="font-bold">{editintTitle}</Paragraph>
+                        <br />
+                        <Paragraph>
+                          您还剩 <span tw="underline">300</span>{" "}
+                          秒，通过可解除封印。
+                        </Paragraph>
+                      </div>
                     </div>
                     <div tw="flex flex-col mt-2">
                       {answers.map((ans, index) => (

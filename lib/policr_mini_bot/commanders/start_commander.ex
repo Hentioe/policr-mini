@@ -83,6 +83,7 @@ defmodule PolicrMiniBot.StartCommander do
            {:ok, {verification_message, markup, captcha_data}} <-
              send_verify_message(verification, scheme, target_chat_id, from_user_id),
            # 创建消息快照
+           # TODO: 快照中缺乏附件相关字段。
            {:ok, message_snapshot} <-
              MessageSnapshotBusiness.create(%{
                chat_id: target_chat_id,
@@ -210,7 +211,74 @@ defmodule PolicrMiniBot.StartCommander do
     end
   end
 
-  def make_send_fun(CustomCaptcha, chat_id, text, _data, parse_mode, markup) do
+  # TODO: 包含附件的消息发送函数缺乏超时重试机制。需设计一种通用的超时函数。
+  # TODO: 包含附件的消息发送函数缺乏对 MarkdownV2 到 HTML 的转换。
+  def make_send_fun(
+        CustomCaptcha,
+        chat_id,
+        text,
+        %{attachment: <<"photo/" <> file_id>>} = _captcha_data,
+        parse_mode,
+        markup
+      ) do
+    fn ->
+      send_photo(chat_id, file_id,
+        reply_markup: markup,
+        parse_mode: parse_mode,
+        caption: text
+      )
+    end
+  end
+
+  def make_send_fun(
+        CustomCaptcha,
+        chat_id,
+        text,
+        %{attachment: <<"video/" <> file_id>>} = _captcha_data,
+        _parse_mode,
+        markup
+      ) do
+    fn ->
+      Telegex.send_video(chat_id, file_id,
+        reply_markup: markup,
+        caption: text
+      )
+    end
+  end
+
+  def make_send_fun(
+        CustomCaptcha,
+        chat_id,
+        text,
+        %{attachment: <<"audio/" <> file_id>>} = _captcha_data,
+        _parse_mode,
+        markup
+      ) do
+    fn ->
+      Telegex.send_audio(chat_id, file_id,
+        reply_markup: markup,
+        caption: text
+      )
+    end
+  end
+
+  def make_send_fun(
+        CustomCaptcha,
+        chat_id,
+        text,
+        %{attachment: <<"document/" <> file_id>>} = _captcha_data,
+        _parse_mode,
+        markup
+      ) do
+    fn ->
+      Telegex.send_document(chat_id, file_id,
+        reply_markup: markup,
+        caption: text
+      )
+    end
+  end
+
+  def make_send_fun(CustomCaptcha, chat_id, text, _captcha_data, parse_mode, markup) do
     fn ->
       send_message(chat_id, text,
         reply_markup: markup,

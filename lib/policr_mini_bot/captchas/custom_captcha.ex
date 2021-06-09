@@ -26,6 +26,7 @@ defmodule PolicrMiniBot.CustomCaptcha do
 
     %Captcha.Data{
       question: custom_kit.title,
+      attachment: custom_kit.attachment,
       candidates: candidates,
       correct_indices: correct_indices
     }
