@@ -198,7 +198,7 @@ export default () => {
           <div tw="w-full lg:w-7/12 mb-8 lg:mb-0">
             <p tw="text-2xl font-bold text-gray-200">构建自己的实例。</p>
             <p tw="text-gray-300">
-              通过简单的 Shell 命令和 Web 服务配置，即可部署在低至 256MB 内存的
+              通过简单的 Shell 命令和 Web 服务配置，即可部署在低至 512MB 内存的
               Linux 服务器上。
             </p>
 
