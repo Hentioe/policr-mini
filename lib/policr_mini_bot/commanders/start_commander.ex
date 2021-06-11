@@ -94,7 +94,8 @@ defmodule PolicrMiniBot.StartCommander do
                text: verification_message.text,
                markup_body: Jason.encode!(markup, pretty: false),
                caption: verification_message.caption,
-               photo_id: get_photo_id(verification_message)
+               photo_id: get_photo_id(verification_message),
+               attachment: captcha_data.attachment
              }),
            # 更新验证记录：关联消息快照、存储正确答案
            {:ok, _} <-

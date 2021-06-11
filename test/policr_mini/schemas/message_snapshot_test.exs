@@ -20,6 +20,7 @@ defmodule PolicrMini.Schemas.MessageSnapshotTest do
                  :photo_id,
                  :caption,
                  :markup_body,
+                 :attachment,
                  :inserted_at,
                  :updated_at
                ]

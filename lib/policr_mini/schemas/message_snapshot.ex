@@ -8,7 +8,7 @@ defmodule PolicrMini.Schemas.MessageSnapshot do
   alias PolicrMini.Schemas.Chat
 
   @required_fields ~w(chat_id message_id from_user_id from_user_name date)a
-  @optional_fields ~w(text photo_id caption markup_body)a
+  @optional_fields ~w(text photo_id caption markup_body attachment)a
 
   schema "message_snapshots" do
     belongs_to :chat, Chat
@@ -21,6 +21,7 @@ defmodule PolicrMini.Schemas.MessageSnapshot do
     field :photo_id, :string
     field :caption, :string
     field :markup_body, :string
+    field :attachment, :string
 
     timestamps()
   end
