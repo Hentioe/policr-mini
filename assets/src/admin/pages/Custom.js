@@ -405,6 +405,7 @@ export default () => {
                         tw="w-full lg:w-9/12"
                         value={editingAttachment}
                         onChange={handleAttachmentTextChange}
+                        placeholder="私聊机器人获取附件字符串，包括：图片、视频、音频、文档（文件）。"
                       />
                     </FormSection>
                   ) : undefined}
