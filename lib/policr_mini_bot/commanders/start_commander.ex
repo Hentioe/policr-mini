@@ -211,8 +211,6 @@ defmodule PolicrMiniBot.StartCommander do
     end
   end
 
-  # TODO: 包含附件的消息发送函数缺乏超时重试机制。需设计一种通用的超时函数。
-  # TODO: 包含附件的消息发送函数缺乏对 MarkdownV2 到 HTML 的转换。
   def make_send_fun(
         CustomCaptcha,
         chat_id,
@@ -239,10 +237,15 @@ defmodule PolicrMiniBot.StartCommander do
         markup
       ) do
     fn ->
-      Telegex.send_video(chat_id, file_id,
-        reply_markup: markup,
-        caption: text
-      )
+      text = Telegex.Marked.as_html(text)
+
+      extended_send retry: 5 do
+        Telegex.send_video(chat_id, file_id,
+          reply_markup: markup,
+          caption: text,
+          parse_mode: "HTML"
+        )
+      end
     end
   end
 
@@ -255,10 +258,15 @@ defmodule PolicrMiniBot.StartCommander do
         markup
       ) do
     fn ->
-      Telegex.send_audio(chat_id, file_id,
-        reply_markup: markup,
-        caption: text
-      )
+      text = Telegex.Marked.as_html(text)
+
+      extended_send retry: 5 do
+        Telegex.send_audio(chat_id, file_id,
+          reply_markup: markup,
+          caption: text,
+          parse_mode: "HTML"
+        )
+      end
     end
   end
 
@@ -271,10 +279,15 @@ defmodule PolicrMiniBot.StartCommander do
         markup
       ) do
     fn ->
-      Telegex.send_document(chat_id, file_id,
-        reply_markup: markup,
-        caption: text
-      )
+      text = Telegex.Marked.as_html(text)
+
+      extended_send retry: 5 do
+        Telegex.send_document(chat_id, file_id,
+          reply_markup: markup,
+          caption: text,
+          parse_mode: "HTML"
+        )
+      end
     end
   end
 

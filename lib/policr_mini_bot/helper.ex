@@ -550,4 +550,34 @@ defmodule PolicrMiniBot.Helper do
 
     {version, args}
   end
+
+  def extended_send(options \\ [], do: block) do
+    retry = Keyword.get(options, :retry, 0)
+
+    case block do
+      {:ok, _} = r ->
+        r
+
+      {:error, %Telegex.Model.RequestError{reason: :timeout}} = e ->
+        if retry > 0 do
+          extended_send(Keyword.merge(options, retry: retry - 1), do: block)
+        else
+          e
+        end
+
+      {:error, %Telegex.Model.Error{description: <<"Too Many Requests: retry after">> <> _rest}} =
+          e ->
+        # 随机暂停以减缓发送速率，提高重试成功率。
+        :timer.sleep(trunc(800 * retry * Enum.random(@time_seeds)))
+
+        if retry > 0 do
+          extended_send(Keyword.merge(options, retry: retry - 1), do: block)
+        else
+          e
+        end
+
+      e ->
+        e
+    end
+  end
 end
