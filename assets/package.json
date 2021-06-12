@@ -4,7 +4,7 @@
   "license": "MIT",
   "scripts": {
     "deploy": "cross-env NODE_ENV=production webpack --mode production",
-    "watch": "cross-env NODE_ENV=development webpack --mode development --watch"
+    "watch": "cross-env NODE_ENV=development webpack --mode development --watch --watch-options-stdin"
   },
   "babelMacros": {
     "twin": {
