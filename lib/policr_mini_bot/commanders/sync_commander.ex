@@ -53,7 +53,7 @@ defmodule PolicrMiniBot.SyncCommander do
           if is_admin do
             chat |> ChatBusiness.update(%{is_take_over: true})
           else
-            chat |> ChatBusiness.takeover_cancelled()
+            chat |> ChatBusiness.cancel_takeover()
           end
 
           message_text = t("sync.success")

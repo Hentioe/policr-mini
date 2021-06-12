@@ -72,11 +72,11 @@ defmodule PolicrMini.ChatBusinessTest do
     assert chat2.title == updated_title
   end
 
-  test "takeover_cancelled/1" do
+  test "cancel_takeover/1" do
     {:ok, chat1} = ChatBusiness.create(build_params())
     assert chat1.is_take_over
 
-    {:ok, chat2} = chat1 |> ChatBusiness.takeover_cancelled()
+    {:ok, chat2} = chat1 |> ChatBusiness.cancel_takeover()
     assert chat2.is_take_over == false
     assert struct(chat2, is_take_over: true) == chat1
   end

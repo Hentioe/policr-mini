@@ -30,9 +30,8 @@ defmodule PolicrMini.ChatBusiness do
     end
   end
 
-  # TODO：重命名函数名称为 `cancel_takeover`。
-  @spec takeover_cancelled(Chat.t()) :: written_returns()
-  def takeover_cancelled(%Chat{} = chat) do
+  @spec cancel_takeover(Chat.t()) :: written_returns()
+  def cancel_takeover(%Chat{} = chat) do
     chat |> update(%{is_take_over: false})
   end
 

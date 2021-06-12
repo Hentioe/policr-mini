@@ -114,7 +114,7 @@ defmodule PolicrMiniBot.Runner do
   # 取消接管
   defp cancel_takeover(%Chat{id: chat_id} = chat, send_notification \\ true)
        when is_integer(chat_id) and is_boolean(send_notification) do
-    ChatBusiness.takeover_cancelled(chat)
+    ChatBusiness.cancel_takeover(chat)
 
     if send_notification,
       do:

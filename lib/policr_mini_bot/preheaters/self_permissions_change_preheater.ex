@@ -267,7 +267,7 @@ defmodule PolicrMiniBot.SelfPermissionsChangePreheater do
 
   defp cancel_takevoder(chat_id) do
     case ChatBusiness.get(chat_id) do
-      {:ok, chat} -> ChatBusiness.takeover_cancelled(chat)
+      {:ok, chat} -> ChatBusiness.cancel_takeover(chat)
       _ -> nil
     end
   end

@@ -67,7 +67,7 @@ defmodule PolicrMiniBot.SelfLeftedPreheater do
 
     # 取消接管
     case ChatBusiness.get(chat_id) do
-      {:ok, chat} -> ChatBusiness.takeover_cancelled(chat)
+      {:ok, chat} -> ChatBusiness.cancel_takeover(chat)
       _ -> nil
     end
 
