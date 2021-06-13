@@ -4,6 +4,7 @@ import React, { useEffect } from "react";
 import ReactDOM from "react-dom";
 import IndexPage from "./user/pages/Index";
 import { Header, Footer } from "./user/components";
+import { HelmetProvider } from "react-helmet-async";
 
 const DEBUG = process.env.NODE_ENV == "development";
 
@@ -16,11 +17,13 @@ const App = () => {
 
   return (
     <React.StrictMode>
-      <div>
-        <Header />
-        <IndexPage />
-        <Footer />
-      </div>
+      <HelmetProvider>
+        <div>
+          <Header />
+          <IndexPage />
+          <Footer />
+        </div>
+      </HelmetProvider>
     </React.StrictMode>
   );
 };

@@ -4,23 +4,28 @@ const MiniCssExtractPlugin = require("mini-css-extract-plugin");
 const CssMinimizerPlugin = require("css-minimizer-webpack-plugin");
 const CopyWebpackPlugin = require("copy-webpack-plugin");
 
-module.exports = (env, options) => {
+module.exports = (_env, options) => {
   const devMode = options.mode !== "production";
+
+  const terserPlugin = (compiler) => {
+    const TerserPlugin = require("terser-webpack-plugin");
+    new TerserPlugin({
+      terserOptions: {
+        compress: {},
+      },
+    }).apply(compiler);
+  };
+
+  // 如果是开发模式，不压缩代码。
+  const minimizer = [
+    !devMode && terserPlugin,
+    new CssMinimizerPlugin({}),
+  ].filter(Boolean);
 
   return {
     optimization: {
       minimize: true,
-      minimizer: [
-        (compiler) => {
-          const TerserPlugin = require("terser-webpack-plugin");
-          new TerserPlugin({
-            terserOptions: {
-              compress: {},
-            },
-          }).apply(compiler);
-        },
-        new CssMinimizerPlugin({}),
-      ],
+      minimizer,
     },
     entry: {
       user: glob.sync("./vendor/**/*.js").concat(["./src/user.js"]),
