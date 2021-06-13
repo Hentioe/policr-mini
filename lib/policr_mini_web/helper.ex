@@ -99,7 +99,7 @@ defmodule PolicrMiniWeb.Helper do
     end)
   end
 
-  @fallback_photo "/images/telegram-x128.png"
+  @fallback_photo "/images/telegram-128x128.png"
 
   @doc """
   获取 Telegram 服务器的图片。

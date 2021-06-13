@@ -26,7 +26,7 @@ export default () => {
         {/* 品牌信息 */}
         <div tw="w-full lg:w-7/12 flex justify-around lg:justify-start mt-10 lg:mt-0">
           <div tw="self-end lg:self-start">
-            <img src="/images/logo-x85.png" />
+            <img src="/images/logo-85x85.png" />
           </div>
           <div tw="ml-6">
             <p tw="text-black text-xl font-bold">policrmini</p>

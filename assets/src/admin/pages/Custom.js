@@ -491,7 +491,7 @@ export default () => {
                   <div tw="w-12 self-end">
                     <img
                       tw="w-full rounded-full"
-                      src="/images/avatar-x100.jpg"
+                      src="/images/avatar-100x100.jpg"
                     />
                   </div>
                   <div tw="pl-4 pt-4 pr-4">

@@ -19,7 +19,7 @@ const Paragraph = styled.p`
 const Avatar = () => {
   return (
     <a href="https://t.me/policr_mini_bot" target="_blank">
-      <img src="/images/avatar-x100.jpg" tw="w-full rounded-full shadow-sm" />
+      <img src="/images/avatar-100x100.jpg" tw="w-full rounded-full shadow-sm" />
     </a>
   );
 };
@@ -162,7 +162,7 @@ export default () => {
             </div>
             <div tw="w-10/12">
               <div tw="shadow rounded-md text-sm pb-4">
-                <img src="/images/et-x400.jpg" tw="w-full rounded-t" />
+                <img src="/images/et-400x225.jpg" tw="w-full rounded-t" />
                 <div tw="px-4 pt-1">
                   <Paragraph tw="italic">
                     来自『<span tw="font-bold">POLICR · 中文社区</span>
