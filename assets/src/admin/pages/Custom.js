@@ -36,12 +36,6 @@ const FormInput = styled.input.attrs({
   ${tw`h-8 px-2 box-border rounded appearance-none border focus:outline-none focus:shadow-outline`};
 `;
 
-const FormTextarea = styled.textarea`
-  border: 0 solid #e2e8f0;
-  border-color: hsl(0, 0%, 80%);
-  ${tw`h-8 px-2 box-border rounded appearance-none border focus:outline-none focus:shadow-outline`};
-`;
-
 const Title = styled.span`
   color: #2f3235;
   ${tw`text-lg`}
