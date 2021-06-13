@@ -20,9 +20,9 @@
 
 ## 技术介绍
 
-本项目使用 Elixir 语言开发，具备 Erlang 系统一切优点。为了在开发过程中更轻易的从根源解决问题，作者本人从零开发了 Telegram bot 库（[Telegex](https://github.com/Hentioe/telegex)），并基于该库构建了本项目。
+本项目使用 Elixir 语言开发，具备 Erlang 系统一切优点。为了在开发过程中更轻易的从根源解决问题，作者本人从零开发了 TG bot 库（[Telegex](https://github.com/Hentioe/telegex)），并基于该库构建了本项目。
 
-作为 [Telegex](https://github.com/Hentioe/telegex) 的现实案例，从事实上证明了它可以让机器人足够可靠、稳定的运行。 并且 [Telegex](https://github.com/Hentioe/telegex) 想较于早已存在的多个同类库，仍然具有更正确、完整的支持，更加优雅的实现等优点。
+作为 [Telegex](https://github.com/Hentioe/telegex) 的现实案例，从事实上证明了它可以让机器人足够可靠、稳定的运行。 并且 [Telegex](https://github.com/Hentioe/telegex) 相较于早已存在的多个同类库，仍然具有更正确、完整的支持，更加优雅的实现等优点。
 
 ## 加入我们
 
