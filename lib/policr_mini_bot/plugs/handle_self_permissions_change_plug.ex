@@ -1,4 +1,4 @@
-defmodule PolicrMiniBot.SelfPermissionsChangePreheater do
+defmodule PolicrMiniBot.HandleSelfPermissionsChangePlug do
   @moduledoc """
   响应自身权限修改的插件。
   """
@@ -22,7 +22,7 @@ defmodule PolicrMiniBot.SelfPermissionsChangePreheater do
   """
 
   # !注意! 由于依赖状态中的 `action` 字段，此模块需要位于管道中的涉及填充状态相关字段、相关值的插件后面。
-  # 当前此模块需要保证位于 `PolicrMiniBot.SelfJoinedPreheater` 和 `PolicrMiniBot.SelfLeftedPreheater` 两个模块的后面。
+  # 当前此模块需要保证位于 `PolicrMiniBot.InitUserJoinedActionPlug` 和 `PolicrMiniBot.HandleSelfLeftedPlug` 两个模块的后面。
 
   @impl true
   def call(%{my_chat_member: nil} = _update, state) do

@@ -1,4 +1,4 @@
-defmodule PolicrMiniBot.LeaveCaller do
+defmodule PolicrMiniBot.CallLeavePlug do
   @moduledoc """
   启用验证功能的回调。
   """

@@ -1,4 +1,4 @@
-defmodule PolicrMiniBot.RevokeTokenCaller do
+defmodule PolicrMiniBot.CallRevokeTokenPlug do
   @moduledoc """
   处理令牌吊销回调。
   """

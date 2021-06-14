@@ -1,4 +1,4 @@
-defmodule PolicrMiniBot.PingCommander do
+defmodule PolicrMiniBot.RespPingCmdPlug do
   @moduledoc """
   ping 命令。
   """

@@ -1,4 +1,4 @@
-defmodule PolicrMiniBot.SyncCommander do
+defmodule PolicrMiniBot.RespSyncCmdPlug do
   @moduledoc """
   `/sync` 命令的响应模块。
 

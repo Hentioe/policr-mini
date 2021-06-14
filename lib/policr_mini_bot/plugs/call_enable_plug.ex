@@ -1,4 +1,4 @@
-defmodule PolicrMiniBot.EnableCaller do
+defmodule PolicrMiniBot.CallEnablePlug do
   @moduledoc """
   启用验证功能的回调。
   """

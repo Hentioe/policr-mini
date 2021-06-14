@@ -1,4 +1,4 @@
-defmodule PolicrMiniBot.UserJoinedGroupPreheater do
+defmodule PolicrMiniBot.HandleUserJoinedGroupPlug do
   @moduledoc """
   用户加入群组的处理器。
   """
@@ -9,7 +9,7 @@ defmodule PolicrMiniBot.UserJoinedGroupPreheater do
 
   use PolicrMiniBot, plug: :preheater
 
-  alias PolicrMiniBot.UserJoinedHandler
+  alias PolicrMiniBot.HandleUserJoinedCleanupPlug
   alias PolicrMini.{Logger, SchemeBusiness}
 
   @doc """
@@ -24,7 +24,7 @@ defmodule PolicrMiniBot.UserJoinedGroupPreheater do
   """
 
   # !注意! 由于匹配过程依赖状态中的 `action` 字段，此模块需要位于管道中的涉及填充相关状态字段、相关值的插件后面。
-  # 当前此模块需要保证位于 `PolicrMiniBot.InitUserJoinedActionPreheater` 模块的后面。
+  # 当前此模块需要保证位于 `PolicrMiniBot.InitUserJoinedActionPlug` 模块的后面。
   @impl true
   def call(%{chat_member: nil} = _update, state) do
     {:ignored, state}
@@ -63,7 +63,7 @@ defmodule PolicrMiniBot.UserJoinedGroupPreheater do
 
     case SchemeBusiness.fetch(chat_id) do
       {:ok, scheme} ->
-        UserJoinedHandler.handle_one(chat_id, new_user, date, scheme, state)
+        HandleUserJoinedCleanupPlug.handle_one(chat_id, new_user, date, scheme, state)
 
       e ->
         Logger.unitized_error("Verification scheme fetching", chat_id: chat_id, returns: e)

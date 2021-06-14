@@ -45,7 +45,7 @@ defmodule PolicrMini.MixProject do
       {:dialyxir, "~> 1.1", only: [:dev], runtime: false},
       {:telegex, "~> 0.1"},
       {:telegex_marked, "~> 0.0.8"},
-      {:telegex_plug, "~> 0.2"},
+      {:telegex_plug, "~> 0.3"},
       {:phoenix, "~> 1.5"},
       {:phoenix_ecto, "~> 4.2"},
       {:ecto_sql, "~> 3.6"},

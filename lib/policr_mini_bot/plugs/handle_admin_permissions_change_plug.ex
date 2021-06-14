@@ -1,4 +1,4 @@
-defmodule PolicrMiniBot.AdminPermissionsChangePreheater do
+defmodule PolicrMiniBot.HandleAdminPermissionsChangePlug do
   @moduledoc """
   同步管理员权限修改的插件。
   """
@@ -6,7 +6,7 @@ defmodule PolicrMiniBot.AdminPermissionsChangePreheater do
   use PolicrMiniBot, plug: :preheater
 
   alias PolicrMini.{Logger, ChatBusiness}
-  alias PolicrMiniBot.SyncCommander
+  alias PolicrMiniBot.RespSyncCmdPlug
 
   @doc """
   根据更新消息中的 `chat_member` 字段，同步管理员权限变化。
@@ -23,7 +23,7 @@ defmodule PolicrMiniBot.AdminPermissionsChangePreheater do
   """
 
   # !注意! 由于依赖状态中的 `action` 字段，此模块需要位于管道中的涉及填充状态相关字段、相关值的插件后面。
-  # 当前此模块需要保证位于 `PolicrMiniBot.InitUserJoinedActionPreheater` 和 `PolicrMiniBot.UserLeftedPreheater` 两个模块的后面。
+  # 当前此模块需要保证位于 `PolicrMiniBot.InitUserJoinedActionPlug` 和 `PolicrMiniBot.HandleUserLeftedGroupPlug` 两个模块的后面。
   @impl true
   def call(%{chat_member: nil} = _update, state) do
     {:ignored, state}
@@ -112,13 +112,14 @@ defmodule PolicrMiniBot.AdminPermissionsChangePreheater do
     # TODO: 优化管理员权限的自动同步过程。改为对单个用户权限的更新或删除，而非根据 API 调用结果同步所有数据。
 
     with {:ok, chat} <- ChatBusiness.get(chat_id),
-         {:ok, _} <- SyncCommander.synchronize_administrators(chat) do
+         {:ok, _} <- RespSyncCmdPlug.synchronize_administrators(chat) do
       text = """
       检测到用户 #{mention(user, anonymization: false, parse_mode: "HTML")} 的管理权限变化，已自动同步至后台权限中。
 
       <i>提示：由于此特性的加入，在管理员权限变化的场景下将不再需要手动调用 <code>/sync</code> 命令。</i>
       """
 
+      # TODO: 延迟自动删除此消息。
       send_message(chat_id, text, parse_mode: "HTML")
     else
       e ->

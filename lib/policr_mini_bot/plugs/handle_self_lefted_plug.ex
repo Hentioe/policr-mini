@@ -1,4 +1,4 @@
-defmodule PolicrMiniBot.SelfLeftedPreheater do
+defmodule PolicrMiniBot.HandleSelfLeftedPlug do
   @moduledoc """
   机器人自己离开群组的处理器。
   """

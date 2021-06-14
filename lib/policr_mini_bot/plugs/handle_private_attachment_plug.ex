@@ -1,7 +1,7 @@
-defmodule PolicrMiniBot.PrivateAttachmentHandler do
+defmodule PolicrMiniBot.HandlePrivateAttachmentPlug do
   @moduledoc false
 
-  use PolicrMiniBot, plug: :handler
+  use PolicrMiniBot, plug: :message_handler
 
   @impl true
   def match(%{chat: %{type: type}} = _message, state)

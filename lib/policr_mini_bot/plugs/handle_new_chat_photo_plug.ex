@@ -1,9 +1,9 @@
-defmodule PolicrMiniBot.NewChatPhotoHandler do
+defmodule PolicrMiniBot.HandleNewChatPhotoPlug do
   @moduledoc """
   新群组头像处理器。
   """
 
-  use PolicrMiniBot, plug: :handler
+  use PolicrMiniBot, plug: :message_handler
 
   alias PolicrMini.ChatBusiness
 

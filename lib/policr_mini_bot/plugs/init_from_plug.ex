@@ -1,4 +1,4 @@
-defmodule PolicrMiniBot.InitFromPreheater do
+defmodule PolicrMiniBot.InitFromPlug do
   @moduledoc """
   检查并缓存来源信息的预热器。
   """

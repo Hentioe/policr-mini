@@ -1,4 +1,4 @@
-defmodule PolicrMiniBot.StartCommander do
+defmodule PolicrMiniBot.RespStartCmdPlug do
   @moduledoc """
   `/start` 命令。
 

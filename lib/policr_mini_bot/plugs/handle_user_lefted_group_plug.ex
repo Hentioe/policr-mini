@@ -1,4 +1,4 @@
-defmodule PolicrMiniBot.UserLeftedGroupPreheater do
+defmodule PolicrMiniBot.HandleUserLeftedGroupPlug do
   @moduledoc """
   群成员离开的处理器。
   """

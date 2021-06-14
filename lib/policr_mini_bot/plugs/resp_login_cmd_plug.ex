@@ -1,4 +1,4 @@
-defmodule PolicrMiniBot.LoginCommander do
+defmodule PolicrMiniBot.RespLoginCmdPlug do
   @moduledoc """
   登录命令。
   """

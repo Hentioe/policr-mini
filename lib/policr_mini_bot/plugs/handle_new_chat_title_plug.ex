@@ -1,9 +1,9 @@
-defmodule PolicrMiniBot.NewChatTitleHandler do
+defmodule PolicrMiniBot.HandleNewChatTitlePlug do
   @moduledoc """
   新群组标题处理器。
   """
 
-  use PolicrMiniBot, plug: :handler
+  use PolicrMiniBot, plug: :message_handler
 
   alias PolicrMini.ChatBusiness
 

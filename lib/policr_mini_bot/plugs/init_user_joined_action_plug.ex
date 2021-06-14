@@ -1,4 +1,4 @@
-defmodule PolicrMiniBot.InitUserJoinedActionPreheater do
+defmodule PolicrMiniBot.InitUserJoinedActionPlug do
   @moduledoc """
   初始化状态中可能的动作：用户加入群组。
   """
@@ -22,7 +22,6 @@ defmodule PolicrMiniBot.InitUserJoinedActionPreheater do
   - 成员之前的状态如果是 `restricted`，但 `is_member` 为 `true`。
   """
 
-  # !注意! 因为以上的验证排除条件，此模块需要保证在填充以上条件的模块的处理流程的后面。
   # !注意! 此模块并不会根据群组是否接管、新成员的用户类型以及新成员的权限等数据进行过滤，这些交由实现相关处理流程的模块来做。
 
   @impl true

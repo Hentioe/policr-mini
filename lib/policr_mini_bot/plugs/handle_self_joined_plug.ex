@@ -1,4 +1,4 @@
-defmodule PolicrMiniBot.SelfJoinedPreheater do
+defmodule PolicrMiniBot.HandleSelfJoinedPlug do
   @moduledoc """
   自身加入新群组的处理器。
   """
@@ -10,7 +10,7 @@ defmodule PolicrMiniBot.SelfJoinedPreheater do
   use PolicrMiniBot, plug: :preheater
   alias PolicrMini.Logger
 
-  alias PolicrMiniBot.{SyncCommander, State}
+  alias PolicrMiniBot.{RespSyncCmdPlug, State}
 
   @doc """
   根据更新消息中的 `my_chat_member` 字段，处理自身加入。
@@ -88,8 +88,8 @@ defmodule PolicrMiniBot.SelfJoinedPreheater do
   @spec handle_it(integer | binary) :: no_return()
   defp handle_it(chat_id) do
     # 同步群组和管理员信息
-    with {:ok, chat} <- SyncCommander.synchronize_chat(chat_id, true),
-         {:ok, _} <- SyncCommander.synchronize_administrators(chat),
+    with {:ok, chat} <- RespSyncCmdPlug.synchronize_chat(chat_id, true),
+         {:ok, _} <- RespSyncCmdPlug.synchronize_administrators(chat),
          :ok <- response(chat_id) do
     else
       # 无发消息权限，直接退出

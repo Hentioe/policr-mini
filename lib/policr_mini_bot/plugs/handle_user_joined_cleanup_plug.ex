@@ -1,17 +1,17 @@
-defmodule PolicrMiniBot.UserJoinedHandler do
+defmodule PolicrMiniBot.HandleUserJoinedCleanupPlug do
   @moduledoc """
   处理新用户加入。
   """
 
-  # TODO: 修改模块含义并迁移代码。因为设计改动，此 `handler` 已无实际验证处理流程，仅作删除消息之用。
+  # TODO: 修改模块含义并迁移代码。因为设计改动，此 `:message_handler` 已无实际验证处理流程，仅作删除消息之用。
 
-  use PolicrMiniBot, plug: :handler
+  use PolicrMiniBot, plug: :message_handler
 
   alias PolicrMini.Logger
 
   alias PolicrMini.Schemas.{Verification, Scheme}
   alias PolicrMini.{SchemeBusiness, VerificationBusiness, OperationBusiness}
-  alias PolicrMiniBot.VerificationCaller
+  alias PolicrMiniBot.CallVerificationPlug
 
   # 过期时间：15 分钟
   @expired_seconds 60 * 15
@@ -304,7 +304,7 @@ defmodule PolicrMiniBot.UserJoinedHandler do
         # 如果还存在多条验证，更新入口消息
         max_seconds = scheme.seconds || countdown()
 
-        VerificationCaller.update_unity_message(
+        CallVerificationPlug.update_unity_message(
           chat_id,
           waiting_count,
           max_seconds

@@ -1,9 +1,9 @@
-defmodule PolicrMiniBot.MemberRemovedHandler do
+defmodule PolicrMiniBot.HandleMemberRemovedPlug do
   @moduledoc """
   群成员被移除的处理器。
   """
 
-  use PolicrMiniBot, plug: :handler
+  use PolicrMiniBot, plug: :message_handler
 
   @doc """
   匹配消息中是否包含已被机器人移除的群成员。

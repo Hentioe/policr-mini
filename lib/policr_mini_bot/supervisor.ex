@@ -4,28 +4,28 @@ defmodule PolicrMiniBot.Supervisor do
   use Supervisor
 
   alias PolicrMiniBot.{
-    InitTakeoveredPreheater,
-    InitFromPreheater,
-    InitUserJoinedActionPreheater,
-    UserJoinedGroupPreheater,
-    UserLeftedGroupPreheater,
-    SelfJoinedPreheater,
-    SelfLeftedPreheater,
-    AdminPermissionsChangePreheater,
-    SelfPermissionsChangePreheater,
-    StartCommander,
-    PingCommander,
-    SyncCommander,
-    LoginCommander,
-    UserJoinedHandler,
-    MemberRemovedHandler,
-    NewChatTitleHandler,
-    NewChatPhotoHandler,
-    PrivateAttachmentHandler,
-    VerificationCaller,
-    RevokeTokenCaller,
-    EnableCaller,
-    LeaveCaller
+    InitTakeoveredPlug,
+    InitFromPlug,
+    InitUserJoinedActionPlug,
+    HandleUserJoinedGroupPlug,
+    HandleUserLeftedGroupPlug,
+    HandleSelfJoinedPlug,
+    HandleSelfLeftedPlug,
+    HandleAdminPermissionsChangePlug,
+    HandleSelfPermissionsChangePlug,
+    RespStartCmdPlug,
+    RespPingCmdPlug,
+    RespSyncCmdPlug,
+    RespLoginCmdPlug,
+    HandleUserJoinedCleanupPlug,
+    HandleMemberRemovedPlug,
+    HandleNewChatTitlePlug,
+    HandleNewChatPhotoPlug,
+    HandlePrivateAttachmentPlug,
+    CallVerificationPlug,
+    CallRevokeTokenPlug,
+    CallEnablePlug,
+    CallLeavePlug
   }
 
   def start_link(_opts) do
@@ -35,31 +35,35 @@ defmodule PolicrMiniBot.Supervisor do
   @impl true
   def init(_init_arg) do
     install_plugs([
-      InitTakeoveredPreheater,
-      InitFromPreheater,
-      InitUserJoinedActionPreheater,
-      UserJoinedGroupPreheater,
-      UserLeftedGroupPreheater,
-      SelfJoinedPreheater,
-      SelfLeftedPreheater,
-      AdminPermissionsChangePreheater,
-      SelfPermissionsChangePreheater
+      InitTakeoveredPlug,
+      InitFromPlug,
+      InitUserJoinedActionPlug,
+      RespStartCmdPlug,
+      RespPingCmdPlug,
+      RespSyncCmdPlug,
+      RespLoginCmdPlug,
+      # ↓此模块↓ 需保证安装在 `InitUserJoinedActionPlug` 模块的后面。
+      HandleUserJoinedGroupPlug,
+      HandleUserLeftedGroupPlug,
+      HandleSelfJoinedPlug,
+      HandleSelfLeftedPlug,
+      # ↓此模块↓ 需保证安装在 `HandleUserLeftedGroupPlug` 模块的后面。
+      HandleAdminPermissionsChangePlug,
+      # ↓此模块↓ 需保证安装在 `InitUserJoinedActionPlug` 和 `HandleSelfLeftedPlug` 模块的后面。
+      HandleSelfPermissionsChangePlug,
+      HandleUserJoinedCleanupPlug,
+      HandleNewChatTitlePlug,
+      HandleNewChatPhotoPlug,
+      HandleMemberRemovedPlug,
+      HandlePrivateAttachmentPlug,
+      CallVerificationPlug,
+      CallRevokeTokenPlug,
+      CallEnablePlug,
+      CallLeavePlug
     ])
 
-    install_plugs([StartCommander, PingCommander, SyncCommander, LoginCommander])
+    children = [  # !注意! 因为以上的验证排除条件，此模块需要保证在填充以上条件的模块的处理流程的后面。
 
-    install_plugs([
-      UserJoinedHandler,
-      NewChatTitleHandler,
-      NewChatPhotoHandler,
-      MemberRemovedHandler,
-      PrivateAttachmentHandler
-    ])
-
-    install_plugs([VerificationCaller, RevokeTokenCaller, EnableCaller, LeaveCaller])
-
-    children = [
-      # 图片供应服务
       PolicrMiniBot.ImageProvider,
       # 消息清理服务
       PolicrMiniBot.Cleaner,

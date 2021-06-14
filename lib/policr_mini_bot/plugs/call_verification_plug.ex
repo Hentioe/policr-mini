@@ -1,4 +1,4 @@
-defmodule PolicrMiniBot.VerificationCaller do
+defmodule PolicrMiniBot.CallVerificationPlug do
   @moduledoc """
   验证回调处理模块。
   """
@@ -8,7 +8,7 @@ defmodule PolicrMiniBot.VerificationCaller do
   alias PolicrMini.Logger
   alias PolicrMini.Schemas.Verification
   alias PolicrMini.{VerificationBusiness, SchemeBusiness, OperationBusiness}
-  alias PolicrMiniBot.{UserJoinedHandler, Disposable}
+  alias PolicrMiniBot.{HandleUserJoinedCleanupPlug, Disposable}
 
   @doc """
   回调处理函数。
@@ -84,7 +84,7 @@ defmodule PolicrMiniBot.VerificationCaller do
         Cleaner.delete_latest_verification_message(verification.chat_id)
       else
         # 如果还存在多条验证，更新入口消息
-        max_seconds = scheme.seconds || UserJoinedHandler.countdown()
+        max_seconds = scheme.seconds || HandleUserJoinedCleanupPlug.countdown()
         update_unity_message(verification.chat_id, count, max_seconds)
       end
 
@@ -201,7 +201,7 @@ defmodule PolicrMiniBot.VerificationCaller do
 
             cleaner_fun.(t("verification.wronged.kick.private"))
 
-            UserJoinedHandler.kick(verification.chat_id, from_user, :wronged)
+            HandleUserJoinedCleanupPlug.kick(verification.chat_id, from_user, :wronged)
 
             {:ok, verification}
 
@@ -224,7 +224,8 @@ defmodule PolicrMiniBot.VerificationCaller do
     if verification = VerificationBusiness.find_last_unity_waiting(chat_id) do
       user = %{id: verification.target_user_id, fullname: verification.target_user_name}
 
-      {text, markup} = UserJoinedHandler.make_unity_content(chat_id, user, count, max_seconds)
+      {text, markup} =
+        HandleUserJoinedCleanupPlug.make_unity_content(chat_id, user, count, max_seconds)
 
       # 获取最新的验证入口消息编号
       message_id = VerificationBusiness.find_last_unity_message_id(chat_id)
