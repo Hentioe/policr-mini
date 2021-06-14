@@ -62,8 +62,8 @@ defmodule PolicrMiniBot.Supervisor do
       CallLeavePlug
     ])
 
-    children = [  # !注意! 因为以上的验证排除条件，此模块需要保证在填充以上条件的模块的处理流程的后面。
-
+    # !注意! 因为以上的验证排除条件，此模块需要保证在填充以上条件的模块的处理流程的后面。
+    children = [
       PolicrMiniBot.ImageProvider,
       # 消息清理服务
       PolicrMiniBot.Cleaner,

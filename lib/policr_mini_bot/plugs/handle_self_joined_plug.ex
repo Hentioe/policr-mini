@@ -8,7 +8,7 @@ defmodule PolicrMiniBot.HandleSelfJoinedPlug do
   # !注意! 此模块功能依赖对 `my_chat_member` 更新的接收。
 
   use PolicrMiniBot, plug: :preheater
-  alias PolicrMini.Logger
+  alias PolicrMini.{Logger, SchemeBusiness}
 
   alias PolicrMiniBot.{RespSyncCmdPlug, State}
 
@@ -87,9 +87,11 @@ defmodule PolicrMiniBot.HandleSelfJoinedPlug do
 
   @spec handle_it(integer | binary) :: no_return()
   defp handle_it(chat_id) do
-    # 同步群组和管理员信息
+    # 同步群组和管理员信息。
+    # 注意，创建群组后需要继续创建方案。
     with {:ok, chat} <- RespSyncCmdPlug.synchronize_chat(chat_id, true),
          {:ok, _} <- RespSyncCmdPlug.synchronize_administrators(chat),
+         {:ok, _} <- SchemeBusiness.fetch(chat_id),
          :ok <- response(chat_id) do
     else
       # 无发消息权限，直接退出

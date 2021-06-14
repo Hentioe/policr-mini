@@ -9,7 +9,7 @@ defmodule PolicrMiniBot.RespSyncCmdPlug do
 
   use PolicrMiniBot, plug: [commander: :sync]
 
-  alias PolicrMini.{ChatBusiness, UserBusiness}
+  alias PolicrMini.{ChatBusiness, UserBusiness, SchemeBusiness}
   alias PolicrMini.Schemas.{Permission, Chat}
   alias PolicrMiniBot.SpeedLimiter
 
@@ -41,9 +41,11 @@ defmodule PolicrMiniBot.RespSyncCmdPlug do
 
         async(fn -> chat_id |> typing() end)
 
-        # 同步群组和管理员信息，并自动设置接管状态
+        # 同步群组和管理员信息，并自动设置接管状态。
+        # 注意，同步完成后需进一步确保方案存在。
         with {:ok, chat} <- synchronize_chat(chat_id),
              {:ok, _} <- synchronize_administrators(chat),
+             {:ok, _} <- SchemeBusiness.fetch(chat_id),
              # 获取自身权限
              {:ok, member} <- Telegex.get_chat_member(chat_id, PolicrMiniBot.id()) do
           is_admin = member.status == "administrator"
