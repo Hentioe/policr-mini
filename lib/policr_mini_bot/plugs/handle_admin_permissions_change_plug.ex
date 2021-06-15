@@ -119,8 +119,16 @@ defmodule PolicrMiniBot.HandleAdminPermissionsChangePlug do
       <i>提示：由于此特性的加入，在管理员权限变化的场景下将不再需要手动调用 <code>/sync</code> 命令。</i>
       """
 
-      # TODO: 延迟自动删除此消息。
-      send_message(chat_id, text, parse_mode: "HTML")
+      case send_message(chat_id, text, parse_mode: "HTML") do
+        {:ok, msg} ->
+          Cleaner.delete_message(chat_id, msg.message_id, delay_seconds: 4)
+
+        e ->
+          Logger.unitized_error("Sending of messages with synchronized permissions",
+            chat_id: chat_id,
+            returns: e
+          )
+      end
     else
       e ->
         send_message(
