@@ -83,7 +83,6 @@ defmodule PolicrMiniBot.RespStartCmdPlug do
            {:ok, {verification_message, markup, captcha_data}} <-
              send_verify_message(verification, scheme, target_chat_id, from_user_id),
            # 创建消息快照
-           # TODO: 快照中缺乏附件相关字段。
            {:ok, message_snapshot} <-
              MessageSnapshotBusiness.create(%{
                chat_id: target_chat_id,
