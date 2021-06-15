@@ -17,6 +17,7 @@ import {
   PageReLoading,
   LabelledButton,
   ActionButton,
+  FormInput,
 } from "../components";
 import { Table, Thead, Tr, Th, Tbody, Td } from "../components/Tables";
 import { updateInNewArray, camelizeJson, toastErrors } from "../helper";
@@ -26,14 +27,6 @@ const FormSection = styled.div`
 `;
 const FormLable = styled.label`
   ${tw`w-full mb-2 lg:mb-0 lg:w-3/12`}
-`;
-
-const FormInput = styled.input.attrs({
-  type: "text",
-})`
-  border: 0 solid #e2e8f0;
-  border-color: hsl(0, 0%, 80%);
-  ${tw`h-8 px-2 box-border rounded appearance-none border focus:outline-none focus:shadow-outline`};
 `;
 
 const Title = styled.span`
@@ -399,7 +392,7 @@ export default () => {
                         tw="w-full lg:w-9/12"
                         value={editingAttachment}
                         onChange={handleAttachmentTextChange}
-                        placeholder="私聊机器人获取附件字符串，包括：图片、视频、音频、文档（文件）。"
+                        placeholder="私聊机器人附件获取此值，支持：图片、视频、音频、文档（文件）。"
                       />
                     </FormSection>
                   ) : undefined}

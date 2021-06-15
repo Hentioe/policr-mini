@@ -12,8 +12,10 @@ import PageReLoading from "./components/PageReLoading";
 import LabelledButton from "./components/LabelledButton";
 import RetryButton from "./components/RetryButton";
 import ActionButton from "./components/ActionButton";
+import LinkButton from "./components/LinkButton";
 import Pagination from "./components/Pagination";
 import HintParagraph from "./components/HintParagraph";
+import FormInput from "./components/FormInput";
 
 export {
   Sidebar,
@@ -30,6 +32,8 @@ export {
   LabelledButton,
   RetryButton,
   ActionButton,
+  LinkButton,
   Pagination,
   HintParagraph,
+  FormInput,
 };

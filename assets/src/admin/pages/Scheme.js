@@ -1,8 +1,8 @@
 import React, { useEffect, useState, useCallback } from "react";
-import "twin.macro";
 import useSWR from "swr";
 import { useSelector, useDispatch } from "react-redux";
 import Select from "react-select";
+import tw, { styled } from "twin.macro";
 
 import { loadSelected } from "../slices/chats";
 import {
@@ -15,10 +15,14 @@ import {
   PageReLoading,
   NotImplemented,
   LabelledButton,
-  HintParagraph,
+  FormInput,
 } from "../components";
 
 import { camelizeJson, toastErrors } from "../helper";
+
+const Comment = styled.span`
+  ${tw`py-5 text-center text-sm text-green-600`}
+`;
 
 const defaultModeOption = { value: 4, label: "系统默认" };
 const modeOptions = [
@@ -35,15 +39,26 @@ const modeMapping = {
   initiative: 3,
 };
 
+const customSecondsOption = { value: "custom", label: "自定义" };
+const defaultSecondsOption = { value: "default", label: "系统默认" };
+const secondsOptions = [
+  { value: 45, label: "自动生成：超短" },
+  { value: 75, label: "自动生成：较短" },
+  { value: 150, label: "自动生成：一般" },
+  { value: 300, label: "自动生成：较长" },
+  defaultSecondsOption,
+  customSecondsOption,
+];
+
 const makeEndpoint = (chat_id) => `/admin/api/chats/${chat_id}/scheme`;
 
-const saveScheme = async ({ chatId, modeValue }) => {
+const saveScheme = async ({ chatId, verificationMode, seconds }) => {
   const endpoint = `/admin/api/chats/${chatId}/scheme`;
   let body = null;
-  if (modeValue != undefined) {
-    if (modeValue === defaultModeOption.value) modeValue = null;
-    body = { verification_mode: modeValue };
-  }
+  if (verificationMode === defaultModeOption.value) verificationMode = null;
+  if (seconds == "") seconds = null;
+
+  body = { verification_mode: verificationMode, seconds };
 
   return fetch(endpoint, {
     method: "PUT",
@@ -71,36 +86,70 @@ export default () => {
   }, [data]);
 
   const [modeValue, setModeValue] = useState(defaultModeOption.value);
-  const [isModeEditing, setIsModeEditing] = useState(false);
-  const [isSecondsEditing, setIsSecondsEditing] = useState(true);
+  const [isEdited, setIsEdited] = useState(false);
+  const [editingSecondsOption, setEditingSecondsOption] =
+    useState(defaultSecondsOption);
+
+  const [editingSeconds, setEditingSeconds] = useState(0);
 
   useEffect(() => {
     setModeValue(getModeValueFromData());
+
+    if (data && data.scheme) {
+      const seconds = data.scheme.seconds;
+
+      setEditingSeconds(seconds || "");
+      if (seconds == null) setEditingSecondsOption(defaultSecondsOption);
+      else setEditingSecondsOption(customSecondsOption);
+    }
   }, [data]);
 
   const handleModeSelectChange = (option) => {
-    setIsModeEditing(true);
+    setIsEdited(true);
     setModeValue(option.value);
   };
 
-  const handleModeEditingCanceling = useCallback(() => {
-    setIsModeEditing(false);
+  const handleEditingSecondsSelectChange = (option) => {
+    setIsEdited(true);
+    setEditingSecondsOption(option);
+
+    if (!isNaN(option.value)) {
+      setEditingSeconds(option.value);
+    } else {
+      setEditingSeconds("");
+    }
+  };
+
+  const handleEdintingSecondsChange = (e) => {
+    setIsEdited(true);
+
+    const value = e.target.value;
+    if (![45, 75, 150, 300].includes(value)) {
+      setEditingSecondsOption(customSecondsOption);
+    }
+    setEditingSeconds(e.target.value);
+  };
+
+  const handleSaveCancel = useCallback(() => {
+    setIsEdited(false);
     setModeValue(getModeValueFromData());
   });
 
-  const handleSaveMode = useCallback(() => {
-    const result = saveScheme({
+  const handleSaveScheme = useCallback(async () => {
+    const result = await saveScheme({
       id: data.scheme ? data.scheme.id : -1,
       chatId: chatsState.selected,
-      modeValue: modeValue,
+      verificationMode: modeValue,
+      seconds: editingSeconds,
     });
+
     if (result.errors) {
       toastErrors(result.errors);
       return;
     }
-    setIsModeEditing(false);
+    setIsEdited(false);
     mutate();
-  }, [modeValue]);
+  }, [modeValue, editingSeconds]);
 
   const isLoaded = () => !error && chatsState.isLoaded && data && !data.errors;
 
@@ -123,30 +172,17 @@ export default () => {
             </PageSectionHeader>
             <main>
               <div tw="my-2">
+                <Comment>
+                  说明：提供有多项验证方式。在已存储资源的基础上随机的包括：图片验证、定制验证，纯动态的包括：算数验证。
+                </Comment>
                 <Select
+                  tw="mt-2"
                   options={modeOptions}
                   value={modeOptions[modeValue]}
                   onChange={handleModeSelectChange}
                   isSearchable={false}
                 />
               </div>
-              {isModeEditing && (
-                <div tw="flex mt-4">
-                  <div tw="flex-1 pr-2 lg:pr-10">
-                    <LabelledButton
-                      label="cancel"
-                      onClick={() => handleModeEditingCanceling()}
-                    >
-                      取消
-                    </LabelledButton>
-                  </div>
-                  <div tw="flex-1 pl-2 lg:pl-10">
-                    <LabelledButton label="ok" onClick={handleSaveMode}>
-                      确定
-                    </LabelledButton>
-                  </div>
-                </div>
-              )}
             </main>
           </PageSection>
           <PageSection>
@@ -178,24 +214,66 @@ export default () => {
               <PageSectionTitle>超时时长</PageSectionTitle>
             </PageSectionHeader>
             <main>
-              {data.scheme.seconds || isSecondsEditing ? (
-                <NotImplemented />
-              ) : (
-                <div>
-                  <HintParagraph>
-                    当前为系统默认，
-                    <span
-                      tw="underline cursor-pointer select-none"
-                      onClick={() => setIsSecondsEditing(true)}
-                    >
-                      点此修改
-                    </span>
-                    。
-                  </HintParagraph>
+              <div tw="my-2">
+                <Comment>
+                  提示：请设置合理的验证时长，超长或太短都不合适。不建议低于 40
+                  秒，也不建议高于 600 秒（10 分钟）。
+                </Comment>
+                <div tw="mt-2 flex items-center">
+                  <div tw="w-3/12">
+                    <label>设置值</label>
+                  </div>
+                  <div tw="flex flex-1">
+                    <Select
+                      tw="mr-2"
+                      styles={{
+                        control: (provided) => ({
+                          ...provided,
+                          width: 200,
+                        }),
+                      }}
+                      options={secondsOptions}
+                      onChange={handleEditingSecondsSelectChange}
+                      isSearchable={false}
+                      value={editingSecondsOption}
+                    />
+                    <FormInput
+                      type="number"
+                      tw="flex-1 text-center"
+                      value={editingSeconds}
+                      onChange={handleEdintingSecondsChange}
+                      placeholder={
+                        editingSecondsOption.value == "default"
+                          ? "系统默认值"
+                          : "在此填入秒数"
+                      }
+                    />
+                  </div>
                 </div>
-              )}
+              </div>
             </main>
           </PageSection>
+          {isEdited ? (
+            <PageSection>
+              <PageSectionHeader>
+                <PageSectionTitle>保存修改</PageSectionTitle>
+              </PageSectionHeader>
+              <main>
+                <div tw="flex mt-4">
+                  <div tw="flex-1 pr-2 lg:pr-10">
+                    <LabelledButton label="cancel" onClick={handleSaveCancel}>
+                      取消
+                    </LabelledButton>
+                  </div>
+                  <div tw="flex-1 pl-2 lg:pl-10">
+                    <LabelledButton label="ok" onClick={handleSaveScheme}>
+                      确定
+                    </LabelledButton>
+                  </div>
+                </div>
+              </main>
+            </PageSection>
+          ) : undefined}
         </PageBody>
       ) : error ? (
         <PageReLoading mutate={mutate} />
