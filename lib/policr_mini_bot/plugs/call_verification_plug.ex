@@ -59,21 +59,20 @@ defmodule PolicrMiniBot.CallVerificationPlug do
     chosen = chosen |> String.to_integer()
     verification_id = verification_id |> String.to_integer()
 
-    handle_answer = fn verification, killing_method ->
+    handle_answer = fn verification, wrong_killing_method ->
       if Enum.member?(verification.indices, chosen) do
         # 处理回答正确
         handle_correct(verification, message_id, from)
       else
         # 处理回答错误
-        handle_wrong(verification, killing_method, message_id, from)
+        handle_wrong(verification, wrong_killing_method, message_id, from)
       end
     end
 
     with {:ok, verification} <- validity_check(user_id, verification_id),
          {:ok, scheme} <- SchemeBusiness.fetch(verification.chat_id),
-         # 处理回答
-         {:ok, verification} <-
-           handle_answer.(verification, scheme.killing_method || default!(:kmethod)),
+         # 处理回答。
+         {:ok, verification} <- handle_answer.(verification, scheme.wrong_killing_method),
          # 更新验证记录中的选择索引
          {:ok, _} <- VerificationBusiness.update(verification, %{chosen: chosen}) do
       count = VerificationBusiness.get_unity_waiting_count(verification.chat_id)
@@ -169,18 +168,20 @@ defmodule PolicrMiniBot.CallVerificationPlug do
   """
   @spec handle_wrong(Verification.t(), atom, integer, Telegex.Model.User.t()) ::
           {:ok, Verification.t()} | {:error, any}
-  def handle_wrong(verification, killing_method, message_id, from_user) do
+  def handle_wrong(verification, wrong_killing_method, message_id, from_user) do
     cleaner_fun = fn notice_text ->
-      async(fn ->
+      async do
         Cleaner.delete_message(verification.target_user_id, message_id)
         send_message(verification.target_user_id, notice_text)
-      end)
+      end
     end
 
     operation_create_fun = fn verification ->
+      operation_action = if wrong_killing_method == :ban, do: :ban, else: :kick
+
       case OperationBusiness.create(%{
              verification_id: verification.id,
-             action: :kick,
+             action: operation_action,
              role: :system
            }) do
         {:ok, _} = r ->
@@ -188,26 +189,25 @@ defmodule PolicrMiniBot.CallVerificationPlug do
 
         e ->
           Logger.unitized_error("Operation creation", e)
+
           e
       end
     end
 
     case verification |> VerificationBusiness.update(%{status: :wronged}) do
       {:ok, verification} ->
-        case killing_method do
-          :kick ->
-            # 添加操作记录（系统）
-            operation_create_fun.(verification)
+        # 添加操作记录（系统）。
+        operation_create_fun.(verification)
+        cleaner_fun.(t("verification.wronged.#{wrong_killing_method || :kick}.private"))
 
-            cleaner_fun.(t("verification.wronged.kick.private"))
+        kill(
+          verification.chat_id,
+          from_user,
+          :wronged,
+          wrong_killing_method
+        )
 
-            HandleUserJoinedCleanupPlug.kick(verification.chat_id, from_user, :wronged)
-
-            {:ok, verification}
-
-          other ->
-            {:error, "unknown killing method: `#{other}`"}
-        end
+        {:ok, verification}
 
       e ->
         e
@@ -249,6 +249,75 @@ defmodule PolicrMiniBot.CallVerificationPlug do
       {:error, :not_found, _} -> {:error, :known, t("errors.verification_not_found")}
       {:check_user, false} -> {:error, :known, t("errors.verification_target_incorrect")}
       {:check_status, false} -> {:error, :known, t("errors.verification_expired")}
+    end
+  end
+
+  @doc """
+  获取允许重新加入时长。
+  当前的实现会根据运行模式返回不同的值。
+  """
+  @spec allow_join_again_seconds :: integer()
+  def allow_join_again_seconds do
+    if PolicrMini.mix_env() == :dev, do: 15, else: 60 * 2
+  end
+
+  @doc """
+  击杀用户。
+
+  此函数会根据击杀方法做出指定动作，并结合击杀原因发送通知消息。若 `method` 参数的值为 `nil`，则默认表示击杀方法为 `:kick`。
+  """
+  @spec kill(integer, map, :wronged | :timeout, :kick | :ban | nil) :: :ok | {:error, map}
+  def kill(chat_id, user, reason, method) do
+    method = method || :kick
+
+    case method do
+      :kick ->
+        Telegex.kick_chat_member(chat_id, user.id)
+        # 解除限制以允许再次加入。
+        async(fn -> Telegex.unban_chat_member(chat_id, user.id) end,
+          seconds: allow_join_again_seconds()
+        )
+
+      :ban ->
+        Telegex.kick_chat_member(chat_id, user.id)
+    end
+
+    time_text =
+      if allow_join_again_seconds() < 60,
+        do: "#{allow_join_again_seconds()} #{t("units.sec")}",
+        else: "#{to_string(trunc(allow_join_again_seconds() / 60))} #{t("units.min")}"
+
+    text =
+      case reason do
+        :timeout ->
+          t("verification.timeout.#{method}.public", %{
+            mentioned_user: mention(user, anonymization: false, mosaic: true),
+            time_text: time_text
+          })
+
+        :wronged ->
+          t("verification.wronged.#{method}.public", %{
+            mentioned_user: mention(user, anonymization: false, mosaic: true),
+            time_text: time_text
+          })
+      end
+
+    async(fn -> chat_id |> typing() end)
+
+    case send_message(chat_id, text, parse_mode: "MarkdownV2ToHTML") do
+      {:ok, sended_message} ->
+        Cleaner.delete_message(chat_id, sended_message.message_id, delay_seconds: 8)
+
+        :ok
+
+      e ->
+        Logger.unitized_error("Send notification of user killed",
+          chat_id: chat_id,
+          user_id: user.id,
+          returns: e
+        )
+
+        e
     end
   end
 end

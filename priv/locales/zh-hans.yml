@@ -65,16 +65,21 @@ verification:
   wronged:
     kick:
       private: 抱歉，验证错误。您已被移出群组，稍后可尝试重新加入。
-      notice: |
+      public: |
         刚刚 %{mentioned_user} 验证错误，已经移出本群。
 
         过 %{time_text}后可再次尝试加入。
+    ban:
+      private: 抱歉，验证错误。您已被封禁。
+      public: 刚刚 %{mentioned_user} 验证错误，已被封禁。
   timeout:
     kick:
-      notice: |
+      public: |
         刚刚 %{mentioned_user} 超时未验证，已经移出本群。
 
         过 %{time_text}后可再次尝试加入。
+    ban:
+      public: 刚刚 %{mentioned_user} 超时未验证，已被封禁。
 
 buttons:
   verification:

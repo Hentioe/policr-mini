@@ -26,7 +26,7 @@ defmodule PolicrMini.SchemeBusinessTest do
     assert scheme.verification_entrance == :unity
     assert scheme.verification_occasion == :private
     assert scheme.seconds == scheme_params.seconds
-    assert scheme.killing_method == :ban
+    assert scheme.wrong_killing_method == :ban
     assert scheme.is_highlighted == scheme_params.is_highlighted
   end
 
@@ -38,7 +38,7 @@ defmodule PolicrMini.SchemeBusinessTest do
     updated_verification_entrance = 1
     updated_verification_occasion = 1
     updated_seconds = 120
-    updated_killing_method = 1
+    updated_timeout_killing_method = :ban
     updated_is_highlighted = false
 
     {:ok, scheme2} =
@@ -48,7 +48,7 @@ defmodule PolicrMini.SchemeBusinessTest do
         verification_entrance: updated_verification_entrance,
         verification_occasion: updated_verification_occasion,
         seconds: updated_seconds,
-        killing_method: updated_killing_method,
+        timeout_killing_method: updated_timeout_killing_method,
         is_highlighted: updated_is_highlighted
       })
 
@@ -57,7 +57,7 @@ defmodule PolicrMini.SchemeBusinessTest do
     assert scheme2.verification_entrance == :independent
     assert scheme2.verification_occasion == :public
     assert scheme2.seconds == updated_seconds
-    assert scheme2.killing_method == :kick
+    assert scheme2.timeout_killing_method == :ban
     assert scheme2.is_highlighted == updated_is_highlighted
   end
 

@@ -10,7 +10,7 @@ defmodule PolicrMiniWeb.Admin.API.VerificationController do
 
   import PolicrMiniWeb.Helper
 
-  action_fallback PolicrMiniWeb.API.FallbackController
+  action_fallback(PolicrMiniWeb.API.FallbackController)
 
   def kick(conn, %{"id" => id, "ban" => ban} = _params) do
     is_ban = ban == "true"
@@ -19,7 +19,8 @@ defmodule PolicrMiniWeb.Admin.API.VerificationController do
          {:ok, _} <- check_permissions(conn, verification.chat.id, [:writable]),
          {:ok, ok} <- kick_by_verification(verification, is_ban: is_ban) do
       action = if is_ban, do: :ban, else: :kick
-      # 添加操作记录（管理员）
+
+      # 添加操作记录（管理员）。
       case OperationBusiness.create(%{
              verification_id: verification.id,
              action: action,

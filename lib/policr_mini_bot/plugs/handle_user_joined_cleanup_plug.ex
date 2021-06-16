@@ -26,19 +26,10 @@ defmodule PolicrMiniBot.HandleUserJoinedCleanupPlug do
   end
 
   @doc """
-  获取允许重新加入时长。
-  当前的实现会根据运行模式返回不同的值。
-  """
-  @spec allow_join_again_seconds :: integer()
-  def allow_join_again_seconds do
-    if PolicrMini.mix_env() == :dev, do: 15, else: 60 * 2
-  end
-
-  @doc """
   检查消息中包含的新加入用户是否有效。
 
   ## 以下情况皆不匹配
-  - 群组未接管
+  - 群组未接管。
 
   除此之外包含新成员的消息都将匹配。
   """
@@ -231,7 +222,6 @@ defmodule PolicrMiniBot.HandleUserJoinedCleanupPlug do
   @spec start_timed_task(Verification.t(), Scheme.t(), integer(), integer()) :: :ok
   @doc """
   启动定时任务处理验证超时。
-  # TODO: 根据 scheme 决定执行的动作
   """
   def start_timed_task(verification, scheme, seconds, reminder_message_id)
       when is_integer(seconds) and is_integer(reminder_message_id) do
@@ -240,42 +230,18 @@ defmodule PolicrMiniBot.HandleUserJoinedCleanupPlug do
 
     target_user = %{id: target_user_id, fullname: target_user_name}
 
-    unban_fun = fn ->
-      async(fn -> Telegex.unban_chat_member(chat_id, target_user_id) end,
-        seconds: allow_join_again_seconds()
-      )
-    end
-
-    operation_create_fun = fn verification ->
-      case OperationBusiness.create(%{
-             verification_id: verification.id,
-             action: :kick,
-             role: :system
-           }) do
-        {:ok, _} = r ->
-          r
-
-        e ->
-          Logger.unitized_error("Operation creation", e)
-          e
-      end
-    end
-
-    verification_handle_fun = fn latest_verification ->
+    handle_verification_fun = fn latest_verification ->
       # 为等待状态则实施操作
       if latest_verification.status == :waiting do
         # 添加操作记录（系统）
-        operation_create_fun.(latest_verification)
+        create_operation(latest_verification, scheme.timeout_killing_method)
 
         # 计数器自增（超时总数）
         PolicrMini.Counter.increment(:verification_timeout_total)
         # 更新状态为超时
         latest_verification |> VerificationBusiness.update(%{status: :timeout})
-        # TODO: 此处需要根据 scheme
-        # 实施操作（踢出）
-        kick(chat_id, target_user, :timeout)
-        # 解除限制以允许再次加入
-        unban_fun.()
+        # 击杀用户（原因为超时）。
+        CallVerificationPlug.kill(chat_id, target_user, :timeout, scheme.timeout_killing_method)
       end
     end
 
@@ -283,7 +249,7 @@ defmodule PolicrMiniBot.HandleUserJoinedCleanupPlug do
       # 读取验证记录，并根据状态实时操作
       case VerificationBusiness.get(verification.id) do
         {:ok, latest_verification} ->
-          verification_handle_fun.(latest_verification)
+          handle_verification_fun.(latest_verification)
 
         e ->
           Logger.unitized_error("After the scheduled task is executed, the verification finding",
@@ -315,51 +281,19 @@ defmodule PolicrMiniBot.HandleUserJoinedCleanupPlug do
     async(timed_task, seconds: seconds)
   end
 
-  @type reason :: :wronged | :timeout
-
-  @spec kick(integer(), map(), reason()) :: :ok | {:error, Telegex.Model.errors()}
-  def kick(chat_id, user, reason) when is_integer(chat_id) and is_map(user) and is_atom(reason) do
-    # 踢出用户
-    Telegex.kick_chat_member(chat_id, user.id)
-    # 解除限制以允许再次加入
-    async(fn -> Telegex.unban_chat_member(chat_id, user.id) end,
-      seconds: allow_join_again_seconds()
-    )
-
-    time_text =
-      if allow_join_again_seconds() < 60,
-        do: "#{allow_join_again_seconds()} #{t("units.sec")}",
-        else: "#{to_string(trunc(allow_join_again_seconds() / 60))} #{t("units.min")}"
-
-    text =
-      case reason do
-        :timeout ->
-          t("verification.timeout.kick.notice", %{
-            mentioned_user: mention(user, anonymization: false, mosaic: true),
-            time_text: time_text
-          })
-
-        :wronged ->
-          t("verification.wronged.kick.notice", %{
-            mentioned_user: mention(user, anonymization: false, mosaic: true),
-            time_text: time_text
-          })
-      end
-
-    async(fn -> chat_id |> typing() end)
-
-    case send_message(chat_id, text, parse_mode: "MarkdownV2ToHTML") do
-      {:ok, sended_message} ->
-        Cleaner.delete_message(chat_id, sended_message.message_id, delay_seconds: 8)
-
-        :ok
+  defp create_operation(verification, killing_method) do
+    operation_action = if killing_method == :ban, do: :ban, else: :kick
+    # 添加操作记录（系统）。
+    case OperationBusiness.create(%{
+           verification_id: verification.id,
+           action: operation_action,
+           role: :system
+         }) do
+      {:ok, _} = r ->
+        r
 
       e ->
-        Logger.unitized_error("User killed notification",
-          chat_id: chat_id,
-          user_id: user.id,
-          returns: e
-        )
+        Logger.unitized_error("Operation creation", e)
 
         e
     end

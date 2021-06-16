@@ -16,7 +16,8 @@ defmodule PolicrMini.Schemas.SchemeTest do
                  :verification_entrance,
                  :verification_occasion,
                  :seconds,
-                 :killing_method,
+                 :timeout_killing_method,
+                 :wrong_killing_method,
                  :is_highlighted,
                  :inserted_at,
                  :updated_at
@@ -33,7 +34,7 @@ defmodule PolicrMini.Schemas.SchemeTest do
     updated_verification_entrance = 0
     updated_verification_occasion = 0
     updated_seconds = 120
-    updated_killing_method = 1
+    updated_wrong_killing_method = :kick
     updated_is_highlighted = false
 
     params = %{
@@ -41,7 +42,7 @@ defmodule PolicrMini.Schemas.SchemeTest do
       "verification_entrance" => updated_verification_entrance,
       "verification_occasion" => updated_verification_occasion,
       "seconds" => updated_seconds,
-      "killing_method" => updated_killing_method,
+      "wrong_killing_method" => updated_wrong_killing_method,
       "is_highlighted" => updated_is_highlighted
     }
 
@@ -50,7 +51,7 @@ defmodule PolicrMini.Schemas.SchemeTest do
       verification_entrance: :unity,
       verification_occasion: :private,
       seconds: updated_seconds,
-      killing_method: :kick,
+      wrong_killing_method: :kick,
       is_highlighted: updated_is_highlighted
     }
 

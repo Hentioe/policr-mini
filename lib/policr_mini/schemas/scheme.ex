@@ -15,7 +15,7 @@ defmodule PolicrMini.Schemas.Scheme do
   }
 
   @required_fields ~w(chat_id)a
-  @optional_fields ~w(verification_mode verification_entrance verification_occasion seconds killing_method is_highlighted)a
+  @optional_fields ~w(verification_mode verification_entrance verification_occasion seconds timeout_killing_method wrong_killing_method is_highlighted)a
 
   schema "schemes" do
     belongs_to :chat, Chat
@@ -24,7 +24,8 @@ defmodule PolicrMini.Schemas.Scheme do
     field :verification_entrance, VerificationEntranceEnum
     field :verification_occasion, VerificationOccasionEnum
     field :seconds, :integer
-    field :killing_method, KillingMethodEnum
+    field :timeout_killing_method, KillingMethodEnum
+    field :wrong_killing_method, KillingMethodEnum
     field :is_highlighted, :boolean
 
     timestamps()

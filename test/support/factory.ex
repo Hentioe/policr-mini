@@ -47,7 +47,8 @@ defmodule PolicrMini.Factory do
       verification_entrance: 0,
       verification_occasion: 0,
       seconds: 80,
-      killing_method: 0,
+      timeout_killing_method: :kick,
+      wrong_killing_method: :ban,
       is_highlighted: true
     }
   end

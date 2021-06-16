@@ -516,9 +516,15 @@ defmodule PolicrMiniBot.Helper do
   @doc """
   异步执行函数，不指定延迟时间。
   """
-  @spec async(function()) :: :ok
+  @spec async(function() | [do: term]) :: :ok
   def async(callback) when is_function(callback) do
     TaskAfter.task_after(0, callback)
+
+    :ok
+  end
+
+  def async(do: block) do
+    TaskAfter.task_after(0, fn -> block end)
 
     :ok
   end
