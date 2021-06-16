@@ -244,7 +244,7 @@ export default () => {
                 </Comment>
                 <div tw="flex flex-wrap items-center">
                   <div tw="w-3/12">
-                    <label>设置方法</label>
+                    <label>修改方法</label>
                   </div>
                   <div tw="w-9/12">
                     <Select
@@ -285,11 +285,11 @@ export default () => {
                   提示：可独立设置验证超时或验证错误的击杀方法。一般来讲：
                   <ul>
                     <li>
-                      验证超时为 Spam bot
+                      验证超时的用户为 Spam bot
                       的可能性极大，封禁有较小的概率误伤正常帐号。
                     </li>
                     <li>
-                      验证错误为真人的概率很大，但也存在很多以发广告为目的进群的真人。
+                      验证错误的用户为真人的概率很大，但也存在很多以发广告为目的进群的真人。
                     </li>
                   </ul>
                   <span>
@@ -299,7 +299,7 @@ export default () => {
 
                 <div tw="flex flex-wrap items-center">
                   <div tw="w-3/12">
-                    <label>设置超时击杀方法</label>
+                    <label>验证超时</label>
                   </div>
                   <div tw="w-9/12">
                     <Select
@@ -311,7 +311,7 @@ export default () => {
                     />
                   </div>
                   <div tw="w-3/12">
-                    <label>设置错误击杀方法</label>
+                    <label>验证错误</label>
                   </div>
                   <div tw="w-9/12">
                     <Select
