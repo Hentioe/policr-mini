@@ -1,7 +1,9 @@
 import React from "react";
 import tw, { styled } from "twin.macro";
 import useSWR from "swr";
+import { useDispatch } from "react-redux";
 
+import { open as openModal } from "../slices/modal";
 import { Title, ErrorParagraph, UnifiedFlexBox } from "../components";
 
 const InlineKeybordButton = styled.div`
@@ -19,10 +21,37 @@ const Paragraph = styled.p`
 const Avatar = () => {
   return (
     <a href="https://t.me/policr_mini_bot" target="_blank">
-      <img src="/images/avatar-100x100.jpg" tw="w-full rounded-full shadow-sm" />
+      <img
+        src="/images/avatar-100x100.jpg"
+        tw="w-full rounded-full shadow-sm"
+      />
     </a>
   );
 };
+
+const pageContentMissing = (
+  <>
+    <span tw="text-gray-600">
+      由于此项目暂未完全实现，此页面内容有待填充。更多细节请参阅
+      <a
+        tw="text-blue-600"
+        target="_blank"
+        href="https://t.me/policr_changelog"
+      >
+        更新频道
+      </a>
+      或在
+      <a
+        tw="text-blue-600"
+        target="_blank"
+        href="https://mini.telestd.me/community"
+      >
+        社群
+      </a>
+      寻求帮助。
+    </span>
+  </>
+);
 
 const fetcher = (url) => fetch(url).then((r) => r.json());
 const initialIndexData = {
@@ -40,6 +69,7 @@ function calculatePassRate({ totals }) {
 
 export default () => {
   const { data, error } = useSWR("/api/index", fetcher);
+  const dispatch = useDispatch();
 
   if (error)
     return (
@@ -108,7 +138,17 @@ export default () => {
                   <Paragraph tw="text-gray-600 mb-3">
                     在后台定制机器人的功能，管理封禁列表和查看验证日志
                   </Paragraph>
-                  <a tw="text-blue-500 text-sm font-bold no-underline" href="#">
+                  <a
+                    tw="text-blue-500 text-sm font-bold no-underline cursor-pointer"
+                    onClick={() => {
+                      dispatch(
+                        openModal({
+                          title: "后台指南",
+                          content: pageContentMissing,
+                        })
+                      );
+                    }}
+                  >
                     &gt; 进入这里阅读后台使用指南
                   </a>
                 </div>
@@ -118,7 +158,17 @@ export default () => {
                   <Paragraph tw="text-gray-600 mb-3">
                     通过解答算术题、识别图片或自定义问答内容“考核”入群成员
                   </Paragraph>
-                  <a tw="text-blue-500 text-sm font-bold no-underline" href="#">
+                  <a
+                    tw="text-blue-500 text-sm font-bold no-underline cursor-pointer"
+                    onClick={() => {
+                      dispatch(
+                        openModal({
+                          title: "设定验证",
+                          content: pageContentMissing,
+                        })
+                      );
+                    }}
+                  >
                     &gt; 来了解如何自己设定验证方案
                   </a>
                 </div>
@@ -217,7 +267,30 @@ export default () => {
             <p tw="text-gray-200">
               也因为如此申请成功的条件相对严苛，它主要是对服务稳定性的考察。
             </p>
-            <a tw="text-white float-right" href="#">
+            <a
+              tw="text-white float-right cursor-pointer"
+              onClick={() => {
+                dispatch(
+                  openModal({
+                    title: "申请社区运营",
+                    content: (
+                      <span tw="text-gray-600">
+                        当前您可通过在
+                        <a
+                          tw="text-blue-600"
+                          target="_blank"
+                          href="https://mini.telestd.me/community"
+                        >
+                          社群
+                        </a>
+                        中联系作者或与其它管理员交流，以告知我们您自行部署的实例的相关信息。
+                        此页面未来将可用。
+                      </span>
+                    ),
+                  })
+                );
+              }}
+            >
               申请社区运营
             </a>
           </div>

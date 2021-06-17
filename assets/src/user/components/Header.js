@@ -1,12 +1,15 @@
 import React from "react";
 import tw, { styled } from "twin.macro";
+import { useDispatch } from "react-redux";
+
+import { open as openModal } from "../slices/modal";
 
 const Link = styled.a`
   ${tw`no-underline`}
 `;
 
 const MenuLink = styled(Link)`
-  ${tw`md:inline-flex md:w-auto w-full py-2 rounded text-gray-600 items-center justify-center`}
+  ${tw`md:inline-flex md:w-auto w-full py-2 rounded text-gray-600 items-center justify-center cursor-pointer`}
 `;
 
 const MenuText = styled.span`
@@ -22,8 +25,34 @@ const LogoMarkup = styled.span`
 const version = "beta";
 const thirdParty = "T-party";
 
+const pageContentMissing = (
+  <>
+    <span tw="text-gray-600">
+      由于此项目暂未完全实现，此页面内容有待填充。更多细节请参阅
+      <a
+        tw="text-blue-600"
+        target="_blank"
+        href="https://t.me/policr_changelog"
+      >
+        更新频道
+      </a>
+      或在
+      <a
+        tw="text-blue-600"
+        target="_blank"
+        href="https://mini.telestd.me/community"
+      >
+        社群
+      </a>
+      寻求帮助。
+    </span>
+  </>
+);
+
 // 参考来源：https://tailwindcomponents.com/component/simple-responsive-navigation-bar-1
 export default () => {
+  const dispatch = useDispatch();
+
   return (
     <nav tw="flex items-center bg-white p-2 md:p-3 flex-wrap">
       {/* LOGO&主页链接 */}
@@ -65,19 +94,68 @@ export default () => {
           <MenuLink href="/">
             <MenuText>首页</MenuText>
           </MenuLink>
-          <MenuLink href="#">
+          <MenuLink
+            onClick={() => {
+              dispatch(
+                openModal({
+                  title: "登入后台",
+                  content: (
+                    <span tw="text-gray-600">
+                      当前可通过私聊机器人{" "}
+                      <a
+                        tw="text-blue-400"
+                        href={`https://t.me/${_GLOBAL.botUsername}`}
+                        target="_blank"
+                      >
+                        <code>/login</code>
+                      </a>{" "}
+                      命令获取后台链接，未来此页面将可用。
+                    </span>
+                  ),
+                })
+              );
+            }}
+          >
             <MenuText>后台</MenuText>
           </MenuLink>
           <MenuLink target="_blank" href="https://mini.telestd.me/community">
             <MenuText>社群</MenuText>
           </MenuLink>
-          <MenuLink href="#">
+          <MenuLink
+            onClick={() => {
+              dispatch(
+                openModal({
+                  title: "维基",
+                  content: pageContentMissing,
+                })
+              );
+            }}
+          >
             <MenuText>维基</MenuText>
           </MenuLink>
-          <MenuLink href="#">
+          <MenuLink
+            onClick={() => {
+              dispatch(
+                openModal({
+                  title: "关于",
+                  content: pageContentMissing,
+                })
+              );
+            }}
+          >
             <MenuText>关于</MenuText>
           </MenuLink>
-          <MenuLink href="#" tw="bg-yellow-400">
+          <MenuLink
+            onClick={() => {
+              dispatch(
+                openModal({
+                  title: "快速入门",
+                  content: pageContentMissing,
+                })
+              );
+            }}
+            tw="bg-yellow-400"
+          >
             <MenuText>快速入门</MenuText>
           </MenuLink>
         </div>

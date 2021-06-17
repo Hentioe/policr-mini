@@ -1,6 +1,8 @@
 import React from "react";
 import tw, { styled } from "twin.macro";
+import { useDispatch } from "react-redux";
 
+import { open as openModal } from "../slices/modal";
 import { UnifiedFlexBox } from "./Unified";
 
 const linkAttrs = {
@@ -16,10 +18,36 @@ const IconLink = styled(Link)`
 `;
 
 const NavLink = styled(Link)`
-  ${tw`text-gray-900 mb-3`}
+  ${tw`text-gray-900 mb-3 cursor-pointer`}
 `;
 
+const pageContentMissing = (
+  <>
+    <span tw="text-gray-600">
+      由于此项目暂未完全实现，此页面内容有待填充。更多细节请参阅
+      <a
+        tw="text-blue-600"
+        target="_blank"
+        href="https://t.me/policr_changelog"
+      >
+        更新频道
+      </a>
+      或在
+      <a
+        tw="text-blue-600"
+        target="_blank"
+        href="https://mini.telestd.me/community"
+      >
+        社群
+      </a>
+      寻求帮助。
+    </span>
+  </>
+);
+
 export default () => {
+  const dispatch = useDispatch();
+
   return (
     <footer tw="bg-yellow-400">
       <UnifiedFlexBox tw="py-10 flex-wrap-reverse">
@@ -57,11 +85,56 @@ export default () => {
                   社区群组
                 </NavLink>
                 <NavLink href="https://t.me/policr_changelog">更新频道</NavLink>
-                <NavLink href="#">关于我们</NavLink>
+                <NavLink
+                  onClick={() => {
+                    dispatch(
+                      openModal({
+                        title: "关于我们",
+                        content: pageContentMissing,
+                      })
+                    );
+                  }}
+                >
+                  关于我们
+                </NavLink>
               </div>
               <div tw="flex flex-col">
-                <NavLink href="#">编辑百科</NavLink>
-                <NavLink href="#">贡献翻译</NavLink>
+                <NavLink
+                  onClick={() => {
+                    dispatch(
+                      openModal({
+                        title: "编辑百科",
+                        content: pageContentMissing,
+                      })
+                    );
+                  }}
+                >
+                  编辑百科
+                </NavLink>
+                <NavLink
+                  onClick={() => {
+                    dispatch(
+                      openModal({
+                        title: "贡献翻译",
+                        content: (
+                          <span tw="text-gray-600">
+                            由于此项目暂未完全实现，当前不考虑对多语言的支持。可关注
+                            <a
+                              tw="text-blue-600"
+                              target="_blank"
+                              href="https://t.me/policr_changelog"
+                            >
+                              更新频道
+                            </a>
+                            等待后续安排，感谢您。
+                          </span>
+                        ),
+                      })
+                    );
+                  }}
+                >
+                  贡献翻译
+                </NavLink>
               </div>
             </div>
           </div>
