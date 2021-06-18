@@ -8,7 +8,7 @@ const ModalContainer = styled.div`
   top: 50%;
   left: 50%;
   transform: translate(-50%, -50%);
-  ${tw`absolute rounded shadow-lg z-50 px-8 py-6 bg-white`}
+  ${tw`absolute rounded shadow-lg z-50 px-8 py-6 bg-white w-64 md:w-auto`}
 `;
 
 const ActionButton = styled.button`
