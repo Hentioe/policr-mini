@@ -52,7 +52,7 @@ const Root = () => {
       // }}
     >
       <div
-        tw="absolute w-full min-h-full"
+        tw="fixed w-full h-full"
         style={{
           background: modalState.isOpen ? "rgba(0, 0, 0, 0.7)" : "transparent",
           zIndex: modalState.isOpen ? 49 : -1,

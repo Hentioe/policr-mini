@@ -199,7 +199,7 @@ export default () => {
               </div>
               <div tw="mt-2">
                 <InlineKeybordButton>
-                  <span tw="underline">点此验证</span>
+                  <span tw="underline select-none">点此验证</span>
                 </InlineKeybordButton>
               </div>
             </div>
@@ -228,13 +228,13 @@ export default () => {
               </div>
               <div tw="mt-2">
                 <InlineKeybordButton>
-                  <span>地铁</span>
+                  <span tw="select-none">地铁</span>
                 </InlineKeybordButton>
                 <InlineKeybordButton>
-                  <span>公路</span>
+                  <span tw="select-none">公路</span>
                 </InlineKeybordButton>
                 <InlineKeybordButton>
-                  <span>外星人</span>
+                  <span tw="select-none">外星人</span>
                 </InlineKeybordButton>
               </div>
             </div>
@@ -268,14 +268,14 @@ export default () => {
               也因为如此申请成功的条件相对严苛，它主要是对服务稳定性的考察。
             </p>
             <a
-              tw="text-white float-right cursor-pointer"
+              tw="text-white float-right cursor-pointer underline"
               onClick={() => {
                 dispatch(
                   openModal({
                     title: "申请社区运营",
                     content: (
                       <span tw="text-gray-600">
-                        当前您可通过在
+                        当前您可在
                         <a
                           tw="text-blue-600"
                           target="_blank"
@@ -283,8 +283,7 @@ export default () => {
                         >
                           社群
                         </a>
-                        中联系作者或与其它管理员交流，以告知我们您自行部署的实例的相关信息。
-                        此页面未来将可用。
+                        中联系作者或与其它管理员交流，以告知我们自行部署的实例的相关信息。未来此页面将可用。
                       </span>
                     ),
                   })

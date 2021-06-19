@@ -101,7 +101,7 @@ export default () => {
                   title: "登入后台",
                   content: (
                     <span tw="text-gray-600">
-                      当前可通过私聊机器人{" "}
+                      当前可私聊机器人{" "}
                       <a
                         tw="text-blue-400"
                         href={`https://t.me/${_GLOBAL.botUsername}`}
@@ -109,7 +109,7 @@ export default () => {
                       >
                         <code>/login</code>
                       </a>{" "}
-                      命令获取后台链接，未来此页面将可用。
+                      命令获取后台链接，略过登录入口。未来此页面将可用。
                     </span>
                   ),
                 })
