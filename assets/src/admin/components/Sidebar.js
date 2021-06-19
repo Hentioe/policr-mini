@@ -17,9 +17,10 @@ import { loadSelected, receiveChats } from "../slices/chats";
 const NavItemLink = styled(RouteLink)`
   ${tw`py-3 px-6 no-underline text-black tracking-wider`}
   ${tw`hover:bg-blue-100 hover:text-blue-500`}
-  ${tw`border-0 border-l-2 border-solid border-transparent`}
+  ${tw`border-0 border-l-2 border-r-2 border-solid border-transparent`}
   ${({ selected = false }) => selected && tw`text-blue-500 border-current`}
   ${({ ending = ending }) => ending && tw`rounded-b`}
+  border-right-color: transparent;
 `;
 
 const NavItem = ({
@@ -189,16 +190,12 @@ export default () => {
           title="自定义"
           href={`/admin/chats/${chatsState.selected}/custom`}
           selected={isSelect("custom", location.pathname)}
-          ending={isOnOwnerMenu ? 1 : 0}
+          ending={isOnOwnerMenu ? "true" : "false"}
         />
         {chatsState.loadedSelected && !isOnOwnerMenu ? (
           <>
-            {/* 
-            TODO: 修正菜单部分的居中（补充解释如下文）。
-            由于菜单链接有一个宽度为 2px 的左边框，此处需要增加对应宽度的外边距以保持对齐。
-            因为如此，本该居中的部分无法完全居中。
-            */}
-            <div tw="px-6" style={{ marginLeft: 2 }}>
+            {/*因为菜单链接有一个宽度为 2px 的左右边框，此处需要增加对应宽度的外边距以保持对齐。*/}
+            <div tw="pt-3 px-6" style={{ marginLeft: 2, marginRight: 2 }}>
               <span tw="xl:text-lg text-gray-600">数据统计</span>
               <div tw="flex items-center justify-between">
                 <div tw="flex flex-col items-center">
@@ -235,7 +232,7 @@ export default () => {
             </div>
             <div
               tw="py-3 px-6 text-lg text-gray-600 flex justify-between"
-              style={{ marginLeft: 2 }}
+              style={{ marginLeft: 2, marginRight: 2 }}
             >
               <span>
                 {chatsState.loadedSelected.isTakeOver ? "已接管" : "未接管"}
