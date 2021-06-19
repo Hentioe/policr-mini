@@ -85,11 +85,13 @@ defmodule PolicrMini.Factory do
   end
 
   def build(:statistic) do
+    utc_now_dt = DateTime.truncate(DateTime.utc_now(), :second)
+
     %PolicrMini.Schemas.Statistic{
       verifications_count: 0,
       languages_top: %{},
-      begin_at: DateTime.utc_now(),
-      end_at: DateTime.utc_now(),
+      begin_at: utc_now_dt,
+      end_at: utc_now_dt,
       verification_status: :other
     }
   end
