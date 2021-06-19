@@ -10,7 +10,7 @@ defmodule PolicrMiniBot.HandleUserJoinedCleanupPlug do
   alias PolicrMini.Logger
 
   alias PolicrMini.Schemas.{Verification, Scheme}
-  alias PolicrMini.{SchemeBusiness, VerificationBusiness, OperationBusiness}
+  alias PolicrMini.{SchemeBusiness, VerificationBusiness, StatisticBusiness, OperationBusiness}
   alias PolicrMiniBot.CallVerificationPlug
 
   # 过期时间：15 分钟
@@ -233,6 +233,15 @@ defmodule PolicrMiniBot.HandleUserJoinedCleanupPlug do
     handle_verification_fun = fn latest_verification ->
       # 为等待状态则实施操作
       if latest_verification.status == :waiting do
+        # 自增统计数据（超时）。
+        async do
+          StatisticBusiness.increment_one(
+            verification.chat_id,
+            verification.target_user_language_code,
+            :timeout
+          )
+        end
+
         # 添加操作记录（系统）
         create_operation(latest_verification, scheme.timeout_killing_method)
 

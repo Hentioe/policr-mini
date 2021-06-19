@@ -7,7 +7,7 @@ defmodule PolicrMiniBot.CallVerificationPlug do
 
   alias PolicrMini.Logger
   alias PolicrMini.Schemas.Verification
-  alias PolicrMini.{VerificationBusiness, SchemeBusiness, OperationBusiness}
+  alias PolicrMini.{VerificationBusiness, StatisticBusiness, SchemeBusiness, OperationBusiness}
   alias PolicrMiniBot.{HandleUserJoinedCleanupPlug, Disposable}
 
   @doc """
@@ -117,6 +117,15 @@ defmodule PolicrMiniBot.CallVerificationPlug do
   @spec handle_correct(Verification.t(), integer(), Telegex.Model.User.t()) ::
           {:ok, Verification.t()} | {:error, any()}
   def handle_correct(verification, message_id, from_user) do
+    # 自增统计数据（通过）。
+    async do
+      StatisticBusiness.increment_one(
+        verification.chat_id,
+        verification.target_user_language_code,
+        :passed
+      )
+    end
+
     # 计数器自增（通过总数）
     PolicrMini.Counter.increment(:verification_passed_total)
     # 发送通知消息并延迟删除
@@ -169,6 +178,15 @@ defmodule PolicrMiniBot.CallVerificationPlug do
   @spec handle_wrong(Verification.t(), atom, integer, Telegex.Model.User.t()) ::
           {:ok, Verification.t()} | {:error, any}
   def handle_wrong(verification, wrong_killing_method, message_id, from_user) do
+    # 自增统计数据（错误）。
+    async do
+      StatisticBusiness.increment_one(
+        verification.chat_id,
+        verification.target_user_language_code,
+        :wronged
+      )
+    end
+
     cleaner_fun = fn notice_text ->
       async do
         Cleaner.delete_message(verification.target_user_id, message_id)

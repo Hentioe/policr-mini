@@ -4,6 +4,7 @@ import { useLocation, Link as RouteLink } from "react-router-dom";
 import tw, { styled } from "twin.macro";
 import MoonLoader from "react-spinners/MoonLoader";
 import Switch from "react-switch";
+import useSWR from "swr";
 
 import {
   camelizeJson,
@@ -13,15 +14,13 @@ import {
 } from "../helper";
 import { loadSelected, receiveChats } from "../slices/chats";
 
-const NavItemLink = styled(
-  RouteLink
-)(({ selected = false, ending: ending }) => [
-  tw`py-3 px-6 no-underline text-black tracking-wider`,
-  tw`hover:bg-blue-100 hover:text-blue-500`,
-  tw`border-0 border-l-2 border-solid border-transparent`,
-  selected && tw`text-blue-500 border-current`,
-  ending && tw`rounded-b`,
-]);
+const NavItemLink = styled(RouteLink)`
+  ${tw`py-3 px-6 no-underline text-black tracking-wider`}
+  ${tw`hover:bg-blue-100 hover:text-blue-500`}
+  ${tw`border-0 border-l-2 border-solid border-transparent`}
+  ${({ selected = false }) => selected && tw`text-blue-500 border-current`}
+  ${({ ending = ending }) => ending && tw`rounded-b`}
+`;
 
 const NavItem = ({
   title: title,
@@ -82,11 +81,20 @@ const changeTakeover = async ({ chatId, isTakeOver }) => {
   }).then((r) => camelizeJson(r));
 };
 
+const makeTodayStatisticsEndpoint = (chat_id, status) =>
+  `/admin/api/statistics/find_today?chat_id=${chat_id}&status=${status}`;
+
 export default () => {
   const location = useLocation();
   const dispatch = useDispatch();
 
   const chatsState = useSelector((state) => state.chats);
+
+  const { data: todayStatisticsData, error } = useSWR(
+    chatsState && chatsState.isLoaded && chatsState.selected
+      ? makeTodayStatisticsEndpoint(chatsState.selected)
+      : null
+  );
 
   const [isTakeOver, setIsTakeOver] = useState(false);
   const [isOnOwnerMenu, setIsOnOwnerMenu] = useState(
@@ -142,59 +150,104 @@ export default () => {
         title="管理员菜单"
         miniTitle="菜单"
       >
-        <NavItem
+        {/* <NavItem
           title="数据统计"
           href={`/admin/chats/${chatsState.selected}/statistics`}
           selected={isSelect("statistics", location.pathname)}
-        />
+        /> */}
         <NavItem
-          title="方案定制*"
+          title="方案定制"
           href={`/admin/chats/${chatsState.selected}/scheme`}
           selected={isSelect("scheme", location.pathname)}
         />
-        <NavItem
+        {/* <NavItem
           title="消息模板"
           href={`/admin/chats/${chatsState.selected}/template`}
           selected={isSelect("template", location.pathname)}
-        />
+        /> */}
         <NavItem
-          title="验证记录*"
+          title="验证记录"
           href={`/admin/chats/${chatsState.selected}/verifications`}
           selected={isSelect("verifications", location.pathname)}
         />
         <NavItem
-          title="操作记录*"
+          title="操作记录"
           href={`/admin/chats/${chatsState.selected}/operations`}
           selected={isSelect("operations", location.pathname)}
         />
         <NavItem
-          title="管理员权限*"
+          title="管理员权限"
           href={`/admin/chats/${chatsState.selected}/permissions`}
           selected={isSelect("permissions", location.pathname)}
         />
-        <NavItem
+        {/* <NavItem
           title="机器人属性"
           href={`/admin/chats/${chatsState.selected}/properties`}
           selected={isSelect("properties", location.pathname)}
-        />
+        /> */}
         <NavItem
-          title="自定义*"
+          title="自定义"
           href={`/admin/chats/${chatsState.selected}/custom`}
           selected={isSelect("custom", location.pathname)}
           ending={isOnOwnerMenu ? 1 : 0}
         />
         {chatsState.loadedSelected && !isOnOwnerMenu ? (
-          <div tw="py-3 px-6 text-lg text-gray-600 flex justify-between">
-            <span>
-              {chatsState.loadedSelected.isTakeOver ? "已接管" : "未接管"}
-            </span>
-            <Switch
-              checked={isTakeOver}
-              checkedIcon={false}
-              uncheckedIcon={false}
-              onChange={handleTakeOverChange}
-            />
-          </div>
+          <>
+            {/* 
+            TODO: 修正菜单部分的居中（补充解释如下文）。
+            由于菜单链接有一个宽度为 2px 的左边框，此处需要增加对应宽度的外边距以保持对齐。
+            因为如此，本该居中的部分无法完全居中。
+            */}
+            <div tw="px-6" style={{ marginLeft: 2 }}>
+              <span tw="xl:text-lg text-gray-600">数据统计</span>
+              <div tw="flex items-center justify-between">
+                <div tw="flex flex-col items-center">
+                  <span tw="text-xs lg:text-sm text-gray-500 mt-2">
+                    今日验证通过
+                  </span>
+                  <span tw="text-sm text-green-700 font-bold mt-1 tracking-wide">
+                    {todayStatisticsData == undefined
+                      ? "计算中"
+                      : todayStatisticsData.passedStatistic
+                      ? todayStatisticsData.passedStatistic.verificationsCount
+                      : 0}
+                  </span>
+                </div>
+                <div tw="bg-gray-300 h-10" style={{ width: 1 }}></div>
+                <div tw="flex flex-col items-center">
+                  <span tw="text-xs lg:text-sm text-gray-500 mt-2">
+                    今日验证失败
+                  </span>
+                  <span tw="text-sm text-red-700 font-bold mt-1 tracking-wider">
+                    {todayStatisticsData == undefined
+                      ? "计算中"
+                      : (todayStatisticsData.timeoutStatistic
+                          ? todayStatisticsData.timeoutStatistic
+                              .verificationsCount
+                          : 0) +
+                        (todayStatisticsData.wrongedStatistic
+                          ? todayStatisticsData.wrongedStatistic
+                              .verificationsCount
+                          : 0)}
+                  </span>
+                </div>
+              </div>
+            </div>
+            <div
+              tw="py-3 px-6 text-lg text-gray-600 flex justify-between"
+              style={{ marginLeft: 2 }}
+            >
+              <span>
+                {chatsState.loadedSelected.isTakeOver ? "已接管" : "未接管"}
+              </span>
+              <Switch
+                checked={isTakeOver}
+                checkedIcon={false}
+                uncheckedIcon={false}
+                onChange={handleTakeOverChange}
+              />
+            </div>
+          </>
         ) : !isOnOwnerMenu ? (
           <div tw="py-3 px-6 text-lg text-gray-600 flex justify-between">
             <span>检查中…</span>
@@ -204,31 +257,31 @@ export default () => {
 
       <MenuBox visibility={_GLOBAL.isOwner} title="系统菜单" miniTitle="系统">
         <NavItem
-          title="批量管理*"
+          title="批量管理"
           href="/admin/sys/managements"
           selected={isSysLink({ path: location.pathname, page: "managements" })}
         />
         <NavItem
-          title="查阅日志*"
+          title="查阅日志"
           href="/admin/sys/logs"
           selected={isSysLink({ path: location.pathname, page: "logs" })}
         />
-        <NavItem
+        {/* <NavItem
           title="定时任务"
           href="/admin/sys/tasks"
           selected={isSysLink({ path: location.pathname, page: "tasks" })}
-        />
-        <NavItem
+        /> */}
+        {/* <NavItem
           title="使用条款"
           href="/admin/sys/terms"
           selected={isSysLink({ path: location.pathname, page: "terms" })}
           ending="true"
-        />
-        <NavItem
+        /> */}
+        {/* <NavItem
           title="模拟终端"
           href="/admin/sys/terminal"
           selected={isSysLink({ path: location.pathname, page: "terminal" })}
-        />
+        /> */}
       </MenuBox>
     </nav>
   );

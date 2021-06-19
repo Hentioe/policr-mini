@@ -6,7 +6,7 @@ defmodule PolicrMiniBot.Runner do
 
   alias PolicrMini.Logger
 
-  alias PolicrMini.{VerificationBusiness, ChatBusiness, PermissionBusiness}
+  alias PolicrMini.{VerificationBusiness, ChatBusiness, StatisticBusiness, PermissionBusiness}
   alias PolicrMini.Schemas.Chat
   alias PolicrMiniBot.Helper, as: BotHelper
 
@@ -27,7 +27,19 @@ defmodule PolicrMiniBot.Runner do
 
     # 修正状态
     # TODO: 待优化：在同一个事物中更新所有验证记录
-    verifications |> Enum.each(fn v -> v |> VerificationBusiness.update(%{status: :expired}) end)
+    verifications
+    |> Enum.each(fn verification ->
+      # 自增统计数据（其它）。
+      PolicrMiniBot.Helper.async do
+        StatisticBusiness.increment_one(
+          verification.chat_id,
+          verification.target_user_language_code,
+          :other
+        )
+      end
+
+      verification |> VerificationBusiness.update(%{status: :expired})
+    end)
 
     len = length(verifications)
     if len > 0, do: Logger.info("Automatically correct #{len} expired verifications")
