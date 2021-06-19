@@ -84,6 +84,18 @@ defmodule PolicrMini.Factory do
     }
   end
 
+  def build(:statistic) do
+    utc_now_dt = DateTime.truncate(DateTime.utc_now(), :second)
+
+    %PolicrMini.Schemas.Statistic{
+      verifications_count: 0,
+      languages_top: %{},
+      begin_at: utc_now_dt,
+      end_at: utc_now_dt,
+      verification_status: :other
+    }
+  end
+
   def build(factory_name, attrs) when is_atom(factory_name) and is_list(attrs) do
     factory_name |> build() |> struct(attrs)
   end
