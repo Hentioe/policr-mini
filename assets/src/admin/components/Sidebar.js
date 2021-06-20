@@ -82,8 +82,8 @@ const changeTakeover = async ({ chatId, isTakeOver }) => {
   }).then((r) => camelizeJson(r));
 };
 
-const makeTodayStatisticsEndpoint = (chat_id, status) =>
-  `/admin/api/statistics/find_today?chat_id=${chat_id}&status=${status}`;
+const makeTodayStatisticsEndpoint = (chat_id) =>
+  `/admin/api/statistics/find_today?chat_id=${chat_id}`;
 
 export default () => {
   const location = useLocation();
