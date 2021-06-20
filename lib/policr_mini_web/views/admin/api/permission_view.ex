@@ -17,6 +17,10 @@ defmodule PolicrMiniWeb.Admin.API.PermissionView do
     %{ok: ok}
   end
 
+  def render("sync.json", %{ok: ok}) do
+    %{ok: ok}
+  end
+
   def render("permission.json", %{permission: permission}) do
     permission
     |> Map.drop([:__meta__, :chat])

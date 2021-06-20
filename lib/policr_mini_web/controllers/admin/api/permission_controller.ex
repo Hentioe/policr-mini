@@ -5,7 +5,8 @@ defmodule PolicrMiniWeb.Admin.API.PermissionController do
 
   use PolicrMiniWeb, :controller
 
-  alias PolicrMini.{PermissionBusiness}
+  alias PolicrMini.{PermissionBusiness, ChatBusiness}
+  alias PolicrMiniBot.RespSyncCmdPlug
 
   import PolicrMiniWeb.Helper
 
@@ -48,6 +49,14 @@ defmodule PolicrMiniWeb.Admin.API.PermissionController do
     end
   end
 
+  def sync(conn, %{"chat_id" => chat_id}) do
+    with {:ok, _} <- check_permissions(conn, chat_id, [:writable, :owner]),
+         {:ok, chat} <- ChatBusiness.get(chat_id),
+         {:ok, _} <- RespSyncCmdPlug.synchronize_administrators(chat) do
+      render(conn, "sync.json", %{ok: true})
+    end
+  end
+
   @demoted_all_permissions [
     can_change_info: false,
     can_post_messages: false,
@@ -82,9 +91,11 @@ defmodule PolicrMiniWeb.Admin.API.PermissionController do
     end
   end
 
+  # 在实施具体写入操作前进行一些和用户与权限的检查，此函数将在以下情况中返回错误：
+  # - 调用 API 的用户在操作自身的权限。
   @spec safely_check(Plug.Conn.t(), PolicrMini.Schemas.Permission.t()) ::
           {:error, map} | {:ok, []}
-  def safely_check(conn, permission) do
+  defp safely_check(conn, permission) do
     %{assigns: %{user: %{id: user_id}}} = conn
 
     if user_id == permission.user.id do

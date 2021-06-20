@@ -14,7 +14,12 @@ import {
   ActionButton,
 } from "../components";
 import { Table, Thead, Tr, Th, Tbody, Td } from "../components/Tables";
-import { camelizeJson, toastErrors, updateInNewArray } from "../helper";
+import {
+  camelizeJson,
+  toastErrors,
+  toastMessage,
+  updateInNewArray,
+} from "../helper";
 import { useDispatch, useSelector } from "react-redux";
 import { loadSelected } from "../slices/chats";
 import PageBody from "../components/PageBody";
@@ -43,6 +48,12 @@ async function withdraw(id) {
   return fetch(endpoint, { method: "DELETE" }).then((r) => camelizeJson(r));
 }
 
+async function sync(chat_id) {
+  const endpoint = `/admin/api/permissions/chats/${chat_id}/sync`;
+
+  return fetch(endpoint, { method: "PUT" }).then((r) => camelizeJson(r));
+}
+
 export default () => {
   const dispatch = useDispatch();
   const chatsState = useSelector((state) => state.chats);
@@ -68,7 +79,7 @@ export default () => {
       const result = await changeBoolField(field, permissions[index].id, value);
 
       if (result.errors) {
-        // 失败再回滚开关
+        // 失败再回滚开关。
         const newPermissions = updateInNewArray(
           permissions,
           { ...permissions[index], [field]: !value },
@@ -76,6 +87,7 @@ export default () => {
         );
         setPermissions(newPermissions);
         toastErrors(result.errors);
+
         return;
       }
     },
@@ -88,15 +100,29 @@ export default () => {
 
       if (result.errors) {
         toastErrors(result.errors);
-        return;
+      } else {
+        toastMessage(
+          `撤销「${makeFullname(permissions[index].user)}」的管理员权限成功。`
+        );
+
+        const newPermissions = permissions.filter((_, i) => i !== index);
+        setPermissions(newPermissions);
       }
-
-      const newPermissions = permissions.filter((_, i) => i !== index);
-
-      setPermissions(newPermissions);
     },
     [permissions]
   );
+
+  const handleSyncClick = async () => {
+    const result = await sync(chatsState.selected);
+
+    if (result.errors) {
+      toastErrors(result.errors);
+    } else {
+      toastMessage("同步完成，即将更新权限列表。");
+
+      mutate();
+    }
+  };
 
   useEffect(() => {
     if (data && data.permissions) setPermissions(data.permissions);
@@ -122,6 +148,11 @@ export default () => {
               <PageSectionTitle>权限列表</PageSectionTitle>
             </PageSectionHeader>
             <main>
+              <div tw="mt-4">
+                <ActionButton onClick={handleSyncClick}>
+                  ↷ 同步全部
+                </ActionButton>
+              </div>
               <Table tw="shadow rounded">
                 <Thead>
                   <Tr>
@@ -175,7 +206,6 @@ export default () => {
                         </div>
                       </Td>
                       <Td tw="text-right">
-                        <ActionButton tw="mr-1">同步</ActionButton>
                         <ActionButton tw="mr-1">禁用</ActionButton>
                         <ActionButton
                           onClick={() => handleWithdrawClick(index)}

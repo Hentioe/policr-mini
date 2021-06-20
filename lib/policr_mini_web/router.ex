@@ -53,6 +53,8 @@ defmodule PolicrMiniWeb.Router do
     put "/permissions/:id/writable", PermissionController, :change_writable
     put "/permissions/:id/customized", PermissionController, :change_customized
     delete "/permissions/:id/withdraw", PermissionController, :withdraw
+    put "/permissions/chats/:chat_id/sync", PermissionController, :sync
+
     get "/statistics/find_today", StatisticController, :find_today
 
     put "/verifications/:id/kick", VerificationController, :kick
