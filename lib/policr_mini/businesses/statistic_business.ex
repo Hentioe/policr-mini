@@ -44,6 +44,8 @@ defmodule PolicrMini.StatisticBusiness do
   """
   @spec increment_one(integer, String.t(), status) :: {:ok, Statistic.t()} | {:error, any}
   def increment_one(chat_id, language_code, status) do
+    language_code = language_code || "unknown"
+
     fetch_stat = fn ->
       case find_today(chat_id, status) do
         nil ->

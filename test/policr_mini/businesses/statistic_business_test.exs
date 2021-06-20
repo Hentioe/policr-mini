@@ -97,11 +97,13 @@ defmodule PolicrMini.StatisticBusinessTest do
 
     {:ok, _} = StatisticBusiness.increment_one(chat.id, "zh-hans", :passed)
     {:ok, _} = StatisticBusiness.increment_one(chat.id, "zh-hans", :passed)
-    {:ok, statistic1} = StatisticBusiness.increment_one(chat.id, "unknown", :passed)
+    {:ok, _} = StatisticBusiness.increment_one(chat.id, "unknown", :passed)
+    # 注意，语言代码值为 `nil` 会被记录为 `unknown`。
+    {:ok, statistic1} = StatisticBusiness.increment_one(chat.id, nil, :passed)
     {:ok, statistic2} = StatisticBusiness.increment_one(chat.id, "zh-hans", :timeout)
 
-    assert statistic1.verifications_count == 3
-    assert statistic1.languages_top == %{"zh-hans" => 2, "unknown" => 1}
+    assert statistic1.verifications_count == 4
+    assert statistic1.languages_top == %{"zh-hans" => 2, "unknown" => 2}
     assert statistic2.verifications_count == 1
     assert statistic2.languages_top == %{"zh-hans" => 1}
 
