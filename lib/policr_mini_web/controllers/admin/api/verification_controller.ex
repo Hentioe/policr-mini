@@ -40,7 +40,7 @@ defmodule PolicrMiniWeb.Admin.API.VerificationController do
 
   @type kick_by_verification_opts :: [{:is_ban, boolean}]
 
-  @spec kick_by_verification(PolicrMini.Schemas.Verification.t(), kick_by_verification_opts) ::
+  @spec kick_by_verification(PolicrMini.Schema.Verification.t(), kick_by_verification_opts) ::
           {:ok, boolean} | {:error, map}
   defp kick_by_verification(verification, options) do
     %{chat: %{id: chat_id}, target_user_id: target_user_id} = verification

@@ -67,7 +67,7 @@ defmodule PolicrMiniWeb.Admin.API.PermissionController do
     can_pin_messages: false,
     can_promote_members: false
   ]
-  @spec demote_administrator(PolicrMini.Schemas.Permission.t()) :: {:ok, boolean} | {:error, map}
+  @spec demote_administrator(PolicrMini.Schema.Permission.t()) :: {:ok, boolean} | {:error, map}
   defp demote_administrator(%{chat_id: chat_id, user_id: user_id} = _permission) do
     case Telegex.promote_chat_member(chat_id, user_id, @demoted_all_permissions) do
       {:ok, true} ->
@@ -93,7 +93,7 @@ defmodule PolicrMiniWeb.Admin.API.PermissionController do
 
   # 在实施具体写入操作前进行一些和用户与权限的检查，此函数将在以下情况中返回错误：
   # - 调用 API 的用户在操作自身的权限。
-  @spec safely_check(Plug.Conn.t(), PolicrMini.Schemas.Permission.t()) ::
+  @spec safely_check(Plug.Conn.t(), PolicrMini.Schema.Permission.t()) ::
           {:error, map} | {:ok, []}
   defp safely_check(conn, permission) do
     %{assigns: %{user: %{id: user_id}}} = conn

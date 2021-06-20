@@ -10,7 +10,7 @@ defmodule PolicrMiniBot.RespSyncCmdPlug do
   use PolicrMiniBot, plug: [commander: :sync]
 
   alias PolicrMini.{ChatBusiness, UserBusiness, SchemeBusiness}
-  alias PolicrMini.Schemas.{Permission, Chat}
+  alias PolicrMini.Schema.{Permission, Chat}
   alias PolicrMiniBot.SpeedLimiter
 
   @doc """

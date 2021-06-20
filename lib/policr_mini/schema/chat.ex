@@ -1,4 +1,4 @@
-defmodule PolicrMini.Schemas.Chat do
+defmodule PolicrMini.Schema.Chat do
   @moduledoc """
   群组（或通用 chat ）模型。
   """

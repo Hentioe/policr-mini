@@ -3,7 +3,7 @@ defmodule PolicrMini.UserBusiness do
   用户业务功能的实现。
   """
 
-  use PolicrMini, business: PolicrMini.Schemas.User
+  use PolicrMini, business: PolicrMini.Schema.User
 
   import Ecto.Query, only: [from: 2]
 

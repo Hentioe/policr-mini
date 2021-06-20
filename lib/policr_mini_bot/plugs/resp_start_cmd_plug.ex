@@ -11,7 +11,7 @@ defmodule PolicrMiniBot.RespStartCmdPlug do
   alias PolicrMini.Logger
 
   alias PolicrMini.{VerificationBusiness, SchemeBusiness, MessageSnapshotBusiness}
-  alias PolicrMini.Schemas.Verification
+  alias PolicrMini.Schema.Verification
   alias PolicrMiniBot.{ArithmeticCaptcha, CustomCaptcha, FallbackCaptcha, ImageCaptcha}
 
   @fallback_captcha_module FallbackCaptcha
@@ -130,7 +130,7 @@ defmodule PolicrMiniBot.RespStartCmdPlug do
   @doc """
   发送验证消息。
   """
-  @spec send_verify_message(Verification.t(), PolicrMini.Schemas.Scheme.t(), integer, integer) ::
+  @spec send_verify_message(Verification.t(), PolicrMini.Schema.Scheme.t(), integer, integer) ::
           tgerror_returns
           | {:ok, {Message.t(), InlineKeyboardMarkup.t(), PolicrMiniBot.Captcha.Data.t()}}
   def send_verify_message(verification, scheme, chat_id, user_id) do

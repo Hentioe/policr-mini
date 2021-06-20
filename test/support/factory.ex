@@ -2,7 +2,7 @@ defmodule PolicrMini.Factory do
   @moduledoc false
 
   def build(:user) do
-    %PolicrMini.Schemas.User{
+    %PolicrMini.Schema.User{
       id: 123_456_789,
       first_name: "小",
       last_name: "明",
@@ -12,7 +12,7 @@ defmodule PolicrMini.Factory do
   end
 
   def build(:chat) do
-    %PolicrMini.Schemas.Chat{
+    %PolicrMini.Schema.Chat{
       id: 1_234_567_890,
       type: "supergroup",
       title: "Elixir 编程语言",
@@ -25,7 +25,7 @@ defmodule PolicrMini.Factory do
   end
 
   def build(:permission) do
-    %PolicrMini.Schemas.Permission{
+    %PolicrMini.Schema.Permission{
       tg_is_owner: true,
       tg_can_promote_members: true,
       tg_can_restrict_members: true,
@@ -35,14 +35,14 @@ defmodule PolicrMini.Factory do
   end
 
   def build(:custom_kit) do
-    %PolicrMini.Schemas.CustomKit{
+    %PolicrMini.Schema.CustomKit{
       title: "猫吃老鼠吗？",
       answers: ["+吃", "-不吃"]
     }
   end
 
   def build(:scheme) do
-    %PolicrMini.Schemas.Scheme{
+    %PolicrMini.Schema.Scheme{
       verification_mode: 0,
       verification_entrance: 0,
       verification_occasion: 0,
@@ -54,7 +54,7 @@ defmodule PolicrMini.Factory do
   end
 
   def build(:message_snapshot) do
-    %PolicrMini.Schemas.MessageSnapshot{
+    %PolicrMini.Schema.MessageSnapshot{
       message_id: 1234,
       from_user_id: 123_456_789,
       from_user_name: "小新",
@@ -65,7 +65,7 @@ defmodule PolicrMini.Factory do
   end
 
   def build(:verification) do
-    %PolicrMini.Schemas.Verification{
+    %PolicrMini.Schema.Verification{
       target_user_id: 491_837_624,
       target_user_name: "小明",
       entrance: 0,
@@ -77,7 +77,7 @@ defmodule PolicrMini.Factory do
   end
 
   def build(:operation) do
-    %PolicrMini.Schemas.Operation{
+    %PolicrMini.Schema.Operation{
       verification_id: 10_000,
       action: :kick,
       role: :system
@@ -87,7 +87,7 @@ defmodule PolicrMini.Factory do
   def build(:statistic) do
     utc_now_dt = DateTime.truncate(DateTime.utc_now(), :second)
 
-    %PolicrMini.Schemas.Statistic{
+    %PolicrMini.Schema.Statistic{
       verifications_count: 0,
       languages_top: %{},
       begin_at: utc_now_dt,

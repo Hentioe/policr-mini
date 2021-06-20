@@ -3,7 +3,7 @@ defmodule PolicrMini.StatisticBusiness do
   用户业务功能的实现。
   """
 
-  use PolicrMini, business: PolicrMini.Schemas.Statistic
+  use PolicrMini, business: PolicrMini.Schema.Statistic
 
   import Ecto.Query, only: [from: 2]
 

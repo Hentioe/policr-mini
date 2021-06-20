@@ -1,8 +1,8 @@
-defmodule PolicrMini.Schemas.PermissionTest do
+defmodule PolicrMini.Schema.PermissionTest do
   use ExUnit.Case
 
   alias PolicrMini.Factory
-  alias PolicrMini.Schemas.Permission
+  alias PolicrMini.Schema.Permission
 
   describe "schema" do
     test "schema metadata" do

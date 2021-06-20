@@ -3,7 +3,7 @@ defmodule PolicrMini.SchemeBusiness do
   方案的业务功能实现。
   """
 
-  use PolicrMini, business: PolicrMini.Schemas.Scheme
+  use PolicrMini, business: PolicrMini.Schema.Scheme
 
   import Ecto.Query, only: [from: 2, dynamic: 2]
 

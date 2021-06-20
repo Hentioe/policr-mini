@@ -7,7 +7,7 @@ defmodule PolicrMiniBot.Runner do
   alias PolicrMini.Logger
 
   alias PolicrMini.{VerificationBusiness, ChatBusiness, StatisticBusiness, PermissionBusiness}
-  alias PolicrMini.Schemas.Chat
+  alias PolicrMini.Schema.Chat
   alias PolicrMiniBot.Helper, as: BotHelper
 
   @spec fix_expired_wait_status :: :ok

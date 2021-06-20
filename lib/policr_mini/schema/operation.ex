@@ -1,4 +1,4 @@
-defmodule PolicrMini.Schemas.Operation do
+defmodule PolicrMini.Schema.Operation do
   @moduledoc """
   操作模型。
   """
@@ -6,7 +6,7 @@ defmodule PolicrMini.Schemas.Operation do
   use PolicrMini.Schema
 
   alias PolicrMini.EctoEnums.{OperationActionEnum, OperationRoleEnum}
-  alias PolicrMini.Schemas.{Verification}
+  alias PolicrMini.Schema.{Verification}
 
   @required_fields ~w(verification_id action role)a
   @optional_fields ~w()a

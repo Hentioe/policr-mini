@@ -1,11 +1,11 @@
-defmodule PolicrMini.Schemas.Permission do
+defmodule PolicrMini.Schema.Permission do
   @moduledoc """
   权限模型。
   """
 
   use PolicrMini.Schema
 
-  alias PolicrMini.Schemas.{Chat, User}
+  alias PolicrMini.Schema.{Chat, User}
 
   @required_fields ~w(chat_id user_id tg_is_owner)a
   @optional_fields ~w(tg_can_restrict_members tg_can_promote_members readable writable customized)a

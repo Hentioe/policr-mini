@@ -1,11 +1,11 @@
-defmodule PolicrMini.Schemas.Statistic do
+defmodule PolicrMini.Schema.Statistic do
   @moduledoc """
   统计模型。
   """
 
   use PolicrMini.Schema
 
-  alias PolicrMini.Schemas.Chat
+  alias PolicrMini.Schema.Chat
   alias PolicrMini.EctoEnums.StatVerificationStatus
 
   @required_fields ~w(chat_id)a

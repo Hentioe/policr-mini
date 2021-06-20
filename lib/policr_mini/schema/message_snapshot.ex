@@ -1,11 +1,11 @@
-defmodule PolicrMini.Schemas.MessageSnapshot do
+defmodule PolicrMini.Schema.MessageSnapshot do
   @moduledoc """
   消息快照模型。
   """
 
   use PolicrMini.Schema
 
-  alias PolicrMini.Schemas.Chat
+  alias PolicrMini.Schema.Chat
 
   @required_fields ~w(chat_id message_id from_user_id from_user_name date)a
   @optional_fields ~w(text photo_id caption markup_body attachment)a

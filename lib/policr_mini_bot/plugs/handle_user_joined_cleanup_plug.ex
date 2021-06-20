@@ -9,7 +9,7 @@ defmodule PolicrMiniBot.HandleUserJoinedCleanupPlug do
 
   alias PolicrMini.Logger
 
-  alias PolicrMini.Schemas.{Verification, Scheme}
+  alias PolicrMini.Schema.{Verification, Scheme}
   alias PolicrMini.{SchemeBusiness, VerificationBusiness, StatisticBusiness, OperationBusiness}
   alias PolicrMiniBot.CallVerificationPlug
 

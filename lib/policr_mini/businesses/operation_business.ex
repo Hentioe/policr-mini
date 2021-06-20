@@ -3,9 +3,9 @@ defmodule PolicrMini.OperationBusiness do
   操作的业务功能实现。
   """
 
-  use PolicrMini, business: PolicrMini.Schemas.Operation
+  use PolicrMini, business: PolicrMini.Schema.Operation
 
-  alias PolicrMini.Schemas.Verification
+  alias PolicrMini.Schema.Verification
 
   import Ecto.Query, only: [from: 2, dynamic: 2]
 

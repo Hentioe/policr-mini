@@ -1,4 +1,4 @@
-defmodule PolicrMini.Schemas.User do
+defmodule PolicrMini.Schema.User do
   @moduledoc """
   用户模型。
   """

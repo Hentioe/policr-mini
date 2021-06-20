@@ -3,11 +3,11 @@ defmodule PolicrMini.ChatBusiness do
   群组的业务功能实现。
   """
 
-  use PolicrMini, business: PolicrMini.Schemas.Chat
+  use PolicrMini, business: PolicrMini.Schema.Chat
 
   import Ecto.Query, only: [from: 2]
 
-  alias PolicrMini.Schemas.Permission
+  alias PolicrMini.Schema.Permission
   alias PolicrMini.PermissionBusiness
 
   @typep written_returns :: {:ok, Chat.t()} | {:error, Ecto.Changeset.t()}

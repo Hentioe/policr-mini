@@ -6,7 +6,7 @@ defmodule PolicrMiniBot.CallVerificationPlug do
   use PolicrMiniBot, plug: [caller: [prefix: "verification:"]]
 
   alias PolicrMini.Logger
-  alias PolicrMini.Schemas.Verification
+  alias PolicrMini.Schema.Verification
   alias PolicrMini.{VerificationBusiness, StatisticBusiness, SchemeBusiness, OperationBusiness}
   alias PolicrMiniBot.{HandleUserJoinedCleanupPlug, Disposable}
 
