@@ -124,11 +124,17 @@ const notPassedCount = (dayStatistic) => {
 
 const rate = (count1, count2) => {
   if (count1 == count2) {
-    return ["--", 0];
+    return ["--", 0.0];
   } else if (count1 > count2) {
-    return ["rise", Math.round(((count1 - count2) / count1) * 100)];
+    return [
+      "rise",
+      parseFloat((((count1 - count2) / count1) * 100).toFixed(2)),
+    ];
   } else {
-    return ["decline", ((count2 - count1) / count2) * 100];
+    return [
+      "decline",
+      parseFloat((((count2 - count1) / count2) * 100).toFixed(2)),
+    ];
   }
 };
 
@@ -294,7 +300,7 @@ export default () => {
                       <span tw="text-red-700"> {arrowDown} </span>
                     )}
                     <span tw="text-black font-bold tracking-wide">
-                      {passedRate[1]}%
+                      {Math.ceil(passedRate[1])}%
                     </span>
                   </div>
                 </div>
@@ -316,7 +322,7 @@ export default () => {
                       <span tw="text-red-700"> {arrowUp} </span>
                     )}
                     <span tw="text-black font-bold tracking-wide">
-                      {notPassedRate[1]}%
+                      {Math.ceil(notPassedRate[1])}%
                     </span>
                   </div>
                 </div>
