@@ -313,7 +313,7 @@ export default () => {
                       tw="ml-2 text-gray-500"
                       to={`/admin/chats/${chatsState.selected}/scheme`}
                     >
-                      切换到已定制的验证
+                      自定义验证未启用，点此切换
                     </RouteLink>
                   )}
                   <Table tw="shadow rounded">

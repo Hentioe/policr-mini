@@ -11,18 +11,25 @@ defmodule PolicrMiniWeb.Admin.API.StatisticController do
 
   action_fallback PolicrMiniWeb.API.FallbackController
 
-  def find_today(conn, params) do
+  def find_recently(conn, params) do
     chat_id = params["chat_id"]
 
     with {:ok, _} <- check_permissions(conn, chat_id, [:readable]) do
-      passed_statistic = StatisticBusiness.find_today(chat_id, :passed)
-      timeout_statistic = StatisticBusiness.find_today(chat_id, :timeout)
-      wronged_statistic = StatisticBusiness.find_today(chat_id, :wronged)
+      today = %{
+        passed_statistic: StatisticBusiness.find_today(chat_id, :passed),
+        timeout_statistic: StatisticBusiness.find_today(chat_id, :timeout),
+        wronged_statistic: StatisticBusiness.find_today(chat_id, :wronged)
+      }
 
-      render(conn, "today.json", %{
-        passed_statistic: passed_statistic,
-        timeout_statistic: timeout_statistic,
-        wronged_statistic: wronged_statistic
+      yesterday = %{
+        passed_statistic: StatisticBusiness.find_yesterday(chat_id, :passed),
+        timeout_statistic: StatisticBusiness.find_yesterday(chat_id, :timeout),
+        wronged_statistic: StatisticBusiness.find_yesterday(chat_id, :wronged)
+      }
+
+      render(conn, "recently.json", %{
+        yesterday: yesterday,
+        today: today
       })
     end
   end

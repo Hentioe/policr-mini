@@ -72,6 +72,66 @@ const MenuBox = ({
   );
 };
 
+const arrowDown = (
+  <svg
+    xmlns="http://www.w3.org/2000/svg"
+    tw="h-3"
+    viewBox="0 0 20 20"
+    fill="currentColor"
+  >
+    <path
+      fillRule="evenodd"
+      d="M14.707 12.293a1 1 0 010 1.414l-4 4a1 1 0 01-1.414 0l-4-4a1 1 0 111.414-1.414L9 14.586V3a1 1 0 012 0v11.586l2.293-2.293a1 1 0 011.414 0z"
+      clipRule="evenodd"
+    />
+  </svg>
+);
+
+const arrowUp = (
+  <svg
+    xmlns="http://www.w3.org/2000/svg"
+    tw="h-3"
+    viewBox="0 0 20 20"
+    fill="currentColor"
+  >
+    <path
+      fillRule="evenodd"
+      d="M5.293 7.707a1 1 0 010-1.414l4-4a1 1 0 011.414 0l4 4a1 1 0 01-1.414 1.414L11 5.414V17a1 1 0 11-2 0V5.414L6.707 7.707a1 1 0 01-1.414 0z"
+      clipRule="evenodd"
+    />
+  </svg>
+);
+
+const passedCount = (dayStatistic) => {
+  if (dayStatistic.passedStatistic == null) return 0;
+
+  return dayStatistic.passedStatistic.verificationsCount;
+};
+
+const notPassedCount = (dayStatistic) => {
+  let timeoutCount = 0;
+  let wrongedCount = 0;
+
+  if (dayStatistic.timeoutStatistic != null) {
+    timeoutCount = dayStatistic.timeoutStatistic.verificationsCount;
+  }
+  if (dayStatistic.wrongedStatistic != null) {
+    wrongedCount = dayStatistic.wrongedStatistic.verificationsCount;
+  }
+
+  return timeoutCount + wrongedCount;
+};
+
+const rate = (count1, count2) => {
+  if (count1 == count2) {
+    return ["--", 0];
+  } else if (count1 > count2) {
+    return ["rise", Math.round(((count1 - count2) / count1) * 100)];
+  } else {
+    return ["decline", ((count2 - count1) / count2) * 100];
+  }
+};
+
 const changeTakeover = async ({ chatId, isTakeOver }) => {
   const endpoint = `/admin/api/chats/${chatId}/takeover?value=${isTakeOver}`;
   return fetch(endpoint, {
@@ -83,7 +143,7 @@ const changeTakeover = async ({ chatId, isTakeOver }) => {
 };
 
 const makeTodayStatisticsEndpoint = (chat_id) =>
-  `/admin/api/statistics/find_today?chat_id=${chat_id}`;
+  `/admin/api/statistics/find_recently?chat_id=${chat_id}`;
 
 export default () => {
   const location = useLocation();
@@ -91,7 +151,7 @@ export default () => {
 
   const chatsState = useSelector((state) => state.chats);
 
-  const { data: todayStatisticsData, error } = useSWR(
+  const { data: recentStatisticsData, error } = useSWR(
     chatsState && chatsState.isLoaded && chatsState.selected
       ? makeTodayStatisticsEndpoint(chatsState.selected)
       : null
@@ -101,6 +161,9 @@ export default () => {
   const [isOnOwnerMenu, setIsOnOwnerMenu] = useState(
     isSysLink({ path: location.pathname })
   );
+
+  const [passedRate, setPassedRate] = useState(["--", 0]);
+  const [notPassedRate, setNotPassedRate] = useState(["--", 0]);
 
   const handleTakeOverChange = useCallback(
     (checked) => {
@@ -143,6 +206,22 @@ export default () => {
   useEffect(() => {
     setIsOnOwnerMenu(isSysLink({ path: location.pathname }));
   }, [location]);
+
+  useEffect(() => {
+    if (recentStatisticsData) {
+      const todayPassedCount = passedCount(recentStatisticsData.today);
+      const yesterdayPassedCount = passedCount(recentStatisticsData.yesterday);
+
+      setPassedRate(rate(todayPassedCount, yesterdayPassedCount));
+
+      const todayNotPassedCount = notPassedCount(recentStatisticsData.today);
+      const yesterdayNotPassedCount = notPassedCount(
+        recentStatisticsData.yesterday
+      );
+
+      setNotPassedRate(rate(todayNotPassedCount, yesterdayNotPassedCount));
+    }
+  }, [recentStatisticsData]);
 
   return (
     <nav>
@@ -202,31 +281,44 @@ export default () => {
                   <span tw="text-xs lg:text-sm text-gray-500 mt-2">
                     今日验证通过
                   </span>
-                  <span tw="text-sm text-green-700 font-bold mt-1 tracking-wide">
-                    {todayStatisticsData == undefined
+                  <span tw="text-sm font-bold mt-1 tracking-wide">
+                    {recentStatisticsData == undefined
                       ? "计算中"
-                      : todayStatisticsData.passedStatistic
-                      ? todayStatisticsData.passedStatistic.verificationsCount
-                      : 0}
+                      : passedCount(recentStatisticsData.today)}
                   </span>
+                  <div tw="mt-2 text-xs lg:text-sm">
+                    <span tw="text-gray-600">较昨日</span>
+                    {["--", "rise"].includes(passedRate[0]) ? (
+                      <span tw="text-green-700"> {arrowUp} </span>
+                    ) : (
+                      <span tw="text-red-700"> {arrowDown} </span>
+                    )}
+                    <span tw="text-black font-bold tracking-wide">
+                      {passedRate[1]}%
+                    </span>
+                  </div>
                 </div>
                 <div tw="bg-gray-300 h-10" style={{ width: 1 }}></div>
                 <div tw="flex flex-col items-center">
                   <span tw="text-xs lg:text-sm text-gray-500 mt-2">
                     今日验证失败
                   </span>
-                  <span tw="text-sm text-red-700 font-bold mt-1 tracking-wider">
-                    {todayStatisticsData == undefined
+                  <span tw="text-sm font-bold mt-1 tracking-wider">
+                    {recentStatisticsData == undefined
                       ? "计算中"
-                      : (todayStatisticsData.timeoutStatistic
-                          ? todayStatisticsData.timeoutStatistic
-                              .verificationsCount
-                          : 0) +
-                        (todayStatisticsData.wrongedStatistic
-                          ? todayStatisticsData.wrongedStatistic
-                              .verificationsCount
-                          : 0)}
+                      : notPassedCount(recentStatisticsData.today)}
                   </span>
+                  <div tw="mt-2 text-xs lg:text-sm">
+                    <span tw="text-gray-600">较昨日</span>
+                    {["--", "decline"].includes(notPassedRate[0]) ? (
+                      <span tw="text-green-700"> {arrowDown} </span>
+                    ) : (
+                      <span tw="text-red-700"> {arrowUp} </span>
+                    )}
+                    <span tw="text-black font-bold tracking-wide">
+                      {notPassedRate[1]}%
+                    </span>
+                  </div>
                 </div>
               </div>
             </div>

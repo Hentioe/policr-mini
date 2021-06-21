@@ -24,17 +24,30 @@ defmodule PolicrMini.StatisticBusiness do
   @zero_oclock ~T[00:00:00]
 
   @spec find_today(integer, status) :: Statistic.t() | nil
-  def find_today(chat_id, status) do
-    # 创建今天的开始时间和结束时间。
-    {begin_at, end_at} = today_begin_and_end_datetimes()
+  def find_today(chat_id, status), do: find(chat_id, status, range: :today)
+
+  @spec find_yesterday(integer, status) :: Statistic.t() | nil
+  def find_yesterday(chat_id, status), do: find(chat_id, status, range: :yesterday)
+
+  @type dt_conts ::
+          [{:range, :today | :yesterday}] | [{:begin_at, DateTime.t()}, {:end_at, DateTime.t()}]
+
+  @spec find(integer, status, dt_conts) :: Statistic.t() | nil
+  defp find(chat_id, status, dt_conts) do
+    {begin_at, end_at} =
+      case Keyword.get(dt_conts, :range) do
+        :today -> today_datetimes()
+        :yesterday -> yesterday_datetimes()
+        nil -> {Keyword.get(dt_conts, :begin_at), Keyword.get(dt_conts, :end_at)}
+      end
 
     from(
       s in Statistic,
       where:
         s.chat_id == ^chat_id and
           s.verification_status == ^status and
-          s.begin_at >= ^begin_at and
-          s.end_at <= ^end_at
+          s.begin_at == ^begin_at and
+          s.end_at == ^end_at
     )
     |> Repo.one()
   end
@@ -49,7 +62,7 @@ defmodule PolicrMini.StatisticBusiness do
     fetch_stat = fn ->
       case find_today(chat_id, status) do
         nil ->
-          {begin_at, end_at} = today_begin_and_end_datetimes()
+          {begin_at, end_at} = today_datetimes()
 
           create(%{
             chat_id: chat_id,
@@ -96,8 +109,18 @@ defmodule PolicrMini.StatisticBusiness do
     end
   end
 
-  defp today_begin_and_end_datetimes do
+  defp today_datetimes do
     begin_at = DateTime.new!(Date.utc_today(), @zero_oclock, "Etc/UTC")
+    end_at = DateTime.add(begin_at, @day_seconds - 1, :second)
+
+    {begin_at, end_at}
+  end
+
+  defp yesterday_datetimes do
+    today_date = Date.utc_today()
+    yesterday_date = Date.add(today_date, -1)
+
+    begin_at = DateTime.new!(yesterday_date, @zero_oclock, "Etc/UTC")
     end_at = DateTime.add(begin_at, @day_seconds - 1, :second)
 
     {begin_at, end_at}

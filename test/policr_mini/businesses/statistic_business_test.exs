@@ -92,6 +92,49 @@ defmodule PolicrMini.StatisticBusinessTest do
     assert statistic2.verification_status == stat_timeout.verification_status
   end
 
+  test "find_yesterday/2" do
+    statistic_params = build_params()
+
+    today_date = Date.utc_today()
+    yesterday_date = Date.add(today_date, -1)
+
+    begin_at = DateTime.new!(yesterday_date, ~T[00:00:00], "Etc/UTC")
+    end_at = DateTime.add(begin_at, 3600 * 24 - 1, :second)
+
+    {:ok, statistic1} =
+      statistic_params
+      |> Map.put(:verification_status, :passed)
+      |> Map.put(:begin_at, begin_at)
+      |> Map.put(:end_at, end_at)
+      |> StatisticBusiness.create()
+
+    {:ok, statistic2} =
+      statistic_params
+      |> Map.put(:verification_status, :timeout)
+      |> Map.put(:begin_at, begin_at)
+      |> Map.put(:end_at, end_at)
+      |> StatisticBusiness.create()
+
+    stat_passwed = StatisticBusiness.find_yesterday(statistic1.chat_id, :passed)
+    stat_timeout = StatisticBusiness.find_yesterday(statistic1.chat_id, :timeout)
+
+    assert statistic1
+    assert statistic1.id == stat_passwed.id
+    assert statistic1.verifications_count == stat_passwed.verifications_count
+    assert statistic1.languages_top == stat_passwed.languages_top
+    assert statistic1.begin_at == stat_passwed.begin_at
+    assert statistic1.end_at == stat_passwed.end_at
+    assert statistic1.verification_status == stat_passwed.verification_status
+
+    assert statistic2
+    assert statistic2.id == stat_timeout.id
+    assert statistic2.verifications_count == stat_timeout.verifications_count
+    assert statistic2.languages_top == stat_timeout.languages_top
+    assert statistic2.begin_at == stat_timeout.begin_at
+    assert statistic2.end_at == stat_timeout.end_at
+    assert statistic2.verification_status == stat_timeout.verification_status
+  end
+
   test "increment_one/3" do
     {:ok, chat} = ChatBusiness.create(Factory.build(:chat) |> Map.from_struct())
 

@@ -14,10 +14,12 @@ defmodule PolicrMiniWeb.Admin.API.StatisticView do
     statistic |> Map.drop([:__meta__, :chat]) |> Map.from_struct()
   end
 
-  def render("today.json", %{
-        passed_statistic: passed_statistic,
-        timeout_statistic: timeout_statistic,
-        wronged_statistic: wronged_statistic
+  def render("day.json", %{
+        day: %{
+          passed_statistic: passed_statistic,
+          timeout_statistic: timeout_statistic,
+          wronged_statistic: wronged_statistic
+        }
       }) do
     passed_statistic = render_one(passed_statistic, __MODULE__, "statistic.json")
     timeout_statistic = render_one(timeout_statistic, __MODULE__, "statistic.json")
@@ -27,6 +29,16 @@ defmodule PolicrMiniWeb.Admin.API.StatisticView do
       passed_statistic: passed_statistic,
       timeout_statistic: timeout_statistic,
       wronged_statistic: wronged_statistic
+    }
+  end
+
+  def render("recently.json", %{yesterday: yesterday, today: today}) do
+    yesterday = render_one(yesterday, __MODULE__, "day.json", as: :day)
+    today = render_one(today, __MODULE__, "day.json", as: :day)
+
+    %{
+      yesterday: yesterday,
+      today: today
     }
   end
 end
