@@ -99,6 +99,17 @@ defmodule PolicrMini.Factory do
     }
   end
 
+  def build(:third_party) do
+    %PolicrMini.Schema.ThirdParty{
+      name: "开发实例",
+      bot_username: "policr_mini_dev_bot",
+      homepage: "https://mini-dev.telestd.me",
+      running_days: 1,
+      version: "0.0.1-rc.0",
+      is_forked: false
+    }
+  end
+
   def build(factory_name, attrs) when is_atom(factory_name) and is_list(attrs) do
     factory_name |> build() |> struct(attrs)
   end
