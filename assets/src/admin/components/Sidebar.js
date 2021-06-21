@@ -72,7 +72,7 @@ const MenuBox = ({
   );
 };
 
-const arrowDown = (
+const arrowDownIcon = (
   <svg
     xmlns="http://www.w3.org/2000/svg"
     tw="h-3"
@@ -87,7 +87,7 @@ const arrowDown = (
   </svg>
 );
 
-const arrowUp = (
+const arrowUpIcon = (
   <svg
     xmlns="http://www.w3.org/2000/svg"
     tw="h-3"
@@ -125,16 +125,13 @@ const notPassedCount = (dayStatistic) => {
 const rate = (count1, count2) => {
   if (count1 == count2) {
     return ["--", 0.0];
-  } else if (count1 > count2) {
-    return [
-      "rise",
-      parseFloat((((count1 - count2) / count1) * 100).toFixed(2)),
-    ];
+  } else if (count2 == 0) {
+    return ["rise", 100.0];
   } else {
-    return [
-      "decline",
-      parseFloat((((count2 - count1) / count2) * 100).toFixed(2)),
-    ];
+    const r = parseFloat((((count1 - count2) / count2) * 100).toFixed(2));
+
+    if (r > 0) return ["rise", r];
+    else return ["decline", -r];
   }
 };
 
@@ -295,9 +292,9 @@ export default () => {
                   <div tw="mt-2 text-xs lg:text-sm">
                     <span tw="text-gray-600">较昨日</span>
                     {["--", "rise"].includes(passedRate[0]) ? (
-                      <span tw="text-green-700"> {arrowUp} </span>
+                      <span tw="text-green-700"> {arrowUpIcon} </span>
                     ) : (
-                      <span tw="text-red-700"> {arrowDown} </span>
+                      <span tw="text-red-700"> {arrowDownIcon} </span>
                     )}
                     <span tw="text-black font-bold tracking-wide">
                       {Math.ceil(passedRate[1])}%
@@ -317,9 +314,9 @@ export default () => {
                   <div tw="mt-2 text-xs lg:text-sm">
                     <span tw="text-gray-600">较昨日</span>
                     {["--", "decline"].includes(notPassedRate[0]) ? (
-                      <span tw="text-green-700"> {arrowDown} </span>
+                      <span tw="text-green-700"> {arrowDownIcon} </span>
                     ) : (
-                      <span tw="text-red-700"> {arrowUp} </span>
+                      <span tw="text-red-700"> {arrowUpIcon} </span>
                     )}
                     <span tw="text-black font-bold tracking-wide">
                       {Math.ceil(notPassedRate[1])}%
