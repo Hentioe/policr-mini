@@ -6,7 +6,7 @@ defmodule PolicrMiniWeb.Admin.API.PermissionController do
   use PolicrMiniWeb, :controller
 
   alias PolicrMini.{PermissionBusiness, ChatBusiness}
-  alias PolicrMiniBot.RespSyncCmdPlug
+  alias PolicrMiniBot.{RespSyncCmdPlug, SpeedLimiter}
 
   import PolicrMiniWeb.Helper
 
@@ -50,10 +50,27 @@ defmodule PolicrMiniWeb.Admin.API.PermissionController do
   end
 
   def sync(conn, %{"chat_id" => chat_id}) do
+    # TODO: 此处需要增加速率限制，并以标准 API 错误的形式返回速度受限的消息。
     with {:ok, _} <- check_permissions(conn, chat_id, [:writable, :owner]),
+         :ok <- speed_check(conn, chat_id),
          {:ok, chat} <- ChatBusiness.get(chat_id),
          {:ok, _} <- RespSyncCmdPlug.synchronize_administrators(chat) do
       render(conn, "sync.json", %{ok: true})
+    end
+  end
+
+  @spec speed_check(Plug.Conn.t(), integer) :: :ok | {:error, map}
+  defp speed_check(conn, chat_id) do
+    %{assigns: %{user: %{id: user_id}}} = conn
+
+    speed_limit_key = "admin-sync-#{user_id}-#{chat_id}"
+
+    if SpeedLimiter.get(speed_limit_key) <= 0 do
+      SpeedLimiter.put(speed_limit_key, 5)
+
+      :ok
+    else
+      {:error, %{description: "too fast, please try again later"}}
     end
   end
 
