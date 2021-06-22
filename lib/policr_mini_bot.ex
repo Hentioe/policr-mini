@@ -55,4 +55,7 @@ defmodule PolicrMiniBot do
   rescue
     _ -> nil
   end
+
+  @official_bots ["policr_mini_bot", "policr_mini_test_bot"]
+  def official_bots, do: @official_bots
 end

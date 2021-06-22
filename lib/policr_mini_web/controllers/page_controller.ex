@@ -5,7 +5,7 @@ defmodule PolicrMiniWeb.PageController do
     bot_name = Application.get_env(:policr_mini, PolicrMiniBot)[:name]
     bot_first_name = PolicrMiniBot.name()
     bot_username = PolicrMiniBot.username()
-    is_third_party = bot_username not in PolicrMini.official_bots()
+    is_third_party = bot_username not in PolicrMiniBot.official_bots()
 
     global = %{
       bot_username: bot_username,
