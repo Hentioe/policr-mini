@@ -26,7 +26,7 @@
 
 ## 加入我们
 
-- [把自己的部署实例加到首页](https://github.com/Hentioe/policr-mini/issues/115)
+- [将自己部署的实例加到首页](https://github.com/Hentioe/policr-mini/issues/115)
 
 ## 关注我们
 
