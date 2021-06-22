@@ -1,6 +1,6 @@
 defmodule PolicrMini.Schema.ThirdParty do
   @moduledoc """
-  统计模型。
+  第三方实例模型。
   """
 
   use PolicrMini.Schema
