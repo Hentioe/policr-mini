@@ -61,7 +61,7 @@ export default () => {
           {_GLOBAL.botName || _GLOBAL.botFirstName}
         </span>
         <LogoMarkup tw="self-end">
-          {_GLOBAL.botUsername === "policr_mini_bot" ? version : thirdParty}
+          {_GLOBAL.isThirdParty ? thirdParty : version}
         </LogoMarkup>
       </Link>
       {/* 参考按钮实现：https://tailwindui.com/components/application-ui/navigation/navbars */}

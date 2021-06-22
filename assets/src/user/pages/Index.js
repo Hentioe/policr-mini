@@ -18,6 +18,29 @@ const Paragraph = styled.p`
   ${tw`m-0`}
 `;
 
+const ThirdPartiesTable = styled.table`
+  ${tw`table-fixed border-collapse w-full shadow-xl rounded-xl`}
+`;
+const ThirdPartiesThead = styled.thead`
+  ${tw`bg-gray-100`}
+`;
+const ThirdPartiesTr = styled.tr``;
+const ThirdPartiesTh = styled.th`
+  ${tw`text-gray-600 font-bold tracking-wider uppercase text-left py-3 px-2 border-b border-gray-200`}
+`;
+const ThirdPartiesTbody = styled.tbody`
+  ${tw``}
+`;
+const ThirdPartiesTd = styled.td`
+  ${tw`py-2 px-2 text-sm text-gray-700 bg-white border-solid border-0 border-t border-gray-200`}
+  ${({ endRow, startCol }) => endRow && startCol && tw`rounded-bl`}
+  ${({ endRow, endCol }) => endRow && endCol && tw`rounded-br`}
+`;
+
+const ThirdPartiesTag = styled.span`
+  ${tw`ml-2 text-xs bg-green-600 text-white p-1 rounded`}
+`;
+
 const Avatar = () => {
   return (
     <a href="https://t.me/policr_mini_bot" target="_blank">
@@ -67,18 +90,28 @@ function calculatePassRate({ totals }) {
   return ((verification_passed / verification_all) * 100).toFixed(2);
 }
 
+const makeThirdPartiesEndpoint = () => {
+  if (_GLOBAL.isThirdParty) {
+    return "https://mini.telestd.me/api/third_parties";
+  } else {
+    return "/api/third_parties";
+  }
+};
+
 export default () => {
-  const { data, error } = useSWR("/api/index", fetcher);
+  const { data: indexData, error: indexError } = useSWR("/api/index", fetcher);
+  const { data: thirdPartiesData, error: thirdPartiesError } = useSWR(
+    makeThirdPartiesEndpoint(),
+    fetcher
+  );
+
   const dispatch = useDispatch();
 
-  if (error)
-    return (
-      <ErrorParagraph>
-        Data loading failed. Please try again later.
-      </ErrorParagraph>
-    );
-  const indexData = data || initialIndexData;
-  const passRate = calculatePassRate(indexData);
+  if (indexError)
+    return <ErrorParagraph>载入首页数据失败，请稍后重试。</ErrorParagraph>;
+
+  const index = indexData || initialIndexData;
+  const passRate = calculatePassRate(index);
 
   return (
     <>
@@ -104,7 +137,7 @@ export default () => {
                 </div>
                 <div tw="flex-1 self-center">
                   <Paragraph tw="text-6xl font-extrabold text-red-400 text-center underline">
-                    {indexData.totals.verification_all}
+                    {index.totals.verification_all}
                   </Paragraph>
                 </div>
                 <div tw="flex-1 self-end">
@@ -123,7 +156,7 @@ export default () => {
                         拦截
                       </span>{" "}
                       <span tw="text-pink-500 font-bold">
-                        {indexData.totals.verification_timeout}
+                        {index.totals.verification_timeout}
                       </span>{" "}
                       <span tw="text-gray-700 font-bold">次垃圾账号侵入】</span>
                     </Paragraph>
@@ -246,7 +279,7 @@ export default () => {
       <div tw="bg-gray-800">
         <UnifiedFlexBox tw="mt-10 py-16 flex-wrap">
           <div tw="w-full lg:w-7/12 mb-8 lg:mb-0">
-            <p tw="text-2xl font-bold text-gray-200">构建自己的实例。</p>
+            <p tw="text-2xl font-bold text-gray-200">构建自己的实例</p>
             <p tw="text-gray-300">
               通过简单的 Shell 命令和 Web 服务配置，即可部署在低至 512MB 内存的
               Linux 服务器上。
@@ -293,6 +326,109 @@ export default () => {
               申请社区运营
             </a>
           </div>
+        </UnifiedFlexBox>
+      </div>
+      <div tw="bg-indigo-400 hidden lg:block">
+        <UnifiedFlexBox tw="flex-col py-16">
+          <p tw="text-2xl font-bold text-gray-200">社区中开放服务的实例</p>
+
+          {thirdPartiesError ? (
+            <div>
+              <p tw="text-gray-200">
+                此列表加载失败，当前实例可能并未注册成为社区运营的实例。去
+                <a
+                  tw="text-gray-200"
+                  href="https://mini.telestd.me#community_instances"
+                  target="_blank"
+                >
+                  官网
+                </a>
+                看看？
+              </p>
+
+              <p tw="text-gray-200 italic float-right">
+                注意：是否向注册成为社区运营实例或开放服务是第三方实例的拥有者的自愿行为，看到此内容并不表示当前实例存在任何问题。
+              </p>
+            </div>
+          ) : thirdPartiesData ? (
+            <ThirdPartiesTable>
+              <ThirdPartiesThead>
+                <ThirdPartiesTr>
+                  <ThirdPartiesTh tw="w-2/12 rounded-tl">
+                    实例名称
+                  </ThirdPartiesTh>
+                  <ThirdPartiesTh tw="w-5/12">实例描述</ThirdPartiesTh>
+                  <ThirdPartiesTh tw="w-1/12 text-center">
+                    运行天数
+                  </ThirdPartiesTh>
+                  <ThirdPartiesTh tw="w-2/12">机器人用户名</ThirdPartiesTh>
+                  <ThirdPartiesTh tw="w-2/12 rounded-tr">
+                    主页链接
+                  </ThirdPartiesTh>
+                </ThirdPartiesTr>
+              </ThirdPartiesThead>
+              <ThirdPartiesTbody>
+                {thirdPartiesData.third_parties.map((thirdParty, i) => (
+                  <ThirdPartiesTr key={thirdParty.bot_username}>
+                    <ThirdPartiesTd
+                      endRow={i == thirdPartiesData.third_parties.length - 1}
+                      startCol={true}
+                    >
+                      {thirdParty.name}
+                    </ThirdPartiesTd>
+                    <ThirdPartiesTd>
+                      {thirdParty.description || "无"}
+
+                      {thirdPartiesData.official_index == i ? (
+                        <ThirdPartiesTag tw="bg-green-600">
+                          官方实例
+                        </ThirdPartiesTag>
+                      ) : undefined}
+
+                      {thirdPartiesData.official_index == i &&
+                      thirdPartiesData.current_index != i ? (
+                        <ThirdPartiesTag tw="bg-gray-600">
+                          非当前实例
+                        </ThirdPartiesTag>
+                      ) : undefined}
+
+                      {thirdPartiesData.current_index == i ? (
+                        <ThirdPartiesTag tw="bg-blue-600">
+                          当前实例
+                        </ThirdPartiesTag>
+                      ) : undefined}
+                    </ThirdPartiesTd>
+                    <ThirdPartiesTd tw="text-center">
+                      {thirdParty.running_days}
+                    </ThirdPartiesTd>
+                    <ThirdPartiesTd>
+                      <a
+                        tw="text-gray-700 no-underline"
+                        href={`https://t.me/${thirdParty.bot_username}`}
+                        target="_blank"
+                      >
+                        @{thirdParty.bot_username}
+                      </a>
+                    </ThirdPartiesTd>
+                    <ThirdPartiesTd
+                      endRow={i == thirdPartiesData.third_parties.length - 1}
+                      endCol={true}
+                    >
+                      <a
+                        tw="text-gray-700"
+                        href={thirdParty.homepage}
+                        target="_blank"
+                      >
+                        {thirdParty.homepage}
+                      </a>
+                    </ThirdPartiesTd>
+                  </ThirdPartiesTr>
+                ))}
+              </ThirdPartiesTbody>
+            </ThirdPartiesTable>
+          ) : (
+            <span tw="text-gray-200">载入中……</span>
+          )}
         </UnifiedFlexBox>
       </div>
     </>

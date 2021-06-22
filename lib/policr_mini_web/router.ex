@@ -27,6 +27,7 @@ defmodule PolicrMiniWeb.Router do
     pipe_through :api
 
     get "/index", IndexController, :index
+    get "/third_parties", ThirdPartyController, :index
   end
 
   scope "/admin/api", PolicrMiniWeb.Admin.API do

@@ -76,7 +76,6 @@ defmodule PolicrMini.Schema.ThirdPartyTest do
              :bot_username,
              :homepage,
              :running_days,
-             :version,
              :is_forked
            ]
 
