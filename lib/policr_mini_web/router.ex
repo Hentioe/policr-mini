@@ -60,6 +60,11 @@ defmodule PolicrMiniWeb.Router do
     put "/verifications/:id/kick", VerificationController, :kick
 
     get "/logs", LogController, :index
+
+    get "/third_parties", ThirdPartyController, :index
+    post "/third_parties", ThirdPartyController, :add
+    put "/third_parties/:id", ThirdPartyController, :update
+    delete "/third_parties/:id", ThirdPartyController, :delete
   end
 
   scope "/admin", PolicrMiniWeb.Admin do

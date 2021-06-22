@@ -83,7 +83,14 @@ function toastMessage(message, { type } = {}) {
   }
 }
 
-const sysPages = ["managements", "logs", "tasks", "terms", "terminal"];
+const sysPages = [
+  "managements",
+  "logs",
+  "tasks",
+  "terms",
+  "terminal",
+  "third_parties",
+];
 
 function isSysLink({ path, page }) {
   if (!path) throw "The `path` argument is missing";

@@ -5,8 +5,8 @@ defmodule PolicrMini.Schema.ThirdParty do
 
   use PolicrMini.Schema
 
-  @required_fields ~w(name bot_username homepage running_days version is_forked)a
-  @optional_fields ~w(bot_avatar description hardware)a
+  @required_fields ~w(name bot_username homepage running_days is_forked)a
+  @optional_fields ~w(bot_avatar description hardware version)a
 
   schema "third_parties" do
     field :name, :string

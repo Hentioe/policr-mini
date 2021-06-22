@@ -25,4 +25,7 @@ defmodule PolicrMini do
   end
 
   def mix_env, do: Application.get_env(:policr_mini, :environment)
+
+  @official_bots ["policr_mini_bot", "policr_mini_test_bot"]
+  def official_bots, do: @official_bots
 end

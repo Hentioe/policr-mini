@@ -11,6 +11,7 @@ import SysLogsPage from "./pages/SysLogs";
 import SysTasksPage from "./pages/SysTasks";
 import SysTermsPage from "./pages/SysTerms";
 import SysTerminalPage from "./pages/SysTerminal";
+import SysThirdPartiesPage from "./pages/ThirdParties";
 
 export {
   StatisticsPage,
@@ -26,4 +27,5 @@ export {
   SysManagementsPage,
   SysTasksPage,
   SysTerminalPage,
+  SysThirdPartiesPage,
 };
