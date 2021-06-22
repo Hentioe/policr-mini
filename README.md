@@ -26,6 +26,10 @@
 
 ## 加入我们
 
+- [把自己的部署实例加到首页](https://github.com/Hentioe/policr-mini/issues/115)
+
+## 关注我们
+
 - [POLICR · 中文社区](https://mini.telestd.me/community)
 - [POLICR · 更新通知](https://t.me/policr_changelog)
 
