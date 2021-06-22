@@ -4,11 +4,8 @@ import { useDispatch } from "react-redux";
 
 import { close } from "../slices/modal";
 
-const ModalContainer = styled.div`
-  top: 50%;
-  left: 50%;
-  transform: translate(-50%, -50%);
-  ${tw`absolute rounded shadow-lg z-50 px-8 py-6 bg-white w-64 md:w-auto`}
+const ConfirmContainer = styled.div`
+  ${tw`rounded shadow-lg px-8 py-6 bg-white w-64 md:w-auto`}
 `;
 
 const ActionButton = styled.button`
@@ -19,12 +16,11 @@ export default ({ children, title }) => {
   const dispatch = useDispatch();
 
   return (
-    <ModalContainer>
+    <ConfirmContainer>
       {title != undefined ? <span tw="font-bold">{title}</span> : undefined}
 
       <div tw="mt-6">{children}</div>
-
-      <div tw="float-right mt-6">
+      <div tw="mt-6 flex justify-end">
         <ActionButton
           onClick={() => {
             dispatch(close());
@@ -33,6 +29,6 @@ export default ({ children, title }) => {
           确定
         </ActionButton>
       </div>
-    </ModalContainer>
+    </ConfirmContainer>
   );
 };

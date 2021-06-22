@@ -3,6 +3,7 @@ import tw, { styled } from "twin.macro";
 import { useDispatch } from "react-redux";
 
 import { open as openModal } from "../slices/modal";
+import Confirm from "./Confirm";
 import { UnifiedFlexBox } from "./Unified";
 
 const linkAttrs = {
@@ -21,8 +22,8 @@ const NavLink = styled(Link)`
   ${tw`text-gray-900 mb-3 cursor-pointer`}
 `;
 
-const pageContentMissing = (
-  <>
+const buildPageContentMissingConfirm = ({ title }) => (
+  <Confirm title={title}>
     <span tw="text-gray-600">
       由于此项目暂未完全实现，此页面内容有待填充。更多细节请参阅
       <a
@@ -42,7 +43,7 @@ const pageContentMissing = (
       </a>
       寻求帮助。
     </span>
-  </>
+  </Confirm>
 );
 
 export default () => {
@@ -89,8 +90,9 @@ export default () => {
                   onClick={() => {
                     dispatch(
                       openModal({
-                        title: "关于我们",
-                        content: pageContentMissing,
+                        content: buildPageContentMissingConfirm({
+                          title: "关于我们",
+                        }),
                       })
                     );
                   }}
@@ -103,8 +105,9 @@ export default () => {
                   onClick={() => {
                     dispatch(
                       openModal({
-                        title: "编辑百科",
-                        content: pageContentMissing,
+                        content: buildPageContentMissingConfirm({
+                          title: "编辑百科",
+                        }),
                       })
                     );
                   }}
@@ -115,19 +118,20 @@ export default () => {
                   onClick={() => {
                     dispatch(
                       openModal({
-                        title: "贡献翻译",
                         content: (
-                          <span tw="text-gray-600">
-                            由于此项目暂未完全实现，当前不考虑对多语言的支持。可关注
-                            <a
-                              tw="text-blue-600"
-                              target="_blank"
-                              href="https://t.me/policr_changelog"
-                            >
-                              更新频道
-                            </a>
-                            等待后续安排，感谢您。
-                          </span>
+                          <Confirm title="贡献翻译">
+                            <span tw="text-gray-600">
+                              由于此项目暂未完全实现，当前不考虑对多语言的支持。可关注
+                              <a
+                                tw="text-blue-600"
+                                target="_blank"
+                                href="https://t.me/policr_changelog"
+                              >
+                                更新频道
+                              </a>
+                              等待后续安排，感谢您。
+                            </span>
+                          </Confirm>
                         ),
                       })
                     );

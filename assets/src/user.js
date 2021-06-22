@@ -11,7 +11,7 @@ import reduxLogger from "redux-logger";
 import { useSelector } from "react-redux";
 import "twin.macro";
 
-import { Header, Footer, Modal } from "./user/components";
+import { Header, Footer, ModalContainer } from "./user/components";
 import Reducers from "./user/reducers";
 
 const DEBUG = process.env.NODE_ENV == "development";
@@ -45,12 +45,7 @@ const Root = () => {
   const modalState = useSelector((state) => state.modal);
 
   return (
-    <div
-      tw="relative h-full"
-      // style={{
-      //   position: modalState.isOpen ? "fixed" : "relative",
-      // }}
-    >
+    <div tw="relative h-full">
       <div
         tw="fixed w-full h-full"
         style={{
@@ -59,9 +54,10 @@ const Root = () => {
         }}
       >
         <div tw="absolute w-full h-screen">
-          {modalState.isOpen ? (
-            <Modal title={modalState.title}>{modalState.content}</Modal>
-          ) : undefined}
+          {(modalState.isOpen && (
+            <ModalContainer>{modalState.content}</ModalContainer>
+          )) ||
+            undefined}
         </div>
       </div>
 

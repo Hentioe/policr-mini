@@ -63,7 +63,7 @@ defmodule PolicrMiniBot.RespLoginCmdPlug do
 
   @spec make_markup(integer, String.t()) :: InlineKeyboardMarkup.t()
   defp make_markup(user_id, token) do
-    root_url = Application.get_env(:policr_mini, PolicrMiniWeb)[:root_url]
+    root_url = PolicrMiniWeb.root_url(has_end_slash: false)
 
     %InlineKeyboardMarkup{
       inline_keyboard: [
@@ -76,7 +76,7 @@ defmodule PolicrMiniBot.RespLoginCmdPlug do
         [
           %InlineKeyboardButton{
             text: t("login.join_text"),
-            url: "#{root_url}admin?token=#{token}"
+            url: "#{root_url}/admin?token=#{token}"
           }
         ]
       ]

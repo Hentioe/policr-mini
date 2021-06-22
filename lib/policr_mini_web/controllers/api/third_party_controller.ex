@@ -53,10 +53,12 @@ defmodule PolicrMiniWeb.API.ThirdPartyController do
 
         1 ->
           # 不在官方记录中。
+          homepage = PolicrMiniWeb.root_url(has_end_slash: false)
+
           current_bot = %PolicrMini.Schema.ThirdParty{
             name: PolicrMiniBot.name(),
             bot_username: PolicrMiniBot.username(),
-            homepage: "/"
+            homepage: homepage
           }
 
           [offical_bot, current_bot] ++ third_parties

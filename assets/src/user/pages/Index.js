@@ -4,7 +4,13 @@ import useSWR from "swr";
 import { useDispatch } from "react-redux";
 
 import { open as openModal } from "../slices/modal";
-import { Title, ErrorParagraph, UnifiedFlexBox } from "../components";
+import {
+  Title,
+  ErrorParagraph,
+  UnifiedFlexBox,
+  Confirm,
+  ThirdPartyTerm,
+} from "../components";
 
 const InlineKeybordButton = styled.div`
   ${tw`shadow-sm bg-blue-400 text-white rounded-md px-4 py-2 text-sm mt-1 flex justify-center bg-opacity-75 cursor-pointer`}
@@ -52,8 +58,8 @@ const Avatar = () => {
   );
 };
 
-const pageContentMissing = (
-  <>
+const buildPageContentMissingConfirm = ({ title }) => (
+  <Confirm title={title}>
     <span tw="text-gray-600">
       由于此项目暂未完全实现，此页面内容有待填充。更多细节请参阅
       <a
@@ -73,7 +79,7 @@ const pageContentMissing = (
       </a>
       寻求帮助。
     </span>
-  </>
+  </Confirm>
 );
 
 const fetcher = (url) => fetch(url).then((r) => r.json());
@@ -176,8 +182,9 @@ export default () => {
                     onClick={() => {
                       dispatch(
                         openModal({
-                          title: "后台指南",
-                          content: pageContentMissing,
+                          content: buildPageContentMissingConfirm({
+                            title: "使用指南",
+                          }),
                         })
                       );
                     }}
@@ -196,8 +203,9 @@ export default () => {
                     onClick={() => {
                       dispatch(
                         openModal({
-                          title: "设定验证",
-                          content: pageContentMissing,
+                          content: buildPageContentMissingConfirm({
+                            title: "设定验证",
+                          }),
                         })
                       );
                     }}
@@ -302,26 +310,8 @@ export default () => {
             </p>
             <a
               tw="text-white float-right cursor-pointer underline"
-              onClick={() => {
-                dispatch(
-                  openModal({
-                    title: "申请社区运营",
-                    content: (
-                      <span tw="text-gray-600">
-                        当前您可在
-                        <a
-                          tw="text-blue-600"
-                          target="_blank"
-                          href="https://mini.telestd.me/community"
-                        >
-                          社群
-                        </a>
-                        中联系作者或与其它管理员交流，以告知我们自行部署的实例的相关信息。未来此页面将可用。
-                      </span>
-                    ),
-                  })
-                );
-              }}
+              href="https://github.com/Hentioe/policr-mini/issues/115"
+              target="_blank"
             >
               申请社区运营
             </a>
@@ -403,14 +393,31 @@ export default () => {
                     </ThirdPartiesTd>
                     <ThirdPartiesTd>
                       <a
-                        tw="text-gray-700 no-underline"
+                        tw="text-gray-700 no-underline cursor-pointer select-none"
                         href={`https://t.me/${thirdParty.bot_username}`}
                         target="_blank"
+                        onClick={(e) => {
+                          if (thirdPartiesData.official_index != i) {
+                            e.preventDefault();
+
+                            dispatch(
+                              openModal({
+                                content: (
+                                  <ThirdPartyTerm
+                                    instanceName={thirdParty.name}
+                                    botUsername={thirdParty.bot_username}
+                                  />
+                                ),
+                              })
+                            );
+                          }
+                        }}
                       >
                         @{thirdParty.bot_username}
                       </a>
                     </ThirdPartiesTd>
                     <ThirdPartiesTd
+                      tw="truncate"
                       endRow={i == thirdPartiesData.third_parties.length - 1}
                       endCol={true}
                     >

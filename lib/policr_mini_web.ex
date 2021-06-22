@@ -100,4 +100,27 @@ defmodule PolicrMiniWeb do
         {:error, :notfound}
     end
   end
+
+  @type root_url_opts :: [{:has_end_slash, boolean}]
+
+  @doc """
+  获取根链接。
+
+  ## 可选参数
+  - `has_end_slash`: 链接结尾处是否包含斜杠。默认为 `true`。
+  """
+  @spec root_url(root_url_opts) :: String.t() | nil
+  def root_url(opts \\ []) do
+    root_url = Application.get_env(:policr_mini, PolicrMiniWeb)[:root_url]
+
+    if root_url do
+      has_end_slash = Keyword.get(opts, :has_end_slash, true)
+
+      if has_end_slash do
+        (String.ends_with?(root_url, "/") && root_url) || root_url <> "/"
+      else
+        (String.ends_with?(root_url, "/") && String.slice(root_url, 0..-2)) || root_url
+      end
+    end
+  end
 end

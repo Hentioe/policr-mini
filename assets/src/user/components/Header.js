@@ -3,6 +3,7 @@ import tw, { styled } from "twin.macro";
 import { useDispatch } from "react-redux";
 
 import { open as openModal } from "../slices/modal";
+import Confirm from "./Confirm";
 
 const Link = styled.a`
   ${tw`no-underline`}
@@ -25,8 +26,8 @@ const LogoMarkup = styled.span`
 const version = "beta";
 const thirdParty = "T-party";
 
-const pageContentMissing = (
-  <>
+const buildPageContentMissingConfirm = ({ title }) => (
+  <Confirm title={title}>
     <span tw="text-gray-600">
       由于此项目暂未完全实现，此页面内容有待填充。更多细节请参阅
       <a
@@ -46,7 +47,7 @@ const pageContentMissing = (
       </a>
       寻求帮助。
     </span>
-  </>
+  </Confirm>
 );
 
 // 参考来源：https://tailwindcomponents.com/component/simple-responsive-navigation-bar-1
@@ -98,19 +99,20 @@ export default () => {
             onClick={() => {
               dispatch(
                 openModal({
-                  title: "登入后台",
                   content: (
-                    <span tw="text-gray-600">
-                      当前可私聊机器人{" "}
-                      <a
-                        tw="text-blue-400"
-                        href={`https://t.me/${_GLOBAL.botUsername}`}
-                        target="_blank"
-                      >
-                        <code>/login</code>
-                      </a>{" "}
-                      命令获取后台链接，略过登录入口。未来此页面将可用。
-                    </span>
+                    <Confirm title="登入后台">
+                      <span tw="text-gray-600">
+                        当前可私聊机器人{" "}
+                        <a
+                          tw="text-blue-400"
+                          href={`https://t.me/${_GLOBAL.botUsername}`}
+                          target="_blank"
+                        >
+                          <code>/login</code>
+                        </a>{" "}
+                        命令获取后台链接，略过登录入口。未来此页面将可用。
+                      </span>
+                    </Confirm>
                   ),
                 })
               );
@@ -125,8 +127,7 @@ export default () => {
             onClick={() => {
               dispatch(
                 openModal({
-                  title: "维基",
-                  content: pageContentMissing,
+                  content: buildPageContentMissingConfirm({ title: "维基" }),
                 })
               );
             }}
@@ -137,8 +138,7 @@ export default () => {
             onClick={() => {
               dispatch(
                 openModal({
-                  title: "关于",
-                  content: pageContentMissing,
+                  content: buildPageContentMissingConfirm({ title: "关于" }),
                 })
               );
             }}
@@ -149,8 +149,9 @@ export default () => {
             onClick={() => {
               dispatch(
                 openModal({
-                  title: "快速入门",
-                  content: pageContentMissing,
+                  content: buildPageContentMissingConfirm({
+                    title: "快速入门",
+                  }),
                 })
               );
             }}

@@ -3,7 +3,9 @@ import Header from "./components/Header";
 import Footer from "./components/Footer";
 import ErrorView, { ErrorParagraph } from "./components/ErrorView";
 import { UnifiedBox, UnifiedFlexBox } from "./components/Unified";
-import Modal from "./components/Modal";
+import Confirm from "./components/Confirm";
+import ModalContainer from "./components/ModalContainer";
+import ThirdPartyTerm from "./components/ThirdPartyTerm";
 
 export {
   Title,
@@ -13,5 +15,7 @@ export {
   ErrorParagraph,
   UnifiedBox,
   UnifiedFlexBox,
-  Modal,
+  ModalContainer,
+  Confirm,
+  ThirdPartyTerm,
 };
