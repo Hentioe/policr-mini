@@ -40,9 +40,14 @@ defmodule PolicrMiniWeb.API.ThirdPartyController do
           if r do
             current_index = elem(r, 1)
 
-            third_parties = List.insert_at(third_parties, current_index + 1, offical_bot())
+            {current_bot, third_parties} = List.pop_at(third_parties, current_index)
 
-            {current_index, current_index + 1, third_parties}
+            third_parties =
+              third_parties
+              |> List.insert_at(0, current_bot)
+              |> List.insert_at(1, offical_bot())
+
+            {0, 1, third_parties}
           else
             # 没有找到此实例。
             if referer == PolicrMiniWeb.root_url(has_end_slash: true) do
