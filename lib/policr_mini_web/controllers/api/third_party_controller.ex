@@ -27,49 +27,41 @@ defmodule PolicrMiniWeb.API.ThirdPartyController do
   def index(conn, _params) do
     third_parties = ThirdPartyBusiness.find_list()
 
-    bot_username = PolicrMiniBot.username()
-    offical_bot = offical_bot()
+    {current_index, official_index, third_parties} =
+      case get_req_header(conn, "referer") do
+        [referer] ->
+          r =
+            third_parties
+            |> Enum.with_index()
+            |> Enum.find(fn {third_party, _} ->
+              referer == PolicrMiniWeb.handle_url(third_party.homepage, has_end_slash: true)
+            end)
 
-    current_index =
-      if bot_username == offical_bot.bot_username do
-        0
-      else
-        r =
-          third_parties
-          |> Enum.with_index()
-          |> Enum.find(fn {third_party, _} -> third_party.bot_username == bot_username end)
+          if r do
+            current_index = elem(r, 1)
 
-        if r do
-          elem(r, 1) + 1
-        else
-          1
-        end
-      end
+            third_parties = List.insert_at(third_parties, current_index + 1, offical_bot())
 
-    third_parties =
-      case current_index do
-        0 ->
-          [offical_bot] ++ third_parties
+            {current_index, current_index + 1, third_parties}
+          else
+            # 没有找到此实例。
+            if referer == PolicrMiniWeb.root_url(has_end_slash: true) do
+              # 此实例为官方实例。
+              {0, 0, [offical_bot()] ++ third_parties}
+            else
+              # 非官方实例。
+              {-1, 0, [offical_bot()] ++ third_parties}
+            end
+          end
 
-        1 ->
-          # 不在官方记录中。
-          homepage = PolicrMiniWeb.root_url(has_end_slash: false)
-
-          current_bot = %PolicrMini.Schema.ThirdParty{
-            name: PolicrMiniBot.name(),
-            bot_username: PolicrMiniBot.username(),
-            homepage: homepage
-          }
-
-          [offical_bot, current_bot] ++ third_parties
-
-        _ ->
-          [offical_bot] ++ third_parties
+        [] ->
+          # 无此实例。
+          {-1, 0, [offical_bot()] ++ third_parties}
       end
 
     render(conn, "index.json", %{
       third_parties: third_parties,
-      official_index: 0,
+      official_index: official_index,
       current_index: current_index
     })
   end

@@ -116,11 +116,35 @@ defmodule PolicrMiniWeb do
     if root_url do
       has_end_slash = Keyword.get(opts, :has_end_slash, true)
 
-      if has_end_slash do
-        (String.ends_with?(root_url, "/") && root_url) || root_url <> "/"
-      else
-        (String.ends_with?(root_url, "/") && String.slice(root_url, 0..-2)) || root_url
-      end
+      handle_url(root_url, has_end_slash: has_end_slash)
+    end
+  end
+
+  @doc """
+  根据选项处理 URL。
+
+  ## 可选项：
+  - `has_end_slash`: 是否存在结束斜杠。默认为 `true`。
+
+  ## 例子
+      iex> PolicrMiniWeb.handle_url("https://t.me")
+      "https://t.me/"
+      iex> PolicrMiniWeb.handle_url("https://t.me/", has_end_slash: false)
+      "https://t.me"
+      iex> PolicrMiniWeb.handle_url("https://t.me", has_end_slash: true)
+      "https://t.me/"
+      iex> PolicrMiniWeb.handle_url("https://t.me", has_end_slash: false)
+      "https://t.me"
+      iex> PolicrMiniWeb.handle_url("https://t.me/", has_end_slash: true)
+      "https://t.me/"
+  """
+  def handle_url(url, opts \\ []) do
+    has_end_slash = Keyword.get(opts, :has_end_slash, true)
+
+    if has_end_slash do
+      (String.ends_with?(url, "/") && url) || url <> "/"
+    else
+      (String.ends_with?(url, "/") && String.slice(url, 0..-2)) || url
     end
   end
 end
