@@ -1,6 +1,7 @@
 import React from "react";
 import tw, { styled } from "twin.macro";
 import { useDispatch } from "react-redux";
+import { Link as RouteLink } from "react-router-dom";
 
 import { open as openModal } from "../slices/modal";
 import Confirm from "./Confirm";
@@ -19,7 +20,11 @@ const IconLink = styled(Link)`
 `;
 
 const NavLink = styled(Link)`
-  ${tw`text-gray-900 mb-3 cursor-pointer`}
+  ${tw`no-underline text-gray-900 mb-3 cursor-pointer`}
+`;
+
+const RouteNavLink = styled(RouteLink)`
+  ${tw`no-underline text-gray-900 mb-3 cursor-pointer`}
 `;
 
 const buildPageContentMissingConfirm = ({ title }) => (
@@ -85,7 +90,6 @@ export default () => {
                 <NavLink href="https://mini.telestd.me/community">
                   社区群组
                 </NavLink>
-                <NavLink href="https://t.me/policr_changelog">更新频道</NavLink>
                 <NavLink
                   onClick={() => {
                     dispatch(
@@ -99,8 +103,10 @@ export default () => {
                 >
                   关于我们
                 </NavLink>
+                <RouteNavLink to="/terms">服务条款</RouteNavLink>
               </div>
               <div tw="flex flex-col">
+                <NavLink href="https://t.me/policr_changelog">更新频道</NavLink>
                 <NavLink
                   onClick={() => {
                     dispatch(
