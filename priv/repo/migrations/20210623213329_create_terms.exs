@@ -3,7 +3,7 @@ defmodule PolicrMini.Repo.Migrations.CreateTerms do
 
   def change do
     create table(:terms, primary_key: false) do
-      add :id, :bigint, comment: "群组编号", primary_key: true
+      add :id, :bigint, comment: "编号", primary_key: true
       add :content, :text, comment: "条款内容"
 
       timestamps()
