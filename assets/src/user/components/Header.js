@@ -1,6 +1,7 @@
 import React from "react";
 import tw, { styled } from "twin.macro";
 import { useDispatch } from "react-redux";
+import { Link as RouteLink } from "react-router-dom";
 
 import { open as openModal } from "../slices/modal";
 import Confirm from "./Confirm";
@@ -9,8 +10,12 @@ const Link = styled.a`
   ${tw`no-underline`}
 `;
 
-const MenuLink = styled(Link)`
-  ${tw`md:inline-flex md:w-auto w-full py-2 rounded text-gray-600 items-center justify-center cursor-pointer`}
+const MenuLink = styled.a`
+  ${tw`no-underline md:inline-flex md:w-auto w-full py-2 rounded text-gray-600 items-center justify-center cursor-pointer`}
+`;
+
+const RouteMenuLink = styled(RouteLink)`
+  ${tw`no-underline md:inline-flex md:w-auto w-full py-2 rounded text-gray-600 items-center justify-center cursor-pointer`}
 `;
 
 const MenuText = styled.span`
@@ -92,34 +97,12 @@ export default () => {
         id="navigation"
       >
         <div tw="md:inline-flex md:ml-auto md:flex-row md:w-auto w-full md:items-center items-start flex flex-col md:h-auto">
-          <MenuLink href="/">
+          <RouteMenuLink to="/">
             <MenuText>首页</MenuText>
-          </MenuLink>
-          <MenuLink
-            onClick={() => {
-              dispatch(
-                openModal({
-                  content: (
-                    <Confirm title="登入后台">
-                      <span tw="text-gray-600">
-                        当前可私聊机器人{" "}
-                        <a
-                          tw="text-blue-400"
-                          href={`https://t.me/${_GLOBAL.botUsername}`}
-                          target="_blank"
-                        >
-                          <code>/login</code>
-                        </a>{" "}
-                        命令获取后台链接，略过登录入口。未来此页面将可用。
-                      </span>
-                    </Confirm>
-                  ),
-                })
-              );
-            }}
-          >
+          </RouteMenuLink>
+          <RouteMenuLink to="/login">
             <MenuText>后台</MenuText>
-          </MenuLink>
+          </RouteMenuLink>
           <MenuLink target="_blank" href="https://mini.telestd.me/community">
             <MenuText>社群</MenuText>
           </MenuLink>

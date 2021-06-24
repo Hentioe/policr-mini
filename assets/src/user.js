@@ -63,9 +63,9 @@ const Root = () => {
       </div>
 
       <div tw="min-h-screen flex flex-col">
-        <Header />
-
         <Router>
+          <Header />
+
           <Switch>
             <Route path="/terms">
               <TermsPage />
@@ -77,8 +77,9 @@ const Root = () => {
               <IndexPage path="/" />
             </Route>
           </Switch>
+
+          <Footer />
         </Router>
-        <Footer />
       </div>
     </div>
   );
