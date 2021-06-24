@@ -1,5 +1,5 @@
 import React from "react";
-import tw from "twin.macro";
+import "twin.macro";
 import useSWR from "swr";
 import { parseISO, format } from "date-fns";
 

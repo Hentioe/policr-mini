@@ -59,6 +59,8 @@ defmodule PolicrMiniWeb.TokenAuthentication do
       |> Map.get(:query_params)
       |> Map.get("token")
 
+    token = token && String.trim(token)
+
     if token do
       {:query, token}
     else
@@ -67,6 +69,8 @@ defmodule PolicrMiniWeb.TokenAuthentication do
         |> fetch_cookies()
         |> Map.get(:req_cookies)
         |> Map.get("token")
+
+      token = token && String.trim(token)
 
       {:cookies, token}
     end

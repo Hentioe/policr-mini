@@ -11,7 +11,7 @@ import { useSelector } from "react-redux";
 import "twin.macro";
 import { BrowserRouter as Router, Switch, Route } from "react-router-dom";
 
-import { IndexPage, TermsPage } from "./user/pages";
+import { IndexPage, TermsPage, LoginPage } from "./user/pages";
 import { Header, Footer, ModalContainer } from "./user/components";
 import Reducers from "./user/reducers";
 
@@ -69,6 +69,9 @@ const Root = () => {
           <Switch>
             <Route path="/terms">
               <TermsPage />
+            </Route>
+            <Route path="/login">
+              <LoginPage />
             </Route>
             <Route>
               <IndexPage path="/" />
