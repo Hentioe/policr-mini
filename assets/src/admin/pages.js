@@ -9,8 +9,8 @@ import CustomPage from "./pages/Custom";
 import SysManagementsPage from "./pages/SysManagements";
 import SysLogsPage from "./pages/SysLogs";
 import SysTasksPage from "./pages/SysTasks";
-import SysTermsPage from "./pages/SysTerms";
 import SysTerminalPage from "./pages/SysTerminal";
+import SysTermsPage from "./pages/SysTerms";
 import SysThirdPartiesPage from "./pages/ThirdParties";
 
 export {
@@ -23,9 +23,9 @@ export {
   PropertiesPage,
   CustomPage,
   SysLogsPage,
-  SysTermsPage,
   SysManagementsPage,
   SysTasksPage,
   SysTerminalPage,
+  SysTermsPage,
   SysThirdPartiesPage,
 };

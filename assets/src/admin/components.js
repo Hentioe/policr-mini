@@ -16,6 +16,7 @@ import LinkButton from "./components/LinkButton";
 import Pagination from "./components/Pagination";
 import HintParagraph from "./components/HintParagraph";
 import FormInput from "./components/FormInput";
+import FormTextarea from "./components/FormTextarea";
 
 export {
   Sidebar,
@@ -36,4 +37,5 @@ export {
   Pagination,
   HintParagraph,
   FormInput,
+  FormTextarea,
 };

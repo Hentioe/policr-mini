@@ -2,7 +2,6 @@ import "../styles/user.scss";
 
 import React, { useEffect } from "react";
 import ReactDOM from "react-dom";
-import IndexPage from "./user/pages/Index";
 import { HelmetProvider } from "react-helmet-async";
 import { Provider } from "react-redux";
 import { configureStore } from "@reduxjs/toolkit";
@@ -10,7 +9,9 @@ import thunkMiddleware from "redux-thunk";
 import reduxLogger from "redux-logger";
 import { useSelector } from "react-redux";
 import "twin.macro";
+import { BrowserRouter as Router, Switch, Route } from "react-router-dom";
 
+import { IndexPage, TermsPage } from "./user/pages";
 import { Header, Footer, ModalContainer } from "./user/components";
 import Reducers from "./user/reducers";
 
@@ -45,7 +46,7 @@ const Root = () => {
   const modalState = useSelector((state) => state.modal);
 
   return (
-    <div tw="relative h-full">
+    <div tw="relative min-h-screen">
       <div
         tw="fixed w-full h-full"
         style={{
@@ -61,9 +62,19 @@ const Root = () => {
         </div>
       </div>
 
-      <div>
+      <div tw="min-h-screen flex flex-col">
         <Header />
-        <IndexPage />
+
+        <Router>
+          <Switch>
+            <Route path="/terms">
+              <TermsPage />
+            </Route>
+            <Route>
+              <IndexPage path="/" />
+            </Route>
+          </Switch>
+        </Router>
         <Footer />
       </div>
     </div>

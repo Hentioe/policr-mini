@@ -28,6 +28,7 @@ defmodule PolicrMiniWeb.Router do
 
     get "/index", IndexController, :index
     get "/third_parties", ThirdPartyController, :index
+    get "/terms", TermController, :index
   end
 
   scope "/admin/api", PolicrMiniWeb.Admin.API do
@@ -66,6 +67,11 @@ defmodule PolicrMiniWeb.Router do
     post "/third_parties", ThirdPartyController, :add
     put "/third_parties/:id", ThirdPartyController, :update
     delete "/third_parties/:id", ThirdPartyController, :delete
+
+    get "/terms", TermController, :index
+    put "/terms", TermController, :add_or_update
+    delete "/terms", TermController, :delete
+    post "/terms/preview", TermController, :preview
   end
 
   scope "/admin", PolicrMiniWeb.Admin do

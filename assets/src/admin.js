@@ -27,9 +27,9 @@ import {
   SysManagementsPage,
   SysLogsPage,
   SysTasksPage,
-  SysTermsPage,
   SysTerminalPage,
   SysThirdPartiesPage,
+  SysTermsPage,
 } from "./admin/pages";
 
 import Reducers from "./admin/reducers";

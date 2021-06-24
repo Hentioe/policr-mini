@@ -67,7 +67,8 @@ defmodule PolicrMini.MixProject do
       {:quantum, "~> 3.3"},
       {:cachex, "~> 3.3"},
       {:httpoison, "~> 1.8"},
-      {:proper_case, "~> 1.3"}
+      {:proper_case, "~> 1.3"},
+      {:earmark, "~> 1.4"}
     ]
   end
 

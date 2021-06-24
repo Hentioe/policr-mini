@@ -358,6 +358,11 @@ export default () => {
           href="/admin/sys/logs"
           selected={isSysLink({ path: location.pathname, page: "logs" })}
         />
+        <NavItem
+          title="服务条款"
+          href="/admin/sys/terms"
+          selected={isSysLink({ path: location.pathname, page: "terms" })}
+        />
         {!_GLOBAL.isThirdParty ? (
           <NavItem
             title="第三方实例"

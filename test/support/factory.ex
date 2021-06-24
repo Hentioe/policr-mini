@@ -110,6 +110,13 @@ defmodule PolicrMini.Factory do
     }
   end
 
+  def build(:term) do
+    %PolicrMini.Schema.Term{
+      id: 1_234_567_890,
+      content: "服务条款内容。"
+    }
+  end
+
   def build(factory_name, attrs) when is_atom(factory_name) and is_list(attrs) do
     factory_name |> build() |> struct(attrs)
   end
