@@ -65,7 +65,7 @@ defmodule PolicrMini.MixProject do
       {:yaml_elixir, "~> 2.7"},
       {:typed_struct, "~> 0.2"},
       {:quantum, "~> 3.3"},
-      {:cachex, "~> 3.3"},
+      {:cachex, "~> 3.4"},
       {:httpoison, "~> 1.8"},
       {:proper_case, "~> 1.3"},
       {:earmark, "~> 1.4"}
