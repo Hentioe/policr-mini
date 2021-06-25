@@ -285,7 +285,7 @@ export default () => {
       </UnifiedFlexBox>
       {/* 自主部署简介和导航 */}
       <div tw="mt-10 bg-gray-800">
-        <UnifiedFlexBox tw="mt-10 py-16 flex-wrap">
+        <UnifiedFlexBox tw="py-16 flex-wrap">
           <div tw="w-full lg:w-7/12 mb-8 lg:mb-0">
             <p tw="text-2xl font-bold text-gray-200">构建自己的实例</p>
             <p tw="text-gray-300">
