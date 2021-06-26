@@ -231,7 +231,7 @@ export default () => {
                 </span>
                 <Divider />
                 <Paragraph>
-                  新成员 <span tw="text-blue-500 cursor-pointer">机░人</span>{" "}
+                  新成员 <span tw="text-blue-500 cursor-pointer">小███混</span>{" "}
                   你好！
                 </Paragraph>
                 <br />
