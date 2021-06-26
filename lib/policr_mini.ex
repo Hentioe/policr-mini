@@ -12,6 +12,7 @@ defmodule PolicrMini do
       alias unquote(schema_module)
       alias PolicrMini.Repo
 
+      @spec get(any, keyword) :: {:ok, Ecto.Schema.t()} | {:error, :not_found, map}
       def get(id, options \\ []) do
         preload = Keyword.get(options, :preload, [])
         record = unquote(schema_module) |> Repo.get(id) |> Repo.preload(preload)
