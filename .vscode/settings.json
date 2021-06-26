@@ -3,6 +3,7 @@
         "**/_build/**": true,
         "**/.elixir_ls/**": true,
         "**/deps/**": true,
-        "**/priv/static/**": true
+        "**/priv/static/**": true,
+        "**/assets/node_modules/**": true
     }
 }
