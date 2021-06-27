@@ -117,6 +117,26 @@ defmodule PolicrMini.Factory do
     }
   end
 
+  def build(:sponsor) do
+    %PolicrMini.Schema.Sponsor{
+      title: "喵小姐",
+      avatar: "/uploaded/meow.jpg",
+      homepage: "https://meow.com",
+      introduction: "欢迎来我的主页逛逛",
+      contact: "@miss_meow",
+      unique_code: "xxxx-xxxx-xxxx-xxxx"
+    }
+  end
+
+  def build(:sponsorship_history) do
+    %PolicrMini.Schema.SponsorshipHistory{
+      expected_to: "请作者喝一杯无糖可乐",
+      amount: 15,
+      has_reached: false,
+      reached_at: DateTime.utc_now()
+    }
+  end
+
   def build(factory_name, attrs) when is_atom(factory_name) and is_list(attrs) do
     factory_name |> build() |> struct(attrs)
   end
