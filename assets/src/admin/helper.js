@@ -90,7 +90,7 @@ const sysPages = [
   "terms",
   "terminal",
   "third_parties",
-  "sponsorship_histories",
+  "sponsorship",
 ];
 
 function isSysLink({ path, page }) {

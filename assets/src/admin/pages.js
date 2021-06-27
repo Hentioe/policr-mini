@@ -12,7 +12,7 @@ import SysTasksPage from "./pages/SysTasks";
 import SysTerminalPage from "./pages/SysTerminal";
 import SysTermsPage from "./pages/SysTerms";
 import SysThirdPartiesPage from "./pages/SysThirdParties";
-import SysSponsorshipHistoriesPage from "./pages/SysSponsorshipHistories";
+import SysSponsorshipPage from "./pages/SysSponsorship";
 
 export {
   StatisticsPage,
@@ -29,5 +29,5 @@ export {
   SysTerminalPage,
   SysTermsPage,
   SysThirdPartiesPage,
-  SysSponsorshipHistoriesPage,
+  SysSponsorshipPage,
 };
