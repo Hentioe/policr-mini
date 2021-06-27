@@ -352,7 +352,7 @@ export default () => {
             </p>
           </Quote>
 
-          <div tw="mt-6 text-center">
+          <div tw="mt-6 text-center md:text-left">
             <button tw="px-6 py-4 font-bold shadow bg-green-500 border-0">
               <a
                 tw="text-white"
