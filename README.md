@@ -26,9 +26,9 @@
 
 作为 [Telegex](https://github.com/Hentioe/telegex) 的现实案例，从事实上证明了它可以让机器人足够可靠、稳定的运行。 并且 [Telegex](https://github.com/Hentioe/telegex) 相较于早已存在的多个同类库，仍然具有更正确、完整的支持，更加优雅的实现等优点。
 
-## 加入我们
+## 加入或帮助我们
 
-- [把你的实例加到首页](https://github.com/Hentioe/policr-mini/issues/115)
+- [添加您的实例到首页](https://github.com/Hentioe/policr-mini/issues/115)
 
 ## 关注我们
 
