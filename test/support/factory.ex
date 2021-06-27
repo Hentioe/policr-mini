@@ -124,7 +124,7 @@ defmodule PolicrMini.Factory do
       homepage: "https://meow.com",
       introduction: "欢迎来我的主页逛逛",
       contact: "@miss_meow",
-      unique_code: "xxxx-xxxx-xxxx-xxxx"
+      uuid: "xxxx-xxxx-xxxx-xxxx"
     }
   end
 

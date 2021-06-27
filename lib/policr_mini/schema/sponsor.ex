@@ -5,7 +5,7 @@ defmodule PolicrMini.Schema.Sponsor do
 
   use PolicrMini.Schema
 
-  @required_fields ~w(contact unique_code)a
+  @required_fields ~w(contact uuid)a
   @optional_fields ~w(title avatar homepage introduction is_official)a
 
   schema "sponsors" do
@@ -14,7 +14,7 @@ defmodule PolicrMini.Schema.Sponsor do
     field :homepage, :string
     field :introduction, :string
     field :contact, :string
-    field :unique_code, :string
+    field :uuid, :string
     field :is_official, :boolean
 
     timestamps()

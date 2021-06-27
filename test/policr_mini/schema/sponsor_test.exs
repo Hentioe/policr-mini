@@ -16,7 +16,7 @@ defmodule PolicrMini.Schema.SponsorTest do
                  :homepage,
                  :introduction,
                  :contact,
-                 :unique_code,
+                 :uuid,
                  :is_official,
                  :inserted_at,
                  :updated_at
@@ -34,7 +34,7 @@ defmodule PolicrMini.Schema.SponsorTest do
     updated_homepage = "https://universe.org"
     updated_introduction = "我们用电报研究外星生命"
     updated_contact = "@universe"
-    updated_unique_code = "yyyy-yyyy-yyyy-yyyy"
+    updated_uuid = "yyyy-yyyy-yyyy-yyyy"
     updated_is_official = true
 
     params = %{
@@ -43,7 +43,7 @@ defmodule PolicrMini.Schema.SponsorTest do
       "homepage" => updated_homepage,
       "introduction" => updated_introduction,
       "contact" => updated_contact,
-      "unique_code" => updated_unique_code,
+      "uuid" => updated_uuid,
       "is_official" => updated_is_official
     }
 
@@ -53,7 +53,7 @@ defmodule PolicrMini.Schema.SponsorTest do
       homepage: updated_homepage,
       introduction: updated_introduction,
       contact: updated_contact,
-      unique_code: updated_unique_code,
+      uuid: updated_uuid,
       is_official: updated_is_official
     }
 
@@ -65,7 +65,7 @@ defmodule PolicrMini.Schema.SponsorTest do
 
     assert changeset.required == [
              :contact,
-             :unique_code
+             :uuid
            ]
 
     assert changeset.valid?
