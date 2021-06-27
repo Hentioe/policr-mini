@@ -12,8 +12,9 @@ defmodule PolicrMini.SponsorshipHistoryBusiness do
   @type written_returns :: {:ok, SponsorshipHistory.t()} | {:error, Ecto.Changeset.t()}
 
   defp fill_reached_at(params) do
-    if params["has_reached"] && params["reached_at"] == nil do
-      Map.put(params, "reached_at", DateTime.utc_now())
+    if params["has_reached"] do
+      (params["reached_at"] in ["", nil] && Map.put(params, "reached_at", DateTime.utc_now())) ||
+        params
     else
       params
     end
