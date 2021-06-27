@@ -2,6 +2,7 @@ import React from "react";
 import tw, { styled } from "twin.macro";
 import useSWR from "swr";
 import { useDispatch } from "react-redux";
+import { parseISO, format as formatDateTime } from "date-fns";
 
 import { open as openModal } from "../slices/modal";
 import {
@@ -11,6 +12,8 @@ import {
   Confirm,
   ThirdPartyTerm,
 } from "../components";
+
+const dateTimeFormat = "yyyy-MM-dd";
 
 const InlineKeybordButton = styled.div`
   ${tw`shadow-sm bg-blue-400 text-white rounded-md px-4 py-2 text-sm mt-1 flex justify-center bg-opacity-75 cursor-pointer`}
@@ -24,27 +27,64 @@ const Paragraph = styled.p`
   ${tw`m-0`}
 `;
 
-const ThirdPartiesTable = styled.table`
-  ${tw`table-fixed border-collapse w-full shadow-xl rounded-xl`}
+const Table = styled.table`
+  box-shadow: 0 0 2px 2px rgba(0, 0, 0, 0.07);
+  ${tw`table-fixed border-collapse w-full rounded-xl`}
 `;
-const ThirdPartiesThead = styled.thead`
+const Thead = styled.thead`
   ${tw`bg-gray-100`}
 `;
-const ThirdPartiesTr = styled.tr``;
-const ThirdPartiesTh = styled.th`
+const Tr = styled.tr``;
+const Th = styled.th`
   ${tw`text-gray-600 font-bold tracking-wider uppercase text-left py-3 px-2 border-b border-gray-200`}
 `;
-const ThirdPartiesTbody = styled.tbody`
+const Tbody = styled.tbody`
   ${tw``}
 `;
-const ThirdPartiesTd = styled.td`
+const Td = styled.td`
   ${tw`py-2 px-2 text-sm text-gray-700 bg-white border-solid border-0 border-t border-gray-200`}
-  ${({ endRow, startCol }) => endRow && startCol && tw`rounded-bl`}
-  ${({ endRow, endCol }) => endRow && endCol && tw`rounded-br`}
+  ${({ endRow, startCol }) => endRow && startCol && tw`rounded-bl-xl`}
+  ${({ endRow, endCol }) => endRow && endCol && tw`rounded-br-xl`}
 `;
 
 const ThirdPartiesTag = styled.span`
   ${tw`ml-2 text-xs bg-green-600 text-white p-1 rounded`}
+`;
+
+const GradientFont = styled.span`
+  -webkit-text-fill-color: transparent;
+  background: -webkit-linear-gradient(-70deg, #2188ff, #804eda);
+  -webkit-background-clip: text;
+`;
+
+const GradientTitle = ({ children }) => {
+  return (
+    <div tw="mb-6 font-extrabold text-2xl md:text-5xl text-center md:text-left tracking-wide md:tracking-normal">
+      <GradientFont>{children}</GradientFont>
+    </div>
+  );
+};
+
+const Quote = styled.div`
+  &:before {
+    color: #ea4aaa;
+    content: "“";
+    display: block;
+    font-size: 4rem;
+    font-weight: 800;
+    left: -2.5rem;
+    line-height: 1;
+    position: absolute;
+    top: -0.5rem;
+  }
+  position: relative;
+  @media (max-width: 1280px) {
+    &:before {
+      left: 0;
+      top: -1.5rem;
+    }
+  }
+  ${tw`mt-4 xl:mt-0`}
 `;
 
 const Avatar = () => {
@@ -110,6 +150,8 @@ export default () => {
     makeThirdPartiesEndpoint(),
     fetcher
   );
+  const { data: sponsorshipHistoriesData, error: sponsorshipHistoriesError } =
+    useSWR("/api/sponsorship_histories", fetcher);
 
   const dispatch = useDispatch();
 
@@ -122,15 +164,21 @@ export default () => {
   return (
     <>
       <Title>首页</Title>
-      <UnifiedFlexBox tw="mt-0 md:mt-10 lg:mt-20 flex-wrap">
+      <UnifiedFlexBox tw="mt-6 md:mt-10 lg:mt-20 flex-wrap">
         {/* 左边主要内容区域 */}
         <div tw="w-full lg:w-8/12">
-          <p tw="text-blue-500 text-2xl text-center md:text-3xl lg:text-4xl lg:text-left font-bold tracking-widest">
-            致力于自主部署使用的，由社区驱动的开源验证机器人。
+          <GradientTitle>免费可自行部署的开源验证机器人</GradientTitle>
+          <p tw="text-base md:text-lg text-center md:text-left md:text-xl font-bold tracking-wide">
+            <span tw="text-gray-900">
+              使用本机器人改善群内环境，避免垃圾帐号的骚扰。
+            </span>
+            <br />
           </p>
-          <p tw="text-sm text-center md:text-base lg:text-left text-gray-600">
-            本项目从 Policr
-            机器人的开发和运营过程中吸取了丰富的经验，设计更加现代，功能单一不膨胀。在未来的更新过程中也只会继续改进核心功能和优化体验，本质保持不变。
+          <p tw="text-sm md:text-lg text-center md:text-left font-normal md:font-bold tracking-wide mr-0 lg:mr-10">
+            <span tw="text-gray-600">
+              本项目从 Policr
+              机器人的开发和运营过程中吸取了丰富的经验，设计更加现代，功能单一不膨胀。在未来的更新过程中也只会继续改进核心功能和优化体验，本质保持不变。
+            </span>
           </p>
           <div tw="mt-10 lg:mt-24 flex flex-wrap">
             {/* 验证数据 */}
@@ -284,160 +332,245 @@ export default () => {
         </div>
       </UnifiedFlexBox>
       {/* 自主部署简介和导航 */}
-      <div tw="mt-10 bg-gray-800">
-        <UnifiedFlexBox tw="py-16 flex-wrap">
-          <div tw="w-full lg:w-7/12 mb-8 lg:mb-0">
-            <p tw="text-2xl font-bold text-gray-200">构建自己的实例</p>
-            <p tw="text-gray-300">
-              通过简单的 Shell 命令和 Web 服务配置，即可部署在低至 512MB 内存的
-              Linux 服务器上。
+      <div tw="mt-10">
+        <UnifiedFlexBox tw="py-8 md:py-16 flex-col">
+          <GradientTitle>构建自己的实例</GradientTitle>
+          <p tw="text-base md:text-xl font-bold tracking-wide">
+            通过简单的 Shell 命令和 Web 服务配置，即可部署在低至 512MB 内存的
+            Linux 服务器上。
+          </p>
+          <Quote>
+            <p tw="text-sm md:text-base text-gray-800 tracking-wider">
+              <span>
+                如果您正在使用自己部署的实例，且有开放服务的想法和比较包容的心态，欢迎申请注册成为社区运营实例。所有被视作社区运营的实例都应该是相对可靠的，会被本项目推荐到可选实例列表中。
+              </span>
+              <br />
+              <br />
+              <span tw="italic">
+                也因为如此申请成功的条件相对严苛，它主要是对服务稳定性的考察。
+              </span>
             </p>
+          </Quote>
+
+          <div tw="mt-6 text-center">
+            <button tw="px-6 py-4 font-bold shadow bg-green-500 border-0">
+              <a
+                tw="text-white"
+                href="https://github.com/Hentioe/policr-mini/wiki/%E8%87%AA%E8%A1%8C%E9%83%A8%E7%BD%B2%EF%BC%88%E6%9E%84%E5%BB%BA%E7%AC%AC%E4%B8%89%E6%96%B9%E5%AE%9E%E4%BE%8B%EF%BC%89"
+                target="_blank"
+              >
+                让我们开始吧
+              </a>
+            </button>
 
             <a
-              tw="mt-6 inline-block bg-green-500 border-0 text-white px-6 py-4 no-underline"
-              href="https://github.com/Hentioe/policr-mini/wiki/%E8%87%AA%E8%A1%8C%E9%83%A8%E7%BD%B2%EF%BC%88%E6%9E%84%E5%BB%BA%E7%AC%AC%E4%B8%89%E6%96%B9%E5%AE%9E%E4%BE%8B%EF%BC%89"
-              target="_blank"
-            >
-              让我们开始吧
-            </a>
-          </div>
-          <div tw="w-full lg:w-5/12">
-            <p tw="text-gray-200 italic tracking-wider">
-              如果您正在使用自己部署的实例，且有开放服务的想法和比较包容的心态，欢迎申请注册成为社区运营实例。所有被视作社区运营的实例都应该是相对可靠的，会被本项目推荐到可选实例列表中。
-            </p>
-            <p tw="text-gray-200">
-              也因为如此申请成功的条件相对严苛，它主要是对服务稳定性的考察。
-            </p>
-            <a
-              tw="text-white float-right cursor-pointer underline"
+              tw="ml-10 font-bold text-gray-900 cursor-pointer underline"
               href="https://github.com/Hentioe/policr-mini/issues/115"
               target="_blank"
             >
               申请社区运营
             </a>
           </div>
+
+          <div tw="hidden md:block">
+            <div tw="my-6 text-gray-800">
+              <span tw="text-2xl font-extrabold">社区中开放服务的实例</span>
+            </div>
+            {thirdPartiesError ? (
+              <div>
+                <p tw="text-gray-200">
+                  此列表加载失败，当前实例可能并未注册成为社区运营的实例。去
+                  <a
+                    tw="text-gray-200"
+                    href="https://mini.telestd.me#community_instances"
+                    target="_blank"
+                  >
+                    官网
+                  </a>
+                  看看？
+                </p>
+
+                <p tw="text-gray-200 italic float-right">
+                  注意：是否向注册成为社区运营实例或开放服务是第三方实例的拥有者的自愿行为，看到此内容并不表示当前实例存在任何问题。
+                </p>
+              </div>
+            ) : thirdPartiesData ? (
+              <Table>
+                <Thead>
+                  <Tr>
+                    <Th tw="w-2/12 rounded-tl-xl">实例名称</Th>
+                    <Th tw="w-5/12">实例描述</Th>
+                    <Th tw="w-1/12 text-center">运行天数</Th>
+                    <Th tw="w-2/12">机器人用户名</Th>
+                    <Th tw="w-2/12 rounded-tr-xl">主页链接</Th>
+                  </Tr>
+                </Thead>
+                <Tbody>
+                  {thirdPartiesData.third_parties.map((thirdParty, i) => (
+                    <Tr key={thirdParty.bot_username}>
+                      <Td
+                        endRow={i == thirdPartiesData.third_parties.length - 1}
+                        startCol={true}
+                      >
+                        {thirdParty.name}
+                      </Td>
+                      <Td>
+                        {thirdParty.description || "无"}
+
+                        {thirdPartiesData.official_index == i ? (
+                          <ThirdPartiesTag tw="bg-green-600">
+                            官方实例
+                          </ThirdPartiesTag>
+                        ) : undefined}
+
+                        {thirdPartiesData.official_index == i &&
+                        thirdPartiesData.current_index != i ? (
+                          <ThirdPartiesTag tw="bg-gray-600">
+                            非当前实例
+                          </ThirdPartiesTag>
+                        ) : undefined}
+
+                        {thirdPartiesData.current_index == i ? (
+                          <ThirdPartiesTag tw="bg-blue-600">
+                            当前实例
+                          </ThirdPartiesTag>
+                        ) : undefined}
+                      </Td>
+                      <Td tw="text-center">{thirdParty.running_days}</Td>
+                      <Td>
+                        <a
+                          tw="text-gray-700 no-underline cursor-pointer select-none"
+                          href={`https://t.me/${thirdParty.bot_username}`}
+                          target="_blank"
+                          onClick={(e) => {
+                            if (thirdPartiesData.official_index != i) {
+                              e.preventDefault();
+
+                              dispatch(
+                                openModal({
+                                  content: (
+                                    <ThirdPartyTerm
+                                      instanceName={thirdParty.name}
+                                      botUsername={thirdParty.bot_username}
+                                    />
+                                  ),
+                                })
+                              );
+                            }
+                          }}
+                        >
+                          @{thirdParty.bot_username}
+                        </a>
+                      </Td>
+                      <Td
+                        tw="truncate"
+                        endRow={i == thirdPartiesData.third_parties.length - 1}
+                        endCol={true}
+                      >
+                        <a
+                          tw="text-gray-700"
+                          href={thirdParty.homepage}
+                          target="_blank"
+                        >
+                          {thirdParty.homepage}
+                        </a>
+                      </Td>
+                    </Tr>
+                  ))}
+                </Tbody>
+              </Table>
+            ) : (
+              <span tw="text-gray-200">载入中……</span>
+            )}
+          </div>
         </UnifiedFlexBox>
       </div>
-      <div tw="bg-indigo-400 hidden lg:block">
-        <UnifiedFlexBox tw="flex-col py-16">
-          <p tw="text-2xl font-bold text-gray-200">社区中开放服务的实例</p>
+      {/* 赞助相关 */}
+      {!_GLOBAL.isThirdParty ? (
+        <div tw="hidden lg:block">
+          <UnifiedFlexBox tw="flex-col py-16">
+            <GradientTitle>投资并获得回报</GradientTitle>
+            <p tw="text-xl font-bold tracking-wide">
+              <span tw="text-gray-900">
+                赞助您的团队所依赖的以建立业务的开源软件和服务。
+              </span>
+              <br />
+              <span tw="text-gray-600">
+                资助开发者，可降低运营和开发消耗的个人成本。提高项目的性能和完成度，以及服务的可靠性。
+              </span>
+            </p>
 
-          {thirdPartiesError ? (
             <div>
-              <p tw="text-gray-200">
-                此列表加载失败，当前实例可能并未注册成为社区运营的实例。去
-                <a
-                  tw="text-gray-200"
-                  href="https://mini.telestd.me#community_instances"
-                  target="_blank"
-                >
-                  官网
-                </a>
-                看看？
-              </p>
+              <button tw="px-4 py-2 select-none border-transparent shadow text-white bg-indigo-500 font-bold cursor-pointer">
+                赞助我们
+              </button>
+            </div>
 
-              <p tw="text-gray-200 italic float-right">
-                注意：是否向注册成为社区运营实例或开放服务是第三方实例的拥有者的自愿行为，看到此内容并不表示当前实例存在任何问题。
+            <div tw="mt-10 text-gray-800">
+              <span tw="text-2xl font-extrabold">赞助人</span>
+              <p tw="text-lg tracking-wide">
+                感谢这些出色的赞助人，是他们让项目和社区变得更好 ：）
               </p>
             </div>
-          ) : thirdPartiesData ? (
-            <ThirdPartiesTable>
-              <ThirdPartiesThead>
-                <ThirdPartiesTr>
-                  <ThirdPartiesTh tw="w-2/12 rounded-tl">
-                    实例名称
-                  </ThirdPartiesTh>
-                  <ThirdPartiesTh tw="w-5/12">实例描述</ThirdPartiesTh>
-                  <ThirdPartiesTh tw="w-1/12 text-center">
-                    运行天数
-                  </ThirdPartiesTh>
-                  <ThirdPartiesTh tw="w-2/12">机器人用户名</ThirdPartiesTh>
-                  <ThirdPartiesTh tw="w-2/12 rounded-tr">
-                    主页链接
-                  </ThirdPartiesTh>
-                </ThirdPartiesTr>
-              </ThirdPartiesThead>
-              <ThirdPartiesTbody>
-                {thirdPartiesData.third_parties.map((thirdParty, i) => (
-                  <ThirdPartiesTr key={thirdParty.bot_username}>
-                    <ThirdPartiesTd
-                      endRow={i == thirdPartiesData.third_parties.length - 1}
-                      startCol={true}
-                    >
-                      {thirdParty.name}
-                    </ThirdPartiesTd>
-                    <ThirdPartiesTd>
-                      {thirdParty.description || "无"}
-
-                      {thirdPartiesData.official_index == i ? (
-                        <ThirdPartiesTag tw="bg-green-600">
-                          官方实例
-                        </ThirdPartiesTag>
-                      ) : undefined}
-
-                      {thirdPartiesData.official_index == i &&
-                      thirdPartiesData.current_index != i ? (
-                        <ThirdPartiesTag tw="bg-gray-600">
-                          非当前实例
-                        </ThirdPartiesTag>
-                      ) : undefined}
-
-                      {thirdPartiesData.current_index == i ? (
-                        <ThirdPartiesTag tw="bg-blue-600">
-                          当前实例
-                        </ThirdPartiesTag>
-                      ) : undefined}
-                    </ThirdPartiesTd>
-                    <ThirdPartiesTd tw="text-center">
-                      {thirdParty.running_days}
-                    </ThirdPartiesTd>
-                    <ThirdPartiesTd>
-                      <a
-                        tw="text-gray-700 no-underline cursor-pointer select-none"
-                        href={`https://t.me/${thirdParty.bot_username}`}
-                        target="_blank"
-                        onClick={(e) => {
-                          if (thirdPartiesData.official_index != i) {
-                            e.preventDefault();
-
-                            dispatch(
-                              openModal({
-                                content: (
-                                  <ThirdPartyTerm
-                                    instanceName={thirdParty.name}
-                                    botUsername={thirdParty.bot_username}
-                                  />
-                                ),
-                              })
-                            );
+            {sponsorshipHistoriesData ? (
+              <Table>
+                <Thead>
+                  <Tr>
+                    <Th tw="w-2/12 rounded-tl-xl">赞助者</Th>
+                    <Th tw="w-4/12">赞助者简介</Th>
+                    <Th tw="w-4/12">期望用途</Th>
+                    <Th tw="w-1/12 text-center">金额</Th>
+                    <Th tw="w-1/12 text-right rounded-tr-xl">赞助日期</Th>
+                  </Tr>
+                </Thead>
+                <Tbody>
+                  {sponsorshipHistoriesData.sponsorship_histories.map(
+                    (sponsorshipHistory, i) => (
+                      <Tr key={sponsorshipHistory.id}>
+                        <Td
+                          endRow={
+                            i ==
+                            sponsorshipHistoriesData.sponsorship_histories
+                              .length -
+                              1
                           }
-                        }}
-                      >
-                        @{thirdParty.bot_username}
-                      </a>
-                    </ThirdPartiesTd>
-                    <ThirdPartiesTd
-                      tw="truncate"
-                      endRow={i == thirdPartiesData.third_parties.length - 1}
-                      endCol={true}
-                    >
-                      <a
-                        tw="text-gray-700"
-                        href={thirdParty.homepage}
-                        target="_blank"
-                      >
-                        {thirdParty.homepage}
-                      </a>
-                    </ThirdPartiesTd>
-                  </ThirdPartiesTr>
-                ))}
-              </ThirdPartiesTbody>
-            </ThirdPartiesTable>
-          ) : (
-            <span tw="text-gray-200">载入中……</span>
-          )}
-        </UnifiedFlexBox>
-      </div>
+                          startCol={true}
+                        >
+                          {(sponsorshipHistory.sponsor &&
+                            sponsorshipHistory.sponsor.title) ||
+                            "匿名"}
+                        </Td>
+                        <Td>
+                          {(sponsorshipHistory.sponsor &&
+                            sponsorshipHistory.sponsor.introduction) ||
+                            "一群不愿留名的可爱之人"}
+                        </Td>
+                        <Td>{sponsorshipHistory.expected_to}</Td>
+                        <Td tw="text-center">{sponsorshipHistory.amount}</Td>
+                        <Td
+                          tw="text-right"
+                          endRow={
+                            i ==
+                            sponsorshipHistoriesData.sponsorship_histories
+                              .length -
+                              1
+                          }
+                          endCol={true}
+                        >
+                          {formatDateTime(
+                            parseISO(sponsorshipHistory.reached_at),
+                            dateTimeFormat
+                          )}
+                        </Td>
+                      </Tr>
+                    )
+                  )}
+                </Tbody>
+              </Table>
+            ) : undefined}
+          </UnifiedFlexBox>
+        </div>
+      ) : undefined}
     </>
   );
 };

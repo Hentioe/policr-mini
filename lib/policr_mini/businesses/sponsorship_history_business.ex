@@ -13,6 +13,9 @@ defmodule PolicrMini.SponsorshipHistoryBusiness do
 
   @spec create(map) :: written_returns
   def create(params) do
+    params =
+      (params["has_reached"] && Map.put(params, "reached_at", DateTime.utc_now())) || params
+
     %SponsorshipHistory{} |> SponsorshipHistory.changeset(params) |> Repo.insert()
   end
 
@@ -33,6 +36,9 @@ defmodule PolicrMini.SponsorshipHistoryBusiness do
 
   @spec update(SponsorshipHistory.t(), map) :: written_returns
   def update(sponsorship_history, params) do
+    params =
+      (params["has_reached"] && Map.put(params, "reached_at", DateTime.utc_now())) || params
+
     sponsorship_history |> SponsorshipHistory.changeset(params) |> Repo.update()
   end
 
