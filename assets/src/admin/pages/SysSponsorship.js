@@ -67,6 +67,7 @@ const saveSponsorHistory = async ({
   sponsorId,
   amount,
   expectedTo,
+  reachedAt,
   hasReached,
 }) => {
   let endpoint = "/admin/api/sponsorship_histories";
@@ -85,6 +86,7 @@ const saveSponsorHistory = async ({
       sponsor_id: sponsorId,
       amount: amount,
       expected_to: expectedTo,
+      reached_at: reachedAt,
       has_reached: hasReached,
     }),
   }).then((r) => camelizeJson(r));
@@ -129,6 +131,7 @@ export default () => {
   const [editingSponsorContact, setEditingSponsorContact] = useState("");
   const [editingAmount, setEditingAmount] = useState("");
   const [editingExpectedTo, setEditingExpectedTo] = useState("");
+  const [editingReachedAt, setEditingReachedAt] = useState("");
   const [editingHasReached, setEditingHasReached] = useState(
     hasReachedOptions[0]
   );
@@ -145,6 +148,7 @@ export default () => {
     setEditingSponsorHomepage("");
     setEditingAmount("");
     setEditingExpectedTo("");
+    setEditingReachedAt("");
     setEditingHasReached(hasReachedOptions[0]);
   };
   const handleCancelEditing = () => initEditingContent();
@@ -168,6 +172,8 @@ export default () => {
   const handleEditingAmountChange = (e) => setEditingAmount(e.target.value);
   const handleEditingExpectedToChange = (e) =>
     setEditingExpectedTo(e.target.value.trim());
+  const handleEditingReachedAtChange = (e) =>
+    setEditingReachedAt(e.target.value.trim());
   const handleEditingHasReachedChange = (option) =>
     setEditingHasReached(option);
 
@@ -208,6 +214,7 @@ export default () => {
           (editingSelectedSponsor && editingSelectedSponsor.value) || null,
         amount: editingAmount,
         expectedTo: editingExpectedTo,
+        reachedAt: editingReachedAt,
         hasReached: editingHasReached.value,
       });
 
@@ -228,6 +235,7 @@ export default () => {
       editingSponsorContact,
       editingAmount,
       editingExpectedTo,
+      editingReachedAt,
       editingHasReached,
     ]
   );
@@ -257,6 +265,7 @@ export default () => {
       }
       setEditingAmount(sponsorshipHistory.amount);
       setEditingExpectedTo(sponsorshipHistory.expectedTo || "");
+      setEditingReachedAt(sponsorshipHistory.reachedAt);
       setEditingHasReached(
         sponsorshipHistory.hasReached
           ? hasReachedOptions[1]
@@ -452,6 +461,14 @@ export default () => {
                       tw="w-full lg:w-9/12"
                       value={editingExpectedTo}
                       onChange={handleEditingExpectedToChange}
+                    />
+                  </FormSection>
+                  <FormSection>
+                    <FormLable>达成日期</FormLable>
+                    <FormInput
+                      tw="w-full lg:w-9/12"
+                      value={editingReachedAt}
+                      onChange={handleEditingReachedAtChange}
                     />
                   </FormSection>
                   <FormSection>
