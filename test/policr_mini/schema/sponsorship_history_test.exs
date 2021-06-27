@@ -27,7 +27,7 @@ defmodule PolicrMini.Schema.SponsorshipHistoryTest do
   test "changeset/2" do
     sponsor_history = Factory.build(:sponsorship_history)
 
-    now_dt = DateTime.truncate(DateTime.utc_now(), :second)
+    now_dt = DateTime.truncate(DateTime.add(DateTime.utc_now(), 1), :second)
 
     updated_expected_to = "替作者买单一份外卖"
     updated_amount = 35
