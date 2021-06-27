@@ -30,6 +30,7 @@ import {
   SysTerminalPage,
   SysThirdPartiesPage,
   SysTermsPage,
+  SysSponsorshipHistoriesPage,
 } from "./admin/pages";
 
 import Reducers from "./admin/reducers";
@@ -105,6 +106,9 @@ const App = () => {
                     </Route>
                     <Route path="/admin/sys/third_parties">
                       <SysThirdPartiesPage />
+                    </Route>
+                    <Route path="/admin/sys/sponsorship_histories">
+                      <SysSponsorshipHistoriesPage />
                     </Route>
                   </Switch>
                 </div>

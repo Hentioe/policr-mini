@@ -365,6 +365,16 @@ export default () => {
         />
         {!_GLOBAL.isThirdParty ? (
           <NavItem
+            title="赞助记录"
+            href="/admin/sys/sponsorship_histories"
+            selected={isSysLink({
+              path: location.pathname,
+              page: "sponsorship_histories",
+            })}
+          />
+        ) : undefined}
+        {!_GLOBAL.isThirdParty ? (
+          <NavItem
             title="第三方实例"
             href="/admin/sys/third_parties"
             selected={isSysLink({

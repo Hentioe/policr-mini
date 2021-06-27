@@ -11,7 +11,7 @@ defmodule PolicrMini.SponsorBusiness do
 
   @spec create(map) :: written_returns
   def create(params) do
-    %Sponsor{} |> Sponsor.changeset(params) |> Repo.insert()
+    %Sponsor{uuid: UUID.uuid4()} |> Sponsor.changeset(params) |> Repo.insert()
   end
 
   @spec update(Sponsor.t(), map) :: written_returns

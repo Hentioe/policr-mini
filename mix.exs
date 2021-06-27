@@ -68,7 +68,8 @@ defmodule PolicrMini.MixProject do
       {:cachex, "~> 3.4"},
       {:httpoison, "~> 1.8"},
       {:proper_case, "~> 1.3"},
-      {:earmark, "~> 1.4"}
+      {:earmark, "~> 1.4"},
+      {:elixir_uuid, "~> 1.2"}
     ]
   end
 

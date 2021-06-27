@@ -72,6 +72,11 @@ defmodule PolicrMiniWeb.Router do
     put "/terms", TermController, :add_or_update
     delete "/terms", TermController, :delete
     post "/terms/preview", TermController, :preview
+
+    get "/sponsorship_histories", SponsorshipHistoryController, :index
+    post "/sponsorship_histories", SponsorshipHistoryController, :add
+    put "/sponsorship_histories/:id", SponsorshipHistoryController, :update
+    delete "/sponsorship_histories/:id", SponsorshipHistoryController, :delete
   end
 
   scope "/admin", PolicrMiniWeb.Admin do
