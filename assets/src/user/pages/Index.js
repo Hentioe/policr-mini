@@ -541,9 +541,9 @@ export default () => {
                             "匿名"}
                         </Td>
                         <Td>
-                          {(sponsorshipHistory.sponsor &&
-                            sponsorshipHistory.sponsor.introduction) ||
-                            "一群不愿留名的可爱之人"}
+                          {sponsorshipHistory.sponsor
+                            ? sponsorshipHistory.sponsor.introduction || "无"
+                            : "一群不愿留名的可爱之人"}
                         </Td>
                         <Td>{sponsorshipHistory.expected_to}</Td>
                         <Td tw="text-center">{sponsorshipHistory.amount}</Td>
