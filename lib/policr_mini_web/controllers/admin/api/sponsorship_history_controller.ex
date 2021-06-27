@@ -42,6 +42,15 @@ defmodule PolicrMiniWeb.Admin.API.SponsorshipHistoryController do
     end
   end
 
+  def update(conn, %{"id" => id, "sponsor" => sponsor} = params) when sponsor != nil do
+    with {:ok, _} <- check_sys_permissions(conn),
+         {:ok, sponsorship_history} <- SponsorshipHistoryBusiness.get(id),
+         {:ok, sponsorship_history} <-
+           SponsorshipHistoryBusiness.update_with_create_sponsor(sponsorship_history, params) do
+      render(conn, "sponsorship_history.json", %{sponsorship_history: sponsorship_history})
+    end
+  end
+
   def update(conn, %{"id" => id} = params) do
     with {:ok, _} <- check_sys_permissions(conn),
          {:ok, sponsorship_history} <- SponsorshipHistoryBusiness.get(id),

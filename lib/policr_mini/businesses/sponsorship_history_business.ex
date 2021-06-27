@@ -16,6 +16,7 @@ defmodule PolicrMini.SponsorshipHistoryBusiness do
     %SponsorshipHistory{} |> SponsorshipHistory.changeset(params) |> Repo.insert()
   end
 
+  # TODO: 添加测试。
   @spec create_with_sponsor(map) :: {:ok, SponsorshipHistory.t()} | {:error, any}
   def create_with_sponsor(params) do
     sponsor = params["sponsor"]
@@ -33,6 +34,23 @@ defmodule PolicrMini.SponsorshipHistoryBusiness do
   @spec update(SponsorshipHistory.t(), map) :: written_returns
   def update(sponsorship_history, params) do
     sponsorship_history |> SponsorshipHistory.changeset(params) |> Repo.update()
+  end
+
+  # TODO: 添加测试。
+  @spec update_with_create_sponsor(SponsorshipHistory.t(), map) ::
+          {:ok, SponsorshipHistory.t()} | {:error, any}
+  def update_with_create_sponsor(sponsorship_history, params) do
+    sponsor = params["sponsor"]
+
+    Repo.transaction(fn ->
+      with {:ok, sponsor} <- SponsorBusiness.create(sponsor),
+           {:ok, sponsorship_history} <-
+             update(sponsorship_history, Map.put(params, "sponsor_id", sponsor.id)) do
+        sponsorship_history
+      else
+        e -> e
+      end
+    end)
   end
 
   def delete(sponsorship_history) when is_struct(sponsorship_history, SponsorshipHistory) do
