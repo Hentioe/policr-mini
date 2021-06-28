@@ -17,6 +17,7 @@ defmodule PolicrMiniBot.Supervisor do
     RespPingCmdPlug,
     RespSyncCmdPlug,
     RespLoginCmdPlug,
+    RespSponsorshipCmdPlug,
     HandleUserJoinedCleanupPlug,
     HandleMemberRemovedPlug,
     HandleNewChatTitlePlug,
@@ -42,6 +43,7 @@ defmodule PolicrMiniBot.Supervisor do
       RespPingCmdPlug,
       RespSyncCmdPlug,
       RespLoginCmdPlug,
+      RespSponsorshipCmdPlug,
       # ↓此模块↓ 需保证安装在 `InitUserJoinedActionPlug` 模块的后面。
       HandleUserJoinedGroupPlug,
       HandleUserLeftedGroupPlug,
