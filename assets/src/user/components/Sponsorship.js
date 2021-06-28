@@ -124,7 +124,7 @@ export default ({ hints = [], token = null }) => {
 
   const handleSaveClick = useCallback(async () => {
     if (isEmpty(editingToken)) {
-      setErrorMsg("未填写赞助令牌。");
+      setErrorMsg("未填写赞助口令。");
       return;
     }
 
@@ -189,15 +189,15 @@ export default ({ hints = [], token = null }) => {
           <>
             <form tw="flex flex-col">
               <FormLine>
-                <FormLabel>赞助令牌</FormLabel>
+                <FormLabel>赞助口令</FormLabel>
                 <FormInput
                   value={editingToken || ""}
                   onChange={handleEditingTokenChange}
                 />
               </FormLine>
               <FromHint>
-                为避免攻击并关联创建人，需私聊机器人 <code>/sponsorship</code>{" "}
-                命令获取令牌
+                为防御攻击并关联创建人，需私聊机器人 <code>/sponsorship</code>{" "}
+                命令获取口令
               </FromHint>
               {isUseUuid ? (
                 <>

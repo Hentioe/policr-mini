@@ -100,12 +100,12 @@ defmodule PolicrMiniWeb.API.SponsorshipHistoryController do
         {:ok, chat_id}
       end
     else
-      {:error, %{description: "赞助令牌无效或已失效"}}
+      {:error, %{description: "赞助口令无效或已失效"}}
     end
   end
 
   defp check_token(_params) do
-    {:error, %{description: "缺少赞助令牌参数"}}
+    {:error, %{description: "缺少赞助口令参数"}}
   end
 
   defp build_speed_limit_key(chat_id), do: "sponsorship-#{chat_id}"

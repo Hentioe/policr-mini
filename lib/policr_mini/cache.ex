@@ -14,7 +14,7 @@ defmodule PolicrMini.Cache do
         id: :photo_cache,
         start: {Cachex, :start_link, [:photo, []]}
       },
-      # 赞助令牌的缓存。
+      # 赞助口令的缓存。
       %{
         id: :sponsorship_cache,
         start: {Cachex, :start_link, [:sponsorship, []]}
