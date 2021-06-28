@@ -208,8 +208,8 @@ export default () => {
             </span>
             <br />
           </p>
-          <p tw="text-sm md:text-lg text-center md:text-left font-normal md:font-bold tracking-wide mr-0 lg:mr-10">
-            <span tw="text-gray-600">
+          <p tw="text-sm md:text-lg text-center md:text-left font-normal md:font-bold tracking-wider mr-0 lg:mr-10">
+            <span tw="text-gray-700">
               本项目从 Policr
               机器人的开发和运营过程中吸取了丰富的经验，设计更加现代，功能单一不膨胀。在未来的更新过程中也只会继续改进核心功能和优化体验，本质保持不变。
             </span>
@@ -526,11 +526,11 @@ export default () => {
             <GradientTitle>投资并获得回报</GradientTitle>
             <p tw="text-xl font-bold tracking-wide">
               <span tw="text-gray-900">
-                赞助您的团队所依赖的以建立业务的开源软件和服务。
+                赞助您的团队依赖以建立业务的开源软件和服务。
               </span>
               <br />
               <span tw="text-gray-600">
-                资助开发者，可降低运营和开发消耗的个人成本。提高项目的性能和完成度，以及服务的可靠性。
+                资助开发者，可降低开发和运营消耗的个人成本，提高项目的完成度和性能以及服务的可靠性。
               </span>
             </p>
 
