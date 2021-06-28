@@ -21,6 +21,7 @@
     "date-fns": "^2.15.0",
     "lodash": "^4.17.21",
     "mdn-polyfills": "^5.20.0",
+    "query-string": "^7.0.1",
     "react": "^16.13.1",
     "react-dom": "^16.13.1",
     "react-helmet-async": "^1.0.6",
