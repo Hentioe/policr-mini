@@ -1,8 +1,10 @@
-import React from "react";
+import React, { useEffect, useRef } from "react";
 import tw, { styled } from "twin.macro";
 import useSWR from "swr";
 import { useDispatch } from "react-redux";
 import { parseISO, format as formatDateTime } from "date-fns";
+import { useLocation } from "react-router-dom";
+import queryString from "query-string";
 
 import { open as openModal } from "../slices/modal";
 import {
@@ -146,6 +148,8 @@ const makeThirdPartiesEndpoint = () => {
 };
 
 export default () => {
+  const location = useLocation();
+
   const { data: indexData, error: indexError } = useSWR("/api/index", fetcher);
   const { data: thirdPartiesData, error: thirdPartiesError } = useSWR(
     makeThirdPartiesEndpoint(),
@@ -154,6 +158,13 @@ export default () => {
   const { data: sponsorshipHistoriesData, error: sponsorshipHistoriesError } =
     useSWR("/api/sponsorship_histories", fetcher);
 
+  const prevSponsorshipHistoriesDataRef = useRef();
+  const prevSponsorshipHistoriesData = prevSponsorshipHistoriesDataRef.current;
+
+  useEffect(() => {
+    prevSponsorshipHistoriesDataRef.current = sponsorshipHistoriesData;
+  });
+
   const dispatch = useDispatch();
 
   if (indexError)
@@ -161,6 +172,28 @@ export default () => {
 
   const index = indexData || initialIndexData;
   const passRate = calculatePassRate(index);
+
+  useEffect(() => {
+    const params = queryString.parse(location.search);
+    const sponsorshipToken = params.sponsorship;
+
+    if (
+      sponsorshipToken &&
+      sponsorshipHistoriesData &&
+      !prevSponsorshipHistoriesData
+    ) {
+      dispatch(
+        openModal({
+          content: (
+            <Sponsorship
+              token={sponsorshipToken}
+              hints={sponsorshipHistoriesData.hints}
+            />
+          ),
+        })
+      );
+    }
+  }, [location, sponsorshipHistoriesData]);
 
   return (
     <>

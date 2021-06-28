@@ -47,6 +47,7 @@ const hintsToSelectOptions = (hints) =>
   }));
 
 const saveSponsorshipHistory = async ({
+  token,
   uuid,
   sponsor,
   expectedTo,
@@ -60,6 +61,7 @@ const saveSponsorshipHistory = async ({
       "Content-Type": "application/json",
     },
     body: JSON.stringify({
+      token: token,
       uuid: uuid,
       sponsor: sponsor,
       expected_to: expectedTo,
@@ -68,10 +70,13 @@ const saveSponsorshipHistory = async ({
   }).then((r) => camelizeJson(r));
 };
 
-export default ({ hints = [] }) => {
+const isEmpty = (value) => value == null || value.toString().trim() == "";
+
+export default ({ hints = [], token = null }) => {
   const dispatch = useDispatch();
 
   const [isUseUuid, setIsUseUuid] = useState(false);
+  const [editingToken, setEditingToken] = useState(token);
   const [editingUuid, setEditingUuid] = useState(null);
   const [editingSponsorTitle, setEditingSponsorTitle] = useState(null);
   const [editingSponsorContact, setEditingSponsorContact] = useState(null);
@@ -92,6 +97,8 @@ export default ({ hints = [] }) => {
   });
 
   const handleEditingUuidChange = (e) => setEditingUuid(e.target.value.trim());
+  const handleEditingTokenChange = (e) =>
+    setEditingToken(e.target.value.trim());
   const handleEditingSponsorTitleChange = (e) =>
     setEditingSponsorTitle(e.target.value.trim());
   const handleEditingSponsorContactChange = (e) =>
@@ -116,10 +123,14 @@ export default ({ hints = [] }) => {
   const handleCloseClick = () => dispatch(close());
 
   const handleSaveClick = useCallback(async () => {
+    if (isEmpty(editingToken)) {
+      setErrorMsg("未填写赞助令牌。");
+      return;
+    }
+
     if (
-      editingUuid == null &&
-      editingSponsorTitle == null &&
-      editingSponsorContact == null
+      isEmpty(editingUuid) &&
+      (isEmpty(editingSponsorTitle) || isEmpty(editingSponsorContact))
     ) {
       setErrorMsg("未填写必要的赞助者信息。");
       return;
@@ -130,7 +141,7 @@ export default ({ hints = [] }) => {
       return;
     }
 
-    if (editingAmount == null) {
+    if (isEmpty(editingAmount)) {
       setErrorMsg("未填写赞助金额。");
       return;
     }
@@ -138,6 +149,7 @@ export default ({ hints = [] }) => {
     setErrorMsg(null);
 
     const result = await saveSponsorshipHistory({
+      token: editingToken,
       uuid: editingUuid,
       sponsor: {
         title: editingSponsorTitle,
@@ -157,6 +169,7 @@ export default ({ hints = [] }) => {
       setSuccessedUuid(editingUuid || result.uuid);
     }
   }, [
+    editingToken,
     editingUuid,
     editingSponsorTitle,
     editingSponsorContact,
@@ -167,7 +180,7 @@ export default ({ hints = [] }) => {
   ]);
 
   return (
-    <div tw="w-96 md:w-110 p-4 bg-white rounded-lg">
+    <div tw="w-80 md:w-110 p-4 bg-white rounded-lg">
       <header tw="text-center border-0 border-b border-solid border-gray-400 pb-3">
         <span tw="text-lg font-bold">赞助此项目</span>
       </header>
@@ -175,6 +188,17 @@ export default ({ hints = [] }) => {
         {!postSuccessed ? (
           <>
             <form tw="flex flex-col">
+              <FormLine>
+                <FormLabel>赞助令牌</FormLabel>
+                <FormInput
+                  value={editingToken || ""}
+                  onChange={handleEditingTokenChange}
+                />
+              </FormLine>
+              <FromHint>
+                为避免攻击，需私聊机器人 <code>/sponsorship_token</code>{" "}
+                命令获取令牌
+              </FromHint>
               {isUseUuid ? (
                 <>
                   <FormLine>

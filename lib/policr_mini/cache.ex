@@ -9,10 +9,15 @@ defmodule PolicrMini.Cache do
 
   def init(_init_arg) do
     children = [
-      # 群头像缓存
+      # 群头像的缓存。
       %{
         id: :photo_cache,
         start: {Cachex, :start_link, [:photo, []]}
+      },
+      # 赞助令牌的缓存。
+      %{
+        id: :sponsorship_cache,
+        start: {Cachex, :start_link, [:sponsorship, []]}
       }
     ]
 
