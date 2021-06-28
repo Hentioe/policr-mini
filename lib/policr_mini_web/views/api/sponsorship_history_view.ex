@@ -11,7 +11,15 @@ defmodule PolicrMiniWeb.API.SponsorshipHistoryView do
       render_one(sponsorship_history.sponsor, PolicrMiniWeb.API.SponsorView, "sponsor.json")
 
     sponsorship_history
-    |> Map.drop([:__meta__, :sponsor])
+    |> Map.drop([
+      :__meta__,
+      :sponsor,
+      :creator,
+      :inserted_at,
+      :updated_at,
+      :sponsor_id,
+      :has_reached
+    ])
     |> Map.from_struct()
     |> Map.put(:sponsor, sponsor)
   end
