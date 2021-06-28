@@ -247,7 +247,7 @@ export default ({ hints = [], token = null }) => {
                       onChange={handleEditingSponsorIntroductionChange}
                     />
                   </FormLine>
-                  <FromHint>可用作企业产品的作宣传介绍或个人自我介绍</FromHint>
+                  <FromHint>可用作企业产品的宣传介绍或个人自我介绍</FromHint>
                 </>
               )}
               <FormLine>
