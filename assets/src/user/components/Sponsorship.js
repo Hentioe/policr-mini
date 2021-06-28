@@ -196,7 +196,7 @@ export default ({ hints = [], token = null }) => {
                 />
               </FormLine>
               <FromHint>
-                为避免攻击，需私聊机器人 <code>/sponsorship_token</code>{" "}
+                为避免攻击并关联创建人，需私聊机器人 <code>/sponsorship</code>{" "}
                 命令获取令牌
               </FromHint>
               {isUseUuid ? (
