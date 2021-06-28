@@ -16,6 +16,7 @@ defmodule PolicrMini.Schema.SponsorshipHistoryTest do
                  :amount,
                  :has_reached,
                  :reached_at,
+                 :creator,
                  :inserted_at,
                  :updated_at
                ]
