@@ -69,7 +69,8 @@ defmodule PolicrMini.MixProject do
       {:httpoison, "~> 1.8"},
       {:proper_case, "~> 1.3"},
       {:earmark, "~> 1.4"},
-      {:elixir_uuid, "~> 1.2"}
+      {:elixir_uuid, "~> 1.2"},
+      {:not_qwerty123, "~> 2.3"}
     ]
   end
 
