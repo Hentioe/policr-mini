@@ -32,7 +32,12 @@ config :policr_mini, PolicrMiniWeb.Endpoint,
   secret_key_base: secret_key_base,
   server: true
 
-# 配置根链接
+# 配置是否自动生成命令。
+config :policr_mini, PolicrMiniBot,
+  auto_gen_commands:
+    String.to_existing_atom(System.get_env("POLICR_MINI_BOT_AUTO_GEN_COMMANDS") || "false")
+
+# 配置根链接。
 config :policr_mini, PolicrMiniWeb,
   root_url:
     System.get_env("POLICR_MINI_SERVER_ROOT_URL") ||

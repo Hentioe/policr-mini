@@ -18,13 +18,16 @@ config :policr_mini, PolicrMiniWeb.Endpoint,
   pubsub_server: PolicrMini.PubSub,
   live_view: [signing_salt: "hy+GpqGC"]
 
-# 配置根链接
+# 配置是否自动生成命令。
+config :policr_mini, PolicrMiniBot, auto_gen_commands: false
+
+# 配置根链接。
 config :policr_mini, PolicrMiniWeb, root_url: "http://0.0.0.0:4000/"
 
-# 配置图片服务
+# 配置图片服务。
 config :policr_mini, PolicrMiniBot.ImageProvider, path: "images"
 
-# 任务调度配置
+# 任务调度配置。
 config :policr_mini, PolicrMiniBot.Scheduler,
   jobs: [
     # 修正过期验证任务

@@ -28,6 +28,10 @@ defmodule PolicrMiniBot.UpdatesPoller do
     :ets.insert(:bot_info, {:username, username})
     :ets.insert(:bot_info, {:name, name})
 
+    if Application.get_env(:policr_mini, PolicrMiniBot)[:auto_gen_commands] do
+      {:ok, _} = username |> gen_commands() |> Telegex.set_my_commands()
+    end
+
     GenServer.start_link(__MODULE__, %{offset: 0}, name: __MODULE__)
   end
 
@@ -88,5 +92,36 @@ defmodule PolicrMiniBot.UpdatesPoller do
 
   defp schedule_pull_updates do
     send(self(), :pull)
+  end
+
+  defp gen_commands(username) do
+    alias Telegex.Model.BotCommand
+
+    commands = [
+      %BotCommand{
+        command: "ping",
+        description: "存活测试"
+      },
+      %BotCommand{
+        command: "sync",
+        description: "同步群数据"
+      },
+      %BotCommand{
+        command: "login",
+        description: "登入后台"
+      }
+    ]
+
+    if username in PolicrMiniBot.official_bots() do
+      commands ++
+        [
+          %BotCommand{
+            command: "sponsorship",
+            description: "赞助此项目（辅助提交赞助表单）"
+          }
+        ]
+    else
+      commands
+    end
   end
 end
