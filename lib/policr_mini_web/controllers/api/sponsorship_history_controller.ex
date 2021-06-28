@@ -43,7 +43,7 @@ defmodule PolicrMiniWeb.API.SponsorshipHistoryController do
     with {:ok, sponsor} <- find_sponsor_by_uuid(uuid),
          {:ok, params} <- preprocessing_params(Map.put(params, "sponsor_id", sponsor.id)),
          {:ok, sponsorship_history} <- SponsorshipHistoryBusiness.create(params) do
-      render(conn, "sponsorship_history.json", %{sponsorship_history: sponsorship_history})
+      render(conn, "added.json", %{sponsorship_history: sponsorship_history, uuid: uuid})
     end
   end
 
@@ -51,7 +51,10 @@ defmodule PolicrMiniWeb.API.SponsorshipHistoryController do
     with {:ok, params} <- preprocessing_params(params),
          {:ok, sponsorship_history} <-
            SponsorshipHistoryBusiness.create_with_sponsor(params) do
-      render(conn, "sponsorship_history.json", %{sponsorship_history: sponsorship_history})
+      render(conn, "added.json", %{
+        sponsorship_history: sponsorship_history,
+        uuid: sponsorship_history.sponsor.uuid
+      })
     end
   end
 

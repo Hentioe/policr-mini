@@ -16,6 +16,12 @@ defmodule PolicrMiniWeb.API.SponsorshipHistoryView do
     |> Map.put(:sponsor, sponsor)
   end
 
+  def render("added.json", %{sponsorship_history: sponsorship_history, uuid: uuid}) do
+    sponsorship_history = render_one(sponsorship_history, __MODULE__, "sponsorship_history.json")
+
+    %{sponsorship_history: sponsorship_history, uuid: uuid}
+  end
+
   def render("index.json", %{
         sponsorship_histories: sponsorship_histories,
         hints: hints

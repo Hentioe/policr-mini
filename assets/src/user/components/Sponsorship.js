@@ -154,7 +154,7 @@ export default ({ hints = [] }) => {
       setErrorMsg(errorsToString(result.errors));
     } else {
       setPostSuccessed(true);
-      setSuccessedUuid(editingUuid || result.sponsor.uuid);
+      setSuccessedUuid(editingUuid || result.uuid);
     }
   }, [
     editingUuid,
