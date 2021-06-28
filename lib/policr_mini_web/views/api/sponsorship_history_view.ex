@@ -8,7 +8,7 @@ defmodule PolicrMiniWeb.API.SponsorshipHistoryView do
   @spec render(String.t(), map()) :: map()
   def render("sponsorship_history.json", %{sponsorship_history: sponsorship_history}) do
     sponsor =
-      render_one(sponsorship_history.sponsor, PolicrMiniWeb.Admin.API.SponsorView, "sponsor.json")
+      render_one(sponsorship_history.sponsor, PolicrMiniWeb.API.SponsorView, "sponsor.json")
 
     sponsorship_history
     |> Map.drop([:__meta__, :sponsor])

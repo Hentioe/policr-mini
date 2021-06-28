@@ -5,7 +5,7 @@ defmodule PolicrMini.SponsorBusiness do
 
   use PolicrMini, business: PolicrMini.Schema.Sponsor
 
-  import Ecto.Query, only: [from: 2]
+  import Ecto.Query, only: [from: 2, dynamic: 2]
 
   @type written_returns :: {:ok, Sponsor.t()} | {:error, Ecto.Changeset.t()}
 
@@ -27,5 +27,17 @@ defmodule PolicrMini.SponsorBusiness do
   def find_list(_find_list_conts \\ []) do
     from(s in Sponsor, order_by: [desc: s.updated_at])
     |> Repo.all()
+  end
+
+  @type find_conts :: [{:uuid, binary}]
+
+  # TODO: 添加测试。
+  @spec find(find_conts) :: Sponsor.t() | nil
+  def find(conts \\ []) do
+    uuid = Keyword.get(conts, :uuid)
+
+    filter_uuid = (uuid && dynamic([s], s.uuid == ^uuid)) || true
+
+    from(s in Sponsor, where: ^filter_uuid) |> Repo.one()
   end
 end

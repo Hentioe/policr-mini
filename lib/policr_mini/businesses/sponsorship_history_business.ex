@@ -35,7 +35,7 @@ defmodule PolicrMini.SponsorshipHistoryBusiness do
     Repo.transaction(fn ->
       with {:ok, sponsor} <- SponsorBusiness.create(sponsor),
            {:ok, sponsorship_history} <- create(Map.put(params, "sponsor_id", sponsor.id)) do
-        sponsorship_history
+        Map.put(sponsorship_history, :sponsor, sponsor)
       else
         e -> e
       end
@@ -59,7 +59,7 @@ defmodule PolicrMini.SponsorshipHistoryBusiness do
       with {:ok, sponsor} <- SponsorBusiness.create(sponsor),
            {:ok, sponsorship_history} <-
              update(sponsorship_history, Map.put(params, "sponsor_id", sponsor.id)) do
-        sponsorship_history
+        Map.put(sponsorship_history, :sponsor, sponsor)
       else
         e -> e
       end

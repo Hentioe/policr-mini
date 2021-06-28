@@ -125,6 +125,10 @@ module.exports = {
       borderColor: {
         "input-active": "rgb(38, 132, 255)",
       },
+      spacing: {
+        100: "28rem",
+        110: "36rem",
+      },
     },
   },
   variants: {},

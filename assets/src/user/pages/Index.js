@@ -11,6 +11,7 @@ import {
   UnifiedFlexBox,
   Confirm,
   ThirdPartyTerm,
+  Sponsorship,
 } from "../components";
 
 const dateTimeFormat = "yyyy-MM-dd";
@@ -501,7 +502,18 @@ export default () => {
             </p>
 
             <div>
-              <button tw="px-4 py-2 select-none border-transparent shadow text-white bg-indigo-500 font-bold cursor-pointer">
+              <button
+                tw="px-4 py-2 select-none border-transparent shadow text-white bg-indigo-500 font-bold cursor-pointer"
+                onClick={() =>
+                  dispatch(
+                    openModal({
+                      content: (
+                        <Sponsorship hints={sponsorshipHistoriesData.hints} />
+                      ),
+                    })
+                  )
+                }
+              >
                 赞助我们
               </button>
             </div>

@@ -30,6 +30,7 @@ defmodule PolicrMiniWeb.Router do
     get "/third_parties", ThirdPartyController, :index
     get "/terms", TermController, :index
     get "/sponsorship_histories", SponsorshipHistoryController, :index
+    post "/sponsorship_histories", SponsorshipHistoryController, :add
   end
 
   scope "/admin/api", PolicrMiniWeb.Admin.API do

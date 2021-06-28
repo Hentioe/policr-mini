@@ -6,6 +6,7 @@ import { UnifiedBox, UnifiedFlexBox } from "./components/Unified";
 import Confirm from "./components/Confirm";
 import ModalContainer from "./components/ModalContainer";
 import ThirdPartyTerm from "./components/ThirdPartyTerm";
+import Sponsorship from "./components/Sponsorship";
 
 export {
   Title,
@@ -18,4 +19,5 @@ export {
   ModalContainer,
   Confirm,
   ThirdPartyTerm,
+  Sponsorship,
 };
