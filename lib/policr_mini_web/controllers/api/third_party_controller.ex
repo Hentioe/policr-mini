@@ -34,7 +34,9 @@ defmodule PolicrMiniWeb.API.ThirdPartyController do
             third_parties
             |> Enum.with_index()
             |> Enum.find(fn {third_party, _} ->
-              referer == PolicrMiniWeb.handle_url(third_party.homepage, has_end_slash: true)
+              homepage = PolicrMiniWeb.handle_url(third_party.homepage, has_end_slash: true)
+
+              String.starts_with?(referer, homepage)
             end)
 
           if r do
