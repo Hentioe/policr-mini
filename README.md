@@ -7,6 +7,8 @@
 
 一个只保留本质功能的 Policr 精简版。
 
+[加入群组](https://mini.telestd.me/community) | [更新频道](https://t.me/policr_changelog) | [自行部署](https://github.com/Hentioe/policr-mini/wiki/%E8%87%AA%E8%A1%8C%E9%83%A8%E7%BD%B2%EF%BC%88%E6%9E%84%E5%BB%BA%E7%AC%AC%E4%B8%89%E6%96%B9%E5%AE%9E%E4%BE%8B%EF%BC%89) | [注册实例](https://github.com/Hentioe/policr-mini/issues/115) | [赞助项目](https://mini.telestd.me/?sponsorship=[谢谢，请获取我])
+
 ## 介绍
 
 本项目是作为 Policr 机器人的临时替代品而诞生，最小化的实现了核心功能。
@@ -25,11 +27,6 @@
 本项目使用 Elixir 语言开发，具备 Erlang 系统一切优点。为了在开发过程中更轻易的从根源解决问题，作者本人从零开发了 TG bot 库（[Telegex](https://github.com/Hentioe/telegex)），并基于该库构建了本项目。
 
 作为 [Telegex](https://github.com/Hentioe/telegex) 的现实案例，从事实上证明了它可以让机器人足够可靠、稳定的运行。 并且 [Telegex](https://github.com/Hentioe/telegex) 相较于早已存在的多个同类库，仍然具有更正确、完整的支持，更加优雅的实现等优点。
-
-## 参与贡献
-
-- [加入社区](https://github.com/Hentioe/policr-mini/issues/115)
-- [赞助项目](https://mini.telestd.me/?sponsorship=[谢谢，请获取我])
 
 ## 关注我们
 
