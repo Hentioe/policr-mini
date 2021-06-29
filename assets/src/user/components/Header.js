@@ -55,6 +55,36 @@ const buildPageContentMissingConfirm = ({ title }) => (
   </Confirm>
 );
 
+const GradientText = styled.span`
+  -webkit-text-fill-color: transparent;
+  background: -webkit-linear-gradient(-70deg, #00F9FF, #0081FF);
+  -webkit-background-clip: text;
+`;
+
+const LogoContainer = styled.div`
+  ${tw`text-lg md:text-xl font-bold text-blue-500 tracking-wide uppercase`}
+
+  &:after {
+    content: "${_GLOBAL.isThirdParty ? thirdParty : version}";
+    color: #FF5733;
+    font-size: 0.5rem;
+    font-weight: 600;
+    top: -0.25rem;
+    text-transform: lowercase;
+    position: absolute;
+    margin-left: 4px;
+  }
+  position: relative;
+`;
+
+const GradientLogo = ({ children }) => {
+  return (
+    <LogoContainer>
+      <GradientText>{children}</GradientText>
+    </LogoContainer>
+  );
+};
+
 // 参考来源：https://tailwindcomponents.com/component/simple-responsive-navigation-bar-1
 export default () => {
   const dispatch = useDispatch();
@@ -63,12 +93,7 @@ export default () => {
     <nav tw="flex items-center bg-white p-2 md:p-3 flex-wrap">
       {/* LOGO&主页链接 */}
       <Link href="/" tw="p-0 md:p-1 lg:p-2 mr-4 inline-flex items-center">
-        <span tw="text-lg md:text-xl font-bold text-blue-500 tracking-wide uppercase">
-          {_GLOBAL.botName || _GLOBAL.botFirstName}
-        </span>
-        <LogoMarkup tw="self-end">
-          {_GLOBAL.isThirdParty ? thirdParty : version}
-        </LogoMarkup>
+        <GradientLogo>{_GLOBAL.botName || _GLOBAL.botFirstName}</GradientLogo>
       </Link>
       {/* 参考按钮实现：https://tailwindui.com/components/application-ui/navigation/navbars */}
       {/* 展开/隐藏菜单按钮 */}

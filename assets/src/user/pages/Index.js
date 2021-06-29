@@ -199,11 +199,10 @@ export default () => {
         {/* 左边主要内容区域 */}
         <div tw="w-full lg:w-8/12">
           <GradientTitle>免费可自行部署的开源验证机器人</GradientTitle>
-          <p tw="text-base md:text-lg text-center md:text-left md:text-xl font-bold tracking-wide">
+          <p tw="text-base md:text-2xl text-center md:text-left font-bold tracking-wide">
             <span tw="text-gray-900">
               使用本机器人改善群内环境，避免垃圾帐号的骚扰。
             </span>
-            <br />
           </p>
           <p tw="text-sm md:text-lg text-center md:text-left font-normal md:font-bold tracking-wider mr-0 lg:mr-10">
             <span tw="text-gray-700">
@@ -216,17 +215,26 @@ export default () => {
             <div tw="w-full lg:w-7/12 flex">
               <div tw="flex-1 flex flex-col lg:pr-10">
                 <div tw="flex-1 self-start">
-                  <span tw="text-blue-600 font-bold tracking-wider">
+                  <span
+                    style={{ color: "#1883FF" }}
+                    tw="font-bold tracking-wider"
+                  >
                     「已进行
                   </span>
                 </div>
                 <div tw="flex-1 self-center">
-                  <Paragraph tw="text-6xl font-extrabold text-red-400 text-center underline">
+                  <Paragraph
+                    style={{ color: "#F04E3E" }}
+                    tw="text-6xl font-extrabold text-center underline"
+                  >
                     {index.totals.verification_all}
                   </Paragraph>
                 </div>
                 <div tw="flex-1 self-end">
-                  <span tw="float-right text-blue-600 font-bold tracking-wider">
+                  <span
+                    style={{ color: "#1883FF" }}
+                    tw="float-right font-bold tracking-wider"
+                  >
                     次验证」
                   </span>
                 </div>
@@ -251,13 +259,17 @@ export default () => {
             </div>
             {/* 主要功能简介与导航 */}
             <div tw="hidden w-full lg:w-5/12 lg:flex flex-col">
-              <div tw="py-3 flex-1 border-solid border-0 lg:border-l-4 border-blue-500">
+              <div
+                style={{ borderColor: "#1883FF" }}
+                tw="py-3 flex-1 border-solid border-0 lg:border-l-4"
+              >
                 <div tw="lg:ml-10">
                   <Paragraph tw="text-gray-600 mb-3">
                     在后台定制机器人的功能，管理封禁列表和查看验证日志
                   </Paragraph>
                   <a
-                    tw="text-blue-500 text-sm font-bold no-underline cursor-pointer"
+                    style={{ color: "#1883FF" }}
+                    tw="text-sm font-bold no-underline cursor-pointer"
                     onClick={() => {
                       dispatch(
                         openModal({
@@ -272,13 +284,17 @@ export default () => {
                   </a>
                 </div>
               </div>
-              <div tw="mt-10 py-3 flex-1 border-solid border-0 lg:border-l-4 border-blue-500">
+              <div
+                style={{ borderColor: "#1883FF" }}
+                tw="mt-10 py-3 flex-1 border-solid border-0 lg:border-l-4"
+              >
                 <div tw="lg:ml-10">
                   <Paragraph tw="text-gray-600 mb-3">
                     通过解答算术题、识别图片或自定义问答内容“考核”入群成员
                   </Paragraph>
                   <a
-                    tw="text-blue-500 text-sm font-bold no-underline cursor-pointer"
+                    style={{ color: "#1883FF" }}
+                    tw="text-sm font-bold no-underline cursor-pointer"
                     onClick={() => {
                       dispatch(
                         openModal({
@@ -304,8 +320,11 @@ export default () => {
               <Avatar />
             </div>
             <div tw="w-10/12">
-              <div tw="shadow rounded-md p-4 text-sm">
-                <span tw="text-red-700 font-semibold cursor-pointer">
+              <div tw="shadow rounded-md p-4 text-sm tracking-wide">
+                <span
+                  style={{ color: "#F39C12" }}
+                  tw="font-semibold cursor-pointer tracking-wider"
+                >
                   {_GLOBAL.botFirstName}
                 </span>
                 <Divider />
@@ -331,7 +350,7 @@ export default () => {
               <Avatar />
             </div>
             <div tw="w-10/12">
-              <div tw="shadow rounded-md text-sm pb-4">
+              <div tw="shadow rounded-md text-sm pb-4 tracking-wide">
                 <img src="/images/et-400x225.jpg" tw="w-full rounded-t" />
                 <div tw="px-4 pt-1">
                   <Paragraph tw="italic">
