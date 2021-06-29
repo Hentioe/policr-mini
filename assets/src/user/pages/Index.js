@@ -93,10 +93,7 @@ const Quote = styled.div`
 const Avatar = () => {
   return (
     <a href="https://t.me/policr_mini_bot" target="_blank">
-      <img
-        src="/images/avatar-100x100.jpg"
-        tw="w-full rounded-full shadow-sm"
-      />
+      <img src="/own_photo" tw="w-full rounded-full shadow-sm" />
     </a>
   );
 };

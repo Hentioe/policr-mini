@@ -482,10 +482,7 @@ export default () => {
               {editingCheckResult == EDITING_CHECK.VALID && (
                 <div tw="flex justify-between">
                   <div tw="w-12 self-end">
-                    <img
-                      tw="w-full rounded-full"
-                      src="/images/avatar-100x100.jpg"
-                    />
+                    <img tw="w-full rounded-full" src="/own_photo" />
                   </div>
                   <div tw="pl-4 pt-4 pr-4">
                     <div tw="shadow rounded border border-solid border-gray-200 text-black">

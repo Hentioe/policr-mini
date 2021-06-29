@@ -20,9 +20,9 @@ defmodule PolicrMiniBot.UpdatesPoller do
     {:ok, %Telegex.Model.User{id: id, username: username, first_name: name}} = Telegex.get_me()
 
     Logger.info("Bot (@#{username}) is working")
-    # 更新 Plug 中缓存的用户名
+    # 更新 Plug 中缓存的用户名。
     Telegex.Plug.update_username(username)
-    # 缓存机器人数据
+    # 缓存机器人数据。
     :ets.new(:bot_info, [:set, :named_table])
     :ets.insert(:bot_info, {:id, id})
     :ets.insert(:bot_info, {:username, username})
@@ -31,6 +31,9 @@ defmodule PolicrMiniBot.UpdatesPoller do
     if Application.get_env(:policr_mini, PolicrMiniBot)[:auto_gen_commands] do
       {:ok, _} = username |> gen_commands() |> Telegex.set_my_commands()
     end
+
+    # 缓存头像文件 ID。
+    :ets.insert(:bot_info, {:photo_file_id, get_avatar_file_id(id)})
 
     GenServer.start_link(__MODULE__, %{offset: 0}, name: __MODULE__)
   end
@@ -122,6 +125,17 @@ defmodule PolicrMiniBot.UpdatesPoller do
         ]
     else
       commands
+    end
+  end
+
+  @spec get_avatar_file_id(integer) :: binary | nil
+  defp get_avatar_file_id(user_id) do
+    case Telegex.get_user_profile_photos(user_id) do
+      {:ok, %{photos: [[%{file_id: file_id} | _]]}} ->
+        file_id
+
+      _ ->
+        nil
     end
   end
 end

@@ -90,6 +90,8 @@ defmodule PolicrMiniWeb.Router do
   scope "/", PolicrMiniWeb do
     pipe_through :browser
 
+    get "/own_photo", PageController, :own_photo
+
     get "/*path", PageController, :index
   end
 end

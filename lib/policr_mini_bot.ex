@@ -45,7 +45,13 @@ defmodule PolicrMiniBot do
   @spec name :: String.t() | nil
   def name, do: find_botinfo(:name)
 
-  @typep bot_field :: :id | :username | :name
+  @doc """
+  获取机器人的头像文件 ID。
+  """
+  @spec photo_file_id :: String.t() | nil
+  def photo_file_id, do: find_botinfo(:photo_file_id)
+
+  @typep bot_field :: :id | :username | :name | :photo_file_id
 
   @spec find_botinfo(bot_field) :: any
   defp find_botinfo(field) do

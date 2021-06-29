@@ -99,49 +99,59 @@ defmodule PolicrMiniWeb.Helper do
     end)
   end
 
-  @fallback_photo "/images/telegram-128x128.png"
+  @default_fallback_photo "/images/telegram-128x128.png"
 
+  @type get_photo_assets_opts :: [{:fallback_photo, binary}]
   @doc """
   获取 Telegram 服务器的图片。
 
   通过此函数获取的图片会缓存到本地，并返回静态资源的路径。如果没有获取到远程图片，将返回后备图片。
+
+  ## 参数：
+  - `filed_id`: 文件 ID。如果值为 `nil` 则直接返回后备图片。
   """
-  @spec get_photo_assets(binary) :: String.t()
-  def get_photo_assets(file_id) do
-    photo =
-      case Cachex.fetch(:photo, file_id, &photo_fetcher/1) do
-        {:ok, assets_file} ->
-          assets_file
+  @spec get_photo_assets(binary | nil, get_photo_assets_opts) :: binary
+  def get_photo_assets(file_id, opts \\ []) do
+    fallback_photo = Keyword.get(opts, :fallback_photo, @default_fallback_photo)
 
-        {:commit, assets_file} ->
-          assets_file
+    if file_id do
+      photo =
+        case Cachex.fetch(:photo, file_id, &photo_fetcher(&1, fallback_photo)) do
+          {:ok, assets_file} ->
+            assets_file
 
-        _ ->
-          @fallback_photo
-      end
+          {:commit, assets_file} ->
+            assets_file
 
-    Cachex.expire(:photo, file_id, :timer.hours(2))
+          _ ->
+            fallback_photo
+        end
 
-    photo
+      Cachex.expire(:photo, file_id, :timer.hours(2))
+
+      photo
+    else
+      fallback_photo
+    end
   end
 
-  @spec photo_fetcher(binary) :: {:commit, String.t()}
-  defp photo_fetcher(file_id) do
+  @spec photo_fetcher(binary, binary) :: {:commit, String.t()}
+  defp photo_fetcher(file_id, fallback_photo) do
     case Telegex.get_file(file_id) do
       {:ok, %{file_path: file_path}} ->
         file_url = "https://api.telegram.org/file/bot#{Telegex.Config.token()}/#{file_path}"
 
-        {:commit, fetch_assets_file(file_url)}
+        {:commit, fetch_assets_file(file_url, fallback_photo)}
 
       _ ->
-        {:commit, @fallback_photo}
+        {:commit, fallback_photo}
     end
   end
 
   @download_options [timeout: 1000 * 5, recv_timeout: 1000 * 15]
 
-  @spec fetch_assets_file(binary) :: String.t()
-  defp fetch_assets_file(file_url) do
+  @spec fetch_assets_file(binary, binary) :: String.t()
+  defp fetch_assets_file(file_url, fallback_photo) do
     etag_finder = fn {header, _} -> header == "ETag" end
 
     fetch_fun = fn %{headers: headers, body: body} ->
@@ -149,9 +159,9 @@ defmodule PolicrMiniWeb.Helper do
         filename =
           "photo_cache_" <> (etag |> elem(1) |> String.slice(1..-2)) <> Path.extname(file_url)
 
-        fetch_from_local(filename, body)
+        fetch_from_local(filename, body, fallback_photo)
       else
-        @fallback_photo
+        fallback_photo
       end
     end
 
@@ -162,12 +172,12 @@ defmodule PolicrMiniWeb.Helper do
       e ->
         Logger.unitized_error("Photo download", e)
 
-        @fallback_photo
+        fallback_photo
     end
   end
 
-  @spec fetch_from_local(binary, iodata) :: String.t()
-  defp fetch_from_local(filename, data) do
+  @spec fetch_from_local(binary, iodata, binary) :: String.t()
+  defp fetch_from_local(filename, data, fallback_photo) do
     assets_file = "#{Application.app_dir(:policr_mini, "priv/static/images")}/#{filename}"
 
     if File.exists?(assets_file) do
@@ -180,7 +190,7 @@ defmodule PolicrMiniWeb.Helper do
         e ->
           Logger.unitized_error("Photo writing", e)
 
-          @fallback_photo
+          fallback_photo
       end
     end
   end
