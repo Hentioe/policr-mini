@@ -7,6 +7,7 @@ import Confirm from "./components/Confirm";
 import ModalContainer from "./components/ModalContainer";
 import ThirdPartyTerm from "./components/ThirdPartyTerm";
 import Sponsorship from "./components/Sponsorship";
+import DeployTermial from "./components/DeployTermial";
 
 export {
   Title,
@@ -20,4 +21,5 @@ export {
   Confirm,
   ThirdPartyTerm,
   Sponsorship,
+  DeployTermial,
 };

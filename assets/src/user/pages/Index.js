@@ -14,6 +14,7 @@ import {
   Confirm,
   ThirdPartyTerm,
   Sponsorship,
+  DeployTermial,
 } from "../components";
 
 const dateTimeFormat = "yyyy-MM-dd";
@@ -84,10 +85,10 @@ const Quote = styled.div`
   @media (max-width: 1280px) {
     &:before {
       left: 0;
-      top: -1.5rem;
+      top: -2rem;
     }
   }
-  ${tw`mt-4 xl:mt-0`}
+  ${tw`mt-8 xl:mt-0`}
 `;
 
 const Avatar = () => {
@@ -384,42 +385,49 @@ export default () => {
       {/* 自主部署简介和导航 */}
       <div tw="mt-10">
         <UnifiedFlexBox tw="py-8 md:py-16 flex-col">
-          <GradientTitle>构建自己的实例</GradientTitle>
-          <p tw="text-base md:text-xl font-bold tracking-wide">
-            通过简单的 Shell 命令和 Web 服务配置，即可部署在低至 512MB 内存的
-            Linux 服务器上。
-          </p>
-          <Quote>
-            <p tw="text-sm md:text-base text-gray-800 tracking-wider">
-              <span>
-                如果您正在使用自己部署的实例，且有开放服务的想法和比较包容的心态，欢迎申请注册成为社区运营实例。所有被视作社区运营的实例都应该是相对可靠的，会被本项目推荐到可选实例列表中。
-              </span>
-              <br />
-              <br />
-              <span tw="italic">
-                也因为如此申请成功的条件相对严苛，它主要是对服务稳定性的考察。
-              </span>
-            </p>
-          </Quote>
+          <div tw="flex flex-wrap">
+            <div tw="w-full lg:w-7/12">
+              <GradientTitle>构建自己的实例</GradientTitle>
+              <p tw="text-base md:text-xl font-bold tracking-wide pr-0 lg:pr-2">
+                通过简单的 Shell 命令和 Web 服务配置，即可部署在低至 512MB
+                内存的 Linux 服务器上。
+              </p>
+              <Quote>
+                <p tw="text-sm md:text-base text-gray-800 tracking-wider pr-0 lg:pr-10">
+                  <span>
+                    如果您正在使用自己部署的实例，且有开放服务的想法和比较包容的心态，欢迎申请注册成为社区运营实例。所有被视作社区运营的实例都应该是相对可靠的，会被本项目推荐到可选实例列表中。
+                  </span>
+                  <br />
+                  <br />
+                  <span tw="italic">
+                    也因为如此申请成功的条件相对严苛，它主要是对服务稳定性的考察。
+                  </span>
+                </p>
+              </Quote>
 
-          <div tw="mt-6 text-center md:text-left">
-            <button tw="px-6 py-4 font-bold shadow bg-green-500 border-0">
-              <a
-                tw="text-white"
-                href="https://github.com/Hentioe/policr-mini/wiki/%E8%87%AA%E8%A1%8C%E9%83%A8%E7%BD%B2%EF%BC%88%E6%9E%84%E5%BB%BA%E7%AC%AC%E4%B8%89%E6%96%B9%E5%AE%9E%E4%BE%8B%EF%BC%89"
-                target="_blank"
-              >
-                让我们开始吧
-              </a>
-            </button>
+              <div tw="mt-6 text-center md:text-left">
+                <button tw="px-6 py-4 font-bold shadow bg-green-500 border-0">
+                  <a
+                    tw="text-white"
+                    href="https://github.com/Hentioe/policr-mini/wiki/%E8%87%AA%E8%A1%8C%E9%83%A8%E7%BD%B2%EF%BC%88%E6%9E%84%E5%BB%BA%E7%AC%AC%E4%B8%89%E6%96%B9%E5%AE%9E%E4%BE%8B%EF%BC%89"
+                    target="_blank"
+                  >
+                    开始部署
+                  </a>
+                </button>
 
-            <a
-              tw="ml-10 font-bold text-gray-900 cursor-pointer underline"
-              href="https://github.com/Hentioe/policr-mini/issues/115"
-              target="_blank"
-            >
-              申请社区运营
-            </a>
+                <a
+                  tw="ml-10 font-bold text-gray-900 cursor-pointer underline"
+                  href="https://github.com/Hentioe/policr-mini/issues/115"
+                  target="_blank"
+                >
+                  申请社区运营
+                </a>
+              </div>
+            </div>
+            <div tw="w-full lg:w-5/12 mt-4 lg:mt-0">
+              <DeployTermial />
+            </div>
           </div>
 
           <div tw="hidden md:block">
@@ -537,98 +545,102 @@ export default () => {
       </div>
       {/* 赞助相关 */}
       {!_GLOBAL.isThirdParty ? (
-        <div tw="hidden lg:block">
+        <div>
           <UnifiedFlexBox tw="flex-col py-16">
-            <GradientTitle>投资并获得回报</GradientTitle>
-            <p tw="text-xl font-bold tracking-wide">
-              <span tw="text-gray-900">
-                赞助您的团队依赖以建立业务的开源软件和服务。
-              </span>
-              <br />
-              <span tw="text-gray-600">
-                资助开发者，可降低开发和运营消耗的个人成本，提高项目的完成度和性能以及服务的可靠性。
-              </span>
-            </p>
-
             <div>
-              <button
-                tw="px-4 py-2 select-none border-transparent shadow text-white bg-indigo-500 font-bold cursor-pointer"
-                onClick={() =>
-                  dispatch(
-                    openModal({
-                      content: (
-                        <Sponsorship hints={sponsorshipHistoriesData.hints} />
-                      ),
-                    })
-                  )
-                }
-              >
-                赞助我们
-              </button>
+              <GradientTitle>投资并获得回报</GradientTitle>
+              <p tw="text-center md:text-left text-base md:text-xl font-bold tracking-wide">
+                <span tw="text-gray-900">
+                  赞助您的团队依赖以建立业务的开源软件和服务。
+                </span>
+                <br />
+                <span tw="text-gray-600">
+                  资助开发者，可降低开发和运营消耗的个人成本，提高项目的完成度和性能以及服务的可靠性。
+                </span>
+              </p>
+
+              <div tw="text-center md:text-left">
+                <button
+                  tw="px-4 py-2 select-none border-transparent shadow text-white bg-indigo-500 font-bold cursor-pointer"
+                  onClick={() =>
+                    dispatch(
+                      openModal({
+                        content: (
+                          <Sponsorship hints={sponsorshipHistoriesData.hints} />
+                        ),
+                      })
+                    )
+                  }
+                >
+                  赞助我们
+                </button>
+              </div>
             </div>
 
-            <div tw="mt-10 text-gray-800">
-              <span tw="text-2xl font-extrabold">赞助人</span>
-              <p tw="text-lg tracking-wide">
-                感谢这些出色的赞助人，是他们让项目和社区变得更好 ：）
-              </p>
+            <div tw="hidden md:block">
+              <div tw="mt-10 text-gray-800">
+                <span tw="text-2xl font-extrabold">赞助人</span>
+                <p tw="text-lg tracking-wide">
+                  感谢这些出色的赞助人，是他们让项目和社区变得更好 ：）
+                </p>
+              </div>
+              {sponsorshipHistoriesData ? (
+                <Table>
+                  <Thead>
+                    <Tr>
+                      <Th tw="w-2/12 rounded-tl-xl">赞助者</Th>
+                      <Th tw="w-4/12">赞助者简介</Th>
+                      <Th tw="w-4/12">期望用途</Th>
+                      <Th tw="w-1/12 text-center">金额</Th>
+                      <Th tw="w-1/12 text-right rounded-tr-xl">赞助日期</Th>
+                    </Tr>
+                  </Thead>
+                  <Tbody>
+                    {sponsorshipHistoriesData.sponsorship_histories.map(
+                      (sponsorshipHistory, i) => (
+                        <Tr key={sponsorshipHistory.id}>
+                          <Td
+                            endRow={
+                              i ==
+                              sponsorshipHistoriesData.sponsorship_histories
+                                .length -
+                                1
+                            }
+                            startCol={true}
+                          >
+                            {(sponsorshipHistory.sponsor &&
+                              sponsorshipHistory.sponsor.title) ||
+                              "匿名"}
+                          </Td>
+                          <Td>
+                            {sponsorshipHistory.sponsor
+                              ? sponsorshipHistory.sponsor.introduction || "无"
+                              : "一群不愿留名的可爱之人"}
+                          </Td>
+                          <Td>{sponsorshipHistory.expected_to}</Td>
+                          <Td tw="text-center">{sponsorshipHistory.amount}</Td>
+                          <Td
+                            tw="text-right"
+                            endRow={
+                              i ==
+                              sponsorshipHistoriesData.sponsorship_histories
+                                .length -
+                                1
+                            }
+                            endCol={true}
+                          >
+                            {formatDateTime(
+                              parseISO(sponsorshipHistory.reached_at),
+                              dateTimeFormat
+                            )}
+                          </Td>
+                        </Tr>
+                      )
+                    )}
+                  </Tbody>
+                </Table>
+              ) : undefined}
             </div>
-            {sponsorshipHistoriesData ? (
-              <Table>
-                <Thead>
-                  <Tr>
-                    <Th tw="w-2/12 rounded-tl-xl">赞助者</Th>
-                    <Th tw="w-4/12">赞助者简介</Th>
-                    <Th tw="w-4/12">期望用途</Th>
-                    <Th tw="w-1/12 text-center">金额</Th>
-                    <Th tw="w-1/12 text-right rounded-tr-xl">赞助日期</Th>
-                  </Tr>
-                </Thead>
-                <Tbody>
-                  {sponsorshipHistoriesData.sponsorship_histories.map(
-                    (sponsorshipHistory, i) => (
-                      <Tr key={sponsorshipHistory.id}>
-                        <Td
-                          endRow={
-                            i ==
-                            sponsorshipHistoriesData.sponsorship_histories
-                              .length -
-                              1
-                          }
-                          startCol={true}
-                        >
-                          {(sponsorshipHistory.sponsor &&
-                            sponsorshipHistory.sponsor.title) ||
-                            "匿名"}
-                        </Td>
-                        <Td>
-                          {sponsorshipHistory.sponsor
-                            ? sponsorshipHistory.sponsor.introduction || "无"
-                            : "一群不愿留名的可爱之人"}
-                        </Td>
-                        <Td>{sponsorshipHistory.expected_to}</Td>
-                        <Td tw="text-center">{sponsorshipHistory.amount}</Td>
-                        <Td
-                          tw="text-right"
-                          endRow={
-                            i ==
-                            sponsorshipHistoriesData.sponsorship_histories
-                              .length -
-                              1
-                          }
-                          endCol={true}
-                        >
-                          {formatDateTime(
-                            parseISO(sponsorshipHistory.reached_at),
-                            dateTimeFormat
-                          )}
-                        </Td>
-                      </Tr>
-                    )
-                  )}
-                </Tbody>
-              </Table>
-            ) : undefined}
           </UnifiedFlexBox>
         </div>
       ) : undefined}
