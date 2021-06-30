@@ -26,7 +26,7 @@ defmodule PolicrMiniBot.RespSponsorshipCmdPlug do
 
       <code>#{token}</code>
 
-      通过<a href="#{web_root}?sponsorship=#{token}">此链接</a>打开的赞助表单可直接使用此口令。
+      通过<a href="#{web_root}?sponsorship=#{token}">这里</a>打开的赞助表单会自动填充此口令。
 
       <i>提示：赞助口令不会把您和表单中的赞助人关联上，但会保留创建关系。它是一种防御攻击的措施，除此之外没有任何实际意义。</i>
       """
