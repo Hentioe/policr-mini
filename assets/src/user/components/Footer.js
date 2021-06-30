@@ -3,9 +3,12 @@ import tw, { styled } from "twin.macro";
 import { useDispatch } from "react-redux";
 import { Link as RouteLink } from "react-router-dom";
 
+import waveSvg from "../../../static/svg/wave.svg";
+
 import { open as openModal } from "../slices/modal";
 import Confirm from "./Confirm";
 import { UnifiedFlexBox } from "./Unified";
+import BackgroundContainer from "./BackgroundContainer";
 
 const linkAttrs = {
   target: "_blank",
@@ -55,7 +58,7 @@ export default () => {
   const dispatch = useDispatch();
 
   return (
-    <footer style={{ background: "url(/svg/footer_bg.svg)" }}>
+    <BackgroundContainer src={waveSvg}>
       <UnifiedFlexBox tw="py-10 flex-wrap-reverse">
         {/* 品牌信息 */}
         <div tw="w-full lg:w-7/12 flex justify-around lg:justify-start mt-10 lg:mt-0">
@@ -146,6 +149,6 @@ export default () => {
           </div>
         </div>
       </UnifiedFlexBox>
-    </footer>
+    </BackgroundContainer>
   );
 };

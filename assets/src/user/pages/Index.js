@@ -6,6 +6,11 @@ import { parseISO, format as formatDateTime } from "date-fns";
 import { useLocation } from "react-router-dom";
 import queryString from "query-string";
 
+import waleLineSvg from "../../../static/svg/wale-line.svg";
+import cloudlySvg from "../../../static/svg/cloudly.svg";
+import rectLightSvg from "../../../static/svg/rect-light.svg";
+import heartSvg from "../../../static/svg/heart.svg";
+
 import { open as openModal } from "../slices/modal";
 import {
   Title,
@@ -15,6 +20,7 @@ import {
   ThirdPartyTerm,
   Sponsorship,
   DeployTermial,
+  BackgroundContainer,
 } from "../components";
 
 const dateTimeFormat = "yyyy-MM-dd";
@@ -48,7 +54,9 @@ const HeartsContainer = styled.div`
   }
 `;
 
-const SponsorsHeart1 = styled.img`
+const SponsorsHeart = styled.img.attrs(() => ({ src: heartSvg }))``;
+
+const SponsorsHeart1 = styled(SponsorsHeart)`
   @keyframes sponsors-heart-1 {
     0% {
       opacity: 0;
@@ -66,7 +74,7 @@ const SponsorsHeart1 = styled.img`
   animation: sponsors-heart-1 5s cubic-bezier(0.535, 0.15, 0.425, 1) -1s infinite;
 `;
 
-const SponsorsHeart2 = styled.img`
+const SponsorsHeart2 = styled(SponsorsHeart)`
   @keyframes sponsors-heart-2 {
     0% {
       opacity: 0;
@@ -245,7 +253,7 @@ export default () => {
   return (
     <>
       <Title>首页</Title>
-      <div style={{ background: "no-repeat url(/svg/wale_line-1536x638.svg)" }}>
+      <BackgroundContainer src={waleLineSvg}>
         <UnifiedFlexBox tw="mt-6 md:mt-10 lg:mt-20 flex-wrap">
           {/* 左边主要内容区域 */}
           <div tw="w-full lg:w-8/12">
@@ -439,12 +447,9 @@ export default () => {
             {/* 验证消息，结束 */}
           </div>
         </UnifiedFlexBox>
-      </div>
+      </BackgroundContainer>
       {/* 自主部署简介和导航 */}
-      <div
-        tw="mt-10"
-        style={{ background: "no-repeat url(/svg/cloudly-1536x400.svg)" }}
-      >
+      <BackgroundContainer tw="mt-10" src={cloudlySvg}>
         <UnifiedFlexBox tw="py-8 md:py-16 flex-col">
           <div tw="flex flex-wrap">
             <div tw="w-full lg:w-7/12">
@@ -603,10 +608,10 @@ export default () => {
             )}
           </div>
         </UnifiedFlexBox>
-      </div>
+      </BackgroundContainer>
       {/* 赞助相关 */}
       {!_GLOBAL.isThirdParty ? (
-        <div style={{ background: "no-repeat url(/svg/hearts_bg.svg)" }}>
+        <BackgroundContainer src={rectLightSvg}>
           <UnifiedFlexBox tw="flex-col py-16">
             <div>
               <GradientTitle>投资并获得回报</GradientTitle>
@@ -636,8 +641,8 @@ export default () => {
                   赞助我们
                 </button>
                 <HeartsContainer>
-                  <SponsorsHeart1 src="/svg/heart.svg" />
-                  <SponsorsHeart2 src="/svg/heart.svg" />
+                  <SponsorsHeart1 />
+                  <SponsorsHeart2 />
                 </HeartsContainer>
               </div>
             </div>
@@ -707,7 +712,7 @@ export default () => {
               ) : undefined}
             </div>
           </UnifiedFlexBox>
-        </div>
+        </BackgroundContainer>
       ) : undefined}
     </>
   );

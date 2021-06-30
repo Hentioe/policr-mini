@@ -55,6 +55,10 @@ module.exports = (_env, options) => {
           test: /\.[s]?css$/,
           use: [MiniCssExtractPlugin.loader, "css-loader", "sass-loader"],
         },
+        {
+          test: /\.svg/,
+          type: "asset/inline",
+        },
       ],
     },
     plugins: [

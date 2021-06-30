@@ -8,6 +8,7 @@ import ModalContainer from "./components/ModalContainer";
 import ThirdPartyTerm from "./components/ThirdPartyTerm";
 import Sponsorship from "./components/Sponsorship";
 import DeployTermial from "./components/DeployTermial";
+import BackgroundContainer from "./components/BackgroundContainer";
 
 export {
   Title,
@@ -22,4 +23,5 @@ export {
   ThirdPartyTerm,
   Sponsorship,
   DeployTermial,
+  BackgroundContainer,
 };
