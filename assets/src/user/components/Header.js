@@ -57,7 +57,7 @@ const buildPageContentMissingConfirm = ({ title }) => (
 
 const GradientText = styled.span`
   -webkit-text-fill-color: transparent;
-  background: -webkit-linear-gradient(-70deg, #00F9FF, #0081FF);
+  background: -webkit-linear-gradient(-70deg, #00f9ff, #0081ff);
   -webkit-background-clip: text;
 `;
 
@@ -66,15 +66,14 @@ const LogoContainer = styled.div`
 
   &:after {
     content: "${_GLOBAL.isThirdParty ? thirdParty : version}";
-    color: #FF5733;
+    color: #ff5733;
     font-size: 0.5rem;
     font-weight: 600;
-    top: -0.25rem;
-    text-transform: lowercase;
-    position: absolute;
+    text-transform: none;
+    transform: translateY(-0.25rem);
+    display: inline-block;
     margin-left: 4px;
   }
-  position: relative;
 `;
 
 const GradientLogo = ({ children }) => {
