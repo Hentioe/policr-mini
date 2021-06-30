@@ -52,7 +52,7 @@ defmodule PolicrMiniWeb.API.ThirdPartyController do
             {0, 1, third_parties}
           else
             # 没有找到此实例。
-            if referer == PolicrMiniWeb.root_url(has_end_slash: true) do
+            if String.starts_with?(referer, PolicrMiniWeb.root_url(has_end_slash: true)) do
               # 此实例为官方实例。
               {0, 0, [offical_bot()] ++ third_parties}
             else
