@@ -37,7 +37,7 @@ const Table = styled.table`
 `;
 
 const HeartsContainer = styled.div`
-  ${tw`absolute`}
+  ${tw`absolute pointer-events-none`}
   left: -10px;
   top: -10px;
 
