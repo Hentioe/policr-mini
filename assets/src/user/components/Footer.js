@@ -16,7 +16,7 @@ const Link = styled.a.attrs(linkAttrs)`
 `;
 
 const IconLink = styled(Link)`
-  ${tw`text-black`}
+  ${tw`text-gray-800`}
 `;
 
 const NavLink = styled(Link)`
@@ -55,21 +55,17 @@ export default () => {
   const dispatch = useDispatch();
 
   return (
-    <footer tw="bg-yellow-400">
+    <footer style={{ background: "url(/svg/footer_bg.svg)" }}>
       <UnifiedFlexBox tw="py-10 flex-wrap-reverse">
         {/* 品牌信息 */}
         <div tw="w-full lg:w-7/12 flex justify-around lg:justify-start mt-10 lg:mt-0">
           <div tw="self-end lg:self-start">
             <img src="/images/logo-85x85.png" />
           </div>
-          <div tw="ml-6">
-            <p tw="text-black text-xl font-bold">policrmini</p>
-            <p tw="text-black text-xs font-bold tracking-wider">
-              项目组：Telestd
-            </p>
-            <p tw="text-black text-xs font-bold tracking-wider">
-              隶属于：POLICR
-            </p>
+          <div tw="ml-6 text-black">
+            <p tw="text-xl font-bold">policrmini</p>
+            <p tw="text-xs font-bold tracking-wider">项目组：Telestd</p>
+            <p tw="text-xs font-bold tracking-wider">隶属于：POLICR</p>
           </div>
         </div>
         <div tw="w-full lg:w-5/12 flex justify-center lg:justify-end">

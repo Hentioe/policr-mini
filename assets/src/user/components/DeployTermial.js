@@ -45,7 +45,7 @@ export default () => {
         <Line>
           <Dir>_data</Dir>
           <File>docker-compose.yml</File>
-          <Dir>.env</Dir>
+          <File>.env</File>
           <Dir>images</Dir>
         </Line>
         <BashLine>vi .env</BashLine>
