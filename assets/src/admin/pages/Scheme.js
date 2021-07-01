@@ -23,18 +23,18 @@ const OwnSelect = styled(Select)`
 `;
 
 const FormLine = styled.div`
-  ${tw`flex items-center mt-2`}
+  ${tw`flex items-center mt-4`}
 `;
 
 const FormLabel = styled.label`
-  ${tw`w-4/12`}
+  ${tw`w-4/12 text-gray-700`}
 `;
 
 const FromHint = ({ children }) => {
   return (
     <div tw="flex">
       <div tw="w-4/12"></div>
-      <span tw="w-8/12 mt-1 text-gray-600 italic text-xs font-bold">
+      <span tw="w-8/12 mt-1 text-gray-600 text-xs font-bold">
         {children}
       </span>
     </div>
@@ -256,7 +256,6 @@ export default () => {
                 <FormLine>
                   <FormLabel>验证方法</FormLabel>
                   <OwnSelect
-                    tw="mt-2"
                     options={modeOptions}
                     value={modeOptions[modeValue]}
                     onChange={handleModeSelectChange}
@@ -269,7 +268,6 @@ export default () => {
                 <FormLine>
                   <FormLabel>击杀方式（超时）</FormLabel>
                   <OwnSelect
-                    tw="mt-2"
                     options={killingMethodOptions}
                     value={editingWrongKillingMethodOption}
                     onChange={handleEditingWrongKillingMethodSelectChange}
@@ -280,7 +278,6 @@ export default () => {
                 <FormLine>
                   <FormLabel>击杀方式（错误）</FormLabel>
                   <OwnSelect
-                    tw="mt-2"
                     options={killingMethodOptions}
                     value={editingTimeoutKillingMethodOption}
                     onChange={handleEditingTimeoutKillingMethodSelectChange}
