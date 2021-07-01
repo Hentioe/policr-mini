@@ -34,7 +34,9 @@ const FromHint = ({ children }) => {
   return (
     <div tw="flex">
       <div tw="w-4/12"></div>
-      <span tw="w-8/12 mt-1 text-xs font-bold text-gray-600">{children}</span>
+      <span tw="w-8/12 mt-1 text-xs italic font-bold text-gray-600">
+        {children}
+      </span>
     </div>
   );
 };
