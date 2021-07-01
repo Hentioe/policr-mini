@@ -30,13 +30,23 @@ const FormLabel = styled.label`
   ${tw`w-4/12 text-gray-700`}
 `;
 
+const ProfileLine = styled.div`
+  ${tw`flex items-center mt-4`}
+`;
+
+const ProfileLabel = styled.label`
+  ${tw`w-4/12 text-gray-700`}
+`;
+
+const ProfileValue = styled.label`
+  ${tw`w-8/12 text-gray-700`}
+`;
+
 const FromHint = ({ children }) => {
   return (
     <div tw="flex">
       <div tw="w-4/12"></div>
-      <span tw="w-8/12 mt-1 text-gray-600 text-xs font-bold">
-        {children}
-      </span>
+      <span tw="w-8/12 mt-1 text-gray-600 text-xs font-bold">{children}</span>
     </div>
   );
 };
@@ -75,6 +85,18 @@ const killingMethodOptions = [
   { value: 0, label: "封禁" },
   defaultKillingMethodOption,
 ];
+
+const modeValueMapping = {
+  image: "图片验证",
+  custom: "定制验证（自定义）",
+  arithmetic: "算数验证",
+  initiative: "主动验证",
+};
+
+const killMethodMapping = {
+  kick: "踢出（封禁再延时解禁）",
+  ban: "封禁",
+};
 
 const makeEndpoint = (chat_id) => `/admin/api/chats/${chat_id}/scheme`;
 
@@ -115,6 +137,9 @@ export default () => {
       ? makeEndpoint(chatsState.selected)
       : null
   );
+
+  const { data: profileData, error: profileError } =
+    useSWR("/admin/api/profile");
 
   const getModeValueFromData = useCallback(() => {
     return data && data.scheme && data.scheme.verificationMode
@@ -269,8 +294,8 @@ export default () => {
                   <FormLabel>击杀方式（超时）</FormLabel>
                   <OwnSelect
                     options={killingMethodOptions}
-                    value={editingWrongKillingMethodOption}
-                    onChange={handleEditingWrongKillingMethodSelectChange}
+                    value={editingTimeoutKillingMethodOption}
+                    onChange={handleEditingTimeoutKillingMethodSelectChange}
                     isSearchable={false}
                   />
                 </FormLine>
@@ -279,39 +304,42 @@ export default () => {
                   <FormLabel>击杀方式（错误）</FormLabel>
                   <OwnSelect
                     options={killingMethodOptions}
-                    value={editingTimeoutKillingMethodOption}
-                    onChange={handleEditingTimeoutKillingMethodSelectChange}
+                    value={editingWrongKillingMethodOption}
+                    onChange={handleEditingWrongKillingMethodSelectChange}
                     isSearchable={false}
                   />
                 </FormLine>
                 <FromHint>针对验证结果为「错误」的用户采取的措施</FromHint>
                 <FormLine>
                   <FormLabel>超时时间</FormLabel>
-                  <div tw="w-4/12 flex flex-1">
-                    <Select
-                      tw="mr-2"
-                      styles={{
-                        control: (provided) => ({
-                          ...provided,
-                          width: 200,
-                        }),
-                      }}
-                      options={secondsOptions}
-                      onChange={handleEditingSecondsSelectChange}
-                      isSearchable={false}
-                      value={editingSecondsOption}
-                    />
-                    <FormInput
-                      type="number"
-                      tw="flex-1 text-center"
-                      value={editingSeconds}
-                      onChange={handleEditingSecondsChange}
-                      placeholder={
-                        editingSecondsOption.value == "default"
-                          ? "系统默认值"
-                          : "在此填入秒数"
-                      }
-                    />
+                  <div tw="w-8/12 flex flex-1">
+                    <div tw="pr-2">
+                      <Select
+                        styles={{
+                          control: (provided) => ({
+                            ...provided,
+                            width: 200,
+                          }),
+                        }}
+                        options={secondsOptions}
+                        onChange={handleEditingSecondsSelectChange}
+                        isSearchable={false}
+                        value={editingSecondsOption}
+                      />
+                    </div>
+                    <div tw="flex-1">
+                      <FormInput
+                        type="number"
+                        tw="w-full text-center"
+                        value={editingSeconds}
+                        onChange={handleEditingSecondsChange}
+                        placeholder={
+                          editingSecondsOption.value == "default"
+                            ? "系统默认值"
+                            : "在此填入秒数"
+                        }
+                      />
+                    </div>
                   </div>
                 </FormLine>
                 <FromHint>单个用户的验证等待时间，单位：秒</FromHint>
@@ -356,6 +384,49 @@ export default () => {
               </main>
             </PageSection>
           ) : undefined}
+
+          <PageSection>
+            <PageSectionHeader>
+              <PageSectionTitle>系统默认值</PageSectionTitle>
+            </PageSectionHeader>
+            {profileData ? (
+              <main>
+                <div>
+                  <ProfileLine>
+                    <ProfileLabel>验证方法</ProfileLabel>
+                    <ProfileValue>
+                      {modeValueMapping[profileData.scheme.verificationMode]}
+                    </ProfileValue>
+                  </ProfileLine>
+                  <FormLine>
+                    <FormLabel>击杀方式（超时）</FormLabel>
+                    <ProfileValue>
+                      {
+                        killMethodMapping[
+                          profileData.scheme.timeoutKillingMethod
+                        ]
+                      }
+                    </ProfileValue>
+                  </FormLine>
+                  <FormLine>
+                    <FormLabel>击杀方式（错误）</FormLabel>
+                    <ProfileValue>
+                      {killMethodMapping[profileData.scheme.wrongKillingMethod]}
+                    </ProfileValue>
+                  </FormLine>
+                  <FormLine>
+                    <FormLabel>超时时间</FormLabel>
+                    <ProfileValue>{profileData.scheme.seconds}</ProfileValue>
+                  </FormLine>
+                </div>
+                <p tw="text-gray-600 italic">
+                  注意：验证方案的系统默认值可以被机器人拥有者随时维护修改，所以以上默认值只能表示此刻的数据。如有需要，请自行定制适合本群的方案。
+                </p>
+              </main>
+            ) : (
+              <PageLoading />
+            )}
+          </PageSection>
         </PageBody>
       ) : error ? (
         <PageReLoading mutate={mutate} />

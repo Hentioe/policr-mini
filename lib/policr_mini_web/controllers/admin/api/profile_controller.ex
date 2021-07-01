@@ -12,11 +12,9 @@ defmodule PolicrMiniWeb.Admin.API.ProfileController do
   action_fallback PolicrMiniWeb.API.FallbackController
 
   def index(conn, _params) do
-    with {:ok, _} <- check_sys_permissions(conn) do
-      scheme = DefaultsServer.get_scheme()
+    scheme = DefaultsServer.get_scheme()
 
-      render(conn, "index.json", %{scheme: scheme})
-    end
+    render(conn, "index.json", %{scheme: scheme})
   end
 
   def update_scheme(conn, params) do
