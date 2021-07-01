@@ -9,8 +9,6 @@ defmodule PolicrMini.SponsorshipHistoryBusiness do
 
   import Ecto.Query, only: [from: 2, dynamic: 2]
 
-  @type written_returns :: {:ok, SponsorshipHistory.t()} | {:error, Ecto.Changeset.t()}
-
   defp fill_reached_at(params) do
     if params["has_reached"] do
       (params["reached_at"] in ["", nil] && Map.put(params, "reached_at", DateTime.utc_now())) ||

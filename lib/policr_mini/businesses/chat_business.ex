@@ -10,8 +10,6 @@ defmodule PolicrMini.ChatBusiness do
   alias PolicrMini.Schema.Permission
   alias PolicrMini.PermissionBusiness
 
-  @typep written_returns :: {:ok, Chat.t()} | {:error, Ecto.Changeset.t()}
-
   @spec create(map()) :: written_returns()
   def create(params) do
     %Chat{} |> Chat.changeset(params) |> Repo.insert()

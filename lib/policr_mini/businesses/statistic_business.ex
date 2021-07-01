@@ -7,7 +7,6 @@ defmodule PolicrMini.StatisticBusiness do
 
   import Ecto.Query, only: [from: 2]
 
-  @type written_returns :: {:ok, Statistic.t()} | {:error, Ecto.Changeset.t()}
   @type status :: :passed | :timeout | :wronged | :other
 
   @spec create(map) :: written_returns

@@ -5,8 +5,6 @@ defmodule PolicrMini.TermBusiness do
 
   use PolicrMini, business: PolicrMini.Schema.Term
 
-  @type written_returns :: {:ok, Term.t()} | {:error, Ecto.Changeset.t()}
-
   @spec create(map) :: written_returns
   def create(params) do
     %Term{} |> Term.changeset(params) |> Repo.insert()

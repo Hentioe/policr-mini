@@ -7,8 +7,6 @@ defmodule PolicrMini.ThirdPartyBusiness do
 
   import Ecto.Query, only: [from: 2]
 
-  @type written_returns :: {:ok, ThirdParty.t()} | {:error, Ecto.Changeset.t()}
-
   @spec create(map) :: written_returns
   def create(params) do
     %ThirdParty{} |> ThirdParty.changeset(params) |> Repo.insert()

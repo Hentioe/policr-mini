@@ -7,8 +7,6 @@ defmodule PolicrMini.UserBusiness do
 
   import Ecto.Query, only: [from: 2]
 
-  @type written_returns :: {:ok, User.t()} | {:error, Ecto.Changeset.t()}
-
   @spec create(map) :: written_returns
   def create(params) do
     %User{token_ver: 0} |> User.changeset(params) |> Repo.insert()

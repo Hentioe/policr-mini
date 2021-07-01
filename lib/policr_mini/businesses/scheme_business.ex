@@ -7,8 +7,6 @@ defmodule PolicrMini.SchemeBusiness do
 
   import Ecto.Query, only: [from: 2, dynamic: 2]
 
-  @type writed_result :: {:ok, Scheme.t()} | {:error, Ecto.Changeset.t()}
-
   def create(params) do
     %Scheme{} |> Scheme.changeset(params) |> Repo.insert()
   end
@@ -33,7 +31,7 @@ defmodule PolicrMini.SchemeBusiness do
     from(s in Scheme, where: ^filter_chat_id) |> Repo.one()
   end
 
-  @spec fetch(integer | binary) :: writed_result()
+  @spec fetch(integer | binary) :: written_returns
   def fetch(chat_id) when is_integer(chat_id) or is_binary(chat_id) do
     case find(chat_id) do
       nil ->

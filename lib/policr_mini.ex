@@ -22,6 +22,9 @@ defmodule PolicrMini do
           r -> {:ok, r}
         end
       end
+
+      @type params :: %{optional(atom) => any} | %{optional(String.t()) => any}
+      @type written_returns :: {:ok, unquote(schema_module).t()} | {:error, Ecto.Changeset.t()}
     end
   end
 

@@ -9,13 +9,11 @@ defmodule PolicrMini.OperationBusiness do
 
   import Ecto.Query, only: [from: 2, dynamic: 2]
 
-  @typep written_returns :: {:ok, Operation.t()} | {:error, Ecto.Changeset.t()}
-
   # TODO：添加测试。
   @doc """
   创建操作记录。
   """
-  @spec create(PolicrMini.Schema.params()) :: written_returns
+  @spec create(params) :: written_returns
   def create(params) do
     %Operation{} |> Operation.changeset(params) |> Repo.insert()
   end

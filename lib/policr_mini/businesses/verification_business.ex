@@ -9,8 +9,6 @@ defmodule PolicrMini.VerificationBusiness do
 
   import Ecto.Query, only: [from: 2, dynamic: 2]
 
-  @typep written_returns :: {:ok, Verification.t()} | {:error, Ecto.Changeset.t()}
-
   @doc """
   创建验证记录。
   """

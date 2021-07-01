@@ -7,8 +7,6 @@ defmodule PolicrMini.SponsorBusiness do
 
   import Ecto.Query, only: [from: 2, dynamic: 2]
 
-  @type written_returns :: {:ok, Sponsor.t()} | {:error, Ecto.Changeset.t()}
-
   @spec create(map) :: written_returns
   def create(params) do
     %Sponsor{uuid: UUID.uuid4()} |> Sponsor.changeset(params) |> Repo.insert()
