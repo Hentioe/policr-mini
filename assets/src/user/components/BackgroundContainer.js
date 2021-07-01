@@ -5,6 +5,7 @@ export default styled.div`
   background-size: 100% auto;
 
   @media (max-width: 768px) {
-    background-size: 768px auto;
+    background: ${({ mobileSrc }) => `no-repeat url(${mobileSrc})`};
+    background-size: 100% auto;
   }
 `;

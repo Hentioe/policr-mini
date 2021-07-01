@@ -4,6 +4,7 @@ import { useDispatch } from "react-redux";
 import { Link as RouteLink } from "react-router-dom";
 
 import waveSvg from "../../../static/svg/wave.svg";
+import mobileBgSvg from "../../../static/svg/footer_bg_mobile.svg";
 
 import { open as openModal } from "../slices/modal";
 import Confirm from "./Confirm";
@@ -58,7 +59,7 @@ export default () => {
   const dispatch = useDispatch();
 
   return (
-    <BackgroundContainer src={waveSvg}>
+    <BackgroundContainer tw="bg-bottom" src={waveSvg} mobileSrc={mobileBgSvg}>
       <UnifiedFlexBox tw="py-10 flex-wrap-reverse">
         {/* 品牌信息 */}
         <div tw="w-full lg:w-7/12 flex justify-around lg:justify-start mt-10 lg:mt-0">

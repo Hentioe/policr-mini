@@ -7,8 +7,14 @@ import { useLocation } from "react-router-dom";
 import queryString from "query-string";
 
 import waleLineSvg from "../../../static/svg/wale-line.svg";
+import mobileMainBgSvg from "../../../static/svg/main_bg_mobile.svg";
+
 import cloudlySvg from "../../../static/svg/cloudly.svg";
+import mobileDeployBgSvg from "../../../static/svg/deploy_bg_mobile.svg";
+
 import rectLightSvg from "../../../static/svg/rect-light.svg";
+import mobileSponsorshipBgSvg from "../../../static/svg/sponsorship_bg_mobile.svg";
+
 import heartSvg from "../../../static/svg/heart.svg";
 
 import { open as openModal } from "../slices/modal";
@@ -253,7 +259,7 @@ export default () => {
   return (
     <>
       <Title>首页</Title>
-      <BackgroundContainer src={waleLineSvg}>
+      <BackgroundContainer src={waleLineSvg} mobileSrc={mobileMainBgSvg}>
         <UnifiedFlexBox tw="mt-6 md:mt-10 lg:mt-20 flex-wrap">
           {/* 左边主要内容区域 */}
           <div tw="w-full lg:w-8/12">
@@ -449,7 +455,11 @@ export default () => {
         </UnifiedFlexBox>
       </BackgroundContainer>
       {/* 自主部署简介和导航 */}
-      <BackgroundContainer tw="mt-10" src={cloudlySvg}>
+      <BackgroundContainer
+        tw="mt-10"
+        src={cloudlySvg}
+        mobileSrc={mobileDeployBgSvg}
+      >
         <UnifiedFlexBox tw="py-8 md:py-16 flex-col">
           <div tw="flex flex-wrap">
             <div tw="w-full lg:w-7/12">
@@ -611,7 +621,10 @@ export default () => {
       </BackgroundContainer>
       {/* 赞助相关 */}
       {!_GLOBAL.isThirdParty ? (
-        <BackgroundContainer src={rectLightSvg}>
+        <BackgroundContainer
+          src={rectLightSvg}
+          mobileSrc={mobileSponsorshipBgSvg}
+        >
           <UnifiedFlexBox tw="flex-col py-16">
             <div>
               <GradientTitle>投资并获得回报</GradientTitle>
