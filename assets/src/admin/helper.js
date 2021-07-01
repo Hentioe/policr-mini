@@ -84,6 +84,7 @@ function toastMessage(message, { type } = {}) {
 }
 
 const sysPages = [
+  "profile",
   "managements",
   "logs",
   "tasks",

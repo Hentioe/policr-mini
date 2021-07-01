@@ -458,32 +458,53 @@ defmodule PolicrMiniBot.Helper do
 
   defp mosaic_name_by_len(name, _len), do: "#{String.at(name, 0)}███#{String.at(name, -1)}"
 
-  @defaults [
-    vmode: :image,
-    ventrance: :unity,
-    voccasion: :private,
-    kmethod: :kick
+  @defaults_key_mapping [
+    vmode: :verification_mode,
+    ventrance: :verification_entrance,
+    voccasion: :verification_occasion,
+    vseconds: :seconds,
+    tkmethod: :timeout_killing_method,
+    wkmethod: :wrong_killing_method
   ]
 
-  @type default_keys :: :vmode | :ventrance | :voccasion | :kmethod
+  @type default_keys ::
+          :vmode
+          | :ventrance
+          | :voccasion
+          | :vseconds
+          | :tkmethod
+          | :wkmethod
 
   @doc """
   获取默认配置。
 
-  当前 `key` 可以是以下值：
-  - `:vmode` - 验证方法
-  - `:ventrance` - 验证入口
-  - `:voccasion` - 验证场合
-  - `:kmethod` - 击杀方法
+  ## 当前 `key` 可以是以下值
+  - `:vmode`: 验证方法。
+  - `:ventrance`: 验证入口。
+  - `:voccasion`: 验证场合。
+  - `:vseconds`: 验证超时时间。
+  - `:tkmethod`: 超时击杀方法。
+  - `:wkmethod`: 错误击杀方法。
+
+  ## 例子
+      iex> PolicrMiniBot.Helper.default!(:vmode)
+      :image
+      iex> PolicrMiniBot.Helper.default!(:ventrance)
+      :unity
+      iex> PolicrMiniBot.Helper.default!(:voccasion)
+      :private
+      iex> PolicrMiniBot.Helper.default!(:vseconds)
+      300
+      iex> PolicrMiniBot.Helper.default!(:tkmethod)
+      :kick
+      iex> PolicrMiniBot.Helper.default!(:wkmethod)
+      :kick
   """
-  @spec default!(default_keys) :: any()
+  @spec default!(default_keys) :: any
   def default!(key) when is_atom(key) do
-    if default = @defaults[key] do
-      default
-    else
-      raise RuntimeError,
-            "The value of the unknown `key` parameter is in the `default!/1` function"
-    end
+    field = @defaults_key_mapping[key] || raise "Default field name without key `#{key}` mapping"
+
+    PolicrMini.DefaultsServer.get_default_scheme_value(field)
   end
 
   @spec t(String.t(), map()) :: String.t()

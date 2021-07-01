@@ -16,15 +16,6 @@ defmodule PolicrMiniBot.HandleUserJoinedCleanupPlug do
   # 过期时间：15 分钟
   @expired_seconds 60 * 15
 
-  @spec countdown :: integer()
-  @doc """
-  获取倒计时。
-  当前的实现会根据运行模式返回不同的值。
-  """
-  def countdown do
-    if PolicrMini.mix_env() == :dev, do: 30 * 3, else: 60 * 5
-  end
-
   @doc """
   检查消息中包含的新加入用户是否有效。
 
@@ -64,7 +55,7 @@ defmodule PolicrMiniBot.HandleUserJoinedCleanupPlug do
     entrance = scheme.verification_entrance || default!(:ventrance)
     mode = scheme.verification_mode || default!(:vmode)
     occasion = scheme.verification_occasion || default!(:voccasion)
-    seconds = scheme.seconds || countdown()
+    seconds = scheme.seconds || default!(:vseconds)
 
     if DateTime.diff(DateTime.utc_now(), joined_datetime) >= @expired_seconds do
       # 处理过期验证
@@ -219,12 +210,12 @@ defmodule PolicrMiniBot.HandleUserJoinedCleanupPlug do
     {text, markup}
   end
 
-  @spec start_timed_task(Verification.t(), Scheme.t(), integer(), integer()) :: :ok
+  @spec start_timed_task(Verification.t(), Scheme.t(), integer, integer) :: :ok
   @doc """
   启动定时任务处理验证超时。
   """
-  def start_timed_task(verification, scheme, seconds, reminder_message_id)
-      when is_integer(seconds) and is_integer(reminder_message_id) do
+  def start_timed_task(verification, scheme, seconds, reminder_msg_id)
+      when is_integer(seconds) and is_integer(reminder_msg_id) do
     %{chat_id: chat_id, target_user_id: target_user_id, target_user_name: target_user_name} =
       verification
 
@@ -242,15 +233,17 @@ defmodule PolicrMiniBot.HandleUserJoinedCleanupPlug do
           )
         end
 
+        timeout_killing_method = scheme.timeout_killing_method || default!(:tkmethod)
+
         # 添加操作记录（系统）
-        create_operation(latest_verification, scheme.timeout_killing_method)
+        create_operation(latest_verification, timeout_killing_method)
 
         # 计数器自增（超时总数）
         PolicrMini.Counter.increment(:verification_timeout_total)
         # 更新状态为超时
         latest_verification |> VerificationBusiness.update(%{status: :timeout})
         # 击杀用户（原因为超时）。
-        CallVerificationPlug.kill(chat_id, target_user, :timeout, scheme.timeout_killing_method)
+        CallVerificationPlug.kill(chat_id, target_user, :timeout, timeout_killing_method)
       end
     end
 
@@ -267,9 +260,7 @@ defmodule PolicrMiniBot.HandleUserJoinedCleanupPlug do
           )
       end
 
-      # TODO: 此处需要根据 scheme
       # 如果还存在多条验证，更新入口消息
-
       waiting_count = VerificationBusiness.get_unity_waiting_count(chat_id)
 
       if waiting_count == 0 do
@@ -277,12 +268,10 @@ defmodule PolicrMiniBot.HandleUserJoinedCleanupPlug do
         Cleaner.delete_latest_verification_message(chat_id)
       else
         # 如果还存在多条验证，更新入口消息
-        max_seconds = scheme.seconds || countdown()
-
         CallVerificationPlug.update_unity_message(
           chat_id,
           waiting_count,
-          max_seconds
+          seconds
         )
       end
     end

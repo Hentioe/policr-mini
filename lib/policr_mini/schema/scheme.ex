@@ -5,8 +5,6 @@ defmodule PolicrMini.Schema.Scheme do
 
   use PolicrMini.Schema
 
-  alias PolicrMini.Schema.Chat
-
   alias PolicrMini.EctoEnums.{
     VerificationModeEnum,
     KillingMethodEnum,
@@ -18,8 +16,7 @@ defmodule PolicrMini.Schema.Scheme do
   @optional_fields ~w(verification_mode verification_entrance verification_occasion seconds timeout_killing_method wrong_killing_method is_highlighted)a
 
   schema "schemes" do
-    belongs_to :chat, Chat
-
+    field :chat_id, :integer
     field :verification_mode, VerificationModeEnum
     field :verification_entrance, VerificationEntranceEnum
     field :verification_occasion, VerificationOccasionEnum
@@ -33,11 +30,19 @@ defmodule PolicrMini.Schema.Scheme do
 
   @type t :: map()
 
-  def changeset(%__MODULE__{} = scheme, attrs) when is_map(attrs) do
-    scheme
+  # 针对默认 scheme 去掉一些约束检查。
+  def changeset(%{chat_id: 0} = struct, attrs)
+      when is_struct(struct, __MODULE__) and is_map(attrs) do
+    struct
     |> cast(attrs, @required_fields ++ @optional_fields)
     |> validate_required(@required_fields)
-    |> assoc_constraint(:chat)
+    |> unique_constraint(:chat_id)
+  end
+
+  def changeset(struct, attrs) when is_struct(struct, __MODULE__) and is_map(attrs) do
+    struct
+    |> cast(attrs, @required_fields ++ @optional_fields)
+    |> validate_required(@required_fields)
     |> unique_constraint(:chat_id)
   end
 end

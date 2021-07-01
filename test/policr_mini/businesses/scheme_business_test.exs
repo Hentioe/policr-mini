@@ -68,7 +68,7 @@ defmodule PolicrMini.SchemeBusinessTest do
     scheme2 = SchemeBusiness.find(scheme_params.chat_id)
     assert scheme2 == scheme1
 
-    assert SchemeBusiness.find(0) == nil
+    assert SchemeBusiness.find(-1) == nil
   end
 
   test "fetch/1" do
@@ -84,5 +84,18 @@ defmodule PolicrMini.SchemeBusinessTest do
     {:ok, scheme3} = SchemeBusiness.fetch(chat2.id)
 
     assert scheme3.chat_id == chat2.id
+  end
+
+  test "fetch_default/0" do
+    {:ok, default} = SchemeBusiness.fetch_default()
+
+    assert default.chat_id == 0
+    assert default.verification_mode == :image
+    assert default.verification_entrance == :unity
+    assert default.verification_occasion == :private
+    assert default.seconds == 300
+    assert default.timeout_killing_method == :kick
+    assert default.wrong_killing_method == :kick
+    assert default.is_highlighted == true
   end
 end

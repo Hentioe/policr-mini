@@ -38,6 +38,7 @@ defmodule PolicrMini.ChatBusiness do
     permission_params_list =
       permissions |> Enum.map(fn p -> p |> struct(chat_id: chat.id) |> Map.from_struct() end)
 
+    # TODO: 此处的事务需保证具有回滚的能力并能够返回错误结果。
     Repo.transaction(fn ->
       # 获取原始用户列表和当前用户列表
       original_user_id_list =

@@ -30,6 +30,7 @@ defmodule PolicrMini.SponsorshipHistoryBusiness do
   def create_with_sponsor(params) do
     sponsor = params["sponsor"]
 
+    # TODO: 此处的事务需保证具有回滚的能力并能够返回错误结果。
     Repo.transaction(fn ->
       with {:ok, sponsor} <- SponsorBusiness.create(sponsor),
            {:ok, sponsorship_history} <- create(Map.put(params, "sponsor_id", sponsor.id)) do
@@ -53,6 +54,7 @@ defmodule PolicrMini.SponsorshipHistoryBusiness do
   def update_with_create_sponsor(sponsorship_history, params) do
     sponsor = params["sponsor"]
 
+    # TODO: 此处的事务需保证具有回滚的能力并能够返回错误结果。
     Repo.transaction(fn ->
       with {:ok, sponsor} <- SponsorBusiness.create(sponsor),
            {:ok, sponsorship_history} <-

@@ -15,6 +15,8 @@ defmodule PolicrMini.Application do
       PolicrMini.DBServer,
       # 计数器
       PolicrMini.Counter,
+      # 获取并维护全局默认值。
+      PolicrMini.DefaultsServer,
       # Start the Telemetry supervisor
       PolicrMiniWeb.Telemetry,
       # Start the PubSub system

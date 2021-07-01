@@ -359,6 +359,11 @@ export default () => {
           selected={isSysLink({ path: location.pathname, page: "logs" })}
         />
         <NavItem
+          title="全局属性"
+          href="/admin/sys/profile"
+          selected={isSysLink({ path: location.pathname, page: "profile" })}
+        />
+        <NavItem
           title="服务条款"
           href="/admin/sys/terms"
           selected={isSysLink({ path: location.pathname, page: "terms" })}

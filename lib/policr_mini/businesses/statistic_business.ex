@@ -86,6 +86,7 @@ defmodule PolicrMini.StatisticBusiness do
       end
     end
 
+    # TODO: 此处的事务需保证具有回滚的能力并能够返回错误结果。
     Repo.transaction(trans_fun)
   end
 

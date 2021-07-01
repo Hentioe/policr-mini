@@ -59,7 +59,9 @@ defmodule PolicrMiniBot.CallVerificationPlug do
     chosen = chosen |> String.to_integer()
     verification_id = verification_id |> String.to_integer()
 
-    handle_answer = fn verification, wrong_killing_method ->
+    handle_answer = fn verification, scheme ->
+      wrong_killing_method = scheme.wrong_killing_method || default!(:wkmethod)
+
       if Enum.member?(verification.indices, chosen) do
         # 处理回答正确
         handle_correct(verification, message_id, from)
@@ -72,7 +74,7 @@ defmodule PolicrMiniBot.CallVerificationPlug do
     with {:ok, verification} <- validity_check(user_id, verification_id),
          {:ok, scheme} <- SchemeBusiness.fetch(verification.chat_id),
          # 处理回答。
-         {:ok, verification} <- handle_answer.(verification, scheme.wrong_killing_method),
+         {:ok, verification} <- handle_answer.(verification, scheme),
          # 更新验证记录中的选择索引
          {:ok, _} <- VerificationBusiness.update(verification, %{chosen: chosen}) do
       count = VerificationBusiness.get_unity_waiting_count(verification.chat_id)
@@ -83,7 +85,7 @@ defmodule PolicrMiniBot.CallVerificationPlug do
         Cleaner.delete_latest_verification_message(verification.chat_id)
       else
         # 如果还存在多条验证，更新入口消息
-        max_seconds = scheme.seconds || HandleUserJoinedCleanupPlug.countdown()
+        max_seconds = scheme.seconds || default!(:vseconds)
         update_unity_message(verification.chat_id, count, max_seconds)
       end
 

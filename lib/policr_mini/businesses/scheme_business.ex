@@ -11,6 +11,15 @@ defmodule PolicrMini.SchemeBusiness do
     %Scheme{} |> Scheme.changeset(params) |> Repo.insert()
   end
 
+  @default_id 0
+  def create_default(params) do
+    %Scheme{chat_id: @default_id} |> Scheme.changeset(params) |> Repo.insert()
+  end
+
+  def delete(scheme) when is_struct(scheme, Scheme) do
+    Repo.delete(scheme)
+  end
+
   def update(%Scheme{} = scheme, params) do
     scheme |> Scheme.changeset(params) |> Repo.update()
   end
@@ -42,5 +51,34 @@ defmodule PolicrMini.SchemeBusiness do
       scheme ->
         {:ok, scheme}
     end
+  end
+
+  @default_scheme %{
+    verification_mode: :image,
+    verification_entrance: :unity,
+    verification_occasion: :private,
+    seconds: 300,
+    timeout_killing_method: :kick,
+    wrong_killing_method: :kick,
+    is_highlighted: true
+  }
+
+  @doc """
+  获取默认方案，如果不存在将自动创建。
+  """
+  @spec fetch_default :: {:ok, Scheme.t()} | {:error, any}
+  def fetch_default do
+    Repo.transaction(fn ->
+      case find(@default_id) || create_default(@default_scheme) do
+        {:ok, scheme} ->
+          scheme
+
+        {:error, e} ->
+          Repo.rollback(e)
+
+        scheme ->
+          scheme
+      end
+    end)
   end
 end

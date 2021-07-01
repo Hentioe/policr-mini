@@ -24,6 +24,7 @@ import {
   PermissionsPage,
   PropertiesPage,
   CustomPage,
+  SysProfilePage,
   SysManagementsPage,
   SysLogsPage,
   SysTasksPage,
@@ -91,6 +92,9 @@ const App = () => {
                     </Route>
                     <Route path="/admin/sys/managements">
                       <SysManagementsPage />
+                    </Route>
+                    <Route path="/admin/sys/profile">
+                      <SysProfilePage />
                     </Route>
                     <Route path="/admin/sys/tasks">
                       <SysTasksPage />
