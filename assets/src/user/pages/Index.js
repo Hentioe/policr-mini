@@ -156,7 +156,7 @@ const Quote = styled.div`
 
 const Avatar = () => {
   return (
-    <a href="https://t.me/policr_mini_bot" target="_blank">
+    <a href={`https://t.me/${_GLOBAL.botUsername}`} target="_blank">
       <img src="/own_photo" tw="w-full rounded-full shadow-sm" />
     </a>
   );
