@@ -18,11 +18,30 @@ import {
   FormInput,
 } from "../components";
 
-import { camelizeJson, toastErrors } from "../helper";
-
-const Comment = styled.div`
-  ${tw`text-sm text-gray-500`}
+const OwnSelect = styled(Select)`
+  ${tw`w-8/12`}
 `;
+
+const FormLine = styled.div`
+  ${tw`flex items-center mt-2`}
+`;
+
+const FormLabel = styled.label`
+  ${tw`w-4/12`}
+`;
+
+const FromHint = ({ children }) => {
+  return (
+    <div tw="flex">
+      <div tw="w-4/12"></div>
+      <span tw="w-8/12 mt-1 text-gray-600 italic text-xs font-bold">
+        {children}
+      </span>
+    </div>
+  );
+};
+
+import { camelizeJson, toastErrors } from "../helper";
 
 const defaultModeOption = { value: 4, label: "系统默认" };
 const modeOptions = [
@@ -230,120 +249,48 @@ export default () => {
         <PageBody>
           <PageSection>
             <PageSectionHeader>
-              <PageSectionTitle>验证方法</PageSectionTitle>
+              <PageSectionTitle>修改方案</PageSectionTitle>
             </PageSectionHeader>
             <main>
-              <div tw="my-2">
-                <Comment>
-                  说明：提供有多项验证方法，主要分以下几类：
-                  <ul>
-                    <li>在已存储资源的基础上随机：图片验证、定制验证。</li>
-                    <li>纯动态：算数验证。</li>
-                    <li>纯静态：主动验证。</li>
-                  </ul>
-                </Comment>
-                <div tw="flex flex-wrap items-center">
-                  <div tw="w-3/12">
-                    <label>修改方法</label>
-                  </div>
-                  <div tw="w-9/12">
-                    <Select
-                      tw="mt-2"
-                      options={modeOptions}
-                      value={modeOptions[modeValue]}
-                      onChange={handleModeSelectChange}
-                      isSearchable={false}
-                    />
-                  </div>
-                </div>
-              </div>
-            </main>
-          </PageSection>
-          <PageSection>
-            <PageSectionHeader>
-              <PageSectionTitle>验证场合</PageSectionTitle>
-            </PageSectionHeader>
-            <main>
-              <NotImplemented />
-            </main>
-          </PageSection>
-          <PageSection>
-            <PageSectionHeader>
-              <PageSectionTitle>验证入口</PageSectionTitle>
-            </PageSectionHeader>
-            <main>
-              <NotImplemented />
-            </main>
-          </PageSection>
-          <PageSection>
-            <PageSectionHeader>
-              <PageSectionTitle>击杀方法</PageSectionTitle>
-            </PageSectionHeader>
-            <main>
-              <div tw="py-2">
-                <Comment>
-                  提示：可独立设置验证超时或验证错误的击杀方法。一般来讲：
-                  <ul>
-                    <li>
-                      验证超时的用户为 Spam bot
-                      的可能性极大，封禁有较小的概率误伤正常帐号。
-                    </li>
-                    <li>
-                      验证错误的用户为真人的概率很大，但也存在很多以发广告为目的进群的真人。
-                    </li>
-                  </ul>
-                  <span>
-                    系统默认的击杀方法总是宽容的，不一定适合所有群。请根据群组自己设置的验证难度和进群门槛选择适合的击杀方法。
-                  </span>
-                </Comment>
-
-                <div tw="flex flex-wrap items-center">
-                  <div tw="w-3/12">
-                    <label>验证超时</label>
-                  </div>
-                  <div tw="w-9/12">
-                    <Select
-                      tw="mt-2"
-                      options={killingMethodOptions}
-                      value={editingTimeoutKillingMethodOption}
-                      onChange={handleEditingTimeoutKillingMethodSelectChange}
-                      isSearchable={false}
-                    />
-                  </div>
-                  <div tw="w-3/12">
-                    <label>验证错误</label>
-                  </div>
-                  <div tw="w-9/12">
-                    <Select
-                      tw="mt-2"
-                      options={killingMethodOptions}
-                      value={editingWrongKillingMethodOption}
-                      onChange={handleEditingWrongKillingMethodSelectChange}
-                      isSearchable={false}
-                    />
-                  </div>
-                </div>
-              </div>
-            </main>
-          </PageSection>
-          <PageSection>
-            <PageSectionHeader>
-              <PageSectionTitle>超时时长</PageSectionTitle>
-            </PageSectionHeader>
-            <main>
-              <div tw="my-2">
-                <Comment>
-                  提示：请设置合理的验证时间，这里有一些建议：
-                  <ul>
-                    <li>最短不低于 40 秒。</li>
-                    <li>最长不高于 600 秒（10 分钟）。</li>
-                  </ul>
-                </Comment>
-                <div tw="mt-2 flex items-center">
-                  <div tw="w-3/12">
-                    <label>设置值</label>
-                  </div>
-                  <div tw="flex flex-1">
+              <form>
+                <FormLine>
+                  <FormLabel>验证方法</FormLabel>
+                  <OwnSelect
+                    tw="mt-2"
+                    options={modeOptions}
+                    value={modeOptions[modeValue]}
+                    onChange={handleModeSelectChange}
+                    isSearchable={false}
+                  />
+                </FormLine>
+                <FromHint>
+                  自定义问答需修改此处为「定制验证」才可生效，取消选择其它即可
+                </FromHint>
+                <FormLine>
+                  <FormLabel>击杀方式（超时）</FormLabel>
+                  <OwnSelect
+                    tw="mt-2"
+                    options={killingMethodOptions}
+                    value={editingWrongKillingMethodOption}
+                    onChange={handleEditingWrongKillingMethodSelectChange}
+                    isSearchable={false}
+                  />
+                </FormLine>
+                <FromHint>针对验证结果为「超时」的用户采取的措施</FromHint>
+                <FormLine>
+                  <FormLabel>击杀方式（错误）</FormLabel>
+                  <OwnSelect
+                    tw="mt-2"
+                    options={killingMethodOptions}
+                    value={editingTimeoutKillingMethodOption}
+                    onChange={handleEditingTimeoutKillingMethodSelectChange}
+                    isSearchable={false}
+                  />
+                </FormLine>
+                <FromHint>针对验证结果为「错误」的用户采取的措施</FromHint>
+                <FormLine>
+                  <FormLabel>超时时间</FormLabel>
+                  <div tw="w-4/12 flex flex-1">
                     <Select
                       tw="mr-2"
                       styles={{
@@ -369,10 +316,28 @@ export default () => {
                       }
                     />
                   </div>
-                </div>
-              </div>
+                </FormLine>
+                <FromHint>单个用户的验证等待时间，单位：秒</FromHint>
+              </form>
             </main>
           </PageSection>
+
+          {/* <PageSection>
+            <PageSectionHeader>
+              <PageSectionTitle>验证场合</PageSectionTitle>
+            </PageSectionHeader>
+            <main>
+              <NotImplemented />
+            </main>
+          </PageSection>
+          <PageSection>
+            <PageSectionHeader>
+              <PageSectionTitle>验证入口</PageSectionTitle>
+            </PageSectionHeader>
+            <main>
+              <NotImplemented />
+            </main>
+          </PageSection> */}
           {isEdited ? (
             <PageSection>
               <PageSectionHeader>
