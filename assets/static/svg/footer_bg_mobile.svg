@@ -1,16 +1,15 @@
 <svg xmlns="http://www.w3.org/2000/svg" version="1.1" xmlns:xlink="http://www.w3.org/1999/xlink"
     xmlns:svgjs="http://svgjs.com/svgjs" width="411" height="340" preserveAspectRatio="none" viewBox="0 0 411 340">
-    <g mask="url(&quot;#SvgjsMask1060&quot;)" fill="none">
+    <g mask="url(&quot;#SvgjsMask1154&quot;)" fill="none">
         <rect width="411" height="340" x="0" y="0" fill="rgba(255, 255, 255, 0)"></rect>
-        <path
-            d="M 0,124 C 27.4,113.8 82.2,73.4 137,73 C 191.8,72.6 219.2,136.6 274,122 C 328.8,107.4 383.6,24.4 411,0L411 340L0 340z"
+        <path d="M 0,68 C 41.2,80 123.8,127.8 206,128 C 288.2,128.2 370,80.8 411,69L411 340L0 340z"
             fill="rgba(196, 181, 0, 0.08)"></path>
         <path
-            d="M 0,232 C 20.6,241.8 61.8,286.2 103,281 C 144.2,275.8 164.8,196.8 206,206 C 247.2,215.2 268,325 309,327 C 350,329 390.6,238.2 411,216L411 340L0 340z"
+            d="M 0,236 C 27.4,247 82.2,292.2 137,291 C 191.8,289.8 219.2,228.4 274,230 C 328.8,231.6 383.6,285.2 411,299L411 340L0 340z"
             fill="rgba(235, 203, 0, 0.08)"></path>
     </g>
     <defs>
-        <mask id="SvgjsMask1060">
+        <mask id="SvgjsMask1154">
             <rect width="411" height="340" fill="#ffffff"></rect>
         </mask>
     </defs>
