@@ -419,7 +419,7 @@ export default () => {
                     <ProfileValue>{profileData.scheme.seconds}</ProfileValue>
                   </FormLine>
                 </div>
-                <p tw="text-gray-600 italic">
+                <p tw="text-gray-600 text-sm tracking-wide italic">
                   注意：验证方案的系统默认值可以被机器人拥有者随时维护修改，所以以上默认值只能表示此刻的数据。如有需要，请自行定制适合本群的方案。
                 </p>
               </main>
