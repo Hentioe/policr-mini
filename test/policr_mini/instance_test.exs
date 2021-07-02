@@ -1,5 +1,6 @@
-defmodule PolicrMini.TermBusinessTest do
+defmodule PolicrMini.InstanceTest do
   use PolicrMini.DataCase
+  doctest PolicrMini.Instance
 
   alias PolicrMini.Factory
 
