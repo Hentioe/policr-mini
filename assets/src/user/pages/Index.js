@@ -511,22 +511,11 @@ export default () => {
               <span tw="text-2xl font-extrabold">社区中开放服务的实例</span>
             </div>
             {thirdPartiesError ? (
-              <div>
-                <p tw="text-gray-200">
-                  此列表加载失败，当前实例可能并未注册成为社区运营的实例。去
-                  <a
-                    tw="text-gray-200"
-                    href="https://mini.telestd.me#community_instances"
-                    target="_blank"
-                  >
-                    官网
-                  </a>
-                  看看？
-                </p>
-
-                <p tw="text-gray-200 italic float-right">
-                  注意：是否向注册成为社区运营实例或开放服务是第三方实例的拥有者的自愿行为，看到此内容并不表示当前实例存在任何问题。
-                </p>
+              <div tw="text-gray-700 text-left inline-block">
+                <span tw="pr-2 font-bold text-sm text-gray-700 inline">
+                  当前实例尚未注册，无法载入此列表
+                </span>
+                <div tw="bg-gray-700 h-1 rounded-2xl "></div>
               </div>
             ) : thirdPartiesData ? (
               <Table>
@@ -614,7 +603,12 @@ export default () => {
                 </Tbody>
               </Table>
             ) : (
-              <span tw="text-gray-200">载入中……</span>
+              <div tw="text-gray-700 text-left inline-block">
+                <span tw="pr-2 font-bold text-sm text-gray-700 inline">
+                  载入中……
+                </span>
+                <div tw="bg-gray-700 h-1 rounded-2xl "></div>
+              </div>
             )}
           </div>
         </UnifiedFlexBox>
