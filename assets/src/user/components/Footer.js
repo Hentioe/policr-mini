@@ -67,7 +67,7 @@ export default () => {
             <img src="/images/logo-85x85.png" />
           </div>
           <div tw="ml-6 text-black">
-            <p tw="text-xl font-bold">policrmini</p>
+            <p tw="text-xl font-bold tracking-wide">policrmini</p>
             <p tw="text-xs font-bold tracking-wider">项目组：Telestd</p>
             <p tw="text-xs font-bold tracking-wider">隶属于：POLICR</p>
           </div>
