@@ -50,7 +50,6 @@ defmodule PolicrMiniWeb.Admin.API.PermissionController do
   end
 
   def sync(conn, %{"chat_id" => chat_id}) do
-    # TODO: 此处需要增加速率限制，并以标准 API 错误的形式返回速度受限的消息。
     with {:ok, _} <- check_permissions(conn, chat_id, [:writable, :owner]),
          :ok <- speed_check(conn, chat_id),
          {:ok, chat} <- ChatBusiness.get(chat_id),
