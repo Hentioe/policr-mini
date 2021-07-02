@@ -20,8 +20,6 @@ defmodule PolicrMini.Schema.Operation do
     timestamps()
   end
 
-  @type t :: Ecto.Schema.t()
-
   def changeset(%__MODULE__{} = operation, attrs) when is_map(attrs) do
     operation
     |> cast(attrs, @required_fields ++ @optional_fields)

@@ -28,8 +28,6 @@ defmodule PolicrMini.Schema.Scheme do
     timestamps()
   end
 
-  @type t :: map()
-
   # 针对默认 scheme 去掉一些约束检查。
   def changeset(%{chat_id: 0} = struct, attrs)
       when is_struct(struct, __MODULE__) and is_map(attrs) do

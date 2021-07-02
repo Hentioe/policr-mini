@@ -5,14 +5,12 @@ defmodule PolicrMiniWeb.API.TermController do
 
   use PolicrMiniWeb, :controller
 
-  alias PolicrMini.TermBusiness
+  alias PolicrMini.Instance
 
   action_fallback PolicrMiniWeb.API.FallbackController
 
-  @term_id 1
-
   def index(conn, _params) do
-    with {:ok, term} <- TermBusiness.fetch(@term_id),
+    with {:ok, term} <- Instance.fetch_term(),
          {:ok, html_content} <- as_html(term.content) do
       render(conn, "index.json", %{term: term, html_content: html_content})
     end

@@ -28,8 +28,6 @@ defmodule PolicrMini.Schema.Verification do
     timestamps()
   end
 
-  @type t :: Ecto.Schema.t()
-
   def changeset(%__MODULE__{} = verification, attrs) when is_map(attrs) do
     verification
     |> cast(attrs, @required_fields ++ @optional_fields)

@@ -22,8 +22,6 @@ defmodule PolicrMini.Schema.SponsorshipHistory do
     timestamps()
   end
 
-  @type t :: Ecto.Schema.t()
-
   def changeset(module, attrs) when is_struct(module, __MODULE__) and is_map(attrs) do
     module
     |> cast(attrs, @required_fields ++ @optional_fields)
