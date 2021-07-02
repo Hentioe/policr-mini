@@ -20,11 +20,11 @@ defmodule PolicrMini.ChatBusiness do
     chat |> Chat.changeset(attrs) |> Repo.update()
   end
 
-  @spec fetch(integer(), map()) :: written_returns()
-  def fetch(id, params) when is_integer(id) do
-    case id |> get() do
-      {:error, :not_found, _} -> create(params |> Map.put(:id, id))
-      {:ok, chat} -> chat |> update(params)
+  @spec fetch(integer(), params) :: written_returns()
+  def fetch(id, params) do
+    case get(id) do
+      {:error, :not_found, _} -> create(Map.put(params, :id, id))
+      {:ok, chat} -> update(chat, params)
     end
   end
 
