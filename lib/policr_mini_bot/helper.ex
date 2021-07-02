@@ -148,6 +148,8 @@ defmodule PolicrMiniBot.Helper do
         end
 
       e ->
+        Logger.unitized_error("Message sending", e: e, text: text)
+
         e
     end
   end

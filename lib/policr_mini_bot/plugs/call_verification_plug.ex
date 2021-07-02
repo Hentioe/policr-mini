@@ -155,10 +155,16 @@ defmodule PolicrMiniBot.CallVerificationPlug do
         # 解除限制
         async(fn -> derestrict_chat_member(verification.chat_id, verification.target_user_id) end)
         # 更新验证结果
-        async(fn ->
+        async do
+          # 注意：此处默认以 `Telegex.Marked` 库转换文字，需要用 `Telegex.Marked.escape_text/1` 函数转义文本中的动态内容。
+          text =
+            t("verification.passed.private", %{
+              chat_title: Telegex.Marked.escape_text(verification.chat.title)
+            })
+
           Cleaner.delete_message(verification.target_user_id, message_id)
-          send_message(verification.target_user_id, t("verification.passed.private"))
-        end)
+          send_message(verification.target_user_id, text, parse_mode: "MarkdownV2ToHTML")
+        end
 
         async(fn -> verification.chat_id |> typing() end)
 
@@ -192,7 +198,7 @@ defmodule PolicrMiniBot.CallVerificationPlug do
     cleaner_fun = fn notice_text ->
       async do
         Cleaner.delete_message(verification.target_user_id, message_id)
-        send_message(verification.target_user_id, notice_text)
+        send_message(verification.target_user_id, notice_text, parse_mode: "MarkdownV2ToHTML")
       end
     end
 
@@ -214,11 +220,19 @@ defmodule PolicrMiniBot.CallVerificationPlug do
       end
     end
 
-    case verification |> VerificationBusiness.update(%{status: :wronged}) do
+    case VerificationBusiness.update(verification, %{status: :wronged}) do
       {:ok, verification} ->
         # 添加操作记录（系统）。
         operation_create_fun.(verification)
-        cleaner_fun.(t("verification.wronged.#{wrong_killing_method || :kick}.private"))
+
+        # 注意：此处默认以 `Telegex.Marked` 库转换文字，需要用 `Telegex.Marked.escape_text/1` 函数转义文本中的动态内容。
+        text =
+          t("verification.wronged.#{wrong_killing_method || :kick}.private", %{
+            chat_title: Telegex.Marked.escape_text(verification.chat.title)
+          })
+
+        # 清理消息并私聊验证结果。
+        cleaner_fun.(text)
 
         kill(
           verification.chat_id,
@@ -261,7 +275,7 @@ defmodule PolicrMiniBot.CallVerificationPlug do
   """
   @spec validity_check(integer(), integer()) :: {:ok, Verification.t()} | {:error, String.t()}
   def validity_check(user_id, verification_id) do
-    with {:ok, verification} <- VerificationBusiness.get(verification_id),
+    with {:ok, verification} <- Verification.get(verification_id, preload: [:chat]),
          {:check_user, true} <- {:check_user, verification.target_user_id == user_id},
          {:check_status, true} <- {:check_status, verification.status == :waiting} do
       {:ok, verification}
