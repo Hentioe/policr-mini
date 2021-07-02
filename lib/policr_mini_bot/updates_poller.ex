@@ -15,7 +15,7 @@ defmodule PolicrMiniBot.UpdatesPoller do
   """
   def start_link(default \\ []) when is_list(default) do
     # 获取机器人必要信息
-    Logger.info("Checking bot information…")
+    Logger.info("Checking bot information ...")
 
     {:ok, %Telegex.Model.User{id: id, username: username, first_name: name}} = Telegex.get_me()
 
