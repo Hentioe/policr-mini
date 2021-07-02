@@ -74,6 +74,12 @@ async function leaveChat(id) {
   return fetch(endpoint, { method: "PUT" }).then((r) => camelizeJson(r));
 }
 
+async function syncChat(id) {
+  const endpoint = `/admin/api/chats/${id}/sync`;
+
+  return fetch(endpoint, { method: "PUT" }).then((r) => camelizeJson(r));
+}
+
 export default () => {
   const location = useLocation();
   const history = useHistory();
@@ -86,7 +92,7 @@ export default () => {
     keywords: keywordsParam,
   });
 
-  const { data, error } = useSWR(endpoint);
+  const { data, error, mutate } = useSWR(endpoint);
 
   const [offset, setOffset] = useState(offsetParam);
   const [searchText, setSearchText] = useState(keywordsParam);
@@ -120,11 +126,26 @@ export default () => {
       return;
     }
 
-    if (result.ok) toastMessage(`退出「${result.chat.title}」成功。`);
+    if (result.ok) toastMessage(`退出『${result.chat.title}』成功。`);
     else
-      toastMessage("不太确定「${result.chat.title}」的退出结果。", {
+      toastMessage("不太确定『${result.chat.title}』的退出结果。", {
         type: "warn",
       });
+
+    mutate();
+  };
+
+  const handleSyncChatClick = async (id) => {
+    const result = await syncChat(id);
+
+    if (result.errors) {
+      toastErrors(result.errors);
+      return;
+    }
+
+    toastMessage(`同步『${result.chat.title}』成功。`);
+
+    mutate();
   };
 
   useEffect(() => {
@@ -210,8 +231,13 @@ export default () => {
                           )}
                         </Td>
                         <Td tw="text-right">
-                          <ActionButton tw="mr-1">同步</ActionButton>
                           <ActionButton
+                            onClick={() => handleSyncChatClick(chat.id)}
+                          >
+                            同步
+                          </ActionButton>
+                          <ActionButton
+                            tw="ml-1"
                             onClick={() => handleLeaveChat(chat.id)}
                           >
                             退出

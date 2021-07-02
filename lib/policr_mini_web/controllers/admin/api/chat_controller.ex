@@ -14,6 +14,8 @@ defmodule PolicrMiniWeb.Admin.API.ChatController do
     OperationBusiness
   }
 
+  alias PolicrMiniBot.RespSyncCmdPlug
+
   import PolicrMiniWeb.Helper
 
   action_fallback PolicrMiniWeb.API.FallbackController
@@ -232,6 +234,13 @@ defmodule PolicrMiniWeb.Admin.API.ChatController do
     with {:ok, _} <- check_sys_permissions(conn) do
       chats = ChatBusiness.search(keywords, options)
       render(conn, "search.json", %{chats: chats})
+    end
+  end
+
+  def sync(conn, %{"id" => chat_id}) do
+    with {:ok, _} <- check_sys_permissions(conn),
+         {:ok, chat} <- RespSyncCmdPlug.synchronize_chat(chat_id) do
+      render(conn, "sync.json", %{chat: chat})
     end
   end
 

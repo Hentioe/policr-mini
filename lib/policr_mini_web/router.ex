@@ -41,6 +41,7 @@ defmodule PolicrMiniWeb.Router do
     get "/chats/:id/customs", ChatController, :customs
     get "/chats/:id/scheme", ChatController, :scheme
     put "/chats/:id/leave", ChatController, :leave
+    put "/chats/:id/sync", ChatController, :sync
     put "/chats/:chat_id/scheme", ChatController, :update_scheme
     put "/chats/:chat_id/takeover", ChatController, :change_takeover
     get "/chats/:chat_id/permissions", ChatController, :permissions

@@ -122,10 +122,7 @@ defmodule PolicrMiniBot.RespSyncCmdPlug do
           tg_can_send_polls: chat_permissions.can_send_polls
         }
 
-        params =
-          if init,
-            do: params |> Map.put(:is_take_over, false),
-            else: params
+        params = (init && Map.put(params, :is_take_over, false)) || params
 
         case ChatBusiness.fetch(chat_id, params) do
           {:error,
