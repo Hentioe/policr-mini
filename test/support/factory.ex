@@ -111,7 +111,7 @@ defmodule PolicrMini.Factory do
   end
 
   def build(:term) do
-    %PolicrMini.Instance.Term{
+    %PolicrMini.Instances.Term{
       id: 1_234_567_890,
       content: "服务条款内容。"
     }

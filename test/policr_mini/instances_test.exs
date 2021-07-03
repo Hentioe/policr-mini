@@ -1,10 +1,10 @@
-defmodule PolicrMini.InstanceTest do
+defmodule PolicrMini.InstancesTest do
   use PolicrMini.DataCase
-  doctest PolicrMini.Instance
+  doctest PolicrMini.Instances
 
   alias PolicrMini.Factory
 
-  import PolicrMini.Instance
+  import PolicrMini.Instances
 
   def build_term_params(attrs \\ []) do
     term = Factory.build(:term)

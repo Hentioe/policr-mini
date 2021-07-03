@@ -7,29 +7,29 @@ defmodule PolicrMiniWeb.Admin.API.TermController do
 
   import PolicrMiniWeb.Helper
 
-  alias PolicrMini.Instance
+  alias PolicrMini.Instances
 
   action_fallback PolicrMiniWeb.API.FallbackController
 
   def index(conn, _params) do
     with {:ok, _} <- check_sys_permissions(conn),
-         {:ok, term} <- Instance.fetch_term() do
+         {:ok, term} <- Instances.fetch_term() do
       render(conn, "index.json", %{term: term})
     end
   end
 
   def add_or_update(conn, params) do
     with {:ok, _} <- check_sys_permissions(conn),
-         {:ok, term} <- Instance.fetch_term(),
-         {:ok, term} <- Instance.update_term(term, params) do
+         {:ok, term} <- Instances.fetch_term(),
+         {:ok, term} <- Instances.update_term(term, params) do
       render(conn, "term.json", %{term: term})
     end
   end
 
   def delete(conn, _params) do
     with {:ok, _} <- check_sys_permissions(conn),
-         {:ok, term} <- Instance.fetch_term(),
-         {:ok, term} <- Instance.delete_term(term) do
+         {:ok, term} <- Instances.fetch_term(),
+         {:ok, term} <- Instances.delete_term(term) do
       render(conn, "term.json", %{term: term})
     end
   end

@@ -1,4 +1,4 @@
-defmodule PolicrMini.Instance do
+defmodule PolicrMini.Instances do
   @moduledoc """
   实例上下文。
   """
@@ -8,7 +8,7 @@ defmodule PolicrMini.Instance do
   import Ecto.Query, warn: false
 
   alias PolicrMini.Repo
-  alias PolicrMini.Instance.Term
+  alias __MODULE__.Term
 
   @type term_written_returns :: {:ok, Term.t()} | {:error, Ecto.Changeset.t()}
 

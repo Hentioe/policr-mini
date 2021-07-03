@@ -1,4 +1,4 @@
-defmodule PolicrMini.Instance.Term do
+defmodule PolicrMini.Instances.Term do
   @moduledoc """
   服务条款模式。
   """

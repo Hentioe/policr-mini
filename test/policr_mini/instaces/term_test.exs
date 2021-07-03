@@ -1,8 +1,8 @@
-defmodule PolicrMini.Instance.TermTest do
+defmodule PolicrMini.Instances.TermTest do
   use ExUnit.Case
 
   alias PolicrMini.Factory
-  alias PolicrMini.Instance.Term
+  alias PolicrMini.Instances.Term
 
   describe "schema" do
     test "schema metadata" do
