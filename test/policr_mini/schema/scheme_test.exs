@@ -19,6 +19,7 @@ defmodule PolicrMini.Schema.SchemeTest do
                  :timeout_killing_method,
                  :wrong_killing_method,
                  :is_highlighted,
+                 :mention_text,
                  :inserted_at,
                  :updated_at
                ]

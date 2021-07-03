@@ -17,9 +17,9 @@ defmodule PolicrMini.DefaultsServer do
     {:ok, state}
   end
 
-  @spec get_default_scheme_value(atom) :: any
-  def get_default_scheme_value(field) do
-    GenServer.call(__MODULE__, {:get_default_scheme_value, field})
+  @spec get_scheme_value(atom) :: any
+  def get_scheme_value(field) do
+    GenServer.call(__MODULE__, {:get_scheme_value, field})
   end
 
   @spec get_scheme :: PolicrMini.Schema.Scheme.t()
@@ -27,12 +27,12 @@ defmodule PolicrMini.DefaultsServer do
     GenServer.call(__MODULE__, {:get_scheme})
   end
 
-  @spec update_default_scheme(SchemeBusiness.params()) :: :ok
-  def update_default_scheme(params) do
-    GenServer.cast(__MODULE__, {:update_default_scheme, params})
+  @spec update_scheme(SchemeBusiness.params()) :: :ok
+  def update_scheme(params) do
+    GenServer.cast(__MODULE__, {:update_scheme, params})
   end
 
-  def handle_call({:get_default_scheme_value, field}, _from, state) do
+  def handle_call({:get_scheme_value, field}, _from, state) do
     value =
       state
       |> Map.get(:scheme)
@@ -45,7 +45,7 @@ defmodule PolicrMini.DefaultsServer do
     {:reply, Map.get(state, :scheme), state}
   end
 
-  def handle_cast({:update_default_scheme, params}, state) do
+  def handle_cast({:update_scheme, params}, state) do
     scheme = Map.get(state, :scheme)
 
     case SchemeBusiness.update(scheme, params) do

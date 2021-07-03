@@ -60,25 +60,42 @@ defmodule PolicrMini.SchemeBusiness do
     seconds: 300,
     timeout_killing_method: :kick,
     wrong_killing_method: :kick,
-    is_highlighted: true
+    is_highlighted: true,
+    mention_text: :mosaic_full_name
   }
 
   @doc """
   获取默认方案，如果不存在将自动创建。
   """
-  @spec fetch_default :: {:ok, Scheme.t()} | {:error, any}
+  @spec fetch_default :: written_returns
   def fetch_default do
     Repo.transaction(fn ->
       case find(@default_id) || create_default(@default_scheme) do
         {:ok, scheme} ->
+          # 创建了一个新的方案。
           scheme
 
         {:error, e} ->
+          # 创建方案发生错误。
           Repo.rollback(e)
 
+        # 方案已存在。
         scheme ->
-          scheme
+          fill_default_in_transaction(scheme)
       end
     end)
+  end
+
+  @spec fill_default_in_transaction(Scheme.t()) :: Scheme.t() | no_return
+  defp fill_default_in_transaction(scheme) do
+    attrs = %{}
+
+    # 此处填充后续在方案中添加的新字段，避免方案已存在时这些字段出现 `nil` 值。
+    attrs = if scheme.mention_text, do: attrs, else: %{mention_text: @default_scheme.mention_text}
+
+    case update(scheme, attrs) do
+      {:ok, scheme} -> scheme
+      {:error, e} -> Repo.rollback(e)
+    end
   end
 end

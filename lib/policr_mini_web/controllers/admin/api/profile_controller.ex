@@ -19,7 +19,7 @@ defmodule PolicrMiniWeb.Admin.API.ProfileController do
 
   def update_scheme(conn, params) do
     with {:ok, _} <- check_sys_permissions(conn),
-         :ok <- DefaultsServer.update_default_scheme(params) do
+         :ok <- DefaultsServer.update_scheme(params) do
       # TODO: 配合 `PolicrMini.DefaultsServer` 模块以支持返回错误消息。
 
       render(conn, "result.json", %{ok: true})

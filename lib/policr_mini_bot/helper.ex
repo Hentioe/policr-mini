@@ -506,7 +506,7 @@ defmodule PolicrMiniBot.Helper do
   def default!(key) when is_atom(key) do
     field = @defaults_key_mapping[key] || raise "Default field name without key `#{key}` mapping"
 
-    PolicrMini.DefaultsServer.get_default_scheme_value(field)
+    PolicrMini.DefaultsServer.get_scheme_value(field)
   end
 
   @spec t(String.t(), map()) :: String.t()

@@ -9,11 +9,21 @@ defmodule PolicrMini.Schema.Scheme do
     VerificationModeEnum,
     KillingMethodEnum,
     VerificationEntranceEnum,
-    VerificationOccasionEnum
+    VerificationOccasionEnum,
+    MentionText
   }
 
   @required_fields ~w(chat_id)a
-  @optional_fields ~w(verification_mode verification_entrance verification_occasion seconds timeout_killing_method wrong_killing_method is_highlighted)a
+  @optional_fields ~w(
+                      verification_mode
+                      verification_entrance
+                      verification_occasion
+                      seconds
+                      timeout_killing_method
+                      wrong_killing_method
+                      is_highlighted
+                      mention_text
+                    )a
 
   schema "schemes" do
     field :chat_id, :integer
@@ -24,6 +34,7 @@ defmodule PolicrMini.Schema.Scheme do
     field :timeout_killing_method, KillingMethodEnum
     field :wrong_killing_method, KillingMethodEnum
     field :is_highlighted, :boolean
+    field :mention_text, MentionText
 
     timestamps()
   end
