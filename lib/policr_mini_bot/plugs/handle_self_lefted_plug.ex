@@ -9,7 +9,9 @@ defmodule PolicrMiniBot.HandleSelfLeftedPlug do
 
   use PolicrMiniBot, plug: :preheater
 
-  alias PolicrMini.{Logger, ChatBusiness}
+  alias PolicrMini.Instances
+  alias PolicrMini.Instances.Chat
+  alias PolicrMini.Logger
   alias PolicrMiniBot.State
 
   @doc """
@@ -66,8 +68,8 @@ defmodule PolicrMiniBot.HandleSelfLeftedPlug do
     state = State.set_action(state, :self_lefted)
 
     # 取消接管
-    case ChatBusiness.get(chat_id) do
-      {:ok, chat} -> ChatBusiness.cancel_takeover(chat)
+    case Chat.get(chat_id) do
+      {:ok, chat} -> Instances.cancel_chat_takeover(chat)
       _ -> nil
     end
 

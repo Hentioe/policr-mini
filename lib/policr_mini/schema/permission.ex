@@ -5,7 +5,8 @@ defmodule PolicrMini.Schema.Permission do
 
   use PolicrMini.Schema
 
-  alias PolicrMini.Schema.{Chat, User}
+  alias PolicrMini.Instances.Chat
+  alias PolicrMini.Schema.User
 
   @required_fields ~w(chat_id user_id tg_is_owner)a
   @optional_fields ~w(tg_can_restrict_members tg_can_promote_members readable writable customized)a

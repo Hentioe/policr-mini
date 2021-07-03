@@ -7,7 +7,7 @@ defmodule PolicrMiniBot.Helper do
 
   alias PolicrMini.Logger
 
-  alias PolicrMini.ChatBusiness
+  alias PolicrMini.Instances.Chat
 
   @type tgerror :: {:error, Telegex.Model.errors()}
   @type tgmsg :: Telegex.Model.Message.t()
@@ -350,7 +350,7 @@ defmodule PolicrMiniBot.Helper do
        tg_can_change_info: can_change_info,
        tg_can_invite_users: can_invite_users,
        tg_can_pin_messages: can_pin_messages
-     }} = ChatBusiness.get(chat_id)
+     }} = Chat.get(chat_id)
 
     Telegex.restrict_chat_member(chat_id, user_id, %Telegex.Model.ChatPermissions{
       can_send_messages: can_send_messages,

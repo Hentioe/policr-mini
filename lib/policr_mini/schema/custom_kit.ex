@@ -5,7 +5,7 @@ defmodule PolicrMini.Schema.CustomKit do
 
   use PolicrMini.Schema
 
-  alias PolicrMini.Schema.Chat
+  alias PolicrMini.Instances.Chat
 
   @required_fields ~w(chat_id title answers)a
   @optional_fields ~w(attachment)a

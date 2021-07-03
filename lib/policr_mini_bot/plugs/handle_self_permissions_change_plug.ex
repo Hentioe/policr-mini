@@ -5,8 +5,9 @@ defmodule PolicrMiniBot.HandleSelfPermissionsChangePlug do
 
   use PolicrMiniBot, plug: :preheater
 
+  alias PolicrMini.{Logger, Instances}
+  alias PolicrMini.Instances.Chat
   alias Telegex.Model.{InlineKeyboardMarkup, InlineKeyboardButton}
-  alias PolicrMini.{Logger, ChatBusiness}
 
   @doc """
   根据更新消息中的 `my_chat_member` 字段，处理自身权限变化。
@@ -266,15 +267,15 @@ defmodule PolicrMiniBot.HandleSelfPermissionsChangePlug do
   end
 
   defp cancel_takevoder(chat_id) do
-    case ChatBusiness.get(chat_id) do
-      {:ok, chat} -> ChatBusiness.cancel_takeover(chat)
+    case Chat.get(chat_id) do
+      {:ok, chat} -> Instances.cancel_chat_takeover(chat)
       _ -> nil
     end
   end
 
   @spec taken_over?(integer) :: boolean
   defp taken_over?(chat_id) do
-    case ChatBusiness.get(chat_id) do
+    case Chat.get(chat_id) do
       {:ok, chat} -> chat.is_take_over
       _ -> false
     end

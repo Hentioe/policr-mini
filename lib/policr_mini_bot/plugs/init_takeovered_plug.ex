@@ -5,7 +5,7 @@ defmodule PolicrMiniBot.InitTakeoveredPlug do
 
   use PolicrMiniBot, plug: :preheater
 
-  alias PolicrMini.ChatBusiness
+  alias PolicrMini.Instances.Chat
 
   @doc """
   检查更新内容涉及群组的接管状态，填充状态中的相关字段。
@@ -17,7 +17,7 @@ defmodule PolicrMiniBot.InitTakeoveredPlug do
   def call(update, state) do
     if chat_id = find_chat_id(update) do
       takeovered =
-        case ChatBusiness.get(chat_id) do
+        case Chat.get(chat_id) do
           {:ok, chat} -> chat.is_take_over
           _ -> false
         end

@@ -5,7 +5,7 @@ defmodule PolicrMini.Schema.Statistic do
 
   use PolicrMini.Schema
 
-  alias PolicrMini.Schema.Chat
+  alias PolicrMini.Instances.Chat
   alias PolicrMini.EctoEnums.StatVerificationStatus
 
   @required_fields ~w(chat_id)a

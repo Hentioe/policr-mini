@@ -1,15 +1,15 @@
 defmodule PolicrMini.VerificationBusinessTest do
   use PolicrMini.DataCase
 
-  alias PolicrMini.Factory
-  alias PolicrMini.{VerificationBusiness, MessageSnapshotBusiness, ChatBusiness}
+  alias PolicrMini.{Factory, Instances}
+  alias PolicrMini.{VerificationBusiness, MessageSnapshotBusiness}
 
   def build_params(attrs \\ []) do
     chat_id =
       if chat_id = attrs[:chat_id] do
         chat_id
       else
-        {:ok, chat} = ChatBusiness.create(Factory.build(:chat) |> Map.from_struct())
+        {:ok, chat} = Instances.create_chat(Factory.build(:chat) |> Map.from_struct())
         chat.id
       end
 

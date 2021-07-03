@@ -1,15 +1,15 @@
 defmodule PolicrMini.CustomKitBusinessTest do
   use PolicrMini.DataCase
 
-  alias PolicrMini.Factory
-  alias PolicrMini.{CustomKitBusiness, ChatBusiness}
+  alias PolicrMini.{Factory, Instances}
+  alias PolicrMini.CustomKitBusiness
 
   def build_params(attrs \\ []) do
     chat_id =
       if chat_id = attrs[:chat_id] do
         chat_id
       else
-        {:ok, chat} = ChatBusiness.create(Factory.build(:chat) |> Map.from_struct())
+        {:ok, chat} = Instances.create_chat(Factory.build(:chat) |> Map.from_struct())
         chat.id
       end
 
@@ -54,7 +54,7 @@ defmodule PolicrMini.CustomKitBusinessTest do
     assert length(custom_kits) == 2
 
     {:ok, chat2} =
-      ChatBusiness.create(Factory.build(:chat, id: 1_098_765_432) |> Map.from_struct())
+      Instances.create_chat(Factory.build(:chat, id: 1_098_765_432) |> Map.from_struct())
 
     {:ok, _} = CustomKitBusiness.create(custom_kit_params |> Map.put(:chat_id, chat2.id))
 

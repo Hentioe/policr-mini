@@ -5,6 +5,9 @@ defmodule PolicrMiniWeb.Admin.API.ChatController do
 
   use PolicrMiniWeb, :controller
 
+  alias PolicrMini.Instances
+  alias PolicrMini.Instances.Chat
+
   alias PolicrMini.{
     ChatBusiness,
     CustomKitBusiness,
@@ -28,14 +31,14 @@ defmodule PolicrMiniWeb.Admin.API.ChatController do
 
   def photo(conn, %{"id" => id}) do
     with {:ok, _} <- check_permissions(conn, id),
-         {:ok, chat} <- ChatBusiness.get(id) do
+         {:ok, chat} <- Chat.get(id) do
       Phoenix.Controller.redirect(conn, to: get_photo_assets(chat.small_photo_id))
     end
   end
 
   def customs(conn, %{"id" => id}) do
     with {:ok, permissions} <- check_permissions(conn, id),
-         {:ok, chat} <- ChatBusiness.get(id) do
+         {:ok, chat} <- Chat.get(id) do
       custom_kits = CustomKitBusiness.find_list(id)
       is_enabled = custom_enabled?(id)
 
@@ -57,7 +60,7 @@ defmodule PolicrMiniWeb.Admin.API.ChatController do
 
   def scheme(conn, %{"id" => id}) do
     with {:ok, permissions} <- check_permissions(conn, id),
-         {:ok, chat} <- ChatBusiness.get(id) do
+         {:ok, chat} <- Chat.get(id) do
       scheme = SchemeBusiness.find(chat_id: id)
 
       render(conn, "scheme.json", %{
@@ -70,7 +73,7 @@ defmodule PolicrMiniWeb.Admin.API.ChatController do
 
   def update_scheme(conn, %{"chat_id" => chat_id} = params) do
     with {:ok, _} <- check_permissions(conn, chat_id, [:writable]),
-         {:ok, chat} <- ChatBusiness.get(chat_id),
+         {:ok, chat} <- Chat.get(chat_id),
          {:ok, scheme} <- SchemeBusiness.fetch(chat_id),
          {:ok, scheme} <- SchemeBusiness.update(scheme, params) do
       render(conn, "scheme.json", %{chat: chat, scheme: scheme, writable: true})
@@ -79,9 +82,9 @@ defmodule PolicrMiniWeb.Admin.API.ChatController do
 
   def change_takeover(conn, %{"chat_id" => chat_id, "value" => is_takeover} = _params) do
     with {:ok, _} <- check_permissions(conn, chat_id, [:writable]),
-         {:ok, chat} <- ChatBusiness.get(chat_id),
+         {:ok, chat} <- Chat.get(chat_id),
          {:ok, _} <- check_takeover_permissions(chat_id, is_takeover),
-         {:ok, chat} <- ChatBusiness.update(chat, %{is_take_over: is_takeover}) do
+         {:ok, chat} <- Instances.update_chat(chat, %{is_take_over: is_takeover}) do
       render(conn, "show.json", %{chat: chat})
     end
   end
@@ -120,7 +123,7 @@ defmodule PolicrMiniWeb.Admin.API.ChatController do
 
   def permissions(conn, %{"chat_id" => chat_id} = _params) do
     with {:ok, perms} <- check_permissions(conn, chat_id),
-         {:ok, chat} <- ChatBusiness.get(chat_id) do
+         {:ok, chat} <- Chat.get(chat_id) do
       permissions = PermissionBusiness.find_list(chat_id: chat_id, preload: [:user])
 
       render(conn, "permissions.json", %{
@@ -145,7 +148,7 @@ defmodule PolicrMiniWeb.Admin.API.ChatController do
     cont = [chat_id: chat_id, offset: offset, status: status]
 
     with {:ok, perms} <- check_permissions(conn, chat_id),
-         {:ok, chat} <- ChatBusiness.get(chat_id) do
+         {:ok, chat} <- Chat.get(chat_id) do
       verifications = VerificationBusiness.find_list(cont)
 
       render(conn, "verifications.json", %{
@@ -183,7 +186,7 @@ defmodule PolicrMiniWeb.Admin.API.ChatController do
     ]
 
     with {:ok, perms} <- check_permissions(conn, chat_id),
-         {:ok, chat} <- ChatBusiness.get(chat_id) do
+         {:ok, chat} <- Chat.get(chat_id) do
       operations = OperationBusiness.find_list(cont)
 
       render(conn, "operations.json", %{
@@ -255,7 +258,7 @@ defmodule PolicrMiniWeb.Admin.API.ChatController do
 
   def leave(conn, %{"id" => id} = _params) do
     with {:ok, _} <- check_sys_permissions(conn, [:writable]),
-         {:ok, chat} <- ChatBusiness.get(id),
+         {:ok, chat} <- Chat.get(id),
          {:ok, ok} <- leave_chat(id) do
       render(conn, "leave.json", %{ok: ok, chat: chat})
     end

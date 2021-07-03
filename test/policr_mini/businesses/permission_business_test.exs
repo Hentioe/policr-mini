@@ -1,15 +1,15 @@
 defmodule PolicrMini.PermissionBusinessTest do
   use PolicrMini.DataCase
 
-  alias PolicrMini.Factory
-  alias PolicrMini.{PermissionBusiness, ChatBusiness, UserBusiness}
+  alias PolicrMini.{Factory, Instances}
+  alias PolicrMini.{PermissionBusiness, UserBusiness}
 
   def build_params(attrs \\ []) do
     chat_id =
       if chat_id = attrs[:chat_id] do
         chat_id
       else
-        {:ok, chat} = ChatBusiness.create(Factory.build(:chat) |> Map.from_struct())
+        {:ok, chat} = Instances.create_chat(Map.from_struct(Factory.build(:chat)))
         chat.id
       end
 
@@ -152,8 +152,12 @@ defmodule PolicrMini.PermissionBusinessTest do
     permission_params = build_params()
     {:ok, _} = PermissionBusiness.create(permission_params |> Map.put(:user_id, user2.id))
 
-    {:ok, chat2} = ChatBusiness.create(Factory.build(:chat, id: 198_765_432) |> Map.from_struct())
-    {:ok, chat3} = ChatBusiness.create(Factory.build(:chat, id: 298_765_432) |> Map.from_struct())
+    {:ok, chat2} =
+      Instances.create_chat(Factory.build(:chat, id: 198_765_432) |> Map.from_struct())
+
+    {:ok, chat3} =
+      Instances.create_chat(Factory.build(:chat, id: 298_765_432) |> Map.from_struct())
+
     {:ok, user3} = UserBusiness.create(Factory.build(:user, id: 1_912_345) |> Map.from_struct())
 
     {:ok, _} = PermissionBusiness.create(permission_params |> Map.put(:chat_id, chat2.id))

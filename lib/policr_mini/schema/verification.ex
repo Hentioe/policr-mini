@@ -6,7 +6,8 @@ defmodule PolicrMini.Schema.Verification do
   use PolicrMini.Schema
 
   alias PolicrMini.EctoEnums.{VerificationEntranceEnum, VerificationStatusEnum}
-  alias PolicrMini.Schema.{Chat, MessageSnapshot}
+  alias PolicrMini.Instances.Chat
+  alias PolicrMini.Schema.MessageSnapshot
 
   @required_fields ~w(chat_id target_user_id entrance seconds status)a
   @optional_fields ~w(message_snapshot_id target_user_name target_user_language_code message_id indices chosen)a

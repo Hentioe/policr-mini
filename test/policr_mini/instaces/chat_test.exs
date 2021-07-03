@@ -1,8 +1,8 @@
-defmodule PolicrMini.Schema.ChatTest do
+defmodule PolicrMini.Instances.ChatTest do
   use ExUnit.Case
 
   alias PolicrMini.Factory
-  alias PolicrMini.Schema.Chat
+  alias PolicrMini.Instances.Chat
 
   describe "schema" do
     test "schema metadata" do

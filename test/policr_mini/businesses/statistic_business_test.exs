@@ -1,15 +1,15 @@
 defmodule PolicrMini.StatisticBusinessTest do
   use PolicrMini.DataCase
 
-  alias PolicrMini.Factory
-  alias PolicrMini.{StatisticBusiness, ChatBusiness}
+  alias PolicrMini.{Factory, Instances}
+  alias PolicrMini.StatisticBusiness
 
   def build_params(attrs \\ []) do
     chat_id =
       if chat_id = attrs[:chat_id] do
         chat_id
       else
-        {:ok, chat} = ChatBusiness.create(Factory.build(:chat) |> Map.from_struct())
+        {:ok, chat} = Instances.create_chat(Factory.build(:chat) |> Map.from_struct())
         chat.id
       end
 
@@ -136,7 +136,7 @@ defmodule PolicrMini.StatisticBusinessTest do
   end
 
   test "increment_one/3" do
-    {:ok, chat} = ChatBusiness.create(Factory.build(:chat) |> Map.from_struct())
+    {:ok, chat} = Instances.create_chat(Factory.build(:chat) |> Map.from_struct())
 
     {:ok, _} = StatisticBusiness.increment_one(chat.id, "zh-hans", :passed)
     {:ok, _} = StatisticBusiness.increment_one(chat.id, "zh-hans", :passed)

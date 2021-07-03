@@ -5,7 +5,8 @@ defmodule PolicrMiniBot.HandleNewChatPhotoPlug do
 
   use PolicrMiniBot, plug: :message_handler
 
-  alias PolicrMini.ChatBusiness
+  alias PolicrMini.Instances
+  alias PolicrMini.Instances.Chat
 
   @doc """
   匹配消息是否包含群组头像修改。
@@ -27,9 +28,9 @@ defmodule PolicrMiniBot.HandleNewChatPhotoPlug do
     %{chat: %{id: chat_id}} = message
 
     # 获取照片中的小图和大图，并更新相应数据
-    case ChatBusiness.get(chat_id) do
+    case Chat.get(chat_id) do
       {:ok, chat} ->
-        ChatBusiness.update(chat, %{
+        Instances.update_chat(chat, %{
           small_photo_id: small_photo_id(message),
           big_photo_id: big_photo_id(message)
         })

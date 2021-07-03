@@ -5,7 +5,7 @@ defmodule PolicrMini.Schema.MessageSnapshot do
 
   use PolicrMini.Schema
 
-  alias PolicrMini.Schema.Chat
+  alias PolicrMini.Instances.Chat
 
   @required_fields ~w(chat_id message_id from_user_id from_user_name date)a
   @optional_fields ~w(text photo_id caption markup_body attachment)a

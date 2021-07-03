@@ -5,7 +5,8 @@ defmodule PolicrMiniWeb.Admin.API.PermissionController do
 
   use PolicrMiniWeb, :controller
 
-  alias PolicrMini.{PermissionBusiness, ChatBusiness}
+  alias PolicrMini.Instances.Chat
+  alias PolicrMini.PermissionBusiness
   alias PolicrMiniBot.{RespSyncCmdPlug, SpeedLimiter}
 
   import PolicrMiniWeb.Helper
@@ -52,7 +53,7 @@ defmodule PolicrMiniWeb.Admin.API.PermissionController do
   def sync(conn, %{"chat_id" => chat_id}) do
     with {:ok, _} <- check_permissions(conn, chat_id, [:writable, :owner]),
          :ok <- speed_check(conn, chat_id),
-         {:ok, chat} <- ChatBusiness.get(chat_id),
+         {:ok, chat} <- Chat.get(chat_id),
          {:ok, _} <- RespSyncCmdPlug.synchronize_administrators(chat) do
       render(conn, "sync.json", %{ok: true})
     end

@@ -12,7 +12,7 @@ defmodule PolicrMini.Factory do
   end
 
   def build(:chat) do
-    %PolicrMini.Schema.Chat{
+    %PolicrMini.Instances.Chat{
       id: 1_234_567_890,
       type: "supergroup",
       title: "Elixir 编程语言",

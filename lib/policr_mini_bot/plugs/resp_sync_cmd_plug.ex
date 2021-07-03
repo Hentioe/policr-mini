@@ -9,8 +9,10 @@ defmodule PolicrMiniBot.RespSyncCmdPlug do
 
   use PolicrMiniBot, plug: [commander: :sync]
 
-  alias PolicrMini.{ChatBusiness, UserBusiness, SchemeBusiness}
-  alias PolicrMini.Schema.{Permission, Chat}
+  alias PolicrMini.Instances
+  alias PolicrMini.Instances.Chat
+  alias PolicrMini.{UserBusiness, SchemeBusiness}
+  alias PolicrMini.Schema.{Permission}
   alias PolicrMiniBot.SpeedLimiter
 
   @doc """
@@ -53,9 +55,9 @@ defmodule PolicrMiniBot.RespSyncCmdPlug do
           last_is_take_over = chat.is_take_over
 
           if is_admin do
-            chat |> ChatBusiness.update(%{is_take_over: true})
+            Instances.update_chat(chat, %{is_take_over: true})
           else
-            chat |> ChatBusiness.cancel_takeover()
+            Instances.cancel_chat_takeover(chat)
           end
 
           message_text = t("sync.success")
@@ -124,10 +126,10 @@ defmodule PolicrMiniBot.RespSyncCmdPlug do
 
         params = (init && Map.put(params, :is_take_over, false)) || params
 
-        case ChatBusiness.fetch(chat_id, params) do
+        case Instances.fetch_and_update_chat(chat_id, params) do
           {:error,
            %Ecto.Changeset{errors: [is_take_over: {"can't be blank", [validation: :required]}]}} ->
-            ChatBusiness.fetch(chat_id, params |> Map.put(:is_take_over, false))
+            Instances.fetch_and_update_chat(chat_id, params |> Map.put(:is_take_over, false))
 
           r ->
             r
@@ -195,7 +197,7 @@ defmodule PolicrMiniBot.RespSyncCmdPlug do
           end)
 
         try do
-          chat |> ChatBusiness.reset_administrators!(permissions)
+          Instances.reset_chat_permissions!(chat, permissions)
 
           {:ok, chat}
         rescue

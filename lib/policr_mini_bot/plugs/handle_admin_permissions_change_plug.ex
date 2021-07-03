@@ -5,7 +5,8 @@ defmodule PolicrMiniBot.HandleAdminPermissionsChangePlug do
 
   use PolicrMiniBot, plug: :preheater
 
-  alias PolicrMini.{Logger, ChatBusiness}
+  alias PolicrMini.Instances.Chat
+  alias PolicrMini.Logger
   alias PolicrMiniBot.RespSyncCmdPlug
 
   @doc """
@@ -111,7 +112,7 @@ defmodule PolicrMiniBot.HandleAdminPermissionsChangePlug do
 
     # TODO: 优化管理员权限的自动同步过程。改为对单个用户权限的更新或删除，而非根据 API 调用结果同步所有数据。
 
-    with {:ok, chat} <- ChatBusiness.get(chat_id),
+    with {:ok, chat} <- Chat.get(chat_id),
          {:ok, _} <- RespSyncCmdPlug.synchronize_administrators(chat) do
       text = """
       检测到用户 #{mention(user, anonymization: false, parse_mode: "HTML")} 的管理权限变化，已自动同步至后台权限中。

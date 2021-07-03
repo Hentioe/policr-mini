@@ -5,7 +5,8 @@ defmodule PolicrMiniBot.HandleNewChatTitlePlug do
 
   use PolicrMiniBot, plug: :message_handler
 
-  alias PolicrMini.ChatBusiness
+  alias PolicrMini.Instances
+  alias PolicrMini.Instances.Chat
 
   @doc """
   匹配消息是否包含群组标题修改。
@@ -26,9 +27,9 @@ defmodule PolicrMiniBot.HandleNewChatTitlePlug do
   def handle(message, state) do
     %{new_chat_title: new_chat_title, chat: %{id: chat_id}} = message
 
-    case ChatBusiness.get(chat_id) do
+    case Chat.get(chat_id) do
       {:ok, chat} ->
-        ChatBusiness.update(chat, %{title: new_chat_title})
+        Instances.update_chat(chat, %{title: new_chat_title})
         {:ok, state}
 
       _ ->

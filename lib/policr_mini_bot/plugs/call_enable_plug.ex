@@ -5,7 +5,8 @@ defmodule PolicrMiniBot.CallEnablePlug do
 
   use PolicrMiniBot, plug: [caller: [prefix: "enable:"]]
 
-  alias PolicrMini.ChatBusiness
+  alias PolicrMini.Instances
+  alias PolicrMini.Instances.Chat
 
   @doc """
   回调处理函数。
@@ -26,9 +27,9 @@ defmodule PolicrMiniBot.CallEnablePlug do
   def handle({"v1", [chat_id]}, callback_query, _state) do
     %{message: %{message_id: message_id}} = callback_query
 
-    case ChatBusiness.get(chat_id) do
+    case Chat.get(chat_id) do
       {:ok, chat} ->
-        ChatBusiness.update(chat, %{is_take_over: true})
+        Instances.update_chat(chat, %{is_take_over: true})
 
         Telegex.answer_callback_query(callback_query.id, text: "功能已启用~", show_alert: true)
 

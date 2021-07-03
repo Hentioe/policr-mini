@@ -7,7 +7,8 @@ defmodule PolicrMiniBot.Runner do
   alias PolicrMini.Logger
 
   alias PolicrMini.{VerificationBusiness, ChatBusiness, StatisticBusiness, PermissionBusiness}
-  alias PolicrMini.Schema.Chat
+  alias PolicrMini.Instances
+  alias PolicrMini.Instances.Chat
   alias PolicrMiniBot.Helper, as: BotHelper
 
   @spec fix_expired_wait_status :: :ok
@@ -126,7 +127,7 @@ defmodule PolicrMiniBot.Runner do
   # 取消接管
   defp cancel_takeover(%Chat{id: chat_id} = chat, send_notification \\ true)
        when is_integer(chat_id) and is_boolean(send_notification) do
-    ChatBusiness.cancel_takeover(chat)
+    Instances.cancel_chat_takeover(chat)
 
     if send_notification,
       do:

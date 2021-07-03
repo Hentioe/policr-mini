@@ -1,6 +1,6 @@
-defmodule PolicrMini.Schema.Chat do
+defmodule PolicrMini.Instances.Chat do
   @moduledoc """
-  群组（或通用 chat ）模型。
+  群组（或通用 chat）模式。
   """
 
   use PolicrMini.Schema
@@ -9,7 +9,12 @@ defmodule PolicrMini.Schema.Chat do
 
   @required_fields ~w(id type is_take_over)a
   @optional_fields ~w(
-                      title small_photo_id big_photo_id username description invite_link
+                      title
+                      small_photo_id
+                      big_photo_id
+                      username
+                      description
+                      invite_link
                       tg_can_add_web_page_previews
                       tg_can_change_info
                       tg_can_invite_users
@@ -42,8 +47,8 @@ defmodule PolicrMini.Schema.Chat do
     timestamps()
   end
 
-  def changeset(%__MODULE__{} = chat, attrs) when is_map(attrs) do
-    chat
+  def changeset(struct, attrs) when is_struct(struct, __MODULE__) and is_map(attrs) do
+    struct
     |> cast(attrs, @required_fields ++ @optional_fields)
     |> validate_required(@required_fields)
   end
