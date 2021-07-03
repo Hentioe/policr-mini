@@ -122,7 +122,7 @@ defmodule PolicrMiniBot.HandleSelfPermissionsChangePlug do
         text = """
         由于本机器人的管理权限被撤销，已自动取消对新成员验证的接管。
 
-        <i>若想再次启用，将本机器人重新提升为管理员即可。如已确定不再需要本机器人，可通过按钮退出或将它移除。</i>
+        <i>提示：若想再次启用，将本机器人重新提升为管理员即可。如已确定不再需要本机器人，可通过按钮退出或将它移除。</i>
         """
 
         markup = make_leave_markup(chat_id)
@@ -164,15 +164,15 @@ defmodule PolicrMiniBot.HandleSelfPermissionsChangePlug do
       - 删除消息（Delete messages）
       - 封禁成员（Ban users）
 
-      <i>权限修改后会自动提供启用功能的按钮，亦可随时进入后台页面操作。</i>
+      <i>提示：权限修改后会自动提供启用功能的按钮，亦可随时进入后台页面操作。</i>
       """
 
       Telegex.send_message(chat_id, text, parse_mode: "HTML")
     else
       text = """
-      <b>本机器人已经具备相关管理权限了，是否需要接管新成员验证？</b>
+      本机器人已经具备相关管理权限了，是否接管新成员验证？
 
-      <i>群管理员可直接通过按钮启用，亦可随时进入后台页面操作。</i>
+      <i>提示：群管理员可直接通过按钮启用，亦可随时进入后台页面操作。</i>
       """
 
       markup = make_enable_markup(chat_id)
@@ -207,7 +207,7 @@ defmodule PolicrMiniBot.HandleSelfPermissionsChangePlug do
         text = """
         本机器人现在已经具备必要管理权限了，是否重新接管新成员验证？
 
-        <i>群管理员可直接通过按钮启用，亦可随时进入后台页面操作。</i>
+        <i>提示：群管理可直接通过按钮启用，亦可随时进入后台页面操作。</i>
         """
 
         markup = make_enable_markup(chat_id)
@@ -224,7 +224,7 @@ defmodule PolicrMiniBot.HandleSelfPermissionsChangePlug do
           - 删除消息（Delete messages）
           - 封禁成员（Ban users）
 
-          <i>权限修改后会自动提供启用功能的按钮，亦可随时进入后台页面操作。</i>
+          <i>提示：权限修改后会自动提供启用功能的按钮，亦可随时进入后台页面操作。</i>
           """
 
           Telegex.send_message(chat_id, text, parse_mode: "HTML")
