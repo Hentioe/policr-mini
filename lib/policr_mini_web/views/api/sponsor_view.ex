@@ -7,6 +7,8 @@ defmodule PolicrMiniWeb.API.SponsorView do
 
   @spec render(String.t(), map()) :: map()
   def render("sponsor.json", %{sponsor: sponsor}) do
-    sponsor |> Map.drop([:__meta__, :uuid, :inserted_at, :updated_at]) |> Map.from_struct()
+    sponsor
+    |> Map.drop([:__meta__, :uuid, :contact, :inserted_at, :updated_at])
+    |> Map.from_struct()
   end
 end
