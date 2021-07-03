@@ -279,7 +279,7 @@ export default () => {
             <main>
               <form>
                 <FormLine>
-                  <FormLabel>验证方法</FormLabel>
+                  <FormLabel>验证方式</FormLabel>
                   <OwnSelect
                     options={modeOptions}
                     value={modeOptions[modeValue]}
@@ -291,7 +291,7 @@ export default () => {
                   自定义问答需修改此处为「定制验证」才可生效，取消选择其它即可
                 </FromHint>
                 <FormLine>
-                  <FormLabel>击杀方式（超时）</FormLabel>
+                  <FormLabel>击杀方法（验证超时）</FormLabel>
                   <OwnSelect
                     options={killingMethodOptions}
                     value={editingTimeoutKillingMethodOption}
@@ -301,7 +301,7 @@ export default () => {
                 </FormLine>
                 <FromHint>针对验证结果为「超时」的用户采取的措施</FromHint>
                 <FormLine>
-                  <FormLabel>击杀方式（错误）</FormLabel>
+                  <FormLabel>击杀方法（验证错误）</FormLabel>
                   <OwnSelect
                     options={killingMethodOptions}
                     value={editingWrongKillingMethodOption}
@@ -393,13 +393,13 @@ export default () => {
               <main>
                 <div>
                   <ProfileLine>
-                    <ProfileLabel>验证方法</ProfileLabel>
+                    <ProfileLabel>验证方式</ProfileLabel>
                     <ProfileValue>
                       {modeValueMapping[profileData.scheme.verificationMode]}
                     </ProfileValue>
                   </ProfileLine>
                   <FormLine>
-                    <FormLabel>击杀方式（超时）</FormLabel>
+                    <FormLabel>击杀方法（验证超时）</FormLabel>
                     <ProfileValue>
                       {
                         killMethodMapping[
@@ -409,7 +409,7 @@ export default () => {
                     </ProfileValue>
                   </FormLine>
                   <FormLine>
-                    <FormLabel>击杀方式（错误）</FormLabel>
+                    <FormLabel>击杀方法（验证错误）</FormLabel>
                     <ProfileValue>
                       {killMethodMapping[profileData.scheme.wrongKillingMethod]}
                     </ProfileValue>
@@ -419,8 +419,8 @@ export default () => {
                     <ProfileValue>{profileData.scheme.seconds}</ProfileValue>
                   </FormLine>
                 </div>
-                <p tw="text-gray-600 text-sm tracking-wide italic">
-                  注意：验证方案的系统默认值可以被机器人拥有者随时维护修改，所以以上默认值只能表示此刻的数据。如有需要，请自行定制适合本群的方案。
+                <p tw="text-gray-600 text-sm tracking-wide">
+                  注意：验证方案的系统默认值可能会被机器人拥有者随时维护性修改，所以上述默认值只能表示此刻的数据。如有需要，请自行定制适合本群的方案。
                 </p>
               </main>
             ) : (

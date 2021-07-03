@@ -208,7 +208,7 @@ export default () => {
             <main>
               <form>
                 <FormLine>
-                  <FormLabel>验证方法</FormLabel>
+                  <FormLabel>验证方式</FormLabel>
                   <OwnSelect
                     options={modeOptions}
                     value={modeOptions[modeValue]}
@@ -217,10 +217,10 @@ export default () => {
                   />
                 </FormLine>
                 <FromHint>
-                  自定义问答需修改此处为「定制验证」才可生效，取消选择其它即可
+                  请不要轻易设置为「定制验证」，因为不是所有群都添加有自定义回答数据
                 </FromHint>
                 <FormLine>
-                  <FormLabel>击杀方式（超时）</FormLabel>
+                  <FormLabel>击杀方法（验证超时）</FormLabel>
                   <OwnSelect
                     options={killingMethodOptions}
                     value={editingTimeoutKillingMethodOption}
@@ -230,7 +230,7 @@ export default () => {
                 </FormLine>
                 <FromHint>针对验证结果为「超时」的用户采取的措施</FromHint>
                 <FormLine>
-                  <FormLabel>击杀方式（错误）</FormLabel>
+                  <FormLabel>击杀方法（验证错误）</FormLabel>
                   <OwnSelect
                     options={killingMethodOptions}
                     value={editingWrongKillingMethodOption}

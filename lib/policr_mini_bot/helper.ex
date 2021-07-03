@@ -481,7 +481,7 @@ defmodule PolicrMiniBot.Helper do
   获取默认配置。
 
   ## 当前 `key` 可以是以下值
-  - `:vmode`: 验证方法。
+  - `:vmode`: 验证方式。
   - `:ventrance`: 验证入口。
   - `:voccasion`: 验证场合。
   - `:vseconds`: 验证超时时间。
