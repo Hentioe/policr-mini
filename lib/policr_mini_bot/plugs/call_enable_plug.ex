@@ -3,6 +3,8 @@ defmodule PolicrMiniBot.CallEnablePlug do
   启用验证功能的回调。
   """
 
+  # TODO: 此模块需要检查必要权限。
+
   use PolicrMiniBot, plug: [caller: [prefix: "enable:"]]
 
   alias PolicrMini.Instances
