@@ -63,14 +63,14 @@ verification:
     private: |
       恭喜您通过了『*%{chat_title}*』的加群验证，可以自由发言了。
 
-      _如果限制仍未解除请主动联系群管理。_
+      _提示：如果限制仍未解除请主动联系群管理。_
     notice: 刚刚 %{mentioned_user} 通过了验证，用时 %{seconds} 秒。
   wronged:
     kick:
       private: |
         抱歉，您未通过『*%{chat_title}*』的加群验证。已被移出该群。
 
-        _可稍后重试，但无法立即再次加入。_
+        _提示：可稍后重试，但无法立刻再次加入。_
       public: |
         刚刚 %{mentioned_user} 验证错误，已经移出本群。
 
