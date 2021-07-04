@@ -11,18 +11,18 @@ defmodule PolicrMiniBot.ImageCaptcha do
     defexception [:message]
   end
 
-  @count 3
-
   @impl true
-  def make!(_chat_id) do
+  def make!(_chat_id, scheme) do
+    count = scheme.image_answers_count || PolicrMiniBot.Helper.default!(:acimage)
+
     # 获得随机数量的系列图片
-    series_images = PolicrMiniBot.ImageProvider.random(@count)
+    series_images = PolicrMiniBot.ImageProvider.random(count)
 
     # 检查图片的系列数量是否充足
-    if length(series_images) < @count, do: raise(Error, "There are not enough series of images")
+    if length(series_images) < count, do: raise(Error, "There are not enough series of images")
 
     # 生成正确索引
-    correct_index = Enum.random(1..@count)
+    correct_index = Enum.random(1..count)
 
     # 生成候选数据
     candidates = series_images |> Enum.map(fn si -> [si.name_zh_hans] end)

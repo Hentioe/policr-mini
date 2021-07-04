@@ -143,12 +143,12 @@ defmodule PolicrMiniBot.RespStartCmdPlug do
     # 所以最终采用的验证模块也需要重新返回。
     {captcha_maker, data} =
       try do
-        {captcha_maker, captcha_maker.make!(chat_id)}
+        {captcha_maker, captcha_maker.make!(chat_id, scheme)}
       rescue
         e ->
           Logger.unitized_error("Verification data generation", chat_id: chat_id, returns: e)
 
-          {@fallback_captcha_module, @fallback_captcha_module.make!(chat_id)}
+          {@fallback_captcha_module, @fallback_captcha_module.make!(chat_id, scheme)}
       end
 
     markup = PolicrMiniBot.Captcha.build_markup(data.candidates, verification.id)

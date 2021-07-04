@@ -10,7 +10,7 @@ defmodule PolicrMiniBot.CustomCaptcha do
   alias PolicrMini.CustomKitBusiness
 
   @impl true
-  def make!(chat_id) do
+  def make!(chat_id, _scheme) do
     custom_kit = CustomKitBusiness.random_one(chat_id)
 
     # 随机混乱答案列表

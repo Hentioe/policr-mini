@@ -505,7 +505,8 @@ defmodule PolicrMiniBot.Helper do
     vseconds: :seconds,
     tkmethod: :timeout_killing_method,
     wkmethod: :wrong_killing_method,
-    mention_scheme: :mention_text
+    mention_scheme: :mention_text,
+    acimage: :image_answers_count
   ]
 
   @type default_keys ::
@@ -516,6 +517,7 @@ defmodule PolicrMiniBot.Helper do
           | :tkmethod
           | :wkmethod
           | :mention_scheme
+          | :acimage
 
   @doc """
   获取默认配置。
@@ -544,6 +546,8 @@ defmodule PolicrMiniBot.Helper do
       :kick
       iex> PolicrMiniBot.Helper.default!(:mention_scheme)
       :mosaic_full_name
+      iex> PolicrMiniBot.Helper.default!(:acimage)
+      4
   """
   @spec default!(default_keys) :: any
   def default!(key) when is_atom(key) do

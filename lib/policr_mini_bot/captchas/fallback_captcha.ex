@@ -11,7 +11,7 @@ defmodule PolicrMiniBot.FallbackCaptcha do
   生成主动验证数据。
   """
   @impl true
-  def make!(_chat_id) do
+  def make!(_chat_id, _scheme) do
     %Captcha.Data{
       question: "点击「通过验证」按钮",
       candidates: [["通过验证"]],

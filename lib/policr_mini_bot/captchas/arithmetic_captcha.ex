@@ -11,7 +11,7 @@ defmodule PolicrMiniBot.ArithmeticCaptcha do
   生成算术验证数据。
   """
   @impl true
-  def make!(_chat_id) do
+  def make!(_chat_id, _scheme) do
     # 生成左数
     ln = @number_range |> Enum.random()
     # 生成右数

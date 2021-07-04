@@ -3,6 +3,7 @@ defmodule PolicrMiniBot.Captcha do
   验证内容生成模块。
   """
 
+  alias PolicrMini.Schema.Scheme
   alias Telegex.Model.{InlineKeyboardButton, InlineKeyboardMarkup}
 
   defmodule Data do
@@ -41,7 +42,7 @@ defmodule PolicrMiniBot.Captcha do
   制造验证数据，提供 `candidates`。
   此函数需要自行实现。
   """
-  @callback make!(chat_id :: integer) :: Data.t()
+  @callback make!(chat_id :: integer, scheme :: Scheme) :: Data.t()
 
   @spec build_markup([[Data.candidate()]], integer()) :: InlineKeyboardMarkup.t()
   @doc """
