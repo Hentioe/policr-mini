@@ -61,7 +61,8 @@ defmodule PolicrMini.SchemeBusiness do
     timeout_killing_method: :kick,
     wrong_killing_method: :kick,
     is_highlighted: true,
-    mention_text: :mosaic_full_name
+    mention_text: :mosaic_full_name,
+    image_answers_count: 4
   }
 
   @doc """
@@ -79,8 +80,8 @@ defmodule PolicrMini.SchemeBusiness do
           # 创建方案发生错误。
           Repo.rollback(e)
 
-        # 方案已存在。
         scheme ->
+          # 方案已存在。
           fill_default_in_transaction(scheme)
       end
     end)
@@ -92,6 +93,11 @@ defmodule PolicrMini.SchemeBusiness do
 
     # 此处填充后续在方案中添加的新字段，避免方案已存在时这些字段出现 `nil` 值。
     attrs = if scheme.mention_text, do: attrs, else: %{mention_text: @default_scheme.mention_text}
+
+    attrs =
+      if scheme.image_answers_count,
+        do: attrs,
+        else: %{image_answers_count: @default_scheme.image_answers_count}
 
     case update(scheme, attrs) do
       {:ok, scheme} -> scheme

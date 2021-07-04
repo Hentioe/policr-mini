@@ -64,12 +64,19 @@ const mentionTextOptions = [
   { value: 2, label: "马赛克全名" },
 ];
 
+const imageAnswersCountOptions = [
+  { value: 3, label: "3" },
+  { value: 4, label: "4" },
+  { value: 5, label: "5" },
+];
+
 const saveScheme = async ({
   verificationMode,
   seconds,
   timeoutKillingMethod,
   wrongKillingMethod,
   mentionText,
+  imageAnswersCount,
 }) => {
   const endpoint = `/admin/api/profile/scheme`;
 
@@ -79,6 +86,7 @@ const saveScheme = async ({
     timeout_killing_method: timeoutKillingMethod,
     wrong_killing_method: wrongKillingMethod,
     mention_text: mentionText,
+    image_answers_count: imageAnswersCount,
   };
 
   return fetch(endpoint, {
@@ -116,6 +124,8 @@ export default () => {
   const [editingSeconds, setEditingSeconds] = useState(0);
   const [editingMentionTextOption, setEditingMentionTextOption] =
     useState(null);
+  const [editingImageAnswersCountOption, setEditingImageAnswersCountOption] =
+    useState(null);
 
   useEffect(() => {
     rebind();
@@ -125,8 +135,13 @@ export default () => {
     setModeValue(getModeValueFromData());
 
     if (data && data.scheme) {
-      const { seconds, timeoutKillingMethod, wrongKillingMethod, mentionText } =
-        data.scheme;
+      const {
+        seconds,
+        timeoutKillingMethod,
+        wrongKillingMethod,
+        mentionText,
+        imageAnswersCount,
+      } = data.scheme;
 
       setEditingSeconds(seconds || "");
 
@@ -146,6 +161,13 @@ export default () => {
         setEditingMentionTextOption(mentionTextOptions[1]);
       else if (mentionText == "mosaic_full_name")
         setEditingMentionTextOption(mentionTextOptions[2]);
+
+      if (imageAnswersCount === 3)
+        setEditingImageAnswersCountOption(imageAnswersCountOptions[0]);
+      else if (imageAnswersCount === 4)
+        setEditingImageAnswersCountOption(imageAnswersCountOptions[1]);
+      else if (imageAnswersCount === 5)
+        setEditingImageAnswersCountOption(imageAnswersCountOptions[2]);
     }
   });
 
@@ -178,6 +200,12 @@ export default () => {
     setEditingMentionTextOption(option);
   };
 
+  const handleEditingImageAnswersCountOptionChange = (option) => {
+    setIsEdited(true);
+
+    setEditingImageAnswersCountOption(option);
+  };
+
   const handleSaveCancel = useCallback(() => {
     setIsEdited(false);
 
@@ -192,12 +220,14 @@ export default () => {
       timeoutKillingMethod: editingTimeoutKillingMethodOption.value,
       wrongKillingMethod: editingWrongKillingMethodOption.value,
       mentionText: editingMentionTextOption.value,
+      imageAnswersCount: editingImageAnswersCountOption.value,
     });
 
     if (result.errors) {
       toastErrors(result.errors);
       return;
     }
+
     setIsEdited(false);
     mutate();
   }, [
@@ -206,6 +236,7 @@ export default () => {
     editingTimeoutKillingMethodOption,
     editingWrongKillingMethodOption,
     editingMentionTextOption,
+    editingImageAnswersCountOption,
   ]);
 
   const isLoaded = () => !error && data && !data.errors;
@@ -283,6 +314,18 @@ export default () => {
                 </FormLine>
                 <FromHint>
                   提及验证用户时显示的内容，马赛克指用符号遮挡部分文字
+                </FromHint>
+                <FormLine>
+                  <FormLabel>答案个数（图片验证）</FormLabel>
+                  <OwnSelect
+                    options={imageAnswersCountOptions}
+                    value={editingImageAnswersCountOption}
+                    onChange={handleEditingImageAnswersCountOptionChange}
+                    isSearchable={false}
+                  />
+                </FormLine>
+                <FromHint>
+                  图片验证时生成的答案个数，此数字不提供自定义
                 </FromHint>
               </form>
             </main>

@@ -94,6 +94,14 @@ const mentionTextOptions = [
   defaultMentionTextOption,
 ];
 
+const defaultImageAnswersCountOption = { value: null, label: "系统默认" };
+const imageAnswersCountOptions = [
+  { value: 3, label: "3" },
+  { value: 4, label: "4" },
+  { value: 5, label: "5" },
+  defaultImageAnswersCountOption,
+];
+
 const modeValueMapping = {
   image: "图片验证",
   custom: "定制验证（自定义）",
@@ -121,6 +129,7 @@ const saveScheme = async ({
   timeoutKillingMethod,
   wrongKillingMethod,
   mentionText,
+  imageAnswersCount,
 }) => {
   const endpoint = `/admin/api/chats/${chatId}/scheme`;
   let body = null;
@@ -133,6 +142,7 @@ const saveScheme = async ({
     timeout_killing_method: timeoutKillingMethod,
     wrong_killing_method: wrongKillingMethod,
     mention_text: mentionText,
+    image_answers_count: imageAnswersCount,
   };
 
   return fetch(endpoint, {
@@ -177,6 +187,8 @@ export default () => {
   const [editingSeconds, setEditingSeconds] = useState(0);
   const [editingMentionTextOption, setEditingMentionTextOption] =
     useState(null);
+  const [editingImageAnswersCountOption, setEditingImageAnswersCountOption] =
+    useState(null);
 
   useEffect(() => {
     rebind();
@@ -186,8 +198,13 @@ export default () => {
     setModeValue(getModeValueFromData());
 
     if (data && data.scheme) {
-      const { seconds, timeoutKillingMethod, wrongKillingMethod, mentionText } =
-        data.scheme;
+      const {
+        seconds,
+        timeoutKillingMethod,
+        wrongKillingMethod,
+        mentionText,
+        imageAnswersCount,
+      } = data.scheme;
 
       setEditingSeconds(seconds || "");
       if (seconds == null) setEditingSecondsOption(defaultSecondsOption);
@@ -215,6 +232,15 @@ export default () => {
         setEditingMentionTextOption(mentionTextOptions[1]);
       else if (mentionText == "mosaic_full_name")
         setEditingMentionTextOption(mentionTextOptions[2]);
+
+      if (imageAnswersCount == null)
+        setEditingImageAnswersCountOption(defaultImageAnswersCountOption);
+      else if (imageAnswersCount === 3)
+        setEditingImageAnswersCountOption(imageAnswersCountOptions[0]);
+      else if (imageAnswersCount === 4)
+        setEditingImageAnswersCountOption(imageAnswersCountOptions[1]);
+      else if (imageAnswersCount === 5)
+        setEditingImageAnswersCountOption(imageAnswersCountOptions[2]);
     }
   });
 
@@ -268,6 +294,12 @@ export default () => {
     rebind();
   });
 
+  const handleEditingImageAnswersCountOptionChange = (option) => {
+    setIsEdited(true);
+
+    setEditingImageAnswersCountOption(option);
+  };
+
   const handleSaveScheme = useCallback(async () => {
     const result = await saveScheme({
       id: data.scheme ? data.scheme.id : -1,
@@ -277,6 +309,7 @@ export default () => {
       timeoutKillingMethod: editingTimeoutKillingMethodOption.value,
       wrongKillingMethod: editingWrongKillingMethodOption.value,
       mentionText: editingMentionTextOption.value,
+      imageAnswersCount: editingImageAnswersCountOption.value,
     });
 
     if (result.errors) {
@@ -291,6 +324,7 @@ export default () => {
     editingTimeoutKillingMethodOption,
     editingWrongKillingMethodOption,
     editingMentionTextOption,
+    editingImageAnswersCountOption,
   ]);
 
   const isLoaded = () => !error && chatsState.isLoaded && data && !data.errors;
@@ -391,6 +425,18 @@ export default () => {
                 <FromHint>
                   提及验证用户时显示的内容，马赛克指用符号遮挡部分文字
                 </FromHint>
+                <FormLine>
+                  <FormLabel>答案个数（图片验证）</FormLabel>
+                  <OwnSelect
+                    options={imageAnswersCountOptions}
+                    value={editingImageAnswersCountOption}
+                    onChange={handleEditingImageAnswersCountOptionChange}
+                    isSearchable={false}
+                  />
+                </FormLine>
+                <FromHint>
+                  图片验证时生成的答案个数，此数字不提供自定义
+                </FromHint>
               </form>
             </main>
           </PageSection>
@@ -470,6 +516,12 @@ export default () => {
                     <FormLabel>提及文本</FormLabel>
                     <ProfileValue>
                       {mentionTextMapping[profileData.scheme.mentionText]}
+                    </ProfileValue>
+                  </FormLine>
+                  <FormLine>
+                    <FormLabel>答案个数（图片验证）</FormLabel>
+                    <ProfileValue>
+                      {profileData.scheme.imageAnswersCount}
                     </ProfileValue>
                   </FormLine>
                 </div>

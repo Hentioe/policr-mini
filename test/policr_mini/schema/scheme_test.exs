@@ -20,6 +20,7 @@ defmodule PolicrMini.Schema.SchemeTest do
                  :wrong_killing_method,
                  :is_highlighted,
                  :mention_text,
+                 :image_answers_count,
                  :inserted_at,
                  :updated_at
                ]

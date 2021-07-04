@@ -23,6 +23,7 @@ defmodule PolicrMini.Schema.Scheme do
                       wrong_killing_method
                       is_highlighted
                       mention_text
+                      image_answers_count
                     )a
 
   schema "schemes" do
@@ -35,6 +36,7 @@ defmodule PolicrMini.Schema.Scheme do
     field :wrong_killing_method, KillingMethodEnum
     field :is_highlighted, :boolean
     field :mention_text, MentionText
+    field :image_answers_count, :integer
 
     timestamps()
   end
