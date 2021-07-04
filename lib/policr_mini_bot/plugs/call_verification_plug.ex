@@ -6,7 +6,7 @@ defmodule PolicrMiniBot.CallVerificationPlug do
   use PolicrMiniBot, plug: [caller: [prefix: "verification:"]]
 
   alias PolicrMini.Logger
-  alias PolicrMini.Schema.Verification
+  alias PolicrMini.Schema.{Verification, Scheme}
   alias PolicrMini.{VerificationBusiness, StatisticBusiness, SchemeBusiness, OperationBusiness}
   alias PolicrMiniBot.{HandleUserJoinedCleanupPlug, Disposable}
 
@@ -86,7 +86,7 @@ defmodule PolicrMiniBot.CallVerificationPlug do
       else
         # 如果还存在多条验证，更新入口消息
         max_seconds = scheme.seconds || default!(:vseconds)
-        update_unity_message(verification.chat_id, count, max_seconds)
+        update_unity_message(verification.chat_id, count, scheme, max_seconds)
       end
 
       :ok
@@ -251,15 +251,15 @@ defmodule PolicrMiniBot.CallVerificationPlug do
   @doc """
   更新统一验证入口消息
   """
-  @spec update_unity_message(integer(), integer(), integer()) ::
+  @spec update_unity_message(integer, integer, Scheme.t(), integer) ::
           :not_found | {:error, Telegex.Model.errors()} | {:ok, Message.t()}
-  def update_unity_message(chat_id, count, max_seconds) do
+  def update_unity_message(chat_id, count, scheme, max_seconds) do
     # 提及当前最新的等待验证记录中的用户
     if verification = VerificationBusiness.find_last_unity_waiting(chat_id) do
       user = %{id: verification.target_user_id, fullname: verification.target_user_name}
 
       {text, markup} =
-        HandleUserJoinedCleanupPlug.make_unity_content(chat_id, user, count, max_seconds)
+        HandleUserJoinedCleanupPlug.make_unity_content(chat_id, user, count, scheme, max_seconds)
 
       # 获取最新的验证入口消息编号
       message_id = VerificationBusiness.find_last_unity_message_id(chat_id)

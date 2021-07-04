@@ -414,6 +414,44 @@ defmodule PolicrMiniBot.Helper do
     end
   end
 
+  @type fullname_user :: %{
+          :id => integer,
+          :fullname => binary
+        }
+  @type raw_user :: %{
+          :id => integer,
+          :first_name => binary,
+          :last_name => binary
+        }
+
+  @type mention_user :: raw_user | fullname_user
+  @type mention_scheme :: :user_id | :full_name | :mosaic_full_name
+
+  @doc """
+  根据方案提及用户。
+
+  请注意：此函数输出 `MarkdownV2` 格式，且不能定制。
+
+  ## 例子
+      iex>PolicrMiniBot.Helper.build_mention(%{id: 101, first_name: "Michael", last_name: "Jackson"}, :full_name)
+      "[Michael Jackson](tg://user?id=101)"
+      iex>PolicrMiniBot.Helper.build_mention(%{id: 101, first_name: "小红在上海鬼混", last_name: nil}, :mosaic_full_name)
+      "[小███混](tg://user?id=101)"
+  """
+  @spec build_mention(mention_user, mention_scheme) :: String.t()
+  def build_mention(user, scheme) do
+    id = user[:id]
+
+    text =
+      case scheme do
+        :user_id -> to_string(id)
+        :full_name -> fullname(user)
+        :mosaic_full_name -> user |> fullname() |> mosaic_name()
+      end
+
+    "[#{Telegex.Marked.escape_text(text)}](tg://user?id=#{id})"
+  end
+
   @doc """
   给名字打马赛克。
 
@@ -466,7 +504,8 @@ defmodule PolicrMiniBot.Helper do
     voccasion: :verification_occasion,
     vseconds: :seconds,
     tkmethod: :timeout_killing_method,
-    wkmethod: :wrong_killing_method
+    wkmethod: :wrong_killing_method,
+    mention_scheme: :mention_text
   ]
 
   @type default_keys ::
@@ -476,6 +515,7 @@ defmodule PolicrMiniBot.Helper do
           | :vseconds
           | :tkmethod
           | :wkmethod
+          | :mention_scheme
 
   @doc """
   获取默认配置。
@@ -487,6 +527,7 @@ defmodule PolicrMiniBot.Helper do
   - `:vseconds`: 验证超时时间。
   - `:tkmethod`: 超时击杀方法。
   - `:wkmethod`: 错误击杀方法。
+  - `:mention_scheme`: 提及方案。
 
   ## 例子
       iex> PolicrMiniBot.Helper.default!(:vmode)
@@ -501,6 +542,8 @@ defmodule PolicrMiniBot.Helper do
       :kick
       iex> PolicrMiniBot.Helper.default!(:wkmethod)
       :kick
+      iex> PolicrMiniBot.Helper.default!(:mention_scheme)
+      :mosaic_full_name
   """
   @spec default!(default_keys) :: any
   def default!(key) when is_atom(key) do

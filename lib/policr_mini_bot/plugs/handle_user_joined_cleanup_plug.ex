@@ -119,15 +119,15 @@ defmodule PolicrMiniBot.HandleUserJoinedCleanupPlug do
     }
 
     with {:ok, verification} <- VerificationBusiness.fetch(verification_params),
-         {text, markup} <- make_verify_content(verification, seconds),
+         {:ok, scheme} <- SchemeBusiness.fetch(chat_id),
+         {text, markup} <- make_verify_content(verification, scheme, seconds),
          {:ok, reminder_message} <-
            Cleaner.send_verification_message(chat_id, text,
              reply_markup: markup,
              parse_mode: "MarkdownV2ToHTML"
            ),
          {:ok, _} <-
-           VerificationBusiness.update(verification, %{message_id: reminder_message.message_id}),
-         {:ok, scheme} <- SchemeBusiness.fetch(chat_id) do
+           VerificationBusiness.update(verification, %{message_id: reminder_message.message_id}) do
       # 计数器自增（验证总数）
       PolicrMini.Counter.increment(:verification_total)
 
@@ -159,9 +159,10 @@ defmodule PolicrMiniBot.HandleUserJoinedCleanupPlug do
   注意：此函数需要在验证记录创建以后调用，否则会出现不正确的等待验证人数。
   因为当前默认统一验证入口的关系，此函数生成的是入口消息而不是验证消息。
   """
-  @spec make_verify_content(Verification.t(), integer()) ::
+  @spec make_verify_content(Verification.t(), Scheme.t(), integer) ::
           {String.t(), InlineKeyboardMarkup.t()}
-  def make_verify_content(%Verification{} = verification, seconds) do
+  def make_verify_content(verification, scheme, seconds)
+      when is_struct(verification, Verification) and is_struct(scheme, Scheme) do
     %{chat_id: chat_id, target_user_id: target_user_id, target_user_name: target_user_name} =
       verification
 
@@ -170,7 +171,7 @@ defmodule PolicrMiniBot.HandleUserJoinedCleanupPlug do
     # 读取等待验证的人数并根据人数分别响应不同的文本内容
     waiting_count = VerificationBusiness.get_unity_waiting_count(chat_id)
 
-    make_unity_content(chat_id, new_chat_member, waiting_count, seconds)
+    make_unity_content(chat_id, new_chat_member, waiting_count, scheme, seconds)
   end
 
   @doc """
@@ -178,20 +179,30 @@ defmodule PolicrMiniBot.HandleUserJoinedCleanupPlug do
 
   参数 `user` 需要满足 `PolicrMiniBot.Helper.fullname/1` 函数子句的匹配。
   """
-  @spec make_unity_content(integer(), map(), integer(), integer()) ::
+  @spec make_unity_content(
+          integer,
+          PolicrMiniBot.Helper.mention_user(),
+          integer,
+          Scheme.t(),
+          integer
+        ) ::
           {String.t(), InlineKeyboardMarkup.t()}
-  def make_unity_content(chat_id, user, waiting_count, seconds) do
+
+  def make_unity_content(chat_id, user, waiting_count, scheme, seconds)
+      when is_struct(scheme, Scheme) do
     # 读取等待验证的人数并根据人数分别响应不同的文本内容
+    mention_scheme = scheme.mention_text || default!(:mention_scheme)
+
     text =
       if waiting_count == 1,
         do:
           t("verification.unity.single_waiting", %{
-            mentioned_user: mention(user, anonymization: false, mosaic: true),
+            mentioned_user: build_mention(user, mention_scheme),
             seconds: seconds
           }),
         else:
           t("verification.unity.multiple_waiting", %{
-            mentioned_user: mention(user, anonymization: false, mosaic: true),
+            mentioned_user: build_mention(user, mention_scheme),
             remaining_count: waiting_count - 1,
             seconds: seconds
           })
@@ -271,6 +282,7 @@ defmodule PolicrMiniBot.HandleUserJoinedCleanupPlug do
         CallVerificationPlug.update_unity_message(
           chat_id,
           waiting_count,
+          scheme,
           seconds
         )
       end
