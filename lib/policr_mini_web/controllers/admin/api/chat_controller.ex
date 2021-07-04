@@ -72,6 +72,15 @@ defmodule PolicrMiniWeb.Admin.API.ChatController do
   end
 
   def update_scheme(conn, %{"chat_id" => chat_id} = params) do
+    image_answers_count =
+      if image_answers_count = params["image_answers_count"] do
+        if image_answers_count > 5 || image_answers_count < 3, do: nil, else: image_answers_count
+      else
+        nil
+      end
+
+    params = Map.put(params, "image_answers_count", image_answers_count)
+
     with {:ok, _} <- check_permissions(conn, chat_id, [:writable]),
          {:ok, chat} <- Chat.get(chat_id),
          {:ok, scheme} <- SchemeBusiness.fetch(chat_id),
