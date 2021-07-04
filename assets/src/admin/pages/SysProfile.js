@@ -265,7 +265,7 @@ export default () => {
 
                   <FormInput
                     type="number"
-                    tw="w-8/12 text-center"
+                    tw="w-8/12"
                     value={editingSeconds}
                     onChange={handleEditingSecondsChange}
                     placeholder="在此填入秒数"
