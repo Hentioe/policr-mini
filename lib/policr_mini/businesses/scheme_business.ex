@@ -97,7 +97,7 @@ defmodule PolicrMini.SchemeBusiness do
     attrs =
       if scheme.image_answers_count,
         do: attrs,
-        else: %{image_answers_count: @default_scheme.image_answers_count}
+        else: Map.put(attrs, :image_answers_count, @default_scheme.image_answers_count)
 
     case update(scheme, attrs) do
       {:ok, scheme} -> scheme
