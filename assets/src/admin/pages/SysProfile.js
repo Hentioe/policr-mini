@@ -1,6 +1,6 @@
 import React, { useEffect, useState, useCallback } from "react";
 import useSWR from "swr";
-import { useSelector, useDispatch } from "react-redux";
+import { useDispatch } from "react-redux";
 import Select from "react-select";
 import tw, { styled } from "twin.macro";
 
@@ -13,7 +13,6 @@ import {
   PageSectionTitle,
   PageLoading,
   PageReLoading,
-  NotImplemented,
   LabelledButton,
   FormInput,
 } from "../components";
@@ -59,11 +58,18 @@ const killingMethodOptions = [
   { value: 0, label: "封禁" },
 ];
 
+const mentionTextOptions = [
+  { value: 0, label: "用户 ID" },
+  { value: 1, label: "用户全名" },
+  { value: 2, label: "马赛克全名" },
+];
+
 const saveScheme = async ({
   verificationMode,
   seconds,
   timeoutKillingMethod,
   wrongKillingMethod,
+  mentionText,
 }) => {
   const endpoint = `/admin/api/profile/scheme`;
 
@@ -72,6 +78,7 @@ const saveScheme = async ({
     seconds: seconds,
     timeout_killing_method: timeoutKillingMethod,
     wrong_killing_method: wrongKillingMethod,
+    mention_text: mentionText,
   };
 
   return fetch(endpoint, {
@@ -107,6 +114,8 @@ export default () => {
     useState(null);
 
   const [editingSeconds, setEditingSeconds] = useState(0);
+  const [editingMentionTextOption, setEditingMentionTextOption] =
+    useState(null);
 
   useEffect(() => {
     rebind();
@@ -116,23 +125,27 @@ export default () => {
     setModeValue(getModeValueFromData());
 
     if (data && data.scheme) {
-      const { seconds, timeoutKillingMethod, wrongKillingMethod } = data.scheme;
+      const { seconds, timeoutKillingMethod, wrongKillingMethod, mentionText } =
+        data.scheme;
 
       setEditingSeconds(seconds || "");
 
-      if (timeoutKillingMethod == null)
-        setEditingTimeoutKillingMethodOption(defaultKillingMethodOption);
-      else if (timeoutKillingMethod == "kick")
+      if (timeoutKillingMethod == "kick")
         setEditingTimeoutKillingMethodOption(killingMethodOptions[0]);
       else if (timeoutKillingMethod == "ban")
         setEditingTimeoutKillingMethodOption(killingMethodOptions[1]);
 
-      if (wrongKillingMethod == null)
-        setEditingWrongKillingMethodOption(defaultKillingMethodOption);
-      else if (wrongKillingMethod == "kick")
+      if (wrongKillingMethod == "kick")
         setEditingWrongKillingMethodOption(killingMethodOptions[0]);
       else if (wrongKillingMethod == "ban")
         setEditingWrongKillingMethodOption(killingMethodOptions[1]);
+
+      if (mentionText == "user_id")
+        setEditingMentionTextOption(mentionTextOptions[0]);
+      else if (mentionText == "full_name")
+        setEditingMentionTextOption(mentionTextOptions[1]);
+      else if (mentionText == "mosaic_full_name")
+        setEditingMentionTextOption(mentionTextOptions[2]);
     }
   });
 
@@ -159,6 +172,12 @@ export default () => {
     setEditingWrongKillingMethodOption(option);
   };
 
+  const handleEditingMentionTextOptionChange = (option) => {
+    setIsEdited(true);
+
+    setEditingMentionTextOption(option);
+  };
+
   const handleSaveCancel = useCallback(() => {
     setIsEdited(false);
 
@@ -172,6 +191,7 @@ export default () => {
       seconds: editingSeconds,
       timeoutKillingMethod: editingTimeoutKillingMethodOption.value,
       wrongKillingMethod: editingWrongKillingMethodOption.value,
+      mentionText: editingMentionTextOption.value,
     });
 
     if (result.errors) {
@@ -185,6 +205,7 @@ export default () => {
     editingSeconds,
     editingTimeoutKillingMethodOption,
     editingWrongKillingMethodOption,
+    editingMentionTextOption,
   ]);
 
   const isLoaded = () => !error && data && !data.errors;
@@ -251,6 +272,18 @@ export default () => {
                   />
                 </FormLine>
                 <FromHint>单个用户的验证等待时间，单位：秒</FromHint>
+                <FormLine>
+                  <FormLabel>提及文本</FormLabel>
+                  <OwnSelect
+                    options={mentionTextOptions}
+                    value={editingMentionTextOption}
+                    onChange={handleEditingMentionTextOptionChange}
+                    isSearchable={false}
+                  />
+                </FormLine>
+                <FromHint>
+                  提及验证用户时显示的内容，马赛克指用符号遮挡部分文字
+                </FromHint>
               </form>
             </main>
           </PageSection>

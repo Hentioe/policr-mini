@@ -86,6 +86,14 @@ const killingMethodOptions = [
   defaultKillingMethodOption,
 ];
 
+const defaultMentionTextOption = { value: null, label: "系统默认" };
+const mentionTextOptions = [
+  { value: 0, label: "用户 ID" },
+  { value: 1, label: "用户全名" },
+  { value: 2, label: "马赛克全名" },
+  defaultMentionTextOption,
+];
+
 const modeValueMapping = {
   image: "图片验证",
   custom: "定制验证（自定义）",
@@ -98,6 +106,12 @@ const killMethodMapping = {
   ban: "封禁",
 };
 
+const mentionTextMapping = {
+  user_id: "用户 ID",
+  full_name: "用户全名",
+  mosaic_full_name: "马赛克全名",
+};
+
 const makeEndpoint = (chat_id) => `/admin/api/chats/${chat_id}/scheme`;
 
 const saveScheme = async ({
@@ -106,6 +120,7 @@ const saveScheme = async ({
   seconds,
   timeoutKillingMethod,
   wrongKillingMethod,
+  mentionText,
 }) => {
   const endpoint = `/admin/api/chats/${chatId}/scheme`;
   let body = null;
@@ -117,6 +132,7 @@ const saveScheme = async ({
     seconds: seconds,
     timeout_killing_method: timeoutKillingMethod,
     wrong_killing_method: wrongKillingMethod,
+    mention_text: mentionText,
   };
 
   return fetch(endpoint, {
@@ -159,6 +175,8 @@ export default () => {
     useState(defaultKillingMethodOption);
 
   const [editingSeconds, setEditingSeconds] = useState(0);
+  const [editingMentionTextOption, setEditingMentionTextOption] =
+    useState(null);
 
   useEffect(() => {
     rebind();
@@ -168,7 +186,8 @@ export default () => {
     setModeValue(getModeValueFromData());
 
     if (data && data.scheme) {
-      const { seconds, timeoutKillingMethod, wrongKillingMethod } = data.scheme;
+      const { seconds, timeoutKillingMethod, wrongKillingMethod, mentionText } =
+        data.scheme;
 
       setEditingSeconds(seconds || "");
       if (seconds == null) setEditingSecondsOption(defaultSecondsOption);
@@ -187,6 +206,15 @@ export default () => {
         setEditingWrongKillingMethodOption(killingMethodOptions[0]);
       else if (wrongKillingMethod == "ban")
         setEditingWrongKillingMethodOption(killingMethodOptions[1]);
+
+      if (mentionText == null)
+        setEditingMentionTextOption(defaultMentionTextOption);
+      else if (mentionText == "user_id")
+        setEditingMentionTextOption(mentionTextOptions[0]);
+      else if (mentionText == "full_name")
+        setEditingMentionTextOption(mentionTextOptions[1]);
+      else if (mentionText == "mosaic_full_name")
+        setEditingMentionTextOption(mentionTextOptions[2]);
     }
   });
 
@@ -228,6 +256,12 @@ export default () => {
     setEditingWrongKillingMethodOption(option);
   };
 
+  const handleEditingMentionTextOptionChange = (option) => {
+    setIsEdited(true);
+
+    setEditingMentionTextOption(option);
+  };
+
   const handleSaveCancel = useCallback(() => {
     setIsEdited(false);
 
@@ -242,6 +276,7 @@ export default () => {
       seconds: editingSeconds,
       timeoutKillingMethod: editingTimeoutKillingMethodOption.value,
       wrongKillingMethod: editingWrongKillingMethodOption.value,
+      mentionText: editingMentionTextOption.value,
     });
 
     if (result.errors) {
@@ -255,6 +290,7 @@ export default () => {
     editingSeconds,
     editingTimeoutKillingMethodOption,
     editingWrongKillingMethodOption,
+    editingMentionTextOption,
   ]);
 
   const isLoaded = () => !error && chatsState.isLoaded && data && !data.errors;
@@ -343,6 +379,18 @@ export default () => {
                   </div>
                 </FormLine>
                 <FromHint>单个用户的验证等待时间，单位：秒</FromHint>
+                <FormLine>
+                  <FormLabel>提及文本</FormLabel>
+                  <OwnSelect
+                    options={mentionTextOptions}
+                    value={editingMentionTextOption}
+                    onChange={handleEditingMentionTextOptionChange}
+                    isSearchable={false}
+                  />
+                </FormLine>
+                <FromHint>
+                  提及验证用户时显示的内容，马赛克指用符号遮挡部分文字
+                </FromHint>
               </form>
             </main>
           </PageSection>
@@ -418,8 +466,14 @@ export default () => {
                     <FormLabel>超时时间</FormLabel>
                     <ProfileValue>{profileData.scheme.seconds}</ProfileValue>
                   </FormLine>
+                  <FormLine>
+                    <FormLabel>提及文本</FormLabel>
+                    <ProfileValue>
+                      {mentionTextMapping[profileData.scheme.mentionText]}
+                    </ProfileValue>
+                  </FormLine>
                 </div>
-                <p tw="text-gray-600 text-sm tracking-wide">
+                <p tw="text-gray-600 text-sm tracking-wide mt-8">
                   注意：验证方案的系统默认值可能会被机器人拥有者随时维护性修改，所以上述默认值只能表示此刻的数据。如有需要，请自行定制适合本群的方案。
                 </p>
               </main>
