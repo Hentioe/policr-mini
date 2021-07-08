@@ -43,3 +43,5 @@ npm-debug.log
 /Mnesia.*/
 
 /data/
+
+/priv/_albums

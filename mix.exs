@@ -62,7 +62,6 @@ defmodule PolicrMini.MixProject do
       {:ecto_enum, "~> 1.4"},
       {:task_after, "~> 1.2"},
       {:exi18n, github: "Hentioe/exi18n"},
-      {:yaml_elixir, "~> 2.7"},
       {:typed_struct, "~> 0.2"},
       {:quantum, "~> 3.3"},
       {:cachex, "~> 3.4"},
@@ -70,7 +69,8 @@ defmodule PolicrMini.MixProject do
       {:proper_case, "~> 1.3"},
       {:earmark, "~> 1.4"},
       {:elixir_uuid, "~> 1.2"},
-      {:not_qwerty123, "~> 2.3"}
+      {:not_qwerty123, "~> 2.3"},
+      {:yaml_elixir, "~> 2.7"}
     ]
   end
 
