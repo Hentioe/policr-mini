@@ -8,12 +8,23 @@ defmodule PolicrMiniBot.UpdatesPoller do
   alias PolicrMini.Logger
   alias PolicrMiniBot.Consumer
 
+  @bot_info_table_name :bot_info
+
   @doc """
   启动获取消息更新的轮询器。
 
   在启动之前会获取机器人自身信息并缓存，并设置初始为 `0` 的 `offset` 值。
   """
   def start_link(default \\ []) when is_list(default) do
+    # 初始化 bot。
+    if :ets.whereis(@bot_info_table_name) == :undefined, do: init_bot()
+
+    Logger.info("Updates poller has started")
+
+    GenServer.start_link(__MODULE__, %{offset: 0}, name: __MODULE__)
+  end
+
+  defp init_bot do
     # 获取机器人必要信息
     Logger.info("Checking bot information ...")
 
@@ -23,19 +34,17 @@ defmodule PolicrMiniBot.UpdatesPoller do
     # 更新 Plug 中缓存的用户名。
     Telegex.Plug.update_username(username)
     # 缓存机器人数据。
-    :ets.new(:bot_info, [:set, :named_table])
-    :ets.insert(:bot_info, {:id, id})
-    :ets.insert(:bot_info, {:username, username})
-    :ets.insert(:bot_info, {:name, name})
+    :ets.new(@bot_info_table_name, [:set, :named_table])
+    :ets.insert(@bot_info_table_name, {:id, id})
+    :ets.insert(@bot_info_table_name, {:username, username})
+    :ets.insert(@bot_info_table_name, {:name, name})
 
     if Application.get_env(:policr_mini, PolicrMiniBot)[:auto_gen_commands] do
       {:ok, _} = username |> gen_commands() |> Telegex.set_my_commands()
     end
 
     # 缓存头像文件 ID。
-    :ets.insert(:bot_info, {:photo_file_id, get_avatar_file_id(id)})
-
-    GenServer.start_link(__MODULE__, %{offset: 0}, name: __MODULE__)
+    :ets.insert(@bot_info_table_name, {:photo_file_id, get_avatar_file_id(id)})
   end
 
   @impl true

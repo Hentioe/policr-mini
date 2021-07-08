@@ -83,6 +83,8 @@ defmodule PolicrMiniWeb.Router do
 
     get "/profile", ProfileController, :index
     put "/profile/scheme", ProfileController, :update_scheme
+    delete "/profile/temp_albums", ProfileController, :delete_temp_albums
+    put "/profile/albums", ProfileController, :update_albums
   end
 
   scope "/admin", PolicrMiniWeb.Admin do

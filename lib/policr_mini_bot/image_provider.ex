@@ -46,9 +46,10 @@ defmodule PolicrMiniBot.ImageProvider do
 
   defmodule Manifest do
     @moduledoc false
-    defstruct [:version, :datetime, :include_formats, :width, :albums]
+    defstruct [:root_path, :version, :datetime, :include_formats, :width, :albums]
 
     @type t :: %__MODULE__{
+            root_path: Path.t(),
             version: binary,
             datetime: binary,
             include_formats: [binary],
@@ -78,7 +79,12 @@ defmodule PolicrMiniBot.ImageProvider do
     @spec fill_albums_images(__MODULE__.t()) :: __MODULE__.t()
     def fill_albums_images(manifest) do
       fill_images_fun = fn album ->
-        images = PolicrMiniBot.ImageProvider.scan_images(album, manifest.include_formats)
+        images =
+          PolicrMiniBot.ImageProvider.scan_images(
+            manifest.root_path,
+            album,
+            manifest.include_formats
+          )
 
         %{album | images: images}
       end
@@ -150,16 +156,11 @@ defmodule PolicrMiniBot.ImageProvider do
   use Agent
 
   @root_path Application.app_dir(:policr_mini, Path.join("priv", "_albums"))
-  @manifest_file Path.join(@root_path, "Manifest.yaml")
+
+  def albums_root_path, do: @root_path
 
   def start_link(_) do
-    manifest = gen_manifest()
-
-    manifest =
-      manifest
-      |> Manifest.fill_albums_images()
-      |> Manifest.clear_empty_albums()
-      |> Manifest.expand_albums_parents()
+    manifest = gen_manifest(@root_path)
 
     Agent.start_link(fn -> %{manifest: manifest} end, name: __MODULE__)
   end
@@ -169,12 +170,25 @@ defmodule PolicrMiniBot.ImageProvider do
     Agent.get(__MODULE__, fn state -> state.manifest end)
   end
 
-  # 生成清单。从 `priv/_albums` 目录中读取 `Manifest.yaml` 并反序列化为 Manifest 结构。
-  @spec gen_manifest() :: Manifest.t()
-  defp gen_manifest do
-    yaml = YamlElixir.read_from_file!(@manifest_file)
+  @doc """
+  生成清单。从指定目录中读取 `Manifest.yaml` 并反序列化为 Manifest 结构。
+  """
+  @spec gen_manifest(Path.t()) :: Manifest.t()
+  def gen_manifest(path) do
+    file = Path.join(path, "Manifest.yaml")
 
-    Manifest.new(yaml)
+    if File.exists?(file) do
+      yaml = YamlElixir.read_from_file!(Path.join(path, "Manifest.yaml"))
+
+      yaml
+      |> Manifest.new()
+      |> Map.put(:root_path, path)
+      |> Manifest.fill_albums_images()
+      |> Manifest.clear_empty_albums()
+      |> Manifest.expand_albums_parents()
+    else
+      nil
+    end
   end
 
   @doc """
@@ -221,9 +235,9 @@ defmodule PolicrMiniBot.ImageProvider do
     end
   end
 
-  @spec scan_images(Album.t(), [binary]) :: [Image.t()]
-  def scan_images(%{id: id}, include_formats) do
-    album_path = Path.join(@root_path, id)
+  @spec scan_images(Path.t(), Album.t(), [binary]) :: [Image.t()]
+  def scan_images(root_path, %{id: id}, include_formats) do
+    album_path = Path.join(root_path, id)
 
     files = File.ls!(album_path)
 

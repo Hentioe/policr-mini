@@ -22,11 +22,23 @@ const OwnSelect = styled(Select)`
 `;
 
 const FormLine = styled.div`
-  ${tw`flex items-center mt-4`}
+  ${tw`flex items-center mt-2`}
 `;
 
 const FormLabel = styled.label`
   ${tw`w-4/12 text-gray-700`}
+`;
+
+const AlbumsLine = styled.div`
+  ${tw`flex mt-2`}
+`;
+
+const AlbumsLabel = styled.label`
+  ${tw`w-4/12 text-gray-700`}
+`;
+
+const AlbumsValue = styled.label`
+  ${tw`w-8/12 text-gray-700`}
 `;
 
 const FromHint = ({ children }) => {
@@ -39,6 +51,7 @@ const FromHint = ({ children }) => {
 };
 
 import { camelizeJson, toastErrors } from "../helper";
+import ActionButton from "../components/ActionButton";
 
 const modeOptions = [
   { value: 0, label: "图片验证" },
@@ -95,6 +108,22 @@ const saveScheme = async ({
       "Content-Type": "application/json",
     },
     body: JSON.stringify(body),
+  }).then((r) => camelizeJson(r));
+};
+
+const deleteTempAlbums = async () => {
+  const endpoint = `/admin/api/profile/temp_albums`;
+
+  return fetch(endpoint, {
+    method: "DELETE",
+  }).then((r) => camelizeJson(r));
+};
+
+const updateAlbums = async () => {
+  const endpoint = `/admin/api/profile/albums`;
+
+  return fetch(endpoint, {
+    method: "PUT",
   }).then((r) => camelizeJson(r));
 };
 
@@ -239,6 +268,33 @@ export default () => {
     editingImageAnswersCountOption,
   ]);
 
+  const handleDeleteTempAlbums = async () => {
+    const result = await deleteTempAlbums();
+
+    if (result.errors) {
+      toastErrors(result.errors);
+      return;
+    }
+
+    mutate();
+  };
+
+  const handleUpdateAlbums = async () => {
+    const result = await updateAlbums();
+
+    if (result.errors) {
+      toastErrors(result.errors);
+      return;
+    }
+
+    if (!result.ok)
+      toastErrors(
+        "资源更新可能失败了，已尝试恢复之前的状态。请手动确认当前图片验证是否能正常工作。"
+      );
+
+    mutate();
+  };
+
   const isLoaded = () => !error && data && !data.errors;
 
   let title = "全局属性";
@@ -368,6 +424,91 @@ export default () => {
               </main>
             </PageSection>
           ) : undefined}
+          <PageSection>
+            <PageSectionHeader>
+              <PageSectionTitle>更新图片验证的资源</PageSectionTitle>
+            </PageSectionHeader>
+            <main>
+              <div>
+                <p tw="text-gray-800 font-bold">当前资源</p>
+                {data.manifest ? (
+                  <div>
+                    <AlbumsLine>
+                      <AlbumsLabel>版本</AlbumsLabel>
+                      <AlbumsValue>{data.manifest.version}</AlbumsValue>
+                    </AlbumsLine>
+                    <AlbumsLine>
+                      <AlbumsLabel>生成日期</AlbumsLabel>
+                      <AlbumsValue>{data.manifest.datetime}</AlbumsValue>
+                    </AlbumsLine>
+                    <AlbumsLine>
+                      <AlbumsLabel>图集总数</AlbumsLabel>
+                      <AlbumsValue>{data.manifest.albumsCount}</AlbumsValue>
+                    </AlbumsLine>
+                    <AlbumsLine>
+                      <AlbumsLabel>图片总数</AlbumsLabel>
+                      <AlbumsValue>{data.manifest.imagesCount}</AlbumsValue>
+                    </AlbumsLine>
+                  </div>
+                ) : (
+                  <div>无</div>
+                )}
+              </div>
+              <div>
+                <p tw="text-gray-800 font-bold">
+                  临时资源
+                  {data.tempManifest && (
+                    <span tw="text-yellow-500">（待确认更新）</span>
+                  )}
+                </p>
+                {data.tempManifest ? (
+                  <div>
+                    <AlbumsLine>
+                      <AlbumsLabel>版本</AlbumsLabel>
+                      <AlbumsValue>{data.tempManifest.version}</AlbumsValue>
+                    </AlbumsLine>
+                    <AlbumsLine>
+                      <AlbumsLabel>生成日期</AlbumsLabel>
+                      <AlbumsValue>{data.tempManifest.datetime}</AlbumsValue>
+                    </AlbumsLine>
+                    <AlbumsLine>
+                      <AlbumsLabel>图集总数</AlbumsLabel>
+                      <AlbumsValue>{data.tempManifest.albumsCount}</AlbumsValue>
+                    </AlbumsLine>
+                    <AlbumsLine>
+                      <AlbumsLabel>图片总数</AlbumsLabel>
+                      <AlbumsValue>{data.tempManifest.imagesCount}</AlbumsValue>
+                    </AlbumsLine>
+                    <AlbumsLine>
+                      <AlbumsLabel>操作</AlbumsLabel>
+                      <AlbumsValue>
+                        <ActionButton onClick={handleDeleteTempAlbums}>
+                          删除此资源
+                        </ActionButton>
+                      </AlbumsValue>
+                    </AlbumsLine>
+                  </div>
+                ) : (
+                  <div>无</div>
+                )}
+              </div>
+              <div tw="mt-4">
+                <div>
+                  <LabelledButton label="ok">上传资源包</LabelledButton>
+                </div>
+
+                <div tw="mt-2">
+                  <LabelledButton
+                    label="cancel"
+                    onClick={handleUpdateAlbums}
+                    disabled={data.tempManifest == null}
+                  >
+                    确认更新
+                  </LabelledButton>
+                </div>
+              </div>
+            </main>
+          </PageSection>
         </PageBody>
       ) : error ? (
         <PageReLoading mutate={mutate} />
