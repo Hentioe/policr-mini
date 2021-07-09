@@ -11,7 +11,6 @@ ARG APP_HOME=/home/policr_mini
 
 
 COPY _build/prod/rel/policr_mini $APP_HOME
-COPY images "$APP_HOME/images"
 
 
 WORKDIR $APP_HOME
