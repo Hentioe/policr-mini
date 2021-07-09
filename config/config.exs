@@ -24,9 +24,6 @@ config :policr_mini, PolicrMiniBot, auto_gen_commands: false
 # 配置根链接。
 config :policr_mini, PolicrMiniWeb, root_url: "http://0.0.0.0:4000/"
 
-# 配置图片服务。
-config :policr_mini, PolicrMiniBot.ImageProvider, path: "images"
-
 # 任务调度配置。
 config :policr_mini, PolicrMiniBot.Scheduler,
   jobs: [

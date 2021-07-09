@@ -56,14 +56,6 @@ config :policr_mini, PolicrMiniBot,
     ),
   name: System.get_env("POLICR_MINI_BOT_NAME")
 
-# Configures the image provider
-config :policr_mini, PolicrMiniBot.ImageProvider,
-  path:
-    System.get_env("POLICR_MINI_BOT_IMAGES_PATH") ||
-      raise("""
-      environment variable POLICR_MINI_BOT_IMAGES_PATH is missing.
-      """)
-
 # Configure marked
 config :policr_mini,
   marked_enabled: (System.get_env("POLICR_MINI_BOT_ISSUE_33") || "false") == "true"
