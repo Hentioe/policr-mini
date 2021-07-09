@@ -8,17 +8,15 @@ defmodule PolicrMiniWeb.Admin.API.ProfileController do
   import PolicrMiniWeb.Helper
 
   alias PolicrMini.{Logger, DefaultsServer}
-  alias PolicrMiniBot.ImageProvider
+  alias PolicrMiniBot.{ImageProvider, UpdatesPoller}
 
   action_fallback(PolicrMiniWeb.API.FallbackController)
-
-  @temp_albums_root Application.app_dir(:policr_mini, Path.join("priv", "_temp_albums"))
 
   def index(conn, _params) do
     with {:ok, _} <- check_sys_permissions(conn) do
       scheme = DefaultsServer.get_scheme()
       manifest = ImageProvider.manifest()
-      temp_manifest = ImageProvider.gen_manifest(@temp_albums_root)
+      temp_manifest = ImageProvider.gen_manifest(ImageProvider.temp_albums_root())
 
       render(conn, "index.json", %{
         scheme: scheme,
@@ -39,41 +37,74 @@ defmodule PolicrMiniWeb.Admin.API.ProfileController do
 
   def delete_temp_albums(conn, _params) do
     with {:ok, _} <- check_sys_permissions(conn) do
-      File.rm_rf!(@temp_albums_root)
+      File.rm_rf!(ImageProvider.temp_albums_root())
 
       render(conn, "result.json", %{ok: true})
     end
   end
 
-  def update_albums(conn, _parms) do
-    alias PolicrMiniBot.{UpdatesPoller, ImageProvider}
+  def upload_temp_albums(conn, %{"zip" => %{content_type: content_type} = zip} = _params)
+      when content_type == "application/zip" do
+    with {:ok, _} <- check_sys_permissions(conn),
+         {:ok, _} <- uploaded_check(zip.path) do
+      unzip_cwd = Path.dirname(zip.path)
 
-    with {:ok, _} <- check_sys_permissions(conn) do
-      if File.exists?(@temp_albums_root) do
-        try do
+      {:ok, _} = :zip.unzip(String.to_charlist(zip.path), cwd: String.to_charlist(unzip_cwd))
+
+      if File.exists?(ImageProvider.temp_albums_root()) do
+        File.rm_rf!(ImageProvider.temp_albums_root())
+      end
+
+      File.cp_r!(Path.join(unzip_cwd, "_albums"), ImageProvider.temp_albums_root())
+
+      render(conn, "result.json", %{ok: true})
+    end
+  end
+
+  defp uploaded_check(path) do
+    zip_file = Unzip.LocalFile.open(path)
+
+    with {:ok, unzip} <- Unzip.new(zip_file) do
+      file_names = unzip |> Unzip.list_entries() |> Enum.map(fn entry -> entry.file_name end)
+
+      if Enum.member?(file_names, "_albums/") && Enum.member?(file_names, "_albums/Manifest.yaml") do
+        {:ok, []}
+      else
+        {:error, %{description: "wrong resources package structure"}}
+      end
+    else
+      _ ->
+        {:error, %{description: "unzip failed"}}
+    end
+  end
+
+  def update_albums(conn, _parms) do
+    try do
+      with {:ok, _} <- check_sys_permissions(conn) do
+        if File.exists?(ImageProvider.temp_albums_root()) do
           :ok = Supervisor.terminate_child(PolicrMiniBot.Supervisor, UpdatesPoller)
 
           :ok = Supervisor.terminate_child(PolicrMiniBot.Supervisor, ImageProvider)
 
-          File.rm_rf!(ImageProvider.albums_root_path())
-          File.rename!(@temp_albums_root, ImageProvider.albums_root_path())
+          File.rm_rf!(ImageProvider.albums_root())
+          File.rename!(ImageProvider.temp_albums_root(), ImageProvider.albums_root())
 
           {:ok, _} = Supervisor.restart_child(PolicrMiniBot.Supervisor, ImageProvider)
           {:ok, _} = Supervisor.restart_child(PolicrMiniBot.Supervisor, UpdatesPoller)
 
           render(conn, "result.json", %{ok: true})
-        rescue
-          e ->
-            Logger.unitized_error("Albums update", exception: e)
-
-            Supervisor.restart_child(PolicrMiniBot.Supervisor, ImageProvider)
-            Supervisor.restart_child(PolicrMiniBot.Supervisor, UpdatesPoller)
-
-            render(conn, "result.json", %{ok: false})
+        else
+          render(conn, "result.json", %{ok: false})
         end
-      else
-        render(conn, "result.json", %{ok: false})
       end
+    rescue
+      e ->
+        Logger.unitized_error("Albums update", exception: e)
+
+        Supervisor.restart_child(PolicrMiniBot.Supervisor, ImageProvider)
+        Supervisor.restart_child(PolicrMiniBot.Supervisor, UpdatesPoller)
+
+        render(conn, "result.json", %{ok: false})
     end
   end
 end

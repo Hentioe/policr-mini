@@ -1,8 +1,9 @@
-import React, { useEffect, useState, useCallback } from "react";
+import React, { useEffect, useState, useCallback, useRef } from "react";
 import useSWR from "swr";
 import { useDispatch } from "react-redux";
 import Select from "react-select";
 import tw, { styled } from "twin.macro";
+import { formatBytes } from "bytes-formatter";
 
 import { loadSelected } from "../slices/chats";
 import {
@@ -127,6 +128,15 @@ const updateAlbums = async () => {
   }).then((r) => camelizeJson(r));
 };
 
+const addTempAlbums = async (fd) => {
+  const endpoint = `/admin/api/profile/temp_albums`;
+
+  return fetch(endpoint, {
+    method: "POST",
+    body: fd,
+  }).then((r) => camelizeJson(r));
+};
+
 export default () => {
   const dispatch = useDispatch();
 
@@ -140,6 +150,9 @@ export default () => {
       modeMapping[data.scheme.verificationMode]
     );
   }, [data]);
+
+  const [fileInputNode, setFileInputNode] = useState(null);
+  const [selectedFile, setSelectedFile] = useState(null);
 
   const [modeValue, setModeValue] = useState(null);
   const [isEdited, setIsEdited] = useState(false);
@@ -294,6 +307,39 @@ export default () => {
 
     mutate();
   };
+
+  const fileInputRef = useCallback((node) => {
+    setFileInputNode(node);
+
+    node.addEventListener("change", fileInputChange, false);
+
+    return () => node.removeEventListener("change", fileInputChange);
+  }, []);
+
+  const fileInputChange = (e) => {
+    setSelectedFile(e.target.files[0]);
+  };
+
+  const handleSelectLocalFile = useCallback(() => {
+    if (fileInputNode) {
+      fileInputNode.click();
+    }
+  }, [fileInputNode]);
+
+  const handleUpload = useCallback(async () => {
+    const fd = new FormData();
+    fd.append("zip", selectedFile);
+
+    const result = await addTempAlbums(fd);
+
+    if (result.errors) {
+      toastErrors(result.errors);
+      return;
+    } else {
+      setSelectedFile(null);
+      mutate();
+    }
+  }, [selectedFile]);
 
   const isLoaded = () => !error && data && !data.errors;
 
@@ -492,9 +538,31 @@ export default () => {
                   <div>无</div>
                 )}
               </div>
-              <div tw="mt-4">
+              {selectedFile && (
                 <div>
-                  <LabelledButton label="ok">上传资源包</LabelledButton>
+                  <p tw="text-gray-800 font-bold">待上传</p>
+                  <div tw="mt-2 flex items-center">
+                    <span tw="w-4/12 text-gray-700">
+                      {selectedFile.name} ({formatBytes(selectedFile.size)})
+                    </span>
+                    <ActionButton tw="ml-2" onClick={handleUpload}>
+                      开始上传
+                    </ActionButton>
+                  </div>
+                </div>
+              )}
+              <div tw="mt-4">
+                {/* 隐藏的文件输入 */}
+                <input
+                  ref={fileInputRef}
+                  type="file"
+                  accept=".zip"
+                  tw="hidden"
+                />
+                <div>
+                  <LabelledButton label="ok" onClick={handleSelectLocalFile}>
+                    {selectedFile && "重新"}选择资源包
+                  </LabelledButton>
                 </div>
 
                 <div tw="mt-2">

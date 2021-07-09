@@ -70,7 +70,8 @@ defmodule PolicrMini.MixProject do
       {:earmark, "~> 1.4"},
       {:elixir_uuid, "~> 1.2"},
       {:not_qwerty123, "~> 2.3"},
-      {:yaml_elixir, "~> 2.7"}
+      {:yaml_elixir, "~> 2.7"},
+      {:unzip, "~> 0.6"}
     ]
   end
 

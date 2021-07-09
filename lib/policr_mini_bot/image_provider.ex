@@ -155,19 +155,35 @@ defmodule PolicrMiniBot.ImageProvider do
 
   use Agent
 
-  @root_path Application.app_dir(:policr_mini, Path.join("priv", "_albums"))
-
-  def albums_root_path, do: @root_path
-
   def start_link(_) do
-    manifest = gen_manifest(@root_path)
+    manifest = gen_manifest(albums_root())
 
-    Agent.start_link(fn -> %{manifest: manifest} end, name: __MODULE__)
+    state = %{manifest: manifest}
+
+    Agent.start_link(fn -> state end, name: __MODULE__)
   end
 
   @spec manifest() :: Manifest.t()
   def manifest() do
-    Agent.get(__MODULE__, fn state -> state.manifest end)
+    get(:manifest)
+  end
+
+  @spec albums_root() :: Path.t()
+  def albums_root() do
+    priv_root = Application.app_dir(:policr_mini, "priv")
+
+    Path.join(priv_root, "_albums")
+  end
+
+  @spec temp_albums_root() :: Path.t()
+  def temp_albums_root() do
+    priv_root = Application.app_dir(:policr_mini, "priv")
+
+    Path.join(priv_root, "_temp_albums")
+  end
+
+  defp get(field) do
+    Agent.get(__MODULE__, fn state -> state[field] end)
   end
 
   @doc """
@@ -198,17 +214,21 @@ defmodule PolicrMiniBot.ImageProvider do
   """
   @spec bomb(integer) :: [Image.t()]
   def bomb(max_count) do
-    gen_strategy_fun = fn state ->
-      state.manifest.albums
-      |> conflict_free_gen(max_count)
-      |> Enum.map(fn album ->
-        image = Enum.random(album.images)
+    Agent.get(__MODULE__, &gen_strategy(&1, max_count))
+  end
 
-        %{image | name: album.name}
-      end)
-    end
+  defp gen_strategy(%{manifest: nil}, _max_count) do
+    []
+  end
 
-    Agent.get(__MODULE__, gen_strategy_fun)
+  defp gen_strategy(%{manifest: manifest}, max_count) do
+    manifest.albums
+    |> conflict_free_gen(max_count)
+    |> Enum.map(fn album ->
+      image = Enum.random(album.images)
+
+      %{image | name: album.name}
+    end)
   end
 
   @spec conflict_free_gen([Album.t()], integer) :: [Album.t()]
