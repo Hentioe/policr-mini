@@ -41,9 +41,29 @@ export default () => {
         style={{ background: "#636363" }}
         tw="bg-white p-4 text-xs md:text-sm text-white font-mono font-medium"
       >
+        <BashLine>touch docker-compose.yml .env</BashLine>
+        <BashLine>
+          vi{" "}
+          <a
+            tw="text-white no-underline hover:underline"
+            href="https://github.com/Hentioe/policr-mini/wiki/%E8%87%AA%E8%A1%8C%E9%83%A8%E7%BD%B2%EF%BC%88%E6%9E%84%E5%BB%BA%E7%AC%AC%E4%B8%89%E6%96%B9%E5%AE%9E%E4%BE%8B%EF%BC%89#%E9%85%8D%E7%BD%AE%E5%B9%B6%E5%90%AF%E5%8A%A8"
+            target="_blank"
+          >
+            docker-compose.yml
+          </a>
+        </BashLine>
+        <BashLine>
+          vi{" "}
+          <a
+            tw="text-white no-underline hover:underline"
+            href="https://github.com/Hentioe/policr-mini/wiki/%E8%87%AA%E8%A1%8C%E9%83%A8%E7%BD%B2%EF%BC%88%E6%9E%84%E5%BB%BA%E7%AC%AC%E4%B8%89%E6%96%B9%E5%AE%9E%E4%BE%8B%EF%BC%89#%E9%85%8D%E7%BD%AE%E5%B9%B6%E5%90%AF%E5%8A%A8"
+            target="_blank"
+          >
+            .env
+          </a>
+        </BashLine>
         <BashLine>ls -a</BashLine>
         <Line>
-          <Dir>_data</Dir>
           <File>
             <a
               tw="text-white no-underline hover:underline"
@@ -53,10 +73,16 @@ export default () => {
               docker-compose.yml
             </a>
           </File>
-          <File>.env</File>
-          <Dir>images</Dir>
+          <File>
+            <a
+              tw="text-white no-underline hover:underline"
+              href="https://github.com/Hentioe/policr-mini/wiki/%E8%87%AA%E8%A1%8C%E9%83%A8%E7%BD%B2%EF%BC%88%E6%9E%84%E5%BB%BA%E7%AC%AC%E4%B8%89%E6%96%B9%E5%AE%9E%E4%BE%8B%EF%BC%89#%E9%85%8D%E7%BD%AE%E5%B9%B6%E5%90%AF%E5%8A%A8"
+              target="_blank"
+            >
+              .env
+            </a>
+          </File>
         </Line>
-        <BashLine>vi .env</BashLine>
         <BashLine>sudo docker-compose up -d</BashLine>
         <Line>
           Creating policr-mini_db_1 ... <span tw="text-green-500">done</span>
@@ -65,18 +91,17 @@ export default () => {
           Creating policr-mini_server_1 ...{" "}
           <span tw="text-green-500">done</span>
         </Line>
+        <BashLine>ls -a</BashLine>
+        <Line>
+          <Dir>_assets</Dir>
+          <Dir>_data</Dir>
+          <File>docker-compose.yml</File>
+          <File>.env</File>
+        </Line>
         <BashLine>sudo docker logs policr-mini_server_1</BashLine>
-        <Line>00:00:00.100 [info] Already up</Line>
-        <Line>
-          00:00:00.200 [info] Running PolicrMiniWeb.Endpoint with cowboy 2.9.0
-          at :::8080 (http)
-        </Line>
-        <Line>
-          00:00:00.300 [info] Access PolicrMiniWeb.Endpoint at
-          http://localhost:8080
-        </Line>
-        <Line>00:00:00.400 [info] Checking bot information ...</Line>
-        <Line>00:00:00.500 [info] Bot (@your_bot_username) is working</Line>
+        <Line>...................</Line>
+        <Line>00:00:00.100 [info] Checking bot information ...</Line>
+        <Line>00:00:00.200 [info] Bot (@your_bot_username) is working</Line>
       </div>
     </div>
   );
