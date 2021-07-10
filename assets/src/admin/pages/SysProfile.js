@@ -312,11 +312,13 @@ export default () => {
   };
 
   const fileInputRef = useCallback((node) => {
-    setFileInputNode(node);
+    if (node) {
+      setFileInputNode(node);
 
-    node.addEventListener("change", fileInputChange, false);
+      node.addEventListener("change", fileInputChange, false);
 
-    return () => node.removeEventListener("change", fileInputChange);
+      return () => node.removeEventListener("change", fileInputChange);
+    }
   }, []);
 
   const fileInputChange = (e) => {
