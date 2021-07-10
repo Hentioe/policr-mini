@@ -8,7 +8,18 @@ defmodule PolicrMiniBot.UpdatesPoller do
   alias PolicrMini.Logger
   alias PolicrMiniBot.Consumer
 
-  @bot_info_table_name :bot_info
+  defmodule BotInfo do
+    @moduledoc false
+
+    defstruct [:id, :username, :name, :photo_file_id]
+
+    @type t :: %__MODULE__{
+            id: integer,
+            username: binary,
+            name: binary,
+            photo_file_id: binary
+          }
+  end
 
   @doc """
   启动获取消息更新的轮询器。
@@ -17,7 +28,7 @@ defmodule PolicrMiniBot.UpdatesPoller do
   """
   def start_link(default \\ []) when is_list(default) do
     # 初始化 bot。
-    if :ets.whereis(@bot_info_table_name) == :undefined, do: init_bot()
+    if :ets.whereis(BotInfo) == :undefined, do: init_bot()
 
     Logger.info("Updates poller has started")
 
@@ -28,28 +39,24 @@ defmodule PolicrMiniBot.UpdatesPoller do
     # 获取机器人必要信息
     Logger.info("Checking bot information ...")
 
-    {:ok, %Telegex.Model.User{id: id, username: username, first_name: name}} = Telegex.get_me()
+    %{username: username} = bot_info = get_bot_info()
 
     Logger.info("Bot (@#{username}) is working")
     # 更新 Plug 中缓存的用户名。
     Telegex.Plug.update_username(username)
     # 缓存机器人数据。
-    :ets.new(@bot_info_table_name, [:set, :named_table])
-    :ets.insert(@bot_info_table_name, {:id, id})
-    :ets.insert(@bot_info_table_name, {:username, username})
-    :ets.insert(@bot_info_table_name, {:name, name})
+    :ets.new(BotInfo, [:set, :named_table])
+    :ets.insert(BotInfo, {:bot_info, bot_info})
 
     if Application.get_env(:policr_mini, PolicrMiniBot)[:auto_gen_commands] do
       {:ok, _} = username |> gen_commands() |> Telegex.set_my_commands()
     end
-
-    # 缓存头像文件 ID。
-    :ets.insert(@bot_info_table_name, {:photo_file_id, get_avatar_file_id(id)})
   end
 
   @impl true
   def init(state) do
     schedule_pull_updates()
+
     {:ok, state}
   end
 
@@ -145,6 +152,28 @@ defmodule PolicrMiniBot.UpdatesPoller do
 
       _ ->
         nil
+    end
+  end
+
+  @spec get_bot_info() :: BotInfo.t()
+  defp get_bot_info do
+    case Telegex.get_me() do
+      {:ok, %Telegex.Model.User{id: id, username: username, first_name: first_name}} ->
+        %BotInfo{
+          id: id,
+          username: username,
+          name: first_name,
+          # TODO: 此处对头像的获取添加超时重试。
+          photo_file_id: get_avatar_file_id(id)
+        }
+
+      {:error, %{reason: :timeout}} ->
+        Logger.warn("Checking bot information has timed out. Retrying ...")
+
+        get_bot_info()
+
+      {:error, e} ->
+        raise e
     end
   end
 end
