@@ -55,24 +55,33 @@ defmodule PolicrMiniWeb.Admin.API.ProfileController do
         File.rm_rf!(ImageProvider.temp_albums_root())
       end
 
-      File.cp_r!(Path.join(unzip_cwd, "_albums"), ImageProvider.temp_albums_root())
+      try do
+        File.cp_r!(Path.join(unzip_cwd, "_albums"), ImageProvider.temp_albums_root())
 
-      render(conn, "result.json", %{ok: true})
+        render(conn, "result.json", %{ok: true})
+      rescue
+        e ->
+          Logger.unitized_error("Resources upload", returns: e)
+
+          render(conn, "result.json", %{ok: false})
+      end
     end
   end
 
   defp uploaded_check(path) do
     zip_file = Unzip.LocalFile.open(path)
 
-    with {:ok, unzip} <- Unzip.new(zip_file) do
-      file_names = unzip |> Unzip.list_entries() |> Enum.map(fn entry -> entry.file_name end)
+    case Unzip.new(zip_file) do
+      {:ok, unzip} ->
+        file_names = unzip |> Unzip.list_entries() |> Enum.map(fn entry -> entry.file_name end)
 
-      if Enum.member?(file_names, "_albums/") && Enum.member?(file_names, "_albums/Manifest.yaml") do
-        {:ok, []}
-      else
-        {:error, %{description: "wrong resources package structure"}}
-      end
-    else
+        if Enum.member?(file_names, "_albums/") &&
+             Enum.member?(file_names, "_albums/Manifest.yaml") do
+          {:ok, []}
+        else
+          {:error, %{description: "wrong resources package structure"}}
+        end
+
       _ ->
         {:error, %{description: "unzip failed"}}
     end

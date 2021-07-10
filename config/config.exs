@@ -18,6 +18,9 @@ config :policr_mini, PolicrMiniWeb.Endpoint,
   pubsub_server: PolicrMini.PubSub,
   live_view: [signing_salt: "hy+GpqGC"]
 
+# 配置图片服务。
+config :policr_mini, PolicrMiniBot.ImageProvider, root: "_assets"
+
 # 配置是否自动生成命令。
 config :policr_mini, PolicrMiniBot, auto_gen_commands: false
 

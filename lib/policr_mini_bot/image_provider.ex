@@ -168,18 +168,18 @@ defmodule PolicrMiniBot.ImageProvider do
     get(:manifest)
   end
 
+  def root do
+    Application.get_env(:policr_mini, __MODULE__)[:root]
+  end
+
   @spec albums_root() :: Path.t()
   def albums_root() do
-    priv_root = Application.app_dir(:policr_mini, "priv")
-
-    Path.join(priv_root, "_albums")
+    Path.join(root(), "_albums")
   end
 
   @spec temp_albums_root() :: Path.t()
   def temp_albums_root() do
-    priv_root = Application.app_dir(:policr_mini, "priv")
-
-    Path.join(priv_root, "_temp_albums")
+    Path.join(root(), "_temp_albums")
   end
 
   defp get(field) do

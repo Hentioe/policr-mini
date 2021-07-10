@@ -51,7 +51,7 @@ const FromHint = ({ children }) => {
   );
 };
 
-import { camelizeJson, toastErrors } from "../helper";
+import { camelizeJson, toastErrors, toastMessage } from "../helper";
 import ActionButton from "../components/ActionButton";
 
 const modeOptions = [
@@ -301,8 +301,11 @@ export default () => {
     }
 
     if (!result.ok)
-      toastErrors(
-        "资源更新可能失败了，已尝试恢复之前的状态。请手动确认当前图片验证是否能正常工作。"
+      toastMessage(
+        "资源更新可能失败了，已尝试恢复之前的状态。请手动确认当前图片验证是否能正常工作。",
+        {
+          type: "error",
+        }
       );
 
     mutate();
@@ -335,7 +338,13 @@ export default () => {
     if (result.errors) {
       toastErrors(result.errors);
       return;
-    } else {
+    }
+
+    if (!result.ok)
+      toastMessage("资源上传可能失败了，请通过「查阅日志」页面查看错误详情。", {
+        type: "error",
+      });
+    else {
       setSelectedFile(null);
       mutate();
     }
