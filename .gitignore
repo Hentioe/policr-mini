@@ -42,6 +42,4 @@ npm-debug.log
 # Mnesia
 /Mnesia.*/
 
-/data/
-
 /_assets/
