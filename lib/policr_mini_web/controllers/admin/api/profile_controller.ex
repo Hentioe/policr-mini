@@ -13,17 +13,16 @@ defmodule PolicrMiniWeb.Admin.API.ProfileController do
   action_fallback(PolicrMiniWeb.API.FallbackController)
 
   def index(conn, _params) do
-    with {:ok, _} <- check_sys_permissions(conn) do
-      scheme = DefaultsServer.get_scheme()
-      manifest = ImageProvider.manifest()
-      temp_manifest = ImageProvider.gen_manifest(ImageProvider.temp_albums_root())
+    # 此 API 调用无需系统权限
+    scheme = DefaultsServer.get_scheme()
+    manifest = ImageProvider.manifest()
+    temp_manifest = ImageProvider.gen_manifest(ImageProvider.temp_albums_root())
 
-      render(conn, "index.json", %{
-        scheme: scheme,
-        manifest: manifest,
-        temp_manifest: temp_manifest
-      })
-    end
+    render(conn, "index.json", %{
+      scheme: scheme,
+      manifest: manifest,
+      temp_manifest: temp_manifest
+    })
   end
 
   def update_scheme(conn, params) do
