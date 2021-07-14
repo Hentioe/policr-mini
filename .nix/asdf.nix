@@ -1,7 +1,7 @@
 with import <nixpkgs> { };
 
 stdenv.mkDerivation {
-  name = "asdf-erlang-build-environment";
+  name = "asdf-erlang-building-environment";
 
   buildInputs = [
     pkg-config
@@ -26,6 +26,6 @@ stdenv.mkDerivation {
   KERL_CONFIGURE_OPTIONS =
     "--with-ssl=${lib.getOutput "out" openssl} --with-ssl-incl=${
       lib.getDev openssl
-    } --enable-jit --without-javac --without-odbc";
+    } --without-javac --without-odbc";
 
 }
