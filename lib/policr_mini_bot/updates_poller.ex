@@ -11,13 +11,14 @@ defmodule PolicrMiniBot.UpdatesPoller do
   defmodule BotInfo do
     @moduledoc false
 
-    defstruct [:id, :username, :name, :photo_file_id]
+    defstruct [:id, :username, :name, :photo_file_id, :is_third_party]
 
     @type t :: %__MODULE__{
             id: integer,
             username: binary,
             name: binary,
-            photo_file_id: binary
+            photo_file_id: binary,
+            is_third_party: boolean
           }
   end
 
@@ -164,7 +165,8 @@ defmodule PolicrMiniBot.UpdatesPoller do
           username: username,
           name: first_name,
           # TODO: 此处对头像的获取添加超时重试。
-          photo_file_id: get_avatar_file_id(id)
+          photo_file_id: get_avatar_file_id(id),
+          is_third_party: username not in PolicrMiniBot.official_bots()
         }
 
       {:error, %{reason: :timeout}} ->

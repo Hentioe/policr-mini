@@ -64,6 +64,7 @@ defmodule PolicrMiniBot do
     end
   end
 
+  @spec info :: BotInfo.t() | nil
   def info() do
     case :ets.lookup(BotInfo, :bot_info) do
       [{:bot_info, value}] ->

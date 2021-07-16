@@ -3,12 +3,23 @@ defmodule PolicrMiniWeb.Admin.PageController do
 
   def index(%{assigns: %{user: user}} = conn, _params) do
     owner_id = Application.get_env(:policr_mini, PolicrMiniBot)[:owner_id]
-    bot_username = PolicrMiniBot.username()
-    is_third_party = bot_username not in PolicrMiniBot.official_bots()
-    name = PolicrMiniBot.name()
 
-    global = %{is_owner: owner_id == user.id, is_third_party: is_third_party, name: name}
+    %{is_third_party: is_third_party, name: name} = PolicrMiniBot.info()
+
+    fullname = PolicrMiniBot.Helper.fullname(user)
+
+    global = %{
+      user_info: %{is_owner: owner_id == user.id, fullname: fullname},
+      bot_info: %{is_third_party: is_third_party, name: name}
+    }
 
     render(conn, "index.html", global: global)
+  end
+
+  def logout(conn, _params) do
+    conn
+    |> delete_resp_cookie("token")
+    |> Phoenix.Controller.redirect(to: "/login")
+    |> halt()
   end
 end

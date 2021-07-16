@@ -214,7 +214,9 @@ export default () => {
                         {htmlContent !== "" ? (
                           <>
                             <header tw="mb-4 text-xs text-black">
-                              <span tw="font-bold">{_GLOBAL.name}服务条款</span>
+                              <span tw="font-bold">
+                                {__GLOBAL__.botInfo.name}服务条款
+                              </span>
                               <p>
                                 {format(
                                   parseISO(data.term.updatedAt),
@@ -225,7 +227,7 @@ export default () => {
                                 本条款仅适用于本机器人实例，条款内容由实例运营者编写。本条款和
                                 Policr Mini
                                 项目本身并无关联，也不受限于该项目。使用本机器人即表示您同意《
-                                {_GLOBAL.name}服务条款》。
+                                {__GLOBAL__.botInfo.name}服务条款》。
                               </p>
                               <p>因此，请仔细阅读以下条款内容：</p>
                             </header>

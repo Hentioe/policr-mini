@@ -91,6 +91,7 @@ defmodule PolicrMiniWeb.Router do
   scope "/admin", PolicrMiniWeb.Admin do
     pipe_through [:browser, :admin]
 
+    get "/logout", PageController, :logout
     get "/*path", PageController, :index
   end
 

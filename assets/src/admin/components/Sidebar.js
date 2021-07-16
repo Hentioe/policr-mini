@@ -233,6 +233,32 @@ export default () => {
         title="管理员菜单"
         miniTitle="菜单"
       >
+        <div tw="px-6 py-3 text-sm border-0 border-l-2 border-r-2 border-solid border-transparent flex items-center justify-between">
+          <div tw="font-medium text-gray-600 ">
+            {__GLOBAL__.userInfo.fullname}
+          </div>
+          <a
+            tw="no-underline text-green-400 text-xs flex items-center"
+            href="/admin/logout"
+          >
+            <span>登出</span>&nbsp;
+            <svg
+              tw="w-3 h-3"
+              xmlns="http://www.w3.org/2000/svg"
+              className="h-6 w-6"
+              fill="none"
+              viewBox="0 0 24 24"
+              stroke="currentColor"
+            >
+              <path
+                strokeLinecap="round"
+                strokeLinejoin="round"
+                strokeWidth={2}
+                d="M17 16l4-4m0 0l-4-4m4 4H7m6 4v1a3 3 0 01-3 3H6a3 3 0 01-3-3V7a3 3 0 013-3h4a3 3 0 013 3v1"
+              />
+            </svg>
+          </a>
+        </div>
         {/* <NavItem
           title="数据统计"
           href={`/admin/chats/${chatsState.selected}/statistics`}
@@ -347,7 +373,11 @@ export default () => {
         ) : null}
       </MenuBox>
 
-      <MenuBox visibility={_GLOBAL.isOwner} title="系统菜单" miniTitle="系统">
+      <MenuBox
+        visibility={__GLOBAL__.userInfo.isOwner}
+        title="系统菜单"
+        miniTitle="系统"
+      >
         <NavItem
           title="批量管理"
           href="/admin/sys/managements"
@@ -368,7 +398,7 @@ export default () => {
           href="/admin/sys/terms"
           selected={isSysLink({ path: location.pathname, page: "terms" })}
         />
-        {!_GLOBAL.isThirdParty ? (
+        {!__GLOBAL__.botInfo.isThirdParty ? (
           <NavItem
             title="赞助记录"
             href="/admin/sys/sponsorship"
@@ -378,7 +408,7 @@ export default () => {
             })}
           />
         ) : undefined}
-        {!_GLOBAL.isThirdParty ? (
+        {!__GLOBAL__.botInfo.isThirdParty ? (
           <NavItem
             title="第三方实例"
             href="/admin/sys/third_parties"
@@ -392,12 +422,6 @@ export default () => {
           title="定时任务"
           href="/admin/sys/tasks"
           selected={isSysLink({ path: location.pathname, page: "tasks" })}
-        /> */}
-        {/* <NavItem
-          title="使用条款"
-          href="/admin/sys/terms"
-          selected={isSysLink({ path: location.pathname, page: "terms" })}
-          ending="true"
         /> */}
         {/* <NavItem
           title="模拟终端"
