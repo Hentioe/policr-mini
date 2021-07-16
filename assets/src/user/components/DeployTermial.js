@@ -100,7 +100,7 @@ export default () => {
         </Line>
         <BashLine>sudo docker logs policr-mini_server_1</BashLine>
         <Line>...................</Line>
-        <Line>00:00:00.100 [info] Checking bot information ...</Line>
+        <Line>00:00:00.100 [info] Checking bot information...</Line>
         <Line>00:00:00.200 [info] Bot (@your_bot_username) is working</Line>
       </div>
     </div>

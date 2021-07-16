@@ -37,7 +37,7 @@ defmodule PolicrMiniBot.UpdatesPoller do
 
   defp init_bot do
     # 获取机器人必要信息
-    Logger.info("Checking bot information ...")
+    Logger.info("Checking bot information...")
 
     %{username: username} = bot_info = get_bot_info()
 
@@ -168,7 +168,7 @@ defmodule PolicrMiniBot.UpdatesPoller do
         }
 
       {:error, %{reason: :timeout}} ->
-        Logger.warn("Checking bot information has timed out. Retrying ...")
+        Logger.warn("Checking bot information has timed out. Retrying...")
 
         get_bot_info()
 
