@@ -5,7 +5,7 @@ defmodule PolicrMini.EctoEnums do
 
   import EctoEnum
 
-  defenum ChatTypeEnum,
+  defenum ChatType,
     private: "private",
     group: "group",
     supergroup: "supergroup",

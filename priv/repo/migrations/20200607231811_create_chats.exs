@@ -1,11 +1,11 @@
 defmodule PolicrMini.Repo.Migrations.CreateChats do
   use PolicrMini.Migration
-  alias PolicrMini.EctoEnums.ChatTypeEnum
+  alias PolicrMini.EctoEnums.ChatType
 
   def change do
     create table(:chats, primary_key: false) do
       add :id, :bigint, comment: "聊天编号", primary_key: true
-      add :type, ChatTypeEnum.type(), comment: "聊天类型"
+      add :type, ChatType.type(), comment: "聊天类型"
       add :title, :string, comment: "标题"
       add :small_photo_id, :string, comment: "小尺寸聊天图片编号"
       add :big_photo_id, :string, comment: "大尺寸聊天图片编号"

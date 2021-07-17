@@ -5,7 +5,7 @@ defmodule PolicrMini.Instances.Chat do
 
   use PolicrMini.Schema
 
-  alias PolicrMini.EctoEnums.ChatTypeEnum
+  alias PolicrMini.EctoEnums.ChatType
 
   @required_fields ~w(id type is_take_over)a
   @optional_fields ~w(
@@ -27,7 +27,7 @@ defmodule PolicrMini.Instances.Chat do
 
   @primary_key {:id, :integer, autogenerate: false}
   schema "chats" do
-    field :type, ChatTypeEnum
+    field :type, ChatType
     field :title, :string
     field :small_photo_id, :string
     field :big_photo_id, :string
