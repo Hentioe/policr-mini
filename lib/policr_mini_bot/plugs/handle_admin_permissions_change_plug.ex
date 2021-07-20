@@ -5,9 +5,9 @@ defmodule PolicrMiniBot.HandleAdminPermissionsChangePlug do
 
   use PolicrMiniBot, plug: :preheater
 
-  alias PolicrMini.Instances.Chat
   alias PolicrMini.Logger
-  alias PolicrMiniBot.RespSyncCmdPlug
+  alias PolicrMini.Instances.Chat
+  alias PolicrMiniBot.Helper.Syncing
 
   @doc """
   根据更新消息中的 `chat_member` 字段，同步管理员权限变化。
@@ -101,7 +101,6 @@ defmodule PolicrMiniBot.HandleAdminPermissionsChangePlug do
     {:ignored, state}
   end
 
-  # 有 bug 待处理：未接管导致状态字段没有填充。
   @impl true
   def call(%{chat_member: chat_member}, state) do
     %{chat: %{id: chat_id}, new_chat_member: %{user: %{id: user_id} = user}} = chat_member
@@ -113,7 +112,7 @@ defmodule PolicrMiniBot.HandleAdminPermissionsChangePlug do
     # TODO: 优化管理员权限的自动同步过程。改为对单个用户权限的更新或删除，而非根据 API 调用结果同步所有数据。
 
     with {:ok, chat} <- Chat.get(chat_id),
-         {:ok, _} <- RespSyncCmdPlug.synchronize_administrators(chat) do
+         {:ok, _} <- Syncing.sync_for_chat_permissions(chat) do
       text = """
       检测到用户 #{mention(user, anonymization: false, parse_mode: "HTML")} 的管理权限变化，已自动同步至后台权限中。
 

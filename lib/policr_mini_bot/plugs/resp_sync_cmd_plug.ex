@@ -11,9 +11,9 @@ defmodule PolicrMiniBot.RespSyncCmdPlug do
 
   alias PolicrMini.Instances
   alias PolicrMini.Instances.Chat
-  alias PolicrMini.{UserBusiness, SchemeBusiness}
-  alias PolicrMini.Schema.{Permission}
+  alias PolicrMini.SchemeBusiness
   alias PolicrMiniBot.SpeedLimiter
+  alias PolicrMiniBot.Helper.Syncing
 
   @doc """
   同步群组数据：群组信息、管理员列表。
@@ -25,11 +25,11 @@ defmodule PolicrMiniBot.RespSyncCmdPlug do
 
     speed_limit_key = "sync-#{chat_id}"
 
-    wainting_time = SpeedLimiter.get(speed_limit_key)
+    waiting_sec = SpeedLimiter.get(speed_limit_key)
 
     cond do
-      wainting_time > 0 ->
-        send_message(chat_id, "同步过于频繁，请在 #{wainting_time} 秒后重试。")
+      waiting_sec > 0 ->
+        send_message(chat_id, "同步过于频繁，请在 #{waiting_sec} 秒后重试。")
 
       no_permissions?(message) ->
         # 添加 10 秒的速度限制记录。
@@ -41,13 +41,13 @@ defmodule PolicrMiniBot.RespSyncCmdPlug do
         # 添加 15 秒的速度限制记录。
         :ok = SpeedLimiter.put(speed_limit_key, 15)
 
-        async(fn -> chat_id |> typing() end)
+        async(fn -> typing(chat_id) end)
 
         # 同步群组和管理员信息，并自动设置接管状态。
         # 注意，同步完成后需进一步确保方案存在。
         with {:ok, chat} <- synchronize_chat(chat_id),
-             {:ok, _} <- synchronize_administrators(chat),
-             {:ok, _} <- SchemeBusiness.fetch(chat_id),
+             {:ok, chat} <- Syncing.sync_for_chat_permissions(chat),
+             {:ok, _scheme} <- SchemeBusiness.fetch(chat_id),
              # 获取自身权限
              {:ok, member} <- Telegex.get_chat_member(chat_id, PolicrMiniBot.id()) do
           is_admin = member.status == "administrator"
@@ -76,9 +76,7 @@ defmodule PolicrMiniBot.RespSyncCmdPlug do
                 )
             end
 
-          async(fn ->
-            send_message(chat_id, message_text)
-          end)
+          async(fn -> send_message(chat_id, message_text) end)
         else
           {:error, e} ->
             Logger.unitized_error("Group data synchronization", e)
@@ -140,74 +138,11 @@ defmodule PolicrMiniBot.RespSyncCmdPlug do
     end
   end
 
-  @doc """
-  同步管理员数据。
-  """
-  @spec synchronize_administrators(Chat.t()) :: {:ok, Chat.t()} | {:error, Ecto.Changeset.t()}
-  def synchronize_administrators(chat = %{id: chat_id}) when is_integer(chat_id) do
-    user_sync_fun = fn member ->
-      user = member.user
+  @group_annonymous_bot_id 1_087_968_824
 
-      user_params = %{
-        id: user.id,
-        first_name: user.first_name,
-        last_name: user.last_name,
-        username: user.username
-      }
-
-      case UserBusiness.fetch(user.id, user_params) do
-        {:ok, _} ->
-          nil
-
-        e ->
-          Logger.unitized_error("Admin data synchronization",
-            chat_id: chat_id,
-            user_id: user.id,
-            returns: e
-          )
-      end
-    end
-
-    case Telegex.get_chat_administrators(chat_id) do
-      {:ok, administrators} ->
-        # 过滤自身
-        administrators =
-          administrators
-          |> Enum.filter(fn member -> !member.user.is_bot end)
-
-        # 更新用户列表
-        Enum.each(administrators, user_sync_fun)
-
-        # 更新管理员列表
-        # 默认具有可读权限，可写权限由 `can_restrict_members` 决定。
-
-        permissions =
-          administrators
-          |> Enum.map(fn member ->
-            is_owner = member.status == "creator"
-
-            %Permission{
-              user_id: member.user.id,
-              tg_is_owner: is_owner,
-              tg_can_restrict_members: member.can_restrict_members,
-              tg_can_promote_members: member.can_promote_members,
-              readable: true,
-              writable: is_owner || member.can_restrict_members
-            }
-          end)
-
-        try do
-          Instances.reset_chat_permissions!(chat, permissions)
-
-          {:ok, chat}
-        rescue
-          e -> {:error, e}
-        end
-
-      e ->
-        e
-    end
-  end
+  # 检查消息来源是否具备权限。
+  # 如果是匿名用户，会被视为无权限。
+  defp no_permissions?(%{from: %{id: @group_annonymous_bot_id}} = _message), do: true
 
   defp no_permissions?(message) do
     %{chat: %{id: chat_id}, from: %{id: user_id}} = message

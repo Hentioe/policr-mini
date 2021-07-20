@@ -7,6 +7,7 @@ defmodule PolicrMiniBot.HandleSelfPermissionsChangePlug do
 
   alias PolicrMini.{Logger, Instances}
   alias PolicrMini.Instances.Chat
+  alias PolicrMini.{PermissionBusiness, UserBusiness}
   alias Telegex.Model.{InlineKeyboardMarkup, InlineKeyboardButton}
 
   @doc """
@@ -152,6 +153,9 @@ defmodule PolicrMiniBot.HandleSelfPermissionsChangePlug do
     %{chat: %{id: chat_id}} = my_chat_member
 
     Logger.debug("The bot has been promoted to administrator (#{chat_id}).")
+
+    # 尝试修正群管理员个数为零导致的权限问题。
+    fix_chat_empty_admins(my_chat_member)
 
     if new_chat_member.can_restrict_members == false ||
          new_chat_member.can_delete_messages == false do
@@ -305,5 +309,64 @@ defmodule PolicrMiniBot.HandleSelfPermissionsChangePlug do
         ]
       ]
     }
+  end
+
+  @typep fix_chat_empty_admins_arg :: Telegex.Model.ChatMemberUpdated.t() | Chat.t()
+  @typep fix_chat_empty_admins_returns :: :fixed | :no_empty | :error
+
+  @spec fix_chat_empty_admins(fix_chat_empty_admins_arg) :: fix_chat_empty_admins_returns
+  defp fix_chat_empty_admins(my_chat_member)
+       when is_struct(my_chat_member, Telegex.Model.ChatMemberUpdated) do
+    %{chat: %{id: chat_id} = chat, from: user} = my_chat_member
+
+    chat_params = %{
+      title: chat.title,
+      type: chat.type,
+      username: chat.username,
+      is_take_over: false
+    }
+
+    user_params_builder = fn ->
+      %{
+        id: user.id,
+        first_name: user.first_name,
+        last_name: user.last_name,
+        username: user.username
+      }
+    end
+
+    # 构造一个拥有除拥有者身份之外的最高权限。
+    permission_params_builder = fn user ->
+      %{
+        chat_id: chat_id,
+        user_id: user.id,
+        tg_is_owner: false,
+        tg_can_restrict_members: true,
+        tg_can_promote_members: true,
+        readable: true,
+        writable: true,
+        # 将 `customized` 置为 `true` 以避免被同步。
+        customized: true
+      }
+    end
+
+    # 同步后未发现管理员，把修改权限的用户添加到管理员中。
+    with {:ok, chat} <- Instances.fetch_and_update_chat(chat_id, chat_params),
+         chat <- PolicrMini.Repo.preload(chat, [:permissions]),
+         {:empty, true} <- {:empty, Enum.empty?(chat.permissions)},
+         {:ok, user} <- UserBusiness.fetch(user.id, user_params_builder.()),
+         {:ok, _permission} <- PermissionBusiness.create(permission_params_builder.(user)) do
+      # 已成功修正。
+
+      :fixed
+    else
+      {:empty, false} ->
+        :no_empty
+
+      e ->
+        Logger.unitized_error("Empty rights fixing", returns: e)
+
+        :error
+    end
   end
 end

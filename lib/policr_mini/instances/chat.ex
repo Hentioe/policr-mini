@@ -5,6 +5,7 @@ defmodule PolicrMini.Instances.Chat do
 
   use PolicrMini.Schema
 
+  alias PolicrMini.Schema.Permission
   alias PolicrMini.EctoEnums.ChatType
 
   @required_fields ~w(id type is_take_over)a
@@ -43,6 +44,8 @@ defmodule PolicrMini.Instances.Chat do
     field :tg_can_send_messages, :boolean
     field :tg_can_send_other_messages, :boolean
     field :tg_can_send_polls, :boolean
+
+    has_many :permissions, Permission
 
     timestamps()
   end

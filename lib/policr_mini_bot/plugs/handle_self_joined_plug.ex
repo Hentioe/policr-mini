@@ -9,7 +9,7 @@ defmodule PolicrMiniBot.HandleSelfJoinedPlug do
 
   use PolicrMiniBot, plug: :preheater
   alias PolicrMini.{Logger, SchemeBusiness}
-
+  alias PolicrMiniBot.Helper.Syncing
   alias PolicrMiniBot.{RespSyncCmdPlug, State}
 
   @doc """
@@ -90,9 +90,26 @@ defmodule PolicrMiniBot.HandleSelfJoinedPlug do
     # 同步群组和管理员信息。
     # 注意，创建群组后需要继续创建方案。
     with {:ok, chat} <- RespSyncCmdPlug.synchronize_chat(chat_id, true),
-         {:ok, _} <- RespSyncCmdPlug.synchronize_administrators(chat),
+         {:ok, chat} <- Syncing.sync_for_chat_permissions(chat),
          {:ok, _} <- SchemeBusiness.fetch(chat_id),
          :ok <- response(chat_id) do
+      if Enum.empty?(chat.permissions) do
+        # 如果找不到任何管理员，发送相应提示。
+        text = """
+        *出现了一些异常*
+
+        由于未能发现一位群管理，这会导致无人可拥有此群的后台权限。一般来讲，看到此消息的原因有二：
+
+        1\\. 群组内不存在任何用户类型的管理员，包括群主。
+        2\\. 群组内的管理员全部保持了匿名。
+
+        针对情况二，本机器人会将修改自身权限（把我提升为管理员）的群成员自动添加到后台权限中，并默认关闭该管理员的同步状态。
+
+        _注意：此设计只是为了避免在所有管理员匿名的情况下无法启用本机器人功能，并非解决管理员匿名所致的权限问题的最终方案。_
+        """
+
+        Telegex.send_message(chat_id, text, parse_mode: "MarkdownV2")
+      end
     else
       # 无发消息权限，直接退出
       {:error, %Telegex.Model.Error{description: "Bad Request: have no rights to send a message"}} ->
