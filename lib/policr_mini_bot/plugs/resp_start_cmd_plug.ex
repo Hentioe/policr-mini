@@ -239,7 +239,7 @@ defmodule PolicrMiniBot.RespStartCmdPlug do
     fn ->
       text = Telegex.Marked.as_html(text)
 
-      extended_send retry: 5 do
+      send_extended retry: 5 do
         Telegex.send_video(chat_id, file_id,
           reply_markup: markup,
           caption: text,
@@ -260,7 +260,7 @@ defmodule PolicrMiniBot.RespStartCmdPlug do
     fn ->
       text = Telegex.Marked.as_html(text)
 
-      extended_send retry: 5 do
+      send_extended retry: 5 do
         Telegex.send_audio(chat_id, file_id,
           reply_markup: markup,
           caption: text,
@@ -281,7 +281,7 @@ defmodule PolicrMiniBot.RespStartCmdPlug do
     fn ->
       text = Telegex.Marked.as_html(text)
 
-      extended_send retry: 5 do
+      send_extended retry: 5 do
         Telegex.send_document(chat_id, file_id,
           reply_markup: markup,
           caption: text,

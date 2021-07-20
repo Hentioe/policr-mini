@@ -627,7 +627,15 @@ defmodule PolicrMiniBot.Helper do
     {version, args}
   end
 
-  def extended_send(options \\ [], do: block) do
+  @doc """
+  和发送相关的扩展函数，支持（由于网络或速率限制导致的）自动重试。
+
+  此函数需要返回 `Telegex.send_*` 函数的返回值。
+
+  ## 可选参数
+  - `:retry`: 重试次数，默认值为 0。
+  """
+  def send_extended(options \\ [], do: block) do
     retry = Keyword.get(options, :retry, 0)
 
     case block do
@@ -636,7 +644,7 @@ defmodule PolicrMiniBot.Helper do
 
       {:error, %Telegex.Model.RequestError{reason: :timeout}} = e ->
         if retry > 0 do
-          extended_send(Keyword.merge(options, retry: retry - 1), do: block)
+          send_extended(Keyword.merge(options, retry: retry - 1), do: block)
         else
           e
         end
@@ -647,7 +655,7 @@ defmodule PolicrMiniBot.Helper do
         :timer.sleep(trunc(800 * retry * Enum.random(@time_seeds)))
 
         if retry > 0 do
-          extended_send(Keyword.merge(options, retry: retry - 1), do: block)
+          send_extended(Keyword.merge(options, retry: retry - 1), do: block)
         else
           e
         end
