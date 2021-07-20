@@ -156,8 +156,14 @@ defmodule PolicrMiniBot.UpdatesPoller do
     end
   end
 
+  @doc """
+  获取机器人信息。
+
+  此函数在遇到部分网络问题时会自动重试，且没有次数上限。
+  """
+  # TODO: 将此函数迁移至 `PolicrMIniBot` 模块，并且和将基于 :ets 的缓存集成在其内部。
   @spec get_bot_info() :: BotInfo.t()
-  defp get_bot_info do
+  def get_bot_info do
     case Telegex.get_me() do
       {:ok, %Telegex.Model.User{id: id, username: username, first_name: first_name}} ->
         %BotInfo{
@@ -171,6 +177,10 @@ defmodule PolicrMiniBot.UpdatesPoller do
 
       {:error, %{reason: :timeout}} ->
         Logger.warn("Checking bot information has timed out. Retrying...")
+
+      {:error, %{reason: :closed}} ->
+        :timer.sleep(100)
+        Logger.warn("The connection to check bot information is closed. Retrying...")
 
         get_bot_info()
 
