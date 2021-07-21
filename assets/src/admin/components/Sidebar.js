@@ -238,7 +238,7 @@ export default () => {
             {__GLOBAL__.userInfo.fullname}
           </div>
           <a
-            tw="no-underline text-green-400 text-xs flex items-center"
+            tw="underline text-gray-500 text-xs flex items-center"
             href="/admin/logout"
           >
             <span>登出</span>&nbsp;
