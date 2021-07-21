@@ -7,7 +7,7 @@ defmodule PolicrMiniBot.HandleSelfPermissionsChangePlug do
 
   alias PolicrMini.{Logger, Instances}
   alias PolicrMini.Instances.Chat
-  alias PolicrMini.{PermissionBusiness, UserBusiness}
+  alias PolicrMiniBot.Helper.Syncing
   alias Telegex.Model.{InlineKeyboardMarkup, InlineKeyboardButton}
 
   @doc """
@@ -35,6 +35,25 @@ defmodule PolicrMiniBot.HandleSelfPermissionsChangePlug do
   def call(%{my_chat_member: %{chat: %{type: chat_type}}}, state)
       when chat_type in ["channel", "private"] do
     {:ignored, state}
+  end
+
+  @impl true
+  def call(
+        %{
+          my_chat_member:
+            %{
+              new_chat_member: %{status: status_new},
+              old_chat_member: %{status: status_old}
+            } = my_chat_member
+        } = _update,
+        state
+      )
+      when status_new == "administrator" and status_old in ["left", "kicked"] do
+    # 机器人通过添加管理员的方式进入群组，这会导致邀请进群和修改权限两个操作同时发生，所以它被放在状态中的动作匹配前面。
+    # TODO：将此情况添加到头部注释中。
+    handle_self_promoted(my_chat_member)
+
+    {:ok, state}
   end
 
   @impl true
@@ -143,46 +162,14 @@ defmodule PolicrMiniBot.HandleSelfPermissionsChangePlug do
         %{
           my_chat_member:
             %{
-              new_chat_member: %{status: status_new} = new_chat_member,
+              new_chat_member: %{status: status_new},
               old_chat_member: %{status: status_old}
             } = my_chat_member
         } = _update,
         state
       )
       when status_new == "administrator" and status_old in ["restricted", "member"] do
-    %{chat: %{id: chat_id}} = my_chat_member
-
-    Logger.debug("The bot has been promoted to administrator (#{chat_id}).")
-
-    # 尝试修正群管理员个数为零导致的权限问题。
-    fix_chat_empty_admins(my_chat_member)
-
-    if new_chat_member.can_restrict_members == false ||
-         new_chat_member.can_delete_messages == false do
-      # 最少权限不完整。
-
-      text = """
-      本机器人已经成为管理员了，但缺乏必要权限，尚无法启用接管验证相关功能。
-
-      请至少赋予以下权限：
-      - 删除消息（Delete messages）
-      - 封禁成员（Ban users）
-
-      <i>提示：权限修改后会自动提供启用功能的按钮，亦可随时进入后台页面操作。</i>
-      """
-
-      Telegex.send_message(chat_id, text, parse_mode: "HTML")
-    else
-      text = """
-      本机器人已经具备相关管理权限了，是否接管新成员验证？
-
-      <i>提示：群管理员可直接通过按钮启用，亦可随时进入后台页面操作。</i>
-      """
-
-      markup = make_enable_markup(chat_id)
-
-      Telegex.send_message(chat_id, text, reply_markup: markup, parse_mode: "HTML")
-    end
+    handle_self_promoted(my_chat_member)
 
     {:ok, state}
   end
@@ -317,7 +304,7 @@ defmodule PolicrMiniBot.HandleSelfPermissionsChangePlug do
   @spec fix_chat_empty_admins(fix_chat_empty_admins_arg) :: fix_chat_empty_admins_returns
   defp fix_chat_empty_admins(my_chat_member)
        when is_struct(my_chat_member, Telegex.Model.ChatMemberUpdated) do
-    %{chat: %{id: chat_id} = chat, from: user} = my_chat_member
+    %{chat: %{id: chat_id} = chat} = my_chat_member
 
     chat_params = %{
       title: chat.title,
@@ -326,36 +313,11 @@ defmodule PolicrMiniBot.HandleSelfPermissionsChangePlug do
       is_take_over: false
     }
 
-    user_params_builder = fn ->
-      %{
-        id: user.id,
-        first_name: user.first_name,
-        last_name: user.last_name,
-        username: user.username
-      }
-    end
-
-    # 构造一个拥有除拥有者身份之外的最高权限。
-    permission_params_builder = fn user ->
-      %{
-        chat_id: chat_id,
-        user_id: user.id,
-        tg_is_owner: false,
-        tg_can_restrict_members: true,
-        tg_can_promote_members: true,
-        readable: true,
-        writable: true,
-        # 将 `customized` 置为 `true` 以避免被同步。
-        customized: true
-      }
-    end
-
     # 同步后未发现管理员，把修改权限的用户添加到管理员中。
     with {:ok, chat} <- Instances.fetch_and_update_chat(chat_id, chat_params),
          chat <- PolicrMini.Repo.preload(chat, [:permissions]),
          {:empty, true} <- {:empty, Enum.empty?(chat.permissions)},
-         {:ok, user} <- UserBusiness.fetch(user.id, user_params_builder.()),
-         {:ok, _permission} <- PermissionBusiness.create(permission_params_builder.(user)) do
+         {:ok, _chat} <- Syncing.sync_for_chat_permissions(chat) do
       # 已成功修正。
 
       :fixed
@@ -367,6 +329,43 @@ defmodule PolicrMiniBot.HandleSelfPermissionsChangePlug do
         Logger.unitized_error("Empty rights fixing", returns: e)
 
         :error
+    end
+  end
+
+  @spec handle_self_promoted(Telegex.Model.ChatMemberUpdated.t()) :: no_return()
+  defp handle_self_promoted(my_chat_member) do
+    %{chat: %{id: chat_id}, new_chat_member: new_chat_member} = my_chat_member
+
+    Logger.debug("The bot has been promoted to administrator (#{chat_id}).")
+
+    # 尝试修正群管理员个数为零导致的权限问题。
+    fix_chat_empty_admins(my_chat_member)
+
+    if new_chat_member.can_restrict_members == false ||
+         new_chat_member.can_delete_messages == false do
+      # 最少权限不完整。
+
+      text = """
+      本机器人已经成为管理员了，但缺乏必要权限，尚无法启用接管验证相关功能。
+
+      请至少赋予以下权限：
+      - 删除消息（Delete messages）
+      - 封禁成员（Ban users）
+
+      <i>提示：权限修改后会自动提供启用功能的按钮，亦可随时进入后台页面操作。</i>
+      """
+
+      Telegex.send_message(chat_id, text, parse_mode: "HTML")
+    else
+      text = """
+      本机器人已经具备相关管理权限了，是否接管新成员验证？
+
+      <i>提示：群管理员可直接通过按钮启用，亦可随时进入后台页面操作。</i>
+      """
+
+      markup = make_enable_markup(chat_id)
+
+      Telegex.send_message(chat_id, text, reply_markup: markup, parse_mode: "HTML")
     end
   end
 end

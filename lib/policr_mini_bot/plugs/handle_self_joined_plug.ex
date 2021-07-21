@@ -35,8 +35,20 @@ defmodule PolicrMiniBot.HandleSelfJoinedPlug do
   end
 
   @impl true
-  def call(%{my_chat_member: %{new_chat_member: %{status: status}}}, state)
-      when status not in ["restricted", "member"] do
+  def call(
+        %{
+          my_chat_member: %{
+            new_chat_member: %{status: status_new},
+            old_chat_member: %{status: status_old}
+          }
+        } = _update,
+        state
+      )
+      when status_new not in ["restricted", "member", "administrator"] or
+             (status_new == "administrator" and status_old not in ["left", "kicked"]) do
+    # 添加了针对成员新状态是 "administrator" 但是此前状态并非 "left" 或 "kicked" 的匹配，这表示机器人是通过添加群成员进来的，在进入的同时就具备了权限。
+    # TODO：将此项匹配逻辑更新到头部注释中。
+
     {:ignored, state}
   end
 
@@ -103,7 +115,7 @@ defmodule PolicrMiniBot.HandleSelfJoinedPlug do
         1\\. 群组内不存在任何用户类型的管理员，包括群主。
         2\\. 群组内的管理员全部保持了匿名。
 
-        针对情况二，本机器人会将修改自身权限（把我提升为管理员）的群成员自动添加到后台权限中，并默认关闭该管理员的同步状态。
+        针对情况二，本机器人会将修改自身权限（把我提升或添加为管理员）的群成员自动添加到后台权限中，防止无人可操作机器人。
 
         _注意：此设计只是为了避免在所有管理员匿名的情况下无法启用本机器人功能，并非解决管理员匿名所致的权限问题的最终方案。_
         """
