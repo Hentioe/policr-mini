@@ -89,7 +89,7 @@ defmodule PolicrMiniBot.UpdatesPoller do
           last_offset
 
         e ->
-          Logger.unitized_error("Message pull", e)
+          Logger.unitized_warn("Message pull", e)
           # 发生错误，降低请求频率
           :timer.sleep(200)
 
