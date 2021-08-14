@@ -5,19 +5,54 @@ defmodule PolicrMini.Counter do
 
   use GenServer
 
-  import PolicrMini.Helper
-
   alias PolicrMini.VerificationBusiness
-  alias :mnesia, as: Mnesia
+
+  defmodule State do
+    @moduledoc false
+
+    defstruct [:verification_total, :verification_passed_total, :verification_timeout_total]
+
+    @type t :: %__MODULE__{
+            verification_total: integer,
+            verification_passed_total: integer,
+            verification_timeout_total: integer
+          }
+
+    use PolicrMini.Mnesia
+
+    def init(node_list) do
+      Mnesia.create_table(__MODULE__,
+        attributes: [:key, :value],
+        ram_copies: node_list
+      )
+    end
+
+    @spec update(atom, integer) :: :ok
+    def update(key, value) do
+      Mnesia.dirty_write({__MODULE__, key, value})
+    end
+
+    @spec update_counter(atom, integer) :: integer
+    def update_counter(key, value) do
+      Mnesia.dirty_update_counter(__MODULE__, key, value)
+    end
+
+    def get(key) do
+      case Mnesia.dirty_read(__MODULE__, key) do
+        [{__MODULE__, _key, value}] -> value
+        [] -> 0
+      end
+    end
+  end
 
   def start_link(_opts) do
-    state = %{
+    state = %State{
       verification_total: VerificationBusiness.find_total(),
       verification_passed_total: VerificationBusiness.find_total(status: :passed),
       verification_timeout_total: VerificationBusiness.find_total(status: :timeout)
     }
 
-    GenServer.start_link(__MODULE__, state, name: __MODULE__)
+    GenServer.start_link(__MODULE__, %{init: state}, name: __MODULE__)
   end
 
   @impl true
@@ -26,22 +61,11 @@ defmodule PolicrMini.Counter do
       verification_total: verification_total,
       verification_passed_total: verification_passed_total,
       verification_timeout_total: verification_timeout_total
-    } = state
+    } = state[:init]
 
-    node_list = init_mnesia!()
-
-    table_result =
-      Mnesia.create_table(Counter,
-        attributes: [:key, :value],
-        ram_copies: node_list
-      )
-
-    check_mnesia_created_table!(table_result)
-
-    Mnesia.wait_for_tables([Counter], 2000)
-    Mnesia.dirty_write({Counter, :verification_total, verification_total})
-    Mnesia.dirty_write({Counter, :verification_passed_total, verification_passed_total})
-    Mnesia.dirty_write({Counter, :verification_timeout_total, verification_timeout_total})
+    :ok = State.update(:verification_total, verification_total)
+    :ok = State.update(:verification_passed_total, verification_passed_total)
+    :ok = State.update(:verification_timeout_total, verification_timeout_total)
 
     {:ok, state}
   end
@@ -59,18 +83,14 @@ defmodule PolicrMini.Counter do
 
   @impl true
   def handle_call({:get_value, key}, _from, state) do
-    value =
-      case Mnesia.dirty_read(Counter, key) do
-        [{Counter, _key, value}] -> value
-        [] -> -1
-      end
+    value = PolicrMini.Counter.State.get(key)
 
     {:reply, value, state}
   end
 
   @impl true
   def handle_cast({:increment, key}, state) do
-    Mnesia.dirty_update_counter(Counter, key, 1)
+    PolicrMini.Counter.State.update_counter(key, 1)
 
     {:noreply, state}
   end

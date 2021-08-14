@@ -6,6 +6,8 @@ defmodule PolicrMini.Application do
   use Application
 
   def start(_type, _args) do
+    PolicrMini.Mnesia.init()
+
     children = [
       # Start the Ecto repository
       PolicrMini.Repo,

@@ -51,7 +51,7 @@ defmodule PolicrMiniWeb.Admin.API.LogController do
     beginning = DateTime.add(time_now, -1 * seconds, :second) |> DateTime.to_unix()
 
     with {:ok, _} <- check_sys_permissions(conn) do
-      with {:ok, logs} <- Logger.query(beginning: beginning, level: level) do
+      with {:ok, logs} <- Logger.Record.query(beginning: beginning, level: level) do
         render(conn, "index.json", %{logs: logs, level: level, beginning: beginning, ending: nil})
       end
     end

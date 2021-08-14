@@ -5,48 +5,86 @@ defmodule PolicrMini.Logger do
 
   require Logger
 
-  alias :mnesia, as: Mnesia
+  defmodule Record do
+    @moduledoc false
 
-  @type query_cont :: [
-          {:level, atom | nil},
-          {:beginning, integer | nil},
-          {:ending, integer | nil}
-        ]
+    use PolicrMini.Mnesia
 
-  @doc """
-  查询已持久化存储的日志。
+    @enforce_keys [:level, :message, :timestamp]
+    defstruct [:level, :message, :timestamp]
 
-  参数 `query_cont` 表示查询条件，支持以下可选项：
-  - `level`: 日志的级别。例如 `:error` 或 `:warn`。
-  - `beginning`: 起始时间（时间戳）。
-  - `ending`: 结束时间（时间戳）。
+    @type t :: %__MODULE__{
+            level: atom,
+            message: String.t(),
+            timestamp: integer
+          }
 
-  注意：如果不指定时间区间相关的参数，将返回所有的日志记录，这个数据量可能会很庞大。
-  """
-  @spec query(query_cont) :: {:ok, [PolicrMini.Logger.Record.t()]} | {:error, any}
-  def query(cont \\ []) do
-    combiner = fn where, acc ->
-      case where do
-        {_, nil} -> acc
-        {:level, level} -> acc ++ [{:==, :"$1", level}]
-        {:beginning, beginning} -> acc ++ [{:>=, :"$3", beginning}]
-        {:ending, ending} -> acc ++ [{:"=<", :"$3", ending}]
+    def new([level, message, timestamp]) do
+      %__MODULE__{level: level, message: message, timestamp: timestamp}
+    end
+
+    @impl true
+    def init(node_list) do
+      Mnesia.create_table(__MODULE__,
+        attributes: [:id, :level, :message, :timestamp],
+        disc_only_copies: node_list
+      )
+    end
+
+    def write(level, msg, ts) when is_binary(msg) do
+      {{year, month, day}, {hour, minute, second, _msec}} = ts
+
+      ts =
+        {{year, month, day}, {hour, minute, second}}
+        |> NaiveDateTime.from_erl!()
+        # 注意：此处的实现表示日志必须使用 UTC 时间
+        |> DateTime.from_naive!("Etc/UTC")
+        |> DateTime.to_unix()
+
+      Mnesia.dirty_write({__MODULE__, Sequence.increment(__MODULE__), level, msg, ts})
+    end
+
+    @type query_cont :: [
+            {:level, atom | nil},
+            {:beginning, integer | nil},
+            {:ending, integer | nil}
+          ]
+
+    @doc """
+    查询已持久化存储的日志。
+
+    参数 `query_cont` 表示查询条件，支持以下可选项：
+    - `level`: 日志的级别。例如 `:error` 或 `:warn`。
+    - `beginning`: 起始时间（时间戳）。
+    - `ending`: 结束时间（时间戳）。
+
+    注意：如果不指定时间区间相关的参数，将返回所有的日志记录，这个数据量可能会很庞大。
+    """
+    @spec query(query_cont) :: {:ok, [t]} | {:error, any}
+    def query(cont \\ []) do
+      cont_combine_fun = fn where, acc ->
+        case where do
+          {_, nil} -> acc
+          {:level, level} -> acc ++ [{:==, :"$1", level}]
+          {:beginning, beginning} -> acc ++ [{:>=, :"$3", beginning}]
+          {:ending, ending} -> acc ++ [{:"=<", :"$3", ending}]
+        end
       end
-    end
 
-    guards = Enum.reduce(cont, [], combiner)
+      guards = Enum.reduce(cont, [], cont_combine_fun)
 
-    matcher = fn ->
-      Mnesia.select(Log, [{{Log, :_, :"$1", :"$2", :"$3"}, guards, [:"$$"]}])
-    end
+      select_fun = fn ->
+        Mnesia.select(__MODULE__, [{{__MODULE__, :_, :"$1", :"$2", :"$3"}, guards, [:"$$"]}])
+      end
 
-    case Mnesia.transaction(matcher) do
-      {:atomic, records} ->
-        records = records |> Enum.map(&PolicrMini.Logger.Record.new/1) |> Enum.reverse()
-        {:ok, records}
+      case Mnesia.transaction(select_fun) do
+        {:atomic, records} ->
+          records = records |> Enum.map(&new/1) |> Enum.reverse()
+          {:ok, records}
 
-      {:aborted, reason} ->
-        {:error, reason}
+        {:aborted, reason} ->
+          {:error, reason}
+      end
     end
   end
 
@@ -80,88 +118,27 @@ defmodule PolicrMini.Logger do
   defdelegate debug(chardata_or_fun, metadata \\ []), to: Logger
   defdelegate log(level, chardata_or_fun, metadata \\ []), to: Logger
 
-  defmodule Record do
-    @moduledoc """
-    可查询的单条日志记录的结构。
-    """
-
-    @enforce_keys [:level, :message, :timestamp]
-    defstruct level: nil, message: nil, timestamp: nil
-
-    @type t :: %__MODULE__{
-            level: atom,
-            message: String.t(),
-            timestamp: integer
-          }
-
-    def new([level, message, timestamp]) do
-      %__MODULE__{level: level, message: message, timestamp: timestamp}
-    end
-  end
-
   defmodule Backend do
     @moduledoc """
     自定义的日志后端。
 
-    此后端会将日志持久化存储到 Mnesia 中，并可通过 `PolicrMini.Logger.query/1` 函数查询。
+    此后端会将日志持久化存储到 Mnesia 中，并可通过 `PolicrMini.Logger.Log.query/1` 函数查询。
     """
 
     @behaviour :gen_event
 
-    alias :mnesia, as: Mnesia
-
+    @impl true
     def init({__MODULE__, name}) do
-      init_mnesia!(name)
-
       {:ok, configure(name, [])}
-    end
-
-    @spec init_mnesia!(atom) :: :ok
-    defp init_mnesia!(_name) do
-      node_list = PolicrMini.Helper.init_mnesia!()
-
-      table_results = [
-        Mnesia.create_table(MnesiaSequence,
-          attributes: [:name, :value],
-          disc_only_copies: node_list
-        ),
-        Mnesia.create_table(Log,
-          attributes: [:id, :level, :message, :timestamp],
-          disc_only_copies: node_list
-        )
-      ]
-
-      PolicrMini.Helper.check_mnesia_created_table!(table_results)
-
-      Mnesia.wait_for_tables([MnesiaSequence, Log], 5000)
-
-      :ok
-    end
-
-    @spec increment(atom) :: integer
-    defp increment(name) do
-      Mnesia.dirty_update_counter(MnesiaSequence, name, 1)
     end
 
     defp configure(name, []) do
       base_level = Application.get_env(:logger, name)[:level] || :debug
 
-      Application.get_env(:logger, name, []) |> Enum.into(%{name: name, level: base_level})
+      :logger |> Application.get_env(name, []) |> Enum.into(%{name: name, level: base_level})
     end
 
-    def dirty_write(level, msg, ts) when is_binary(msg) do
-      {{year, month, day}, {hour, minute, second, _msec}} = ts
-
-      ts =
-        {{year, month, day}, {hour, minute, second}}
-        |> NaiveDateTime.from_erl!()
-        # 注意：此处的实现表示日志必须使用 UTC 时间
-        |> DateTime.from_naive!("Etc/UTC")
-        |> DateTime.to_unix()
-
-      Mnesia.dirty_write({Log, increment(Log), level, msg, ts})
-    end
-
+    @impl true
     def handle_event(:flush, state) do
       {:ok, state}
     end
@@ -170,7 +147,7 @@ defmodule PolicrMini.Logger do
     def handle_event({level, _gl, {Logger, msg, ts, _md}}, %{level: min_level} = state)
         when is_binary(msg) do
       if right_log_level?(min_level, level) do
-        dirty_write(level, msg, ts)
+        PolicrMini.Logger.Record.write(level, msg, ts)
       end
 
       {:ok, state}
@@ -178,6 +155,7 @@ defmodule PolicrMini.Logger do
 
     def handle_event(_, state), do: {:ok, state}
 
+    @impl true
     def handle_call({:configure, opts}, %{name: name} = state) do
       {:ok, :ok, configure(name, opts, state)}
     end
