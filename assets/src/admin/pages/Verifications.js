@@ -119,6 +119,33 @@ const dateTimeFormat = "yyyy-MM-dd HH:mm:ss";
 const makeEndpoint = (chatId, queryString) =>
   `/admin/api/chats/${chatId}/verifications${queryString}`;
 
+const UserInfoCard = ({ verification, x, y }) => (
+  <div
+    style={{
+      left: x,
+      top: y,
+    }}
+    tw="absolute z-50 pointer-events-auto bg-white rounded-t shadow-lg w-60"
+  >
+    <header tw="bg-gray-100 text-center rounded-t py-2">
+      <span tw="font-bold">用户详情</span>
+    </header>
+
+    <div tw="px-4 py-2">
+      <div tw="text-xs">
+        <label tw="font-bold text-black">全名</label>：
+        <div tw="py-2">
+          <span tw="text-blue-600">{verification.targetUserName}</span>
+        </div>
+      </div>
+      <div tw="text-xs">
+        <label tw="font-bold text-black">ID</label>：
+        <span tw="text-blue-600 font-mono">{verification.targetUserId}</span>
+      </div>
+    </div>
+  </div>
+);
+
 export default () => {
   const dispatch = useDispatch();
   const location = useLocation();
@@ -131,7 +158,8 @@ export default () => {
   const offset = parseOffset(searchParams.get("offset"));
   const apiQueryString = makeQueryString({ status, timeRange, offset });
 
-  const [statusOption, setStatusOption] = useState(findStatusOption(status));
+  const [statusOption, _setStatusOption] = useState(findStatusOption(status));
+  const [hoveredInfo, setHoveredInfo] = useState(undefined);
 
   const handleStatusChange = () => {};
 
@@ -168,6 +196,12 @@ export default () => {
       );
     }
   };
+
+  const showUserInfo = (v, e) => {
+    setHoveredInfo({ verification: v, x: e.pageX, y: e.pageY });
+  };
+
+  const hiddenUserInfo = () => setHoveredInfo(undefined);
 
   const isLoaded = () => chatsState.isLoaded && !error && data && !data.errors;
 
@@ -253,6 +287,13 @@ export default () => {
           <main>
             {isLoaded() ? (
               <div tw="shadow rounded">
+                {hoveredInfo && (
+                  <UserInfoCard
+                    verification={hoveredInfo.verification}
+                    x={hoveredInfo.x}
+                    y={hoveredInfo.y}
+                  />
+                )}
                 <Table tw="mt-3">
                   <Thead>
                     <Tr>
@@ -265,9 +306,15 @@ export default () => {
                     </Tr>
                   </Thead>
                   <Tbody>
-                    {data.verifications.map((v, i) => (
+                    {data.verifications.map((v) => (
                       <Tr key={v.id}>
-                        <Td tw="truncate">{v.targetUserName}</Td>
+                        <Td
+                          tw="truncate"
+                          onMouseEnter={(e) => showUserInfo(v, e)}
+                          onMouseLeave={hiddenUserInfo}
+                        >
+                          {v.targetUserName}
+                        </Td>
                         <Td>{v.targetUserLanguageCode || "unknown"}</Td>
                         <Td>
                           {formatDateTime(
