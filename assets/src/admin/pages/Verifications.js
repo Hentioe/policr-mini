@@ -21,6 +21,7 @@ import {
   PageBody,
   ActionButton,
   Pagination,
+  FloatingCard,
 } from "../components";
 import { Table, Thead, Tr, Th, Tbody, Td } from "../components/Tables";
 import { loadSelected } from "../slices/chats";
@@ -107,7 +108,7 @@ function statusUI(status) {
   return <span style={{ color: color }}>{text}</span>;
 }
 
-const STATUS_COLOR_BG_MAPPING = {
+const STATUS_BG_COLOR_MAPPING = {
   waiting: "#FFE4A2",
   passed: "#BEFFA2",
   timeout: "#FFB4A2",
@@ -125,44 +126,6 @@ const dateTimeFormat = "yyyy-MM-dd HH:mm:ss";
 
 const makeEndpoint = (chatId, queryString) =>
   `/admin/api/chats/${chatId}/verifications${queryString}`;
-
-const UserInfoCard = ({ verification, x, y }) => (
-  <div
-    style={{
-      left: x,
-      top: y,
-    }}
-    tw="absolute z-50 pointer-events-none bg-white rounded-t shadow-lg"
-  >
-    <header
-      style={{
-        background:
-          STATUS_COLOR_BG_MAPPING[verification.status] ||
-          "rgba(247,250,252,var(--tw-bg-opacity))",
-      }}
-      tw="text-center rounded-t py-2"
-    >
-      <span tw="font-bold">用户详情</span>
-    </header>
-
-    <div tw="p-3">
-      <div tw="text-xs">
-        <label tw="font-bold text-black">全名</label>：
-        <div tw="py-2">
-          <span tw="text-gray-600 tracking-tight">
-            {verification.targetUserName}
-          </span>
-        </div>
-      </div>
-      <div tw="text-xs">
-        <label tw="font-bold text-black">ID</label>：
-        <span tw="text-gray-600 font-mono">
-          {verification.targetUserId}
-        </span>
-      </div>
-    </div>
-  </div>
-);
 
 export default () => {
   const dispatch = useDispatch();
@@ -306,11 +269,37 @@ export default () => {
             {isLoaded() ? (
               <div tw="shadow rounded">
                 {hoveredInfo && (
-                  <UserInfoCard
-                    verification={hoveredInfo.verification}
-                    x={hoveredInfo.x}
-                    y={hoveredInfo.y}
-                  />
+                  // 用户信息浮动卡片。
+                  <FloatingCard x={hoveredInfo.x} y={hoveredInfo.y}>
+                    <header
+                      style={{
+                        background:
+                          STATUS_BG_COLOR_MAPPING[
+                            hoveredInfo.verification.status
+                          ] || "rgba(247,250,252,var(--tw-bg-opacity))",
+                      }}
+                      tw="text-center rounded-t py-2"
+                    >
+                      <span tw="font-bold">用户详情</span>
+                    </header>
+
+                    <div tw="p-3">
+                      <div tw="text-xs">
+                        <label tw="font-bold text-black">全名</label>：
+                        <div tw="py-2">
+                          <span tw="text-gray-600 tracking-tight">
+                            {hoveredInfo.verification.targetUserName}
+                          </span>
+                        </div>
+                      </div>
+                      <div tw="text-xs">
+                        <label tw="font-bold text-black">ID</label>：
+                        <span tw="text-gray-600 font-mono">
+                          {hoveredInfo.verification.targetUserId}
+                        </span>
+                      </div>
+                    </div>
+                  </FloatingCard>
                 )}
                 <Table tw="mt-3">
                   <Thead>

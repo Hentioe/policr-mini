@@ -4,10 +4,7 @@ import { useSelector, useDispatch } from "react-redux";
 import { Link as RouteLink, useLocation } from "react-router-dom";
 import tw, { styled } from "twin.macro";
 import Select from "react-select";
-import {
-  parseISO,
-  format as formatDateTime,
-} from "date-fns";
+import { parseISO, format as formatDateTime } from "date-fns";
 
 import {
   PageHeader,
@@ -18,6 +15,7 @@ import {
   PageSectionTitle,
   PageBody,
   Pagination,
+  FloatingCard,
 } from "../components";
 import { Table, Thead, Tr, Th, Tbody, Td } from "../components/Tables";
 import { loadSelected } from "../slices/chats";
@@ -132,6 +130,13 @@ function actionUI(action) {
   return <span style={{ color: color }}>{text}</span>;
 }
 
+const STATUS_BG_COLOR_MAPPING = {
+  waiting: "#FFE4A2",
+  passed: "#BEFFA2",
+  timeout: "#FFB4A2",
+  wronged: "#FFB4A2",
+};
+
 const dateTimeFormat = "yyyy-MM-dd HH:mm:ss";
 
 const makeEndpoint = (chatId, queryString) =>
@@ -150,14 +155,21 @@ export default () => {
   const offset = parseOffset(searchParams.get("offset"));
   const apiQueryString = makeQueryString({ role, action, timeRange, offset });
 
-  const [roleOption, setRoleOption] = useState(findRoleOption(role));
-  const [actionOption, setActionOption] = useState(findActionOption(action));
+  const [roleOption, _setRoleOption] = useState(findRoleOption(role));
+  const [actionOption, _setActionOption] = useState(findActionOption(action));
+  const [hoveredInfo, setHoveredInfo] = useState(undefined);
 
   const { data, error, mutate } = useSWR(
     chatsState && chatsState.isLoaded && chatsState.selected
       ? makeEndpoint(chatsState.selected, apiQueryString)
       : null
   );
+
+  const showUserInfo = (o, e) => {
+    setHoveredInfo({ operation: o, x: e.pageX, y: e.pageY });
+  };
+
+  const hiddenUserInfo = () => setHoveredInfo(undefined);
 
   const isLoaded = () => chatsState.isLoaded && !error && data && !data.errors;
 
@@ -252,6 +264,39 @@ export default () => {
           <main>
             {isLoaded() ? (
               <div tw="shadow rounded">
+                {hoveredInfo && (
+                  // 用户信息浮动卡片。
+                  <FloatingCard x={hoveredInfo.x} y={hoveredInfo.y}>
+                    <header
+                      style={{
+                        background:
+                          STATUS_BG_COLOR_MAPPING[
+                            hoveredInfo.operation.verification.status
+                          ] || "rgba(247,250,252,var(--tw-bg-opacity))",
+                      }}
+                      tw="text-center rounded-t py-2"
+                    >
+                      <span tw="font-bold">用户详情</span>
+                    </header>
+
+                    <div tw="p-3">
+                      <div tw="text-xs">
+                        <label tw="font-bold text-black">全名</label>：
+                        <div tw="py-2">
+                          <span tw="text-gray-600 tracking-tight">
+                            {hoveredInfo.operation.verification.targetUserName}
+                          </span>
+                        </div>
+                      </div>
+                      <div tw="text-xs">
+                        <label tw="font-bold text-black">ID</label>：
+                        <span tw="text-gray-600 font-mono">
+                          {hoveredInfo.operation.verification.targetUserId}
+                        </span>
+                      </div>
+                    </div>
+                  </FloatingCard>
+                )}
                 <Table tw="mt-3">
                   <Thead>
                     <Tr>
@@ -263,9 +308,15 @@ export default () => {
                     </Tr>
                   </Thead>
                   <Tbody>
-                    {data.operations.map((o, i) => (
+                    {data.operations.map((o) => (
                       <Tr key={o.id}>
-                        <Td tw="truncate">{o.verification.targetUserName}</Td>
+                        <Td
+                          tw="truncate"
+                          onMouseEnter={(e) => showUserInfo(o, e)}
+                          onMouseLeave={hiddenUserInfo}
+                        >
+                          {o.verification.targetUserName}
+                        </Td>
                         <Td>
                           {formatDateTime(
                             parseISO(o.verification.insertedAt),
