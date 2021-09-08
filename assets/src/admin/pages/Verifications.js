@@ -107,6 +107,13 @@ function statusUI(status) {
   return <span style={{ color: color }}>{text}</span>;
 }
 
+const STATUS_COLOR_BG_MAPPING = {
+  waiting: "#FFE4A2",
+  passed: "#BEFFA2",
+  timeout: "#FFB4A2",
+  wronged: "#FFB4A2",
+};
+
 async function kickByVerification(id, { ban }) {
   ban = ban === true;
   const endpoint = `/admin/api/verifications/${id}/kick?ban=${ban}`;
@@ -125,22 +132,33 @@ const UserInfoCard = ({ verification, x, y }) => (
       left: x,
       top: y,
     }}
-    tw="absolute z-50 pointer-events-auto bg-white rounded-t shadow-lg w-60"
+    tw="absolute z-50 pointer-events-none bg-white rounded-t shadow-lg"
   >
-    <header tw="bg-gray-100 text-center rounded-t py-2">
+    <header
+      style={{
+        background:
+          STATUS_COLOR_BG_MAPPING[verification.status] ||
+          "rgba(247,250,252,var(--tw-bg-opacity))",
+      }}
+      tw="text-center rounded-t py-2"
+    >
       <span tw="font-bold">用户详情</span>
     </header>
 
-    <div tw="px-4 py-2">
+    <div tw="p-3">
       <div tw="text-xs">
         <label tw="font-bold text-black">全名</label>：
         <div tw="py-2">
-          <span tw="text-blue-600">{verification.targetUserName}</span>
+          <span tw="text-gray-600 tracking-tight">
+            {verification.targetUserName}
+          </span>
         </div>
       </div>
       <div tw="text-xs">
         <label tw="font-bold text-black">ID</label>：
-        <span tw="text-blue-600 font-mono">{verification.targetUserId}</span>
+        <span tw="text-gray-600 font-mono">
+          {verification.targetUserId}
+        </span>
       </div>
     </div>
   </div>
