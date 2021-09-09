@@ -118,6 +118,20 @@ const checkAttachmentTextError = (attachmentText) => {
   return null;
 };
 
+const getAttachmentName = (attachmentText) => {
+  if (attachmentText.startsWith("photo/")) {
+    return "图片";
+  } else if (attachmentText.startsWith("video/")) {
+    return "视频";
+  } else if (attachmentText.startsWith("audio/")) {
+    return "音频";
+  } else if (attachmentText.startsWith("document/")) {
+    return "文件";
+  } else {
+    return "附件";
+  }
+};
+
 export default () => {
   const chatsState = useSelector((state) => state.chats);
   const location = useLocation();
@@ -129,7 +143,7 @@ export default () => {
       : null
   );
   const [isEditing, setIsEditing] = useState(false);
-  const [isIncludesAttachment, setIsIncludesAttachment] = useState(false);
+  const [includedAttachment, setIsIncludesAttachment] = useState(false);
   const [editingId, setEditingId] = useState(initialEditingId);
   const [editintTitle, setEditingTitle] = useState(initialEditingTitle);
   const [editingAttachment, setEditingAttachment] = useState("");
@@ -270,13 +284,13 @@ export default () => {
   );
 
   const handleAddOrDeleteAttachment = useCallback(() => {
-    if (isIncludesAttachment) {
+    if (includedAttachment) {
       // 删除附件。
       setEditingAttachment("");
     }
 
-    setIsIncludesAttachment(!isIncludesAttachment);
-  }, [isIncludesAttachment]);
+    setIsIncludesAttachment(!includedAttachment);
+  }, [includedAttachment]);
 
   useEffect(() => {
     // 初始化编辑内容
@@ -385,14 +399,14 @@ export default () => {
                       onChange={handleTitleChange}
                     />
                   </FormSection>
-                  {isIncludesAttachment ? (
+                  {includedAttachment ? (
                     <FormSection>
                       <FormLable>附件</FormLable>
                       <FormInput
                         tw="w-full lg:w-9/12"
                         value={editingAttachment}
                         onChange={handleAttachmentTextChange}
-                        placeholder="私聊机器人附件获取此值，支持：图片、视频、音频、文档（文件）。"
+                        placeholder="私聊机器人任意文件获取此值，支持：图片、视频、音频、文档（文件）。"
                       />
                     </FormSection>
                   ) : undefined}
@@ -433,7 +447,7 @@ export default () => {
                       tw="mr-2"
                       onClick={handleAddOrDeleteAttachment}
                     >
-                      {isIncludesAttachment ? "删除" : "添加"}附件
+                      {includedAttachment ? "删除" : "添加"}附件
                     </ActionButton>
                     <span tw="text-sm text-red-600">{attachmentError}</span>
                   </div>
@@ -486,12 +500,13 @@ export default () => {
                   </div>
                   <div tw="pl-4 pt-4 pr-4">
                     <div tw="shadow rounded border border-solid border-gray-200 text-black">
-                      {isIncludesAttachment &&
-                      editingAttachment.trim() != "" ? (
+                      {includedAttachment && editingAttachment.trim() != "" && (
                         <div tw="flex justify-center w-full py-12 bg-blue-400 rounded-t">
-                          <span tw="text-white text-lg">附件</span>
+                          <span tw="text-white text-lg">
+                            {getAttachmentName(editingAttachment)}
+                          </span>
                         </div>
-                      ) : undefined}
+                      )}
                       <div tw="p-2">
                         <Paragraph tw="italic">
                           来自『<span tw="font-bold">{data.chat.title}</span>
