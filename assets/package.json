@@ -14,7 +14,7 @@
     }
   },
   "dependencies": {
-    "@reduxjs/toolkit": "^1.5.1",
+    "@reduxjs/toolkit": "^1.6.1",
     "bytes-formatter": "^21.6.10",
     "camelcase-keys": "^6.2.2",
     "classnames": "^2.2.6",
