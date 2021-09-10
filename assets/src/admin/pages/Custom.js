@@ -9,6 +9,7 @@ import { useLocation, Link as RouteLink } from "react-router-dom";
 import { parseISO, format as formatDateTime } from "date-fns";
 
 import { loadSelected } from "../slices/chats";
+import { shown as readonlyShown } from "../slices/readonly";
 import {
   PageHeader,
   PageBody,
@@ -293,7 +294,11 @@ export default () => {
   }, [includedAttachment]);
 
   useEffect(() => {
-    // 初始化编辑内容
+    dispatch(readonlyShown(false));
+  }, []);
+
+  useEffect(() => {
+    // 初始化编辑内容。
     initEditingContent();
   }, [location]);
 
@@ -304,7 +309,10 @@ export default () => {
 
   useEffect(() => {
     if (data && data.errors) toastErrors(data.errors);
-    if (isLoaded()) dispatch(loadSelected(data.chat));
+    if (isLoaded()) {
+      dispatch(loadSelected(data.chat));
+      dispatch(readonlyShown(!data.writable));
+    }
   }, [data]);
 
   return (

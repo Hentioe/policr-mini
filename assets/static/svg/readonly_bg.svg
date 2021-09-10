@@ -1,0 +1,24 @@
+<svg id="diagtext" xmlns="http://www.w3.org/2000/svg" xmlns:xlink="http://www.w3.org/1999/xlink" width="100%"
+    height="100%">
+    <style type="text/css">
+        text {
+            fill: gray;
+            fill-opacity: 0.20;
+            font-family: sans-serif;
+            font-weight: 500;
+        }
+    </style>
+    <defs>
+        <pattern id="en" patternUnits="userSpaceOnUse" width="140" height="80">
+            <text y="30" font-size="30" id="enName">readonly</text>
+        </pattern>
+        <pattern xlink:href="#en">
+            <text y="80" x="35" font-size="30" id="cnName">只读</text>
+        </pattern>
+        <pattern id="combo" xlink:href="#en" patternTransform="rotate(-45)">
+            <use xlink:href="#enName" />
+            <use xlink:href="#cnName" />
+        </pattern>
+    </defs>
+    <rect width="100%" height="100%" fill="url(#combo)" />
+</svg>

@@ -4,7 +4,7 @@ import "react-toastify/dist/ReactToastify.css";
 import React from "react";
 import ReactDOM from "react-dom";
 import "twin.macro";
-import { Provider } from "react-redux";
+import { Provider, useSelector } from "react-redux";
 import { configureStore } from "@reduxjs/toolkit";
 import thunkMiddleware from "redux-thunk";
 import reduxLogger from "redux-logger";
@@ -13,6 +13,7 @@ import { SWRConfig } from "swr";
 import { ToastContainer } from "react-toastify";
 import { HelmetProvider } from "react-helmet-async";
 
+import readonlyBgSvg from "../static/svg/readonly_bg.svg";
 import { camelizeJson } from "./admin/helper";
 import { Sidebar, Chats } from "./admin/components";
 import {
@@ -46,6 +47,21 @@ const store = configureStore({
 
 const fetcher = (...args) => fetch(...args).then((resp) => camelizeJson(resp));
 
+const RootBox = ({ children }) => {
+  const readonlyState = useSelector((state) => state.readonly);
+
+  return (
+    <div
+      tw="flex px-0 lg:px-12 xl:px-12"
+      style={{
+        background: readonlyState.shown && `url(${readonlyBgSvg})`,
+      }}
+    >
+      {children}
+    </div>
+  );
+};
+
 const App = () => {
   return (
     <React.StrictMode>
@@ -60,7 +76,7 @@ const App = () => {
             }}
           >
             <Router>
-              <div tw="flex px-0 lg:px-12 xl:px-12">
+              <RootBox>
                 <div tw="hidden md:block w-2/12 md:w-2/12 xl:w-3/12">
                   <Sidebar />
                 </div>
@@ -119,7 +135,7 @@ const App = () => {
                 <div tw="hidden md:block w-2/12 md:w-2/12 xl:w-3/12">
                   <Chats />
                 </div>
-              </div>
+              </RootBox>
               <ToastContainer
                 position="bottom-center"
                 autoClose={2500}
