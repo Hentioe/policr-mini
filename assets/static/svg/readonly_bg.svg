@@ -13,7 +13,7 @@
             <text y="30" font-size="30" id="enName">readonly</text>
         </pattern>
         <pattern xlink:href="#en">
-            <text y="80" x="35" font-size="30" id="cnName">只读</text>
+            <text y="70" x="35" font-size="30" id="cnName">只读</text>
         </pattern>
         <pattern id="combo" xlink:href="#en" patternTransform="rotate(-45)">
             <use xlink:href="#enName" />
