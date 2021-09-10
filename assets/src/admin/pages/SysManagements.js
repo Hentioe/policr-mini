@@ -17,6 +17,7 @@ import {
   PageReLoading,
   ActionButton,
   Pagination,
+  FloatingCard,
 } from "../components";
 import { Table, Thead, Tr, Th, Tbody, Td } from "../components/Tables";
 import { toastErrors, toastMessage, camelizeJson } from "../helper";
@@ -101,6 +102,7 @@ export default () => {
   const [searchText, setSearchText] = useState(keywordsParam);
   const [isSearching, setIsSearching] = useState(keywordsParam !== "");
   const [isShowClearText, setIsShowClearText] = useState(false);
+  const [hoveredInfo, setHoveredInfo] = useState(undefined);
 
   const handleSearchTextChange = (e) => setSearchText(e.target.value);
   const handleSearchInputKeyDown = useCallback(
@@ -113,6 +115,7 @@ export default () => {
     },
     [searchText, offset]
   );
+
   const handleClearSearchText = useCallback(() => {
     setSearchText("");
     if (!isSearching) return;
@@ -150,6 +153,12 @@ export default () => {
 
     mutate();
   };
+
+  const showChatInfo = (c, e) => {
+    setHoveredInfo({ chat: c, x: e.pageX, y: e.pageY });
+  };
+
+  const hiddenChatInfo = () => setHoveredInfo(undefined);
 
   useEffect(() => {
     if (searchText && searchText.trim() != "") setIsShowClearText(true);
@@ -195,6 +204,32 @@ export default () => {
           {isLoaded() ? (
             <main>
               <div tw="shadow rounded">
+                {hoveredInfo && (
+                  <FloatingCard x={hoveredInfo.x} y={hoveredInfo.y}>
+                    <header
+                      style={{
+                        background: hoveredInfo.chat.isTakeOver && "#F1F7FF",
+                      }}
+                      tw="text-center rounded-t py-2 bg-gray-100"
+                    >
+                      <span>群组详情</span>
+                    </header>
+                    <main tw="w-72 text-xs p-2">
+                      <div>
+                        <label tw="font-bold text-black">标题：</label>
+                        <span>{hoveredInfo.chat.title}</span>
+                      </div>
+                      <div tw="mt-2">
+                        <label tw="font-bold text-black">描述：</label>
+                        <div tw="py-2">
+                          <span tw="tracking-tight">
+                            {hoveredInfo.chat.descripion || "无"}
+                          </span>
+                        </div>
+                      </div>
+                    </main>
+                  </FloatingCard>
+                )}
                 <Table>
                   <Thead>
                     <Tr>
@@ -207,7 +242,11 @@ export default () => {
                   <Tbody>
                     {data.chats.map((chat) => (
                       <Tr key={chat.id}>
-                        <Td tw="truncate">
+                        <Td
+                          tw="truncate"
+                          onMouseEnter={(e) => showChatInfo(chat, e)}
+                          onMouseLeave={hiddenChatInfo}
+                        >
                           {/* TODO: 此处切换群组会造成一个多余的请求发送，需解决（可能采取和 Chats 组件部分相同的逻辑替代 RouteLink） */}
                           <TitleLink
                             takeovered={chat.isTakeOver ? 1 : 0}
