@@ -42,7 +42,7 @@ defmodule PolicrMini.Factory do
   end
 
   def build(:scheme) do
-    %PolicrMini.Schema.Scheme{
+    %PolicrMini.Chats.Scheme{
       verification_mode: 0,
       verification_entrance: 0,
       verification_occasion: 0,

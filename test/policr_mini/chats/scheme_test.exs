@@ -1,8 +1,8 @@
-defmodule PolicrMini.Schema.SchemeTest do
+defmodule PolicrMini.Chats.SchemeTest do
   use ExUnit.Case
 
   alias PolicrMini.Factory
-  alias PolicrMini.Schema.Scheme
+  alias PolicrMini.Chats.Scheme
 
   describe "schema" do
     test "schema metadata" do
@@ -21,6 +21,7 @@ defmodule PolicrMini.Schema.SchemeTest do
                  :is_highlighted,
                  :mention_text,
                  :image_answers_count,
+                 :service_message_cleanup,
                  :inserted_at,
                  :updated_at
                ]

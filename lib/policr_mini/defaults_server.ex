@@ -22,7 +22,7 @@ defmodule PolicrMini.DefaultsServer do
     GenServer.call(__MODULE__, {:get_scheme_value, field})
   end
 
-  @spec get_scheme :: PolicrMini.Schema.Scheme.t()
+  @spec get_scheme :: PolicrMini.Chats.Scheme.t()
   def get_scheme do
     GenServer.call(__MODULE__, {:get_scheme})
   end

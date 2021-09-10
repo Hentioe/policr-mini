@@ -3,7 +3,7 @@ defmodule PolicrMiniBot.Captcha do
   验证内容生成模块。
   """
 
-  alias PolicrMini.Schema.Scheme
+  alias PolicrMini.Chats.Scheme
   alias Telegex.Model.{InlineKeyboardButton, InlineKeyboardMarkup}
 
   defmodule Data do

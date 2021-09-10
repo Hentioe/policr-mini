@@ -1,4 +1,4 @@
-defmodule PolicrMini.Schema.Scheme do
+defmodule PolicrMini.Chats.Scheme do
   @moduledoc """
   方案模型。
   """
@@ -24,6 +24,7 @@ defmodule PolicrMini.Schema.Scheme do
                       is_highlighted
                       mention_text
                       image_answers_count
+                      service_message_cleanup
                     )a
 
   schema "schemes" do
@@ -37,6 +38,7 @@ defmodule PolicrMini.Schema.Scheme do
     field :is_highlighted, :boolean
     field :mention_text, MentionText
     field :image_answers_count, :integer
+    field :service_message_cleanup, :boolean
 
     timestamps()
   end
