@@ -293,25 +293,23 @@ export default () => {
     setIsIncludesAttachment(!includedAttachment);
   }, [includedAttachment]);
 
-  useEffect(() => {
-    dispatch(readonlyShown(false));
-  }, []);
-
-  useEffect(() => {
-    // 初始化编辑内容。
-    initEditingContent();
-  }, [location]);
+  let title = "自定义";
+  if (isLoaded()) title += ` / ${data.chat.title}`;
 
   const editingCheckResult = checkEditintValid();
 
-  let title = "自定义";
-  if (isLoaded()) title += ` / ${data.chat.title}`;
+  useEffect(() => {
+    // 初始化只读显示状态。
+    dispatch(readonlyShown(false));
+    // 初始化编辑内容。
+    initEditingContent();
+  }, [location]);
 
   useEffect(() => {
     if (data && data.errors) toastErrors(data.errors);
     if (isLoaded()) {
       dispatch(loadSelected(data.chat));
-      dispatch(readonlyShown(!data.writable));
+      dispatch(readonlyShown(data.writable));
     }
   }, [data]);
 

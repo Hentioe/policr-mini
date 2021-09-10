@@ -4,6 +4,8 @@ import "twin.macro";
 import Switch from "react-switch";
 import fetch from "unfetch";
 
+import { loadSelected } from "../slices/chats";
+import { shown as readonlyShown } from "../slices/readonly";
 import {
   PageHeader,
   PageLoading,
@@ -21,7 +23,6 @@ import {
   updateInNewArray,
 } from "../helper";
 import { useDispatch, useSelector } from "react-redux";
-import { loadSelected } from "../slices/chats";
 import PageBody from "../components/PageBody";
 
 const makeEndpoint = (chat_id) => `/admin/api/chats/${chat_id}/permissions`;
@@ -134,8 +135,16 @@ export default () => {
   if (isLoaded()) title += ` / ${data.chat.title}`;
 
   useEffect(() => {
+    // 初始化只读显示状态。
+    dispatch(readonlyShown(false));
+  }, [location]);
+
+  useEffect(() => {
     if (data && data.errors) toastErrors(data.errors);
-    if (isLoaded()) dispatch(loadSelected(data.chat));
+    if (isLoaded()) {
+      dispatch(loadSelected(data.chat));
+      dispatch(readonlyShown(data.writable));
+    }
   }, [data]);
 
   return (

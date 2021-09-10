@@ -5,6 +5,7 @@ import Select from "react-select";
 import tw, { styled } from "twin.macro";
 
 import { loadSelected } from "../slices/chats";
+import { shown as readonlyShown } from "../slices/readonly";
 import {
   PageHeader,
   PageBody,
@@ -13,7 +14,6 @@ import {
   PageSectionTitle,
   PageLoading,
   PageReLoading,
-  NotImplemented,
   LabelledButton,
   FormInput,
 } from "../components";
@@ -333,8 +333,16 @@ export default () => {
   if (isLoaded()) title += ` / ${data.chat.title}`;
 
   useEffect(() => {
+    // 初始化只读显示状态。
+    dispatch(readonlyShown(false));
+  }, [location]);
+
+  useEffect(() => {
     if (data && data.errors) toastErrors(data.errors);
-    if (isLoaded()) dispatch(loadSelected(data.chat));
+    if (isLoaded()) {
+      dispatch(loadSelected(data.chat));
+      dispatch(readonlyShown(data.writable));
+    }
   }, [data]);
 
   return (

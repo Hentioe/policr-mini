@@ -1,10 +1,12 @@
 import React, { useState, useEffect, useCallback } from "react";
 import tw, { styled } from "twin.macro";
 import { Link as RouteLink, useLocation, useHistory } from "react-router-dom";
+import { useDispatch } from "react-redux";
 import useSWR from "swr";
 import { parseISO, format as formatDateTime } from "date-fns";
 import fetch from "unfetch";
 
+import { shown as readonlyShown } from "../slices/readonly";
 import {
   PageHeader,
   PageBody,
@@ -83,6 +85,7 @@ async function syncChat(id) {
 export default () => {
   const location = useLocation();
   const history = useHistory();
+  const dispatch = useDispatch();
 
   const searchParams = new URLSearchParams(location.search);
   const offsetParam = parseOffset(searchParams.get("offset"));
@@ -156,6 +159,8 @@ export default () => {
   useEffect(() => {
     setOffset(offsetParam);
     setIsSearching(keywordsParam !== "");
+    // 初始化只读显示状态。
+    dispatch(readonlyShown(false));
   }, [location]);
 
   const isLoaded = () => !error && data;

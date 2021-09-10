@@ -6,6 +6,8 @@ import tw, { styled } from "twin.macro";
 import Select from "react-select";
 import { parseISO, format as formatDateTime } from "date-fns";
 
+import { loadSelected } from "../slices/chats";
+import { shown as readonlyShown } from "../slices/readonly";
 import {
   PageHeader,
   PageLoading,
@@ -18,7 +20,6 @@ import {
   FloatingCard,
 } from "../components";
 import { Table, Thead, Tr, Th, Tbody, Td } from "../components/Tables";
-import { loadSelected } from "../slices/chats";
 import { toastErrors } from "../helper";
 
 const TimeLink = styled(RouteLink)`
@@ -177,8 +178,16 @@ export default () => {
   if (isLoaded()) title += ` / ${data.chat.title}`;
 
   useEffect(() => {
+    // 初始化只读显示状态。
+    dispatch(readonlyShown(false));
+  }, [location]);
+
+  useEffect(() => {
     if (data && data.errors) toastErrors(data.errors);
-    if (isLoaded()) dispatch(loadSelected(data.chat));
+    if (isLoaded()) {
+      dispatch(loadSelected(data.chat));
+      dispatch(readonlyShown(data.writable));
+    }
   }, [data]);
 
   return (

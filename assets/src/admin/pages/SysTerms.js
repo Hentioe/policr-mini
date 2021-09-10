@@ -3,8 +3,10 @@ import useSWR from "swr";
 import tw, { styled } from "twin.macro";
 import fetch from "unfetch";
 import { useLocation } from "react-router-dom";
+import { useDispatch } from "react-redux";
 import { parseISO, format } from "date-fns";
 
+import { shown as readonlyShown } from "../slices/readonly";
 import {
   PageHeader,
   PageBody,
@@ -45,14 +47,6 @@ const saveTerm = async ({ content }) => {
   }).then((r) => camelizeJson(r));
 };
 
-const deleteTerm = async () => {
-  const endpoint = `/admin/api/terms`;
-  const method = "DELETE";
-  return fetch(endpoint, {
-    method: method,
-  }).then((r) => camelizeJson(r));
-};
-
 const previewTerm = async ({ content }) => {
   const endpoint = `/admin/api/terms/preview`;
   const method = "POST";
@@ -69,6 +63,7 @@ const previewTerm = async ({ content }) => {
 
 export default () => {
   const location = useLocation();
+  const dispatch = useDispatch();
 
   const { data, mutate, error } = useSWR(makeEndpoint());
   const [activeTabMenu, setActiveTabMenu] = useState(TAB_MENU_PREVIEW);
@@ -144,6 +139,8 @@ export default () => {
   useEffect(() => {
     // 初始化编辑内容
     initEditingContent();
+    // 初始化只读显示状态。
+    dispatch(readonlyShown(false));
   }, [location]);
 
   let title = "服务条款";

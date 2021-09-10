@@ -1,11 +1,13 @@
-import React, { useState } from "react";
+import React, { useEffect, useState } from "react";
 import useSWR from "swr";
 import tw, { styled } from "twin.macro";
 import Select from "react-select";
 import { Link as RouteLink, useLocation, useHistory } from "react-router-dom";
+import { useDispatch } from "react-redux";
 import MoonLoader from "react-spinners/MoonLoader";
 import { fromUnixTime, format as formatDateTime, getUnixTime } from "date-fns";
 
+import { shown as readonlyShown } from "../slices/readonly";
 import {
   PageHeader,
   PageBody,
@@ -73,6 +75,7 @@ function makeQueryString(level, timeRange) {
 export default () => {
   const location = useLocation();
   const history = useHistory();
+  const dispatch = useDispatch();
 
   const searchParams = new URLSearchParams(location.search);
 
@@ -88,6 +91,11 @@ export default () => {
     const queryString = makeQueryString(option.value, timeRange);
     history.push(`/admin/sys/logs${queryString}`);
   };
+
+  useEffect(() => {
+    // 初始化只读显示状态。
+    dispatch(readonlyShown(false));
+  }, [location]);
 
   const isLoaded = () => data;
 

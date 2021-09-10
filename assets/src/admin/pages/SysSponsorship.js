@@ -4,8 +4,10 @@ import tw, { styled } from "twin.macro";
 import fetch from "unfetch";
 import Select from "react-select";
 import { useLocation } from "react-router-dom";
+import { useDispatch } from "react-redux";
 import { parseISO, format as formatDateTime } from "date-fns";
 
+import { shown as readonlyShown } from "../slices/readonly";
 import {
   PageHeader,
   PageBody,
@@ -115,6 +117,7 @@ const deleteSponsorHistory = async (id) => {
 
 export default () => {
   const location = useLocation();
+  const dispatch = useDispatch();
 
   const { data, mutate, error } = useSWR(makeEndpoint());
   const [isEditing, setIsEditing] = useState(false);
@@ -295,6 +298,11 @@ export default () => {
   const editingCheckResult = checkEditintValid();
 
   let title = "赞助记录";
+
+  useEffect(() => {
+    // 初始化只读显示状态。
+    dispatch(readonlyShown(false));
+  }, [location]);
 
   useEffect(() => {
     if (data && data.errors) toastErrors(data.errors);

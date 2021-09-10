@@ -6,6 +6,7 @@ import tw, { styled } from "twin.macro";
 import { formatBytes } from "bytes-formatter";
 
 import { loadSelected } from "../slices/chats";
+import { shown as readonlyShown } from "../slices/readonly";
 import {
   PageHeader,
   PageBody,
@@ -357,8 +358,12 @@ export default () => {
   let title = "全局属性";
 
   useEffect(() => {
+    // 初始化只读显示状态。
+    dispatch(readonlyShown(false));
+  }, [location]);
+
+  useEffect(() => {
     if (data && data.errors) toastErrors(data.errors);
-    if (isLoaded()) dispatch(loadSelected(data.chat));
   }, [data]);
 
   return (

@@ -3,7 +3,9 @@ import useSWR from "swr";
 import tw, { styled } from "twin.macro";
 import fetch from "unfetch";
 import { useLocation } from "react-router-dom";
+import { useDispatch } from "react-redux";
 
+import { shown as readonlyShown } from "../slices/readonly";
 import {
   PageHeader,
   PageBody,
@@ -93,6 +95,7 @@ const deleteThirdParty = async (id) => {
 
 export default () => {
   const location = useLocation();
+  const dispatch = useDispatch();
 
   const { data, mutate, error } = useSWR(makeEndpoint());
   const [isEditing, setIsEditing] = useState(false);
@@ -207,6 +210,8 @@ export default () => {
   useEffect(() => {
     // 初始化编辑内容
     initEditingContent();
+    // 初始化只读显示状态。
+    dispatch(readonlyShown(false));
   }, [location]);
 
   const editingCheckResult = checkEditintValid();
