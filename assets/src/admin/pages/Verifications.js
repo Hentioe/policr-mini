@@ -110,10 +110,10 @@ function statusUI(status) {
 }
 
 const STATUS_BG_COLOR_MAPPING = {
-  waiting: "#FFE4A2",
-  passed: "#BEFFA2",
-  timeout: "#FFB4A2",
-  wronged: "#FFB4A2",
+  waiting: "#FFFFEB",
+  passed: "#EFFFEE",
+  timeout: "#FFF1F1",
+  wronged: "#FFF1F1",
 };
 
 async function kickByVerification(id, { ban }) {
@@ -285,9 +285,9 @@ export default () => {
                         background:
                           STATUS_BG_COLOR_MAPPING[
                             hoveredInfo.verification.status
-                          ] || "rgba(247,250,252,var(--tw-bg-opacity))",
+                          ],
                       }}
-                      tw="text-center rounded-t py-2"
+                      tw="text-center rounded-t py-2 bg-gray-100"
                     >
                       <span tw="font-bold">用户详情</span>
                     </header>
