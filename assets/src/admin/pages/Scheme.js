@@ -341,7 +341,7 @@ export default () => {
     if (data && data.errors) toastErrors(data.errors);
     if (isLoaded()) {
       dispatch(loadSelected(data.chat));
-      dispatch(readonlyShown(data.writable));
+      dispatch(readonlyShown(!data.writable));
     }
   }, [data]);
 
