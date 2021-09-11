@@ -223,7 +223,7 @@ export default () => {
                         <label tw="font-bold text-black">描述：</label>
                         <div tw="py-2">
                           <span tw="tracking-tight">
-                            {hoveredInfo.chat.descripion || "无"}
+                            {hoveredInfo.chat.description || "无"}
                           </span>
                         </div>
                       </div>
