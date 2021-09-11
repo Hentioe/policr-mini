@@ -101,7 +101,6 @@ defmodule PolicrMini.ChatsTest do
       assert default.timeout_killing_method == :kick
       assert default.wrong_killing_method == :kick
       assert default.is_highlighted == true
-      assert default.service_message_cleanup == true
     end
   end
 end
