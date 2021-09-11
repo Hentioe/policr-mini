@@ -9,9 +9,8 @@ defmodule PolicrMiniBot.RespSyncCmdPlug do
 
   use PolicrMiniBot, plug: [commander: :sync]
 
-  alias PolicrMini.Instances
+  alias PolicrMini.{Instances, Chats}
   alias PolicrMini.Instances.Chat
-  alias PolicrMini.SchemeBusiness
   alias PolicrMiniBot.SpeedLimiter
   alias PolicrMiniBot.Helper.Syncing
 
@@ -47,7 +46,7 @@ defmodule PolicrMiniBot.RespSyncCmdPlug do
         # 注意，同步完成后需进一步确保方案存在。
         with {:ok, chat} <- synchronize_chat(chat_id),
              {:ok, chat} <- Syncing.sync_for_chat_permissions(chat),
-             {:ok, _scheme} <- SchemeBusiness.fetch(chat_id),
+             {:ok, _scheme} <- Chats.fetch_scheme(chat_id),
              # 获取自身权限
              {:ok, member} <- Telegex.get_chat_member(chat_id, PolicrMiniBot.id()) do
           is_admin = member.status == "administrator"

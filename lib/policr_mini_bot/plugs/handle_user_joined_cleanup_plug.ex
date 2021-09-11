@@ -7,11 +7,10 @@ defmodule PolicrMiniBot.HandleUserJoinedCleanupPlug do
 
   use PolicrMiniBot, plug: :message_handler
 
-  alias PolicrMini.Logger
-
+  alias PolicrMini.{Logger, Chats}
   alias PolicrMini.Chats.Scheme
   alias PolicrMini.Schema.Verification
-  alias PolicrMini.{SchemeBusiness, VerificationBusiness, StatisticBusiness, OperationBusiness}
+  alias PolicrMini.{VerificationBusiness, StatisticBusiness, OperationBusiness}
   alias PolicrMiniBot.CallVerificationPlug
 
   # 过期时间：15 分钟
@@ -120,7 +119,7 @@ defmodule PolicrMiniBot.HandleUserJoinedCleanupPlug do
     }
 
     with {:ok, verification} <- VerificationBusiness.fetch(verification_params),
-         {:ok, scheme} <- SchemeBusiness.fetch(chat_id),
+         {:ok, scheme} <- Chats.fetch_scheme(chat_id),
          {text, markup} <- make_verify_content(verification, scheme, seconds),
          {:ok, reminder_message} <-
            Cleaner.send_verification_message(chat_id, text,

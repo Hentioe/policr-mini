@@ -5,10 +5,10 @@ defmodule PolicrMini.DefaultsServer do
 
   use GenServer
 
-  alias PolicrMini.{Logger, SchemeBusiness}
+  alias PolicrMini.{Logger, Chats}
 
   def start_link(_) do
-    {:ok, scheme} = SchemeBusiness.fetch_default()
+    {:ok, scheme} = Chats.fetch_default_scheme()
 
     GenServer.start_link(__MODULE__, %{scheme: scheme}, name: __MODULE__)
   end
@@ -27,7 +27,7 @@ defmodule PolicrMini.DefaultsServer do
     GenServer.call(__MODULE__, {:get_scheme})
   end
 
-  @spec update_scheme(SchemeBusiness.params()) :: :ok
+  @spec update_scheme(PolicrMini.Schema.params()) :: :ok
   def update_scheme(params) do
     GenServer.cast(__MODULE__, {:update_scheme, params})
   end
@@ -48,7 +48,7 @@ defmodule PolicrMini.DefaultsServer do
   def handle_cast({:update_scheme, params}, state) do
     scheme = Map.get(state, :scheme)
 
-    case SchemeBusiness.update(scheme, params) do
+    case Chats.update_scheme(scheme, params) do
       {:ok, scheme} ->
         {:noreply, Map.put(state, :scheme, scheme)}
 

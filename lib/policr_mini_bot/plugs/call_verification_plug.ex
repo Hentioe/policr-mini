@@ -5,10 +5,10 @@ defmodule PolicrMiniBot.CallVerificationPlug do
 
   use PolicrMiniBot, plug: [caller: [prefix: "verification:"]]
 
-  alias PolicrMini.Logger
+  alias PolicrMini.{Logger, Chats}
   alias PolicrMini.Chats.Scheme
   alias PolicrMini.Schema.Verification
-  alias PolicrMini.{VerificationBusiness, StatisticBusiness, SchemeBusiness, OperationBusiness}
+  alias PolicrMini.{VerificationBusiness, StatisticBusiness, OperationBusiness}
   alias PolicrMiniBot.{HandleUserJoinedCleanupPlug, Disposable}
 
   @doc """
@@ -73,7 +73,7 @@ defmodule PolicrMiniBot.CallVerificationPlug do
     end
 
     with {:ok, verification} <- validity_check(user_id, verification_id),
-         {:ok, scheme} <- SchemeBusiness.fetch(verification.chat_id),
+         {:ok, scheme} <- Chats.fetch_scheme(verification.chat_id),
          # 处理回答。
          {:ok, verification} <- handle_answer.(verification, scheme),
          # 更新验证记录中的选择索引

@@ -10,7 +10,7 @@ defmodule PolicrMiniBot.HandleUserJoinedGroupPlug do
   use PolicrMiniBot, plug: :preheater
 
   alias PolicrMiniBot.HandleUserJoinedCleanupPlug
-  alias PolicrMini.{Logger, SchemeBusiness}
+  alias PolicrMini.{Logger, Chats}
 
   @doc """
   根据更新消息中的 `chat_member` 字段，验证用户。
@@ -61,7 +61,7 @@ defmodule PolicrMiniBot.HandleUserJoinedGroupPlug do
 
     Logger.debug("A new member (#{new_user.id}) has joined the group (#{chat_id}).")
 
-    case SchemeBusiness.fetch(chat_id) do
+    case Chats.fetch_scheme(chat_id) do
       {:ok, scheme} ->
         HandleUserJoinedCleanupPlug.handle_one(chat_id, new_user, date, scheme, state)
 

@@ -1,5 +1,8 @@
 defmodule PolicrMini.Schema do
   @moduledoc false
+
+  @type params :: %{optional(atom) => any} | %{optional(String.t()) => any}
+
   defmacro __using__(_) do
     quote do
       use Ecto.Schema

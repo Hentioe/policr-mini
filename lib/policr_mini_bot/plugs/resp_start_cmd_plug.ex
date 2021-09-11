@@ -8,9 +8,7 @@ defmodule PolicrMiniBot.RespStartCmdPlug do
 
   use PolicrMiniBot, plug: [commander: :start]
 
-  alias PolicrMini.Logger
-
-  alias PolicrMini.{VerificationBusiness, SchemeBusiness, MessageSnapshotBusiness}
+  alias PolicrMini.{Logger, Chats, VerificationBusiness, MessageSnapshotBusiness}
   alias PolicrMini.Schema.Verification
   alias PolicrMiniBot.{ArithmeticCaptcha, CustomCaptcha, FallbackCaptcha, ImageCaptcha}
 
@@ -78,7 +76,7 @@ defmodule PolicrMiniBot.RespStartCmdPlug do
 
     if verification = VerificationBusiness.find_unity_waiting(target_chat_id, from_user_id) do
       # 读取验证方案（当前的实现没有实际根据方案数据动态决定什么）
-      with {:ok, scheme} <- SchemeBusiness.fetch(target_chat_id),
+      with {:ok, scheme} <- Chats.fetch_scheme(target_chat_id),
            # 发送验证消息
            {:ok, {verification_message, markup, captcha_data}} <-
              send_verify_message(verification, scheme, target_chat_id, from_user_id),
