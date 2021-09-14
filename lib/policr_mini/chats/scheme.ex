@@ -10,7 +10,8 @@ defmodule PolicrMini.Chats.Scheme do
     KillingMethodEnum,
     VerificationEntranceEnum,
     VerificationOccasionEnum,
-    MentionText
+    MentionText,
+    ServiceMessage
   }
 
   @required_fields ~w(chat_id)a
@@ -24,6 +25,7 @@ defmodule PolicrMini.Chats.Scheme do
                       is_highlighted
                       mention_text
                       image_answers_count
+                      service_message_cleanup
                     )a
 
   schema "schemes" do
@@ -37,6 +39,7 @@ defmodule PolicrMini.Chats.Scheme do
     field :is_highlighted, :boolean
     field :mention_text, MentionText
     field :image_answers_count, :integer
+    field :service_message_cleanup, {:array, ServiceMessage}
 
     timestamps()
   end

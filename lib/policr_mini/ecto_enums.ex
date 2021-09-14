@@ -20,4 +20,5 @@ defmodule PolicrMini.EctoEnums do
   defenum OperationRoleEnum, system: 0, admin: 1
   defenum StatVerificationStatus, passed: 0, timeout: 1, wronged: 2, other: 3
   defenum MentionText, user_id: 0, full_name: 1, mosaic_full_name: 2
+  defenum ServiceMessage, joined: 0, lefted: 1
 end

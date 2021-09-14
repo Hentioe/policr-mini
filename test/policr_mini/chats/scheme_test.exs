@@ -21,6 +21,7 @@ defmodule PolicrMini.Chats.SchemeTest do
                  :is_highlighted,
                  :mention_text,
                  :image_answers_count,
+                 :service_message_cleanup,
                  :inserted_at,
                  :updated_at
                ]
