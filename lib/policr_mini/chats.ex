@@ -65,7 +65,8 @@ defmodule PolicrMini.Chats do
     wrong_killing_method: :kick,
     is_highlighted: true,
     mention_text: :mosaic_full_name,
-    image_answers_count: 4
+    image_answers_count: 4,
+    service_message_cleanup: [:joined]
   }
 
   @doc """
@@ -101,6 +102,11 @@ defmodule PolicrMini.Chats do
       if scheme.image_answers_count,
         do: attrs,
         else: Map.put(attrs, :image_answers_count, @default_scheme.image_answers_count)
+
+    attrs =
+      if scheme.service_message_cleanup,
+        do: attrs,
+        else: Map.put(attrs, :service_message_cleanup, @default_scheme.service_message_cleanup)
 
     case update_scheme(scheme, attrs) do
       {:ok, scheme} -> scheme
