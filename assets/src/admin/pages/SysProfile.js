@@ -5,7 +5,7 @@ import Select from "react-select";
 import tw, { styled } from "twin.macro";
 import { formatBytes } from "bytes-formatter";
 
-import { loadSelected } from "../slices/chats";
+import Switch from "react-switch";
 import { shown as readonlyShown } from "../slices/readonly";
 import {
   PageHeader,
@@ -169,6 +169,10 @@ export default () => {
     useState(null);
   const [editingImageAnswersCountOption, setEditingImageAnswersCountOption] =
     useState(null);
+  const [editingJoinedCleared, setEditingJoinedCleared] = useState(undefined);
+  const [editingLeftedCleared, setEditingLeftedCleared] = useState(undefined);
+  const [editingServiceMessageDefaulted, setEditingServiceMessageDefaulted] =
+    useState(undefined);
 
   useEffect(() => {
     rebind();
@@ -445,26 +449,45 @@ export default () => {
                 <FromHint>
                   图片验证时生成的答案个数，此数字不提供自定义
                 </FromHint>
+                <FormLine>
+                  <FormLabel>服务消息清理</FormLabel>
+                  <div tw="flex flex-1">
+                    <div tw="w-4/12 flex items-center">
+                      <label tw="mr-2">加入群组</label>
+                      <Switch
+                        height={14}
+                        width={30}
+                        checked={editingJoinedCleared}
+                        checkedIcon={false}
+                        uncheckedIcon={false}
+                      />
+                    </div>
+                    <div tw="w-4/12 flex items-center">
+                      <label tw="mr-2">退出群组</label>
+                      <Switch
+                        height={14}
+                        width={30}
+                        checked={editingLeftedCleared}
+                        checkedIcon={false}
+                        uncheckedIcon={false}
+                      />
+                    </div>
+                    <div tw="w-4/12 flex items-center">
+                      <label tw="mr-2">系统默认</label>
+                      <Switch
+                        height={14}
+                        width={30}
+                        checked={editingServiceMessageDefaulted}
+                        checkedIcon={false}
+                        uncheckedIcon={false}
+                      />
+                    </div>
+                  </div>
+                </FormLine>
+                <FromHint>清理用户加入或退出群组时产生的系统消息</FromHint>
               </form>
             </main>
           </PageSection>
-
-          {/* <PageSection>
-            <PageSectionHeader>
-              <PageSectionTitle>验证场合</PageSectionTitle>
-            </PageSectionHeader>
-            <main>
-              <NotImplemented />
-            </main>
-          </PageSection>
-          <PageSection>
-            <PageSectionHeader>
-              <PageSectionTitle>验证入口</PageSectionTitle>
-            </PageSectionHeader>
-            <main>
-              <NotImplemented />
-            </main>
-          </PageSection> */}
           {isEdited ? (
             <PageSection>
               <PageSectionHeader>
