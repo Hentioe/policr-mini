@@ -92,6 +92,7 @@ const saveScheme = async ({
   wrongKillingMethod,
   mentionText,
   imageAnswersCount,
+  serviceMessageCleanup,
 }) => {
   const endpoint = `/admin/api/profile/scheme`;
 
@@ -102,6 +103,7 @@ const saveScheme = async ({
     wrong_killing_method: wrongKillingMethod,
     mention_text: mentionText,
     image_answers_count: imageAnswersCount,
+    service_message_cleanup: serviceMessageCleanup,
   };
 
   return fetch(endpoint, {
@@ -169,14 +171,8 @@ export default () => {
     useState(null);
   const [editingImageAnswersCountOption, setEditingImageAnswersCountOption] =
     useState(null);
-  const [editingJoinedCleared, setEditingJoinedCleared] = useState(undefined);
-  const [editingLeftedCleared, setEditingLeftedCleared] = useState(undefined);
-  const [editingServiceMessageDefaulted, setEditingServiceMessageDefaulted] =
-    useState(undefined);
-
-  useEffect(() => {
-    rebind();
-  }, [data]);
+  const [editingJoinedCleared, setEditingJoinedCleared] = useState(false);
+  const [editingLeftedCleared, setEditingLeftedCleared] = useState(false);
 
   const rebind = useCallback(() => {
     setModeValue(getModeValueFromData());
@@ -188,6 +184,7 @@ export default () => {
         wrongKillingMethod,
         mentionText,
         imageAnswersCount,
+        serviceMessageCleanup,
       } = data.scheme;
 
       setEditingSeconds(seconds || "");
@@ -215,6 +212,15 @@ export default () => {
         setEditingImageAnswersCountOption(imageAnswersCountOptions[1]);
       else if (imageAnswersCount === 5)
         setEditingImageAnswersCountOption(imageAnswersCountOptions[2]);
+
+      // 必须保证默认状态都是 false。
+      if (serviceMessageCleanup != null) {
+        setEditingJoinedCleared(serviceMessageCleanup.includes("joined"));
+        setEditingLeftedCleared(serviceMessageCleanup.includes("lefted"));
+      } else {
+        setEditingJoinedCleared(false);
+        setEditingLeftedCleared(false);
+      }
     }
   });
 
@@ -225,41 +231,49 @@ export default () => {
 
   const handleEditingSecondsChange = (e) => {
     setIsEdited(true);
-
     setEditingSeconds(e.target.value);
   };
 
   const handleEditingTimeoutKillingMethodSelectChange = (option) => {
     setIsEdited(true);
-
     setEditingTimeoutKillingMethodOption(option);
   };
 
   const handleEditingWrongKillingMethodSelectChange = (option) => {
     setIsEdited(true);
-
     setEditingWrongKillingMethodOption(option);
   };
 
   const handleEditingMentionTextOptionChange = (option) => {
     setIsEdited(true);
-
     setEditingMentionTextOption(option);
   };
 
   const handleEditingImageAnswersCountOptionChange = (option) => {
     setIsEdited(true);
-
     setEditingImageAnswersCountOption(option);
   };
 
   const handleSaveCancel = useCallback(() => {
     setIsEdited(false);
-
     rebind();
   });
 
+  const handleJoinedCleanupChange = (checked) => {
+    setIsEdited(true);
+    setEditingJoinedCleared(checked);
+  };
+
+  const handleLeftedCleanupChange = (checked) => {
+    setIsEdited(true);
+    setEditingLeftedCleared(checked);
+  };
+
   const handleSaveScheme = useCallback(async () => {
+    let serviceMessageCleanup = [];
+    if (editingJoinedCleared) serviceMessageCleanup.push(0);
+    if (editingLeftedCleared) serviceMessageCleanup.push(1);
+
     const result = await saveScheme({
       id: data.scheme ? data.scheme.id : -1,
       verificationMode: modeValue,
@@ -268,6 +282,7 @@ export default () => {
       wrongKillingMethod: editingWrongKillingMethodOption.value,
       mentionText: editingMentionTextOption.value,
       imageAnswersCount: editingImageAnswersCountOption.value,
+      serviceMessageCleanup: serviceMessageCleanup,
     });
 
     if (result.errors) {
@@ -284,6 +299,8 @@ export default () => {
     editingWrongKillingMethodOption,
     editingMentionTextOption,
     editingImageAnswersCountOption,
+    editingJoinedCleared,
+    editingLeftedCleared,
   ]);
 
   const handleDeleteTempAlbums = async () => {
@@ -360,6 +377,11 @@ export default () => {
   const isLoaded = () => !error && data && !data.errors;
 
   let title = "全局属性";
+
+  useEffect(() => {
+    // 绑定数据到 UI。
+    rebind();
+  }, [data]);
 
   useEffect(() => {
     // 初始化只读显示状态。
@@ -453,33 +475,25 @@ export default () => {
                   <FormLabel>服务消息清理</FormLabel>
                   <div tw="flex flex-1">
                     <div tw="w-4/12 flex items-center">
-                      <label tw="mr-2">加入群组</label>
+                      <label tw="mr-2 text-gray-700">加入群组</label>
                       <Switch
                         height={14}
                         width={30}
                         checked={editingJoinedCleared}
                         checkedIcon={false}
                         uncheckedIcon={false}
+                        onChange={handleJoinedCleanupChange}
                       />
                     </div>
                     <div tw="w-4/12 flex items-center">
-                      <label tw="mr-2">退出群组</label>
+                      <label tw="mr-2 text-gray-700">退出群组</label>
                       <Switch
                         height={14}
                         width={30}
                         checked={editingLeftedCleared}
                         checkedIcon={false}
                         uncheckedIcon={false}
-                      />
-                    </div>
-                    <div tw="w-4/12 flex items-center">
-                      <label tw="mr-2">系统默认</label>
-                      <Switch
-                        height={14}
-                        width={30}
-                        checked={editingServiceMessageDefaulted}
-                        checkedIcon={false}
-                        uncheckedIcon={false}
+                        onChange={handleLeftedCleanupChange}
                       />
                     </div>
                   </div>
