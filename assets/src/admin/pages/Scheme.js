@@ -3,6 +3,7 @@ import useSWR from "swr";
 import { useSelector, useDispatch } from "react-redux";
 import Select from "react-select";
 import tw, { styled } from "twin.macro";
+import Switch from "react-switch";
 
 import { loadSelected } from "../slices/chats";
 import { shown as readonlyShown } from "../slices/readonly";
@@ -122,6 +123,7 @@ const saveScheme = async ({
   wrongKillingMethod,
   mentionText,
   imageAnswersCount,
+  serviceMessageCleanup,
 }) => {
   const endpoint = `/admin/api/chats/${chatId}/scheme`;
   let body = null;
@@ -135,6 +137,7 @@ const saveScheme = async ({
     wrong_killing_method: wrongKillingMethod,
     mention_text: mentionText,
     image_answers_count: imageAnswersCount,
+    service_message_cleanup: serviceMessageCleanup,
   };
 
   return fetch(endpoint, {
@@ -156,7 +159,7 @@ export default () => {
       : null
   );
 
-  const { data: profileData, error: profileError } =
+  const { data: profileData, error: _profileError } =
     useSWR("/admin/api/profile");
 
   const getModeValueFromData = useCallback(() => {
@@ -181,10 +184,12 @@ export default () => {
     useState(null);
   const [editingImageAnswersCountOption, setEditingImageAnswersCountOption] =
     useState(null);
-
-  useEffect(() => {
-    rebind();
-  }, [data]);
+  const [editingJoinedCleared, setEditingJoinedCleared] = useState(false);
+  const [editingLeftedCleared, setEditingLeftedCleared] = useState(false);
+  const [
+    editingServiceMessageCleanupDefaulted,
+    setEditingServiceMessageCleanupDefaulted,
+  ] = useState(false);
 
   const rebind = useCallback(() => {
     setModeValue(getModeValueFromData());
@@ -196,6 +201,7 @@ export default () => {
         wrongKillingMethod,
         mentionText,
         imageAnswersCount,
+        serviceMessageCleanup,
       } = data.scheme;
 
       setEditingSeconds(seconds || "");
@@ -233,6 +239,19 @@ export default () => {
         setEditingImageAnswersCountOption(imageAnswersCountOptions[1]);
       else if (imageAnswersCount === 5)
         setEditingImageAnswersCountOption(imageAnswersCountOptions[2]);
+
+      console.log(data.scheme);
+
+      // 绑定服务消息清理。注意：必须保证默认状态都是 false。
+      if (serviceMessageCleanup != null) {
+        setEditingJoinedCleared(serviceMessageCleanup.includes("joined"));
+        setEditingLeftedCleared(serviceMessageCleanup.includes("lefted"));
+        setEditingServiceMessageCleanupDefaulted(false);
+      } else {
+        setEditingJoinedCleared(false);
+        setEditingLeftedCleared(false);
+        setEditingServiceMessageCleanupDefaulted(true);
+      }
     }
   });
 
@@ -264,35 +283,52 @@ export default () => {
 
   const handleEditingTimeoutKillingMethodSelectChange = (option) => {
     setIsEdited(true);
-
     setEditingTimeoutKillingMethodOption(option);
   };
 
   const handleEditingWrongKillingMethodSelectChange = (option) => {
     setIsEdited(true);
-
     setEditingWrongKillingMethodOption(option);
   };
 
   const handleEditingMentionTextOptionChange = (option) => {
     setIsEdited(true);
-
     setEditingMentionTextOption(option);
   };
 
   const handleSaveCancel = useCallback(() => {
     setIsEdited(false);
-
     rebind();
   });
 
   const handleEditingImageAnswersCountOptionChange = (option) => {
     setIsEdited(true);
-
     setEditingImageAnswersCountOption(option);
   };
 
+  const handleJoinedCleanupChange = (checked) => {
+    setIsEdited(true);
+    setEditingJoinedCleared(checked);
+  };
+
+  const handleLeftedCleanupChange = (checked) => {
+    setIsEdited(true);
+    setEditingLeftedCleared(checked);
+  };
+
+  const handleServiceMessageCleanupDefaultedChange = (checked) => {
+    setIsEdited(true);
+    setEditingServiceMessageCleanupDefaulted(checked);
+  };
+
   const handleSaveScheme = useCallback(async () => {
+    let serviceMessageCleanup = null;
+    if (!editingServiceMessageCleanupDefaulted) {
+      serviceMessageCleanup = [];
+      if (editingJoinedCleared) serviceMessageCleanup.push(0);
+      if (editingLeftedCleared) serviceMessageCleanup.push(1);
+    }
+
     const result = await saveScheme({
       id: data.scheme ? data.scheme.id : -1,
       chatId: chatsState.selected,
@@ -302,6 +338,7 @@ export default () => {
       wrongKillingMethod: editingWrongKillingMethodOption.value,
       mentionText: editingMentionTextOption.value,
       imageAnswersCount: editingImageAnswersCountOption.value,
+      serviceMessageCleanup: serviceMessageCleanup,
     });
 
     if (result.errors) {
@@ -317,12 +354,20 @@ export default () => {
     editingWrongKillingMethodOption,
     editingMentionTextOption,
     editingImageAnswersCountOption,
+    editingJoinedCleared,
+    editingLeftedCleared,
+    editingServiceMessageCleanupDefaulted,
   ]);
 
   const isLoaded = () => !error && chatsState.isLoaded && data && !data.errors;
 
   let title = "方案定制";
   if (isLoaded()) title += ` / ${data.chat.title}`;
+
+  useEffect(() => {
+    // 绑定数据到 UI。
+    rebind();
+  }, [data]);
 
   useEffect(() => {
     // 初始化只读显示状态。
@@ -437,6 +482,49 @@ export default () => {
                 <FromHint>
                   图片验证时生成的答案个数，此数字不提供自定义
                 </FromHint>
+                <ProfileField>
+                  <ProfileFieldLabel>服务消息清理</ProfileFieldLabel>
+                  <div tw="flex flex-1">
+                    {!editingServiceMessageCleanupDefaulted && (
+                      <>
+                        <div tw="w-4/12 flex items-center">
+                          <label tw="mr-2 text-gray-700">加入群组</label>
+                          <Switch
+                            height={14}
+                            width={30}
+                            checked={editingJoinedCleared}
+                            checkedIcon={false}
+                            uncheckedIcon={false}
+                            onChange={handleJoinedCleanupChange}
+                          />
+                        </div>
+                        <div tw="w-4/12 flex items-center">
+                          <label tw="mr-2 text-gray-700">退出群组</label>
+                          <Switch
+                            height={14}
+                            width={30}
+                            checked={editingLeftedCleared}
+                            checkedIcon={false}
+                            uncheckedIcon={false}
+                            onChange={handleLeftedCleanupChange}
+                          />
+                        </div>
+                      </>
+                    )}
+                    <div tw="w-4/12 flex items-center">
+                      <label tw="mr-2 text-gray-700">系统默认</label>
+                      <Switch
+                        height={14}
+                        width={30}
+                        checked={editingServiceMessageCleanupDefaulted}
+                        checkedIcon={false}
+                        uncheckedIcon={false}
+                        onChange={handleServiceMessageCleanupDefaultedChange}
+                      />
+                    </div>
+                  </div>
+                </ProfileField>
+                <FromHint>清理用户加入或退出群组时产生的系统消息</FromHint>
               </form>
             </main>
           </PageSection>

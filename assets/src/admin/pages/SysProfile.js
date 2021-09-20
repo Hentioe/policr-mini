@@ -4,8 +4,8 @@ import { useDispatch } from "react-redux";
 import Select from "react-select";
 import tw, { styled } from "twin.macro";
 import { formatBytes } from "bytes-formatter";
-
 import Switch from "react-switch";
+
 import { shown as readonlyShown } from "../slices/readonly";
 import {
   PageHeader,
@@ -213,7 +213,7 @@ export default () => {
       else if (imageAnswersCount === 5)
         setEditingImageAnswersCountOption(imageAnswersCountOptions[2]);
 
-      // 必须保证默认状态都是 false。
+      // 绑定服务消息清理。注意：必须保证默认状态都是 false。
       if (serviceMessageCleanup != null) {
         setEditingJoinedCleared(serviceMessageCleanup.includes("joined"));
         setEditingLeftedCleared(serviceMessageCleanup.includes("lefted"));
