@@ -22,23 +22,15 @@ const OwnSelect = styled(Select)`
   ${tw`w-8/12`}
 `;
 
-const FormLine = styled.div`
+const ProfileField = styled.div`
   ${tw`flex items-center mt-4`}
 `;
 
-const FormLabel = styled.label`
+const ProfileFieldLabel = styled.label`
   ${tw`w-4/12 text-gray-700`}
 `;
 
-const ProfileLine = styled.div`
-  ${tw`flex items-center mt-4`}
-`;
-
-const ProfileLabel = styled.label`
-  ${tw`w-4/12 text-gray-700`}
-`;
-
-const ProfileValue = styled.label`
+const ProfileFieldValue = styled.div`
   ${tw`w-8/12 text-gray-700`}
 `;
 
@@ -356,40 +348,40 @@ export default () => {
             </PageSectionHeader>
             <main>
               <form>
-                <FormLine>
-                  <FormLabel>验证方式</FormLabel>
+                <ProfileField>
+                  <ProfileFieldLabel>验证方式</ProfileFieldLabel>
                   <OwnSelect
                     options={modeOptions}
                     value={modeOptions[modeValue]}
                     onChange={handleModeSelectChange}
                     isSearchable={false}
                   />
-                </FormLine>
+                </ProfileField>
                 <FromHint>
                   自定义问答需修改此处为「定制验证」才可生效，取消选择其它即可
                 </FromHint>
-                <FormLine>
-                  <FormLabel>击杀方法（验证超时）</FormLabel>
+                <ProfileField>
+                  <ProfileFieldLabel>击杀方法（验证超时）</ProfileFieldLabel>
                   <OwnSelect
                     options={killingMethodOptions}
                     value={editingTimeoutKillingMethodOption}
                     onChange={handleEditingTimeoutKillingMethodSelectChange}
                     isSearchable={false}
                   />
-                </FormLine>
+                </ProfileField>
                 <FromHint>针对验证结果为「超时」的用户采取的措施</FromHint>
-                <FormLine>
-                  <FormLabel>击杀方法（验证错误）</FormLabel>
+                <ProfileField>
+                  <ProfileFieldLabel>击杀方法（验证错误）</ProfileFieldLabel>
                   <OwnSelect
                     options={killingMethodOptions}
                     value={editingWrongKillingMethodOption}
                     onChange={handleEditingWrongKillingMethodSelectChange}
                     isSearchable={false}
                   />
-                </FormLine>
+                </ProfileField>
                 <FromHint>针对验证结果为「错误」的用户采取的措施</FromHint>
-                <FormLine>
-                  <FormLabel>超时时间</FormLabel>
+                <ProfileField>
+                  <ProfileFieldLabel>超时时间</ProfileFieldLabel>
                   <div tw="w-8/12 flex flex-1">
                     <div tw="pr-2">
                       <Select
@@ -419,52 +411,35 @@ export default () => {
                       />
                     </div>
                   </div>
-                </FormLine>
+                </ProfileField>
                 <FromHint>单个用户的验证等待时间，单位：秒</FromHint>
-                <FormLine>
-                  <FormLabel>提及文本</FormLabel>
+                <ProfileField>
+                  <ProfileFieldLabel>提及文本</ProfileFieldLabel>
                   <OwnSelect
                     options={mentionTextOptions}
                     value={editingMentionTextOption}
                     onChange={handleEditingMentionTextOptionChange}
                     isSearchable={false}
                   />
-                </FormLine>
+                </ProfileField>
                 <FromHint>
                   提及验证用户时显示的内容，马赛克指用符号遮挡部分文字
                 </FromHint>
-                <FormLine>
-                  <FormLabel>答案个数（图片验证）</FormLabel>
+                <ProfileField>
+                  <ProfileFieldLabel>答案个数（图片验证）</ProfileFieldLabel>
                   <OwnSelect
                     options={imageAnswersCountOptions}
                     value={editingImageAnswersCountOption}
                     onChange={handleEditingImageAnswersCountOptionChange}
                     isSearchable={false}
                   />
-                </FormLine>
+                </ProfileField>
                 <FromHint>
                   图片验证时生成的答案个数，此数字不提供自定义
                 </FromHint>
               </form>
             </main>
           </PageSection>
-
-          {/* <PageSection>
-            <PageSectionHeader>
-              <PageSectionTitle>验证场合</PageSectionTitle>
-            </PageSectionHeader>
-            <main>
-              <NotImplemented />
-            </main>
-          </PageSection>
-          <PageSection>
-            <PageSectionHeader>
-              <PageSectionTitle>验证入口</PageSectionTitle>
-            </PageSectionHeader>
-            <main>
-              <NotImplemented />
-            </main>
-          </PageSection> */}
           {isEdited ? (
             <PageSection>
               <PageSectionHeader>
@@ -494,47 +469,74 @@ export default () => {
             {profileData ? (
               <main>
                 <div>
-                  <ProfileLine>
-                    <ProfileLabel>验证方式</ProfileLabel>
-                    <ProfileValue>
+                  <ProfileField>
+                    <ProfileFieldLabel>验证方式</ProfileFieldLabel>
+                    <ProfileFieldValue>
                       {modeValueMapping[profileData.scheme.verificationMode]}
-                    </ProfileValue>
-                  </ProfileLine>
-                  <FormLine>
-                    <FormLabel>击杀方法（验证超时）</FormLabel>
-                    <ProfileValue>
+                    </ProfileFieldValue>
+                  </ProfileField>
+                  <ProfileField>
+                    <ProfileFieldLabel>击杀方法（验证超时）</ProfileFieldLabel>
+                    <ProfileFieldValue>
                       {
                         killMethodMapping[
                           profileData.scheme.timeoutKillingMethod
                         ]
                       }
-                    </ProfileValue>
-                  </FormLine>
-                  <FormLine>
-                    <FormLabel>击杀方法（验证错误）</FormLabel>
-                    <ProfileValue>
+                    </ProfileFieldValue>
+                  </ProfileField>
+                  <ProfileField>
+                    <ProfileFieldLabel>击杀方法（验证错误）</ProfileFieldLabel>
+                    <ProfileFieldValue>
                       {killMethodMapping[profileData.scheme.wrongKillingMethod]}
-                    </ProfileValue>
-                  </FormLine>
-                  <FormLine>
-                    <FormLabel>超时时间</FormLabel>
-                    <ProfileValue>{profileData.scheme.seconds}</ProfileValue>
-                  </FormLine>
-                  <FormLine>
-                    <FormLabel>提及文本</FormLabel>
-                    <ProfileValue>
+                    </ProfileFieldValue>
+                  </ProfileField>
+                  <ProfileField>
+                    <ProfileFieldLabel>超时时间</ProfileFieldLabel>
+                    <ProfileFieldValue>
+                      {profileData.scheme.seconds}
+                    </ProfileFieldValue>
+                  </ProfileField>
+                  <ProfileField>
+                    <ProfileFieldLabel>提及文本</ProfileFieldLabel>
+                    <ProfileFieldValue>
                       {mentionTextMapping[profileData.scheme.mentionText]}
-                    </ProfileValue>
-                  </FormLine>
-                  <FormLine>
-                    <FormLabel>答案个数（图片验证）</FormLabel>
-                    <ProfileValue>
+                    </ProfileFieldValue>
+                  </ProfileField>
+                  <ProfileField>
+                    <ProfileFieldLabel>答案个数（图片验证）</ProfileFieldLabel>
+                    <ProfileFieldValue>
                       {profileData.scheme.imageAnswersCount}
-                    </ProfileValue>
-                  </FormLine>
+                    </ProfileFieldValue>
+                  </ProfileField>
+                  <ProfileField>
+                    <ProfileFieldLabel>服务消息清理</ProfileFieldLabel>
+                    <ProfileFieldValue tw="flex">
+                      <div tw="w-4/12">
+                        <label>加入群组</label>
+                        <span tw="ml-1">
+                          {(
+                            profileData.scheme.serviceMessageCleanup || []
+                          ).includes("joined")
+                            ? "✓"
+                            : "✕"}
+                        </span>
+                      </div>
+                      <div tw="w-4/12">
+                        <label>退出群组</label>
+                        <span tw="ml-1">
+                          {(
+                            profileData.scheme.serviceMessageCleanup || []
+                          ).includes("lefted")
+                            ? "✓"
+                            : "✕"}
+                        </span>
+                      </div>
+                    </ProfileFieldValue>
+                  </ProfileField>
                 </div>
                 <p tw="text-gray-600 text-sm tracking-wide mt-8">
-                  注意：验证方案的系统默认值可能会被机器人拥有者随时维护性修改，所以上述默认值只能表示此刻的数据。如有需要，请自行定制适合本群的方案。
+                  注意：上述默认值只能表示此刻的数据，因为系统默认值可能会被机器人拥有者随时维护性修改。如有需要，请自行定制适合本群的方案。
                 </p>
               </main>
             ) : (
