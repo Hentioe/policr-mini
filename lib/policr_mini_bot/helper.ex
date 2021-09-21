@@ -506,7 +506,8 @@ defmodule PolicrMiniBot.Helper do
     tkmethod: :timeout_killing_method,
     wkmethod: :wrong_killing_method,
     mention_scheme: :mention_text,
-    acimage: :image_answers_count
+    acimage: :image_answers_count,
+    smc: :service_message_cleanup
   ]
 
   @type default_keys ::
@@ -530,6 +531,7 @@ defmodule PolicrMiniBot.Helper do
   - `:tkmethod`: 超时击杀方法。
   - `:wkmethod`: 错误击杀方法。
   - `:mention_scheme`: 提及方案。
+  - `:smc`: 服务消息清理。
 
   ## 例子
       iex> PolicrMiniBot.Helper.default!(:vmode)
@@ -548,6 +550,8 @@ defmodule PolicrMiniBot.Helper do
       :mosaic_full_name
       iex> PolicrMiniBot.Helper.default!(:acimage)
       4
+      iex> PolicrMiniBot.Helper.default!(:smc)
+      [:joined]
   """
   @spec default!(default_keys) :: any
   def default!(key) when is_atom(key) do

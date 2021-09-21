@@ -38,8 +38,16 @@ defmodule PolicrMiniBot.HandleUserJoinedCleanupPlug do
   def handle(message, state) do
     %{chat: %{id: chat_id}} = message
 
-    # 异步删除服务消息
-    Cleaner.delete_message(chat_id, message.message_id)
+    # TOD0: 将 scheme 的获取放在一个独立的 plug 中，通过状态传递。
+    case Chats.fetch_scheme(chat_id) do
+      {:ok, scheme} ->
+        service_message_cleanup = scheme.service_message_cleanup || default!(:smc) || []
+
+        if Enum.member?(service_message_cleanup, :joined) do
+          # 删除服务消息。
+          Cleaner.delete_message(chat_id, message.message_id)
+        end
+    end
 
     {:ok, %{state | done: true, deleted: true}}
   end
