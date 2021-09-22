@@ -9,8 +9,8 @@ defmodule PolicrMiniBot.HandleUserLeftedGroupPlug do
 
   use PolicrMiniBot, plug: :preheater
 
-  alias PolicrMini.{Logger, PermissionBusiness}
-  alias PolicrMiniBot.State
+  alias PolicrMini.{Logger, Chats, PermissionBusiness}
+  alias PolicrMiniBot.{State, Cleaner}
 
   @doc """
   根据更新消息中的 `chat_member` 字段，清理离开数据。
@@ -64,7 +64,7 @@ defmodule PolicrMiniBot.HandleUserLeftedGroupPlug do
   end
 
   @impl true
-  def call(%{chat_member: chat_member} = _update, state) do
+  def call(%{chat_member: chat_member} = update, state) do
     %{chat: %{id: chat_id}, new_chat_member: %{user: %{id: lefted_user_id} = user}} = chat_member
 
     Logger.debug("A member (#{lefted_user_id}) has lefted the group (#{chat_id}).")
@@ -72,9 +72,21 @@ defmodule PolicrMiniBot.HandleUserLeftedGroupPlug do
 
     if lefted_user_id == bot_id() do
       # 跳过机器人自身
-
       {:ignored, state}
     else
+      # 检测并删除服务消息。
+      # TOD0: 将 scheme 的获取放在一个独立的 plug 中，通过状态传递。
+      # TODO: 将存在 message 的清理代码放在一个独立的 plug 中。
+      case Chats.fetch_scheme(chat_id) do
+        {:ok, scheme} ->
+          service_message_cleanup = scheme.service_message_cleanup || default!(:smc) || []
+
+          if Enum.member?(service_message_cleanup, :joined) && update.message do
+            # 删除服务消息。
+            Cleaner.delete_message(chat_id, update.message.message_id)
+          end
+      end
+
       # 如果是管理员（非群主）则删除权限记录
       if perm = PermissionBusiness.find(chat_id, lefted_user_id) do
         unless perm.tg_is_owner do
@@ -89,8 +101,8 @@ defmodule PolicrMiniBot.HandleUserLeftedGroupPlug do
           send_message(chat_id, text, parse_mode: "HTML")
         end
       end
-    end
 
-    {:ok, %{state | done: true}}
+      {:ok, %{state | done: true}}
+    end
   end
 end
