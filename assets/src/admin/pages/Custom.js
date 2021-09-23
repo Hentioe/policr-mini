@@ -19,6 +19,7 @@ import {
   LabelledButton,
   ActionButton,
   FormInput,
+  SimulatedMessage,
 } from "../components";
 import { Table, Thead, Tr, Th, Tbody, Td } from "../components/Tables";
 import { updateInNewArray, camelizeJson, toastErrors } from "../helper";
@@ -41,10 +42,6 @@ const Paragraph = styled.p`
 
 const HintParagraph = styled(Paragraph)`
   ${tw`py-5 text-center text-lg text-gray-400 font-bold`}
-`;
-
-const InlineKeybordButton = styled.div`
-  ${tw`shadow-sm bg-blue-400 text-white rounded-md px-4 py-2 text-sm mt-1 flex justify-center bg-opacity-75 cursor-pointer`}
 `;
 
 const EDITING_CHECK = {
@@ -119,19 +116,11 @@ const checkAttachmentTextError = (attachmentText) => {
   return null;
 };
 
-const getAttachmentName = (attachmentText) => {
-  if (attachmentText.startsWith("photo/")) {
-    return "图片";
-  } else if (attachmentText.startsWith("video/")) {
-    return "视频";
-  } else if (attachmentText.startsWith("audio/")) {
-    return "音频";
-  } else if (attachmentText.startsWith("document/")) {
-    return "文件";
-  } else {
-    return "附件";
-  }
-};
+function answersToInlineKeyboard(answers) {
+  const inlineKeyboard = answers.map((ans) => [{ text: ans.text }]);
+
+  return inlineKeyboard;
+}
 
 export default () => {
   const chatsState = useSelector((state) => state.chats);
@@ -500,41 +489,24 @@ export default () => {
                 <HintParagraph>请修正内容上的错误</HintParagraph>
               )}
               {editingCheckResult == EDITING_CHECK.VALID && (
-                <div tw="flex justify-between">
-                  <div tw="w-12 self-end">
-                    <img tw="w-full rounded-full" src="/own_photo" />
-                  </div>
-                  <div tw="pl-4 pt-4 pr-4">
-                    <div tw="shadow rounded border border-solid border-gray-200 text-black">
-                      {includedAttachment && editingAttachment.trim() != "" && (
-                        <div tw="flex justify-center w-full py-12 bg-blue-400 rounded-t">
-                          <span tw="text-white text-lg">
-                            {getAttachmentName(editingAttachment)}
-                          </span>
-                        </div>
-                      )}
-                      <div tw="p-2">
-                        <Paragraph tw="italic">
-                          来自『<span tw="font-bold">{data.chat.title}</span>
-                          』的验证，请确认问题并选择您认为正确的答案。
-                        </Paragraph>
-                        <br />
-                        <Paragraph tw="font-bold">{editintTitle}</Paragraph>
-                        <br />
-                        <Paragraph>
-                          您还剩 <span tw="underline">300</span>{" "}
-                          秒，通过可解除封印。
-                        </Paragraph>
-                      </div>
-                    </div>
-                    <div tw="flex flex-col mt-2">
-                      {answers.map((ans, index) => (
-                        <InlineKeybordButton key={index}>
-                          <span>{ans.text}</span>
-                        </InlineKeybordButton>
-                      ))}
-                    </div>
-                  </div>
+                <div>
+                  <SimulatedMessage
+                    avatarSrc={"/own_photo"}
+                    attachment={editingAttachment}
+                    inlineKeyboard={answersToInlineKeyboard(answers)}
+                  >
+                    <Paragraph tw="italic">
+                      来自『<span tw="font-bold">{data.chat.title}</span>
+                      』的验证，请确认问题并选择您认为正确的答案。
+                    </Paragraph>
+                    <br />
+                    <Paragraph tw="font-bold">{editintTitle}</Paragraph>
+                    <br />
+                    <Paragraph>
+                      您还剩 <span tw="underline">300</span>{" "}
+                      秒，通过可解除封印。
+                    </Paragraph>
+                  </SimulatedMessage>
                 </div>
               )}
             </main>

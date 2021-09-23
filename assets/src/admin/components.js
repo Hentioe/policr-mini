@@ -18,6 +18,7 @@ import HintParagraph from "./components/HintParagraph";
 import FormInput from "./components/FormInput";
 import FormTextarea from "./components/FormTextarea";
 import FloatingCard from "./components/FloatingCard";
+import SimulatedMessage from "./components/SimulatedMessage";
 
 export {
   Sidebar,
@@ -40,4 +41,5 @@ export {
   FormInput,
   FormTextarea,
   FloatingCard,
+  SimulatedMessage,
 };
