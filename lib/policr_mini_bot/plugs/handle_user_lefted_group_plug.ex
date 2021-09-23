@@ -81,7 +81,7 @@ defmodule PolicrMiniBot.HandleUserLeftedGroupPlug do
         {:ok, scheme} ->
           service_message_cleanup = scheme.service_message_cleanup || default!(:smc) || []
 
-          if Enum.member?(service_message_cleanup, :joined) && update.message do
+          if Enum.member?(service_message_cleanup, :lefted) && update.message do
             # 删除服务消息。
             Cleaner.delete_message(chat_id, update.message.message_id)
           end
