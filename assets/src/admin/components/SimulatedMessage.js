@@ -21,11 +21,11 @@ const InlineKeybordButton = styled.div`
 
 export default ({ attachment, children, inlineKeyboard, avatarSrc }) => {
   return (
-    <div tw="flex">
+    <div tw="flex justify-center">
       <div tw="w-12 h-12 self-end">
         <img tw="w-full rounded-full" src={avatarSrc} />
       </div>
-      <div tw="flex-1 ml-4 self-end">
+      <div tw="ml-2 self-end">
         <div tw="shadow rounded border border-solid border-gray-200 text-black">
           {attachment && attachment.trim() != "" && (
             <div tw="flex justify-center w-full py-12 bg-blue-400 rounded-t">
@@ -34,7 +34,9 @@ export default ({ attachment, children, inlineKeyboard, avatarSrc }) => {
               </span>
             </div>
           )}
-          <div tw="p-2 break-all">{children}</div>
+          <div tw="p-2 break-all" style={{ maxWidth: "31rem" }}>
+            {children}
+          </div>
         </div>
         <div tw="flex flex-col mt-2">
           {inlineKeyboard.map((row, i) => (

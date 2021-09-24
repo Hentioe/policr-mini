@@ -489,7 +489,7 @@ export default () => {
                 <HintParagraph>请修正内容上的错误</HintParagraph>
               )}
               {editingCheckResult == EDITING_CHECK.VALID && (
-                <div>
+                <div tw="mt-2">
                   <SimulatedMessage
                     avatarSrc={"/own_photo"}
                     attachment={editingAttachment}
