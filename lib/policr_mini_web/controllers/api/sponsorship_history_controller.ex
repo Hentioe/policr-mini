@@ -5,7 +5,7 @@ defmodule PolicrMiniWeb.API.SponsorshipHistoryController do
 
   use PolicrMiniWeb, :controller
 
-  alias PolicrMini.{SponsorBusiness, SponsorshipHistoryBusiness}
+  alias PolicrMini.{Instances, SponsorshipHistoryBusiness}
   alias PolicrMiniBot.SpeedLimiter
 
   action_fallback(PolicrMiniWeb.API.FallbackController)
@@ -67,7 +67,7 @@ defmodule PolicrMiniWeb.API.SponsorshipHistoryController do
   end
 
   defp find_sponsor_by_uuid(uuid) do
-    case SponsorBusiness.find(uuid: uuid) do
+    case Instances.find_sponsor(uuid: uuid) do
       nil -> {:error, %{description: "没有找到此 UUID 关联的赞助者"}}
       sponsor -> {:ok, sponsor}
     end

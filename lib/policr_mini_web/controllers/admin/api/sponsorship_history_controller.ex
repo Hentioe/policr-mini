@@ -7,7 +7,7 @@ defmodule PolicrMiniWeb.Admin.API.SponsorshipHistoryController do
 
   import PolicrMiniWeb.Helper
 
-  alias PolicrMini.{SponsorBusiness, SponsorshipHistoryBusiness}
+  alias PolicrMini.{Instances, SponsorshipHistoryBusiness}
 
   action_fallback PolicrMiniWeb.API.FallbackController
 
@@ -17,7 +17,7 @@ defmodule PolicrMiniWeb.Admin.API.SponsorshipHistoryController do
       sponsorship_histories =
         SponsorshipHistoryBusiness.find_list(preload: [:sponsor], order_by: @order_by)
 
-      sponsors = SponsorBusiness.find_list()
+      sponsors = Instances.find_sponsors()
 
       render(conn, "index.json", %{
         sponsorship_histories: sponsorship_histories,

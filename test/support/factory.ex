@@ -119,7 +119,7 @@ defmodule PolicrMini.Factory do
   end
 
   def build(:sponsor) do
-    %PolicrMini.Schema.Sponsor{
+    %PolicrMini.Instances.Sponsor{
       title: "喵小姐",
       avatar: "/uploaded/meow.jpg",
       homepage: "https://meow.com",
@@ -130,7 +130,7 @@ defmodule PolicrMini.Factory do
   end
 
   def build(:sponsorship_history) do
-    %PolicrMini.Schema.SponsorshipHistory{
+    %PolicrMini.Instances.SponsorshipHistory{
       expected_to: "请作者喝一杯无糖可乐",
       amount: 15,
       has_reached: false,

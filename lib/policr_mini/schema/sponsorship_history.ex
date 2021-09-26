@@ -1,11 +1,11 @@
-defmodule PolicrMini.Schema.SponsorshipHistory do
+defmodule PolicrMini.Instances.SponsorshipHistory do
   @moduledoc """
   赞助历史模型。
   """
 
   use PolicrMini.Schema
 
-  alias PolicrMini.Schema.Sponsor
+  alias PolicrMini.Instances.Sponsor
 
   @required_fields ~w(amount has_reached)a
   @optional_fields ~w(sponsor_id expected_to reached_at creator)a

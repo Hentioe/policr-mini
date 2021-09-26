@@ -1,8 +1,8 @@
-defmodule PolicrMini.Schema.SponsorTest do
+defmodule PolicrMini.Instances.SponsorTest do
   use ExUnit.Case
 
   alias PolicrMini.Factory
-  alias PolicrMini.Schema.Sponsor
+  alias PolicrMini.Instances.Sponsor
 
   describe "schema" do
     test "schema metadata" do

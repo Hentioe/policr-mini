@@ -3,9 +3,9 @@ defmodule PolicrMini.SponsorshipHistoryBusiness do
   赞助历史的业务功能实现。
   """
 
-  use PolicrMini, business: PolicrMini.Schema.SponsorshipHistory
+  use PolicrMini, business: PolicrMini.Instances.SponsorshipHistory
 
-  alias PolicrMini.SponsorBusiness
+  alias PolicrMini.Instances
 
   import Ecto.Query, only: [from: 2, dynamic: 2]
 
@@ -32,7 +32,7 @@ defmodule PolicrMini.SponsorshipHistoryBusiness do
 
     # TODO: 此处的事务需保证具有回滚的能力并能够返回错误结果。
     Repo.transaction(fn ->
-      with {:ok, sponsor} <- SponsorBusiness.create(sponsor),
+      with {:ok, sponsor} <- Instances.create_sponsor(sponsor),
            {:ok, sponsorship_history} <- create(Map.put(params, "sponsor_id", sponsor.id)) do
         Map.put(sponsorship_history, :sponsor, sponsor)
       else
@@ -56,7 +56,7 @@ defmodule PolicrMini.SponsorshipHistoryBusiness do
 
     # TODO: 此处的事务需保证具有回滚的能力并能够返回错误结果。
     Repo.transaction(fn ->
-      with {:ok, sponsor} <- SponsorBusiness.create(sponsor),
+      with {:ok, sponsor} <- Instances.create_sponsor(sponsor),
            {:ok, sponsorship_history} <-
              update(sponsorship_history, Map.put(params, "sponsor_id", sponsor.id)) do
         Map.put(sponsorship_history, :sponsor, sponsor)

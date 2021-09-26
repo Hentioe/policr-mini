@@ -1,4 +1,4 @@
-defmodule PolicrMini.Schema.Sponsor do
+defmodule PolicrMini.Instances.Sponsor do
   @moduledoc """
   赞助者模型。
   """

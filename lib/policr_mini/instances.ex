@@ -9,10 +9,11 @@ defmodule PolicrMini.Instances do
 
   alias PolicrMini.{Repo, PermissionBusiness}
   alias PolicrMini.Schema.Permission
-  alias __MODULE__.{Term, Chat}
+  alias __MODULE__.{Term, Chat, Sponsor}
 
   @type term_written_returns :: {:ok, Term.t()} | {:error, Ecto.Changeset.t()}
   @type chat_written_returns :: {:ok, Chat.t()} | {:error, Ecto.Changeset.t()}
+  @type sponsor_written_returns :: {:ok, Sponsor.t()} | {:error, Ecto.Changeset.t()}
 
   @term_id 1
 
@@ -145,5 +146,37 @@ defmodule PolicrMini.Instances do
 
       :ok
     end)
+  end
+
+  @spec create_sponsor(map) :: sponsor_written_returns
+  def create_sponsor(params) do
+    %Sponsor{uuid: UUID.uuid4()} |> Sponsor.changeset(params) |> Repo.insert()
+  end
+
+  @spec update_sponsor(Sponsor.t(), map) :: sponsor_written_returns
+  def update_sponsor(sponsor, params) do
+    sponsor |> Sponsor.changeset(params) |> Repo.update()
+  end
+
+  def delete_sponsor(sponsor) when is_struct(sponsor, Sponsor) do
+    Repo.delete(sponsor)
+  end
+
+  @spec find_sponsors(keyword) :: [Sponsor.t()]
+  def find_sponsors(_find_list_conts \\ []) do
+    from(s in Sponsor, order_by: [desc: s.updated_at])
+    |> Repo.all()
+  end
+
+  @type find_sponsor_conts :: [{:uuid, binary}]
+
+  # TODO: 添加测试。
+  @spec find_sponsor(find_sponsor_conts) :: Sponsor.t() | nil
+  def find_sponsor(conts \\ []) do
+    uuid = Keyword.get(conts, :uuid)
+
+    filter_uuid = (uuid && dynamic([s], s.uuid == ^uuid)) || true
+
+    from(s in Sponsor, where: ^filter_uuid) |> Repo.one()
   end
 end
