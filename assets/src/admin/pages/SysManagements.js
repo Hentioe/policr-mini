@@ -250,7 +250,7 @@ export default () => {
                           {/* TODO: 此处切换群组会造成一个多余的请求发送，需解决（可能采取和 Chats 组件部分相同的逻辑替代 RouteLink） */}
                           <TitleLink
                             takeovered={chat.isTakeOver ? 1 : 0}
-                            to={`/admin/chats/${chat.id}/custom`}
+                            to={`/admin/chats/${chat.id}/scheme`}
                           >
                             {chat.title}
                           </TitleLink>
