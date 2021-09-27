@@ -49,7 +49,7 @@ const ReLoading = ({ mutate }) => {
 };
 
 const endpoint = "/admin/api/chats";
-const defaultMenu = "custom";
+const defaultMenu = "scheme";
 
 export default () => {
   const dispatch = useDispatch();

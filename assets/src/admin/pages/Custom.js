@@ -20,6 +20,7 @@ import {
   ActionButton,
   FormInput,
   SimulatedMessage,
+  FloatingCard,
 } from "../components";
 import { Table, Thead, Tr, Th, Tbody, Td } from "../components/Tables";
 import { updateInNewArray, camelizeJson, toastErrors } from "../helper";
@@ -122,6 +123,14 @@ function answersToInlineKeyboard(answers) {
   return inlineKeyboard;
 }
 
+function answersTextToInlineKeyboard(answers) {
+  const inlineKeyboard = answers.map((ans) => [
+    { text: ans.slice(1, ans.length) },
+  ]);
+
+  return inlineKeyboard;
+}
+
 export default () => {
   const chatsState = useSelector((state) => state.chats);
   const location = useLocation();
@@ -139,6 +148,7 @@ export default () => {
   const [editingAttachment, setEditingAttachment] = useState("");
   const [answers, setAnswers] = useState([initialAnswer]);
   const [attachmentError, setAttachmentError] = useState(null);
+  const [hoveredInfo, setHoveredInfo] = useState(undefined);
 
   const handleIsEditing = () => setIsEditing(!isEditing);
   const initEditingContent = () => {
@@ -162,6 +172,12 @@ export default () => {
       setAttachmentError(null);
     }
   };
+
+  const showCustomKitInfo = (customKit, e) => {
+    setHoveredInfo({ customKit: customKit, x: e.pageX, y: e.pageY });
+  };
+
+  const hiddenCustomKitInfo = () => setHoveredInfo(undefined);
 
   const handleAnswerROWChange = useCallback(
     (value, index) => {
@@ -325,6 +341,36 @@ export default () => {
                       尚未启用，点此切换
                     </RouteLink>
                   )}
+                  {hoveredInfo && (
+                    <FloatingCard
+                      x={hoveredInfo.x}
+                      y={hoveredInfo.y}
+                      noneShadow={true}
+                      transparentBackground={true}
+                    >
+                      <SimulatedMessage
+                        avatarSrc={"/own_photo"}
+                        attachment={hoveredInfo.customKit.attachment}
+                        inlineKeyboard={answersTextToInlineKeyboard(
+                          hoveredInfo.customKit.answers
+                        )}
+                      >
+                        <Paragraph tw="italic">
+                          来自『<span tw="font-bold">{data.chat.title}</span>
+                          』的验证，请确认问题并选择您认为正确的答案。
+                        </Paragraph>
+                        <br />
+                        <Paragraph tw="font-bold">
+                          {hoveredInfo.customKit.title}
+                        </Paragraph>
+                        <br />
+                        <Paragraph>
+                          您还剩 <span tw="underline">300</span>{" "}
+                          秒，通过可解除封印。
+                        </Paragraph>
+                      </SimulatedMessage>
+                    </FloatingCard>
+                  )}
                   <Table tw="shadow rounded">
                     <Thead>
                       <Tr>
@@ -337,7 +383,15 @@ export default () => {
                     <Tbody>
                       {data.customKits.map((customKit, index) => (
                         <Tr key={customKit.id}>
-                          <Td tw="break-all pr-0">{customKit.title}</Td>
+                          <Td
+                            tw="truncate"
+                            onMouseEnter={(e) =>
+                              showCustomKitInfo(customKit, e)
+                            }
+                            onMouseLeave={hiddenCustomKitInfo}
+                          >
+                            {customKit.title}
+                          </Td>
                           <Td tw="text-center px-0">
                             {customKit.answers.length}
                           </Td>
@@ -494,6 +548,7 @@ export default () => {
                     avatarSrc={"/own_photo"}
                     attachment={editingAttachment}
                     inlineKeyboard={answersToInlineKeyboard(answers)}
+                    transparentTextBackground={true}
                   >
                     <Paragraph tw="italic">
                       来自『<span tw="font-bold">{data.chat.title}</span>

@@ -19,13 +19,19 @@ const InlineKeybordButton = styled.div`
   ${tw`shadow-sm bg-blue-400 text-white rounded-md px-4 py-2 text-sm mt-1 flex justify-center bg-opacity-75 cursor-pointer`}
 `;
 
-export default ({ attachment, children, inlineKeyboard, avatarSrc }) => {
+export default ({
+  attachment,
+  children,
+  inlineKeyboard,
+  avatarSrc,
+  transparentTextBackground = false,
+}) => {
   return (
     <div tw="flex justify-center">
       <div tw="w-12 h-12 self-end">
         <img tw="w-full rounded-full" src={avatarSrc} />
       </div>
-      <div tw="ml-2 self-end">
+      <div tw="ml-3 self-end">
         <div tw="shadow rounded border border-solid border-gray-200 text-black">
           {attachment && attachment.trim() != "" && (
             <div tw="flex justify-center w-full py-12 bg-blue-400 rounded-t">
@@ -34,7 +40,13 @@ export default ({ attachment, children, inlineKeyboard, avatarSrc }) => {
               </span>
             </div>
           )}
-          <div tw="p-2 break-all" style={{ maxWidth: "31rem" }}>
+          <div
+            tw="p-2 break-all bg-white"
+            style={{
+              maxWidth: "31rem",
+              background: transparentTextBackground && "transparent",
+            }}
+          >
             {children}
           </div>
         </div>
