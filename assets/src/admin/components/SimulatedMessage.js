@@ -25,7 +25,7 @@ export default ({ attachment, children, inlineKeyboard, avatarSrc }) => {
       <div tw="w-12 h-12 self-end">
         <img tw="w-full rounded-full" src={avatarSrc} />
       </div>
-      <div tw="ml-2 self-end">
+      <div tw="ml-3 self-end">
         <div tw="shadow rounded border border-solid border-gray-200 text-black">
           {attachment && attachment.trim() != "" && (
             <div tw="flex justify-center w-full py-12 bg-blue-400 rounded-t">
