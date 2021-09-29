@@ -5,7 +5,7 @@ defmodule PolicrMiniWeb.API.SponsorshipHistoryController do
 
   use PolicrMiniWeb, :controller
 
-  alias PolicrMini.{Instances, SponsorshipHistoryBusiness}
+  alias PolicrMini.Instances
   alias PolicrMiniBot.SpeedLimiter
 
   action_fallback(PolicrMiniWeb.API.FallbackController)
@@ -28,7 +28,7 @@ defmodule PolicrMiniWeb.API.SponsorshipHistoryController do
 
   def index(conn, _params) do
     sponsorship_histories =
-      SponsorshipHistoryBusiness.find_list(
+      Instances.find_sponsorship_histrories(
         has_reached: true,
         preload: [:sponsor],
         order_by: @order_by
@@ -45,7 +45,7 @@ defmodule PolicrMiniWeb.API.SponsorshipHistoryController do
          {:ok, sponsor} <- find_sponsor_by_uuid(uuid),
          {:ok, params} <-
            preprocessing_params(Map.put(params, "sponsor_id", sponsor.id), chat_id),
-         {:ok, sponsorship_history} <- SponsorshipHistoryBusiness.create(params) do
+         {:ok, sponsorship_history} <- Instances.create_sponsorship_histrory(params) do
       :ok = chat_id |> build_speed_limit_key() |> SpeedLimiter.put(10)
 
       render(conn, "added.json", %{sponsorship_history: sponsorship_history, uuid: uuid})
@@ -56,7 +56,7 @@ defmodule PolicrMiniWeb.API.SponsorshipHistoryController do
     with {:ok, chat_id} <- check_token(params),
          {:ok, params} <- preprocessing_params(params, chat_id),
          {:ok, sponsorship_history} <-
-           SponsorshipHistoryBusiness.create_with_sponsor(params) do
+           Instances.create_sponsorship_histrory_with_sponsor(params) do
       :ok = chat_id |> build_speed_limit_key() |> SpeedLimiter.put(30)
 
       render(conn, "added.json", %{
