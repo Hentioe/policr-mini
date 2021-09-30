@@ -134,7 +134,8 @@ defmodule PolicrMini.Factory do
       expected_to: "请作者喝一杯无糖可乐",
       amount: 15,
       has_reached: false,
-      reached_at: DateTime.truncate(DateTime.utc_now(), :second)
+      reached_at: DateTime.truncate(DateTime.utc_now(), :second),
+      hidden: false
     }
   end
 

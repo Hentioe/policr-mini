@@ -8,7 +8,7 @@ defmodule PolicrMini.Instances.SponsorshipHistory do
   alias PolicrMini.Instances.Sponsor
 
   @required_fields ~w(amount has_reached)a
-  @optional_fields ~w(sponsor_id expected_to reached_at creator)a
+  @optional_fields ~w(sponsor_id expected_to reached_at creator hidden)a
 
   schema "sponsorship_histories" do
     belongs_to :sponsor, Sponsor
@@ -18,6 +18,7 @@ defmodule PolicrMini.Instances.SponsorshipHistory do
     field :has_reached, :boolean
     field :reached_at, :utc_datetime
     field :creator, :integer
+    field :hidden, :boolean
 
     timestamps()
   end

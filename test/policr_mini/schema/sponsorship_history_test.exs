@@ -17,6 +17,7 @@ defmodule PolicrMini.Instances.SponsorshipHistoryTest do
                  :has_reached,
                  :reached_at,
                  :creator,
+                 :hidden,
                  :inserted_at,
                  :updated_at
                ]
@@ -34,19 +35,22 @@ defmodule PolicrMini.Instances.SponsorshipHistoryTest do
     updated_amount = 35
     updated_has_reached = true
     updated_reached_at = now_dt
+    updated_hidden = true
 
     params = %{
       "expected_to" => updated_expected_to,
       "amount" => updated_amount,
       "has_reached" => updated_has_reached,
-      "reached_at" => updated_reached_at
+      "reached_at" => updated_reached_at,
+      "hidden" => updated_hidden
     }
 
     changes = %{
       expected_to: updated_expected_to,
       amount: updated_amount,
       has_reached: updated_has_reached,
-      reached_at: updated_reached_at
+      reached_at: updated_reached_at,
+      hidden: updated_hidden
     }
 
     changeset = SponsorshipHistory.changeset(sponsor_history, params)
