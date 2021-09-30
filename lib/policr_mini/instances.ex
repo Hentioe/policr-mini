@@ -280,7 +280,7 @@ defmodule PolicrMini.Instances do
 
     filter_display =
       case display do
-        :not_hidden -> dynamic([s], s.hidden != true)
+        :not_hidden -> dynamic([s], is_nil(s.hidden) or s.hidden == false)
         :hidden -> dynamic([s], s.hidden == true)
         _ -> true
       end

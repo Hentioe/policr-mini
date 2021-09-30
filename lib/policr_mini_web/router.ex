@@ -80,6 +80,7 @@ defmodule PolicrMiniWeb.Router do
     post "/sponsorship_histories", SponsorshipHistoryController, :add
     put "/sponsorship_histories/:id", SponsorshipHistoryController, :update
     delete "/sponsorship_histories/:id", SponsorshipHistoryController, :delete
+    put "/sponsorship_histories/:id/hidden", SponsorshipHistoryController, :hidden
 
     get "/profile", ProfileController, :index
     put "/profile/scheme", ProfileController, :update_scheme

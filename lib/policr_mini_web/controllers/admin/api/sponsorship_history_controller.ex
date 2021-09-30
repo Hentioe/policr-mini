@@ -13,11 +13,10 @@ defmodule PolicrMiniWeb.Admin.API.SponsorshipHistoryController do
   action_fallback PolicrMiniWeb.API.FallbackController
 
   @order_by [asc_nulls_first: :has_reached, desc: :reached_at, desc: :updated_at]
+  @index_cont [preload: [:sponsor], order_by: @order_by, display: :not_hidden]
   def index(conn, _params) do
     with {:ok, _} <- check_sys_permissions(conn) do
-      sponsorship_histories =
-        Instances.find_sponsorship_histrories(preload: [:sponsor], order_by: @order_by)
-
+      sponsorship_histories = Instances.find_sponsorship_histrories(@index_cont)
       sponsors = Instances.find_sponsors()
 
       render(conn, "index.json", %{
@@ -65,6 +64,15 @@ defmodule PolicrMiniWeb.Admin.API.SponsorshipHistoryController do
     with {:ok, _} <- check_sys_permissions(conn),
          {:ok, sponsorship_history} <- SponsorshipHistory.get(id),
          {:ok, sponsorship_history} <- Instances.delete_sponsorship_histrory(sponsorship_history) do
+      render(conn, "sponsorship_history.json", %{sponsorship_history: sponsorship_history})
+    end
+  end
+
+  def hidden(conn, %{"id" => id} = _params) do
+    with {:ok, _} <- check_sys_permissions(conn),
+         {:ok, sponsorship_history} <- SponsorshipHistory.get(id),
+         {:ok, sponsorship_history} <-
+           Instances.update_sponsorship_histrory(sponsorship_history, %{hidden: true}) do
       render(conn, "sponsorship_history.json", %{sponsorship_history: sponsorship_history})
     end
   end

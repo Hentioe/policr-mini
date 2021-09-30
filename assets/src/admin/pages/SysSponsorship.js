@@ -107,9 +107,9 @@ const constructSponsor = (title, introduction, homepage, contact) => {
   }
 };
 
-const deleteSponsorHistory = async (id) => {
-  const endpoint = `/admin/api/sponsorship_histories/${id}`;
-  const method = "DELETE";
+const hiddenSponsorHistory = async (id) => {
+  const endpoint = `/admin/api/sponsorship_histories/${id}/hidden`;
+  const method = "PUT";
   return fetch(endpoint, {
     method: method,
   }).then((r) => camelizeJson(r));
@@ -243,9 +243,9 @@ export default () => {
     ]
   );
 
-  const handleDeleteClick = useCallback(
+  const handleHiddenClick = useCallback(
     (id) => {
-      deleteSponsorHistory(id).then((result) => {
+      hiddenSponsorHistory(id).then((result) => {
         if (result.errors) toastErrors(result.errors);
         else mutate();
       });
@@ -363,10 +363,10 @@ export default () => {
                               </ActionButton>
                               <ActionButton
                                 onClick={() =>
-                                  handleDeleteClick(sponsorshipHistory.id)
+                                  handleHiddenClick(sponsorshipHistory.id)
                                 }
                               >
-                                删除
+                                隐藏
                               </ActionButton>
                             </Td>
                           </Tr>
