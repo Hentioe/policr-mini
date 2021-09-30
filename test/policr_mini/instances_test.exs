@@ -307,23 +307,35 @@ defmodule PolicrMini.InstancesTest do
       assert sponsorship_history2.has_reached == true
     end
 
-    test "find_list/1" do
+    test "find_sponsorship_histrories/1" do
       {:ok, sponsorship_history1} =
         create_sponsorship_histrory(build_sponsorship_history_params(has_reached: true))
 
       reached_at = DateTime.add(DateTime.utc_now(), 1, :second)
 
-      {:ok, sponsorship_history2} =
-        create_sponsorship_histrory(build_sponsorship_history_params(reached_at: reached_at))
+      params = build_sponsorship_history_params(reached_at: reached_at, hidden: true)
+      {:ok, sponsorship_history2} = create_sponsorship_histrory(params)
 
-      [sponsorship_history3, sponsorship_history4] = find_sponsorship_histrories()
+      sponsorship_histories = find_sponsorship_histrories()
 
-      assert sponsorship_history3 == sponsorship_history2
-      assert sponsorship_history4 == sponsorship_history1
+      assert length(sponsorship_histories) == 2
+      assert Enum.at(sponsorship_histories, 0) == sponsorship_history2
+      assert Enum.at(sponsorship_histories, 1) == sponsorship_history1
 
-      [sponsorship_history5] = find_sponsorship_histrories(has_reached: true)
+      sponsorship_histories = find_sponsorship_histrories(has_reached: true)
 
-      assert sponsorship_history1 == sponsorship_history5
+      assert length(sponsorship_histories) == 1
+      assert hd(sponsorship_histories) == sponsorship_history1
+
+      sponsorship_histories = find_sponsorship_histrories(display: :hidden)
+
+      assert length(sponsorship_histories) == 1
+      assert hd(sponsorship_histories) == sponsorship_history2
+
+      sponsorship_histories = find_sponsorship_histrories(display: :not_hidden)
+
+      assert length(sponsorship_histories) == 1
+      assert hd(sponsorship_histories) == sponsorship_history1
     end
   end
 end

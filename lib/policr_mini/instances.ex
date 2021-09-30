@@ -264,7 +264,8 @@ defmodule PolicrMini.Instances do
   @type find_list_cont :: [
           {:has_reached, boolean},
           {:preload, [:sponsor]},
-          {:order_by, [{:desc | :asc | :desc_nulls_first, atom}]}
+          {:order_by, [{:desc | :asc | :desc_nulls_first, atom}]},
+          {:display, :not_hidden | :hidden}
         ]
 
   @spec find_sponsorship_histrories(find_list_cont) :: [SponsorshipHistory.t()]
@@ -272,12 +273,21 @@ defmodule PolicrMini.Instances do
     has_reached = Keyword.get(find_list_cont, :has_reached)
     preload = Keyword.get(find_list_cont, :preload, [])
     order_by = Keyword.get(find_list_cont, :order_by, desc: :reached_at)
+    display = Keyword.get(find_list_cont, :display)
 
     filter_has_reached =
       (has_reached != nil && dynamic([s], s.has_reached == ^has_reached)) || true
 
+    filter_display =
+      case display do
+        :not_hidden -> dynamic([s], s.hidden != true)
+        :hidden -> dynamic([s], s.hidden == true)
+        _ -> true
+      end
+
     from(s in SponsorshipHistory,
       where: ^filter_has_reached,
+      where: ^filter_display,
       order_by: ^order_by,
       preload: ^preload
     )
