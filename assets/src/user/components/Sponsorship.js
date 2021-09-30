@@ -34,9 +34,7 @@ const FromHint = ({ children }) => {
   return (
     <div tw="flex">
       <div tw="w-4/12"></div>
-      <span tw="w-8/12 mt-1 text-xs font-bold text-gray-600">
-        {children}
-      </span>
+      <span tw="w-8/12 mt-1 text-xs font-bold text-gray-600">{children}</span>
     </div>
   );
 };
@@ -198,7 +196,7 @@ export default ({ hints = [], token = null }) => {
                 />
               </FormLine>
               <FromHint>
-                为防御攻击并关联创建人，需私聊机器人 <code>/sponsorship</code>{" "}
+                为御防攻击并关联创建人，需私聊机器人 <code>/sponsorship</code>{" "}
                 命令获取口令
               </FromHint>
               {isUseUuid ? (
@@ -228,10 +226,11 @@ export default ({ hints = [], token = null }) => {
                     <FormLabel>联系方式</FormLabel>
                     <FormInput
                       value={editingSponsorContact || ""}
+                      type="email"
                       onChange={handleEditingSponsorContactChange}
                     />
                   </FormLine>
-                  <FromHint>用户名或邮箱，此数据无法被外部获取</FromHint>
+                  <FromHint>当前仅限邮箱地址，此数据无法被外部获取</FromHint>
                   <FormLine>
                     <FormLabel>您的主页</FormLabel>
                     <FormInput
