@@ -28,7 +28,7 @@ defmodule PolicrMiniBot.RespSponsorshipCmdPlug do
 
       通过<a href="#{web_root}?sponsorship=#{token}">这里</a>打开的赞助表单会自动填充此口令。
 
-      <i>提示：赞助口令不会把您和表单中的赞助人关联上，但会保留创建关系。它是一种防御攻击的措施，除此之外没有任何实际意义。</i>
+      <i>提示：赞助口令不会把您和表单中的赞助人关联上，但会保留创建关系。它是一种御防攻击的措施，除此之外没有任何实际意义。</i>
       """
 
       :ok = SpeedLimiter.put(speed_limit_key, 60 * 5)
