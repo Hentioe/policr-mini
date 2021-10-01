@@ -139,6 +139,15 @@ defmodule PolicrMini.Factory do
     }
   end
 
+  def build(:sponsorship_addresses) do
+    %PolicrMini.Instances.SponsorshipAddress{
+      name: "USDT (TRC20)",
+      description: "如美元般稳定的加密货币 USDT 的转账地址，仅限 TRC20 网络。",
+      text: "****************************",
+      image: "usdt-trc20-qrcode.jpg"
+    }
+  end
+
   def build(factory_name, attrs) when is_atom(factory_name) and is_list(attrs) do
     factory_name |> build() |> struct(attrs)
   end
