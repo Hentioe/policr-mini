@@ -9,7 +9,7 @@ defmodule PolicrMini.Instances do
 
   alias PolicrMini.{Repo, PermissionBusiness}
   alias PolicrMini.Schema.Permission
-  alias __MODULE__.{Term, Chat, Sponsor, SponsorshipHistory}
+  alias __MODULE__.{Term, Chat, Sponsor, SponsorshipHistory, SponsorshipAddress}
 
   @type term_written_returns ::
           {:ok, Term.t()} | {:error, Ecto.Changeset.t()}
@@ -19,6 +19,8 @@ defmodule PolicrMini.Instances do
           {:ok, Sponsor.t()} | {:error, Ecto.Changeset.t()}
   @type sponsor_histories_written_returns ::
           {:ok, SponsorshipHistory.t()} | {:error, Ecto.Changeset.t()}
+  @type sponsorship_addresses_written_returns ::
+          {:ok, SponsorshipAddress.t()} | {:error, Ecto.Changeset.t()}
 
   @term_id 1
 
@@ -292,5 +294,28 @@ defmodule PolicrMini.Instances do
       preload: ^preload
     )
     |> Repo.all()
+  end
+
+  @spec create_sponsorship_address(map) :: sponsorship_addresses_written_returns
+  def create_sponsorship_address(params) do
+    %SponsorshipAddress{} |> SponsorshipAddress.changeset(params) |> Repo.insert()
+  end
+
+  def delete_sponsorship_address(sponsorship_address)
+      when is_struct(sponsorship_address, SponsorshipAddress) do
+    Repo.delete(sponsorship_address)
+  end
+
+  @spec update_sponsorship_address(SponsorshipAddress.t(), map) ::
+          sponsorship_addresses_written_returns
+  def update_sponsorship_address(sponsorship_address, params) do
+    sponsorship_address |> SponsorshipAddress.changeset(params) |> Repo.update()
+  end
+
+  @type find_sponsorship_addresses_cont :: []
+
+  @spec find_sponsorship_addresses(find_sponsorship_addresses_cont) :: [SponsorshipAddress.t()]
+  def find_sponsorship_addresses(_find_sponsorship_addresses_cont \\ []) do
+    from(s in SponsorshipAddress) |> Repo.all()
   end
 end
