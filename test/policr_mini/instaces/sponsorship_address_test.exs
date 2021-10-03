@@ -24,7 +24,7 @@ defmodule PolicrMini.Instances.SponsorshipAddressTest do
   end
 
   test "changeset/2" do
-    sponsorship_address = Factory.build(:sponsorship_addresses)
+    sponsorship_address = Factory.build(:sponsorship_address)
 
     updated_name = "USDT (ERC20)"
     updated_description = "如美元般稳定的加密货币 USDT 的转账地址，仅限 ERC20 网络。"

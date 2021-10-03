@@ -296,16 +296,25 @@ defmodule PolicrMini.Instances do
     |> Repo.all()
   end
 
+  @doc """
+  创建一个赞助地址。
+  """
   @spec create_sponsorship_address(map) :: sponsorship_addresses_written_returns
   def create_sponsorship_address(params) do
     %SponsorshipAddress{} |> SponsorshipAddress.changeset(params) |> Repo.insert()
   end
 
+  @doc """
+  删除一个赞助地址。
+  """
   def delete_sponsorship_address(sponsorship_address)
       when is_struct(sponsorship_address, SponsorshipAddress) do
     Repo.delete(sponsorship_address)
   end
 
+  @doc """
+  更新一个赞助地址。
+  """
   @spec update_sponsorship_address(SponsorshipAddress.t(), map) ::
           sponsorship_addresses_written_returns
   def update_sponsorship_address(sponsorship_address, params) do
@@ -314,6 +323,9 @@ defmodule PolicrMini.Instances do
 
   @type find_sponsorship_addresses_cont :: []
 
+  @doc """
+  查找赞助地址列表。
+  """
   @spec find_sponsorship_addresses(find_sponsorship_addresses_cont) :: [SponsorshipAddress.t()]
   def find_sponsorship_addresses(_find_sponsorship_addresses_cont \\ []) do
     from(s in SponsorshipAddress) |> Repo.all()

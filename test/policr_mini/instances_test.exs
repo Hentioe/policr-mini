@@ -3,6 +3,7 @@ defmodule PolicrMini.InstancesTest do
   doctest PolicrMini.Instances
 
   alias PolicrMini.{Factory, ChatBusiness, PermissionBusiness, UserBusiness}
+  alias PolicrMini.Instances.SponsorshipAddress
 
   import PolicrMini.Instances
 
@@ -336,6 +337,68 @@ defmodule PolicrMini.InstancesTest do
 
       assert length(sponsorship_histories) == 1
       assert hd(sponsorship_histories) == sponsorship_history1
+    end
+  end
+
+  describe "sponsorship_addresses" do
+    def build_sponsorship_address_params(attrs \\ []) do
+      sponsorship_address = Factory.build(:sponsorship_address)
+
+      sponsorship_address
+      |> struct(attrs)
+      |> Map.from_struct()
+    end
+
+    test "create_sponsorship_address/1" do
+      params = build_sponsorship_address_params()
+      {:ok, sponsorship_address} = create_sponsorship_address(params)
+
+      assert sponsorship_address.name == params.name
+      assert sponsorship_address.description == params.description
+      assert sponsorship_address.text == params.text
+      assert sponsorship_address.image == params.image
+    end
+
+    test "delete_sponsorship_address/1" do
+      params = build_sponsorship_address_params()
+      {:ok, sponsorship_address} = create_sponsorship_address(params)
+
+      {:ok, _} = delete_sponsorship_address(sponsorship_address)
+
+      {:error, :not_found, _} = SponsorshipAddress.get(sponsorship_address.id)
+    end
+
+    test "update_sponsorship_address/2" do
+      params = build_sponsorship_address_params()
+      {:ok, sponsorship_address1} = create_sponsorship_address(params)
+
+      updated_name = "USDT (ERC20)"
+      updated_description = "如美元般稳定的加密货币 USDT 的转账地址，仅限 ERC20 网络。"
+      updated_text = "--------------------------"
+      updated_image = "usdt-erc20-qrcode.jpg"
+
+      params = %{
+        "name" => updated_name,
+        "description" => updated_description,
+        "text" => updated_text,
+        "image" => updated_image
+      }
+
+      {:ok, sponsorship_address2} = sponsorship_address1 |> update_sponsorship_address(params)
+
+      assert sponsorship_address2.name == updated_name
+      assert sponsorship_address2.description == updated_description
+      assert sponsorship_address2.text == updated_text
+      assert sponsorship_address2.image == updated_image
+    end
+
+    test "find_sponsorship_address/1" do
+      {:ok, _} = create_sponsorship_address(build_sponsorship_address_params())
+      {:ok, _} = create_sponsorship_address(build_sponsorship_address_params())
+
+      sponsorship_addresses = find_sponsorship_addresses()
+
+      assert length(sponsorship_addresses) == 2
     end
   end
 end

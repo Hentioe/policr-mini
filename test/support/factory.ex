@@ -139,7 +139,7 @@ defmodule PolicrMini.Factory do
     }
   end
 
-  def build(:sponsorship_addresses) do
+  def build(:sponsorship_address) do
     %PolicrMini.Instances.SponsorshipAddress{
       name: "USDT (TRC20)",
       description: "如美元般稳定的加密货币 USDT 的转账地址，仅限 TRC20 网络。",
