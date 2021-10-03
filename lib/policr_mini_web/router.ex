@@ -82,6 +82,11 @@ defmodule PolicrMiniWeb.Router do
     delete "/sponsorship_histories/:id", SponsorshipHistoryController, :delete
     put "/sponsorship_histories/:id/hidden", SponsorshipHistoryController, :hidden
 
+    get "/sponsorship_addresses", SponsorshipAddressController, :index
+    post "/sponsorship_addresses", SponsorshipAddressController, :add
+    put "/sponsorship_addresses/:id", SponsorshipAddressController, :update
+    delete "/sponsorship_addresses/:id", SponsorshipAddressController, :delete
+
     get "/profile", ProfileController, :index
     put "/profile/scheme", ProfileController, :update_scheme
     delete "/profile/temp_albums", ProfileController, :delete_temp_albums
