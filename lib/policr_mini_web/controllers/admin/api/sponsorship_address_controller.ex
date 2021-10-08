@@ -22,26 +22,26 @@ defmodule PolicrMiniWeb.Admin.API.SponsorshipAddressController do
 
   def add(conn, params) do
     with {:ok, _} <- check_sys_permissions(conn),
-         {:ok, sponsorship_addresses} <- Instances.create_sponsorship_address(params) do
-      render(conn, "sponsorship_addresses.json", %{sponsorship_addresses: sponsorship_addresses})
+         {:ok, sponsorship_address} <- Instances.create_sponsorship_address(params) do
+      render(conn, "sponsorship_address.json", %{sponsorship_address: sponsorship_address})
     end
   end
 
   def update(conn, %{"id" => id} = params) do
     with {:ok, _} <- check_sys_permissions(conn),
-         {:ok, sponsorship_addresses} <- SponsorshipAddress.get(id),
-         {:ok, sponsorship_addresses} <-
-           Instances.update_sponsorship_address(sponsorship_addresses, params) do
-      render(conn, "sponsorship_addresses.json", %{sponsorship_addresses: sponsorship_addresses})
+         {:ok, sponsorship_address} <- SponsorshipAddress.get(id),
+         {:ok, sponsorship_address} <-
+           Instances.update_sponsorship_address(sponsorship_address, params) do
+      render(conn, "sponsorship_address.json", %{sponsorship_address: sponsorship_address})
     end
   end
 
   def delete(conn, %{"id" => id} = _params) do
     with {:ok, _} <- check_sys_permissions(conn),
-         {:ok, sponsorship_addresses} <- SponsorshipAddress.get(id),
-         {:ok, sponsorship_addresses} <-
-           Instances.delete_sponsorship_address(sponsorship_addresses) do
-      render(conn, "sponsorship_addresses.json", %{sponsorship_addresses: sponsorship_addresses})
+         {:ok, sponsorship_address} <- SponsorshipAddress.get(id),
+         {:ok, sponsorship_address} <-
+           Instances.delete_sponsorship_address(sponsorship_address) do
+      render(conn, "sponsorship_address.json", %{sponsorship_address: sponsorship_address})
     end
   end
 end

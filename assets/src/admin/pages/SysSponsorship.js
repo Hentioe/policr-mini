@@ -61,7 +61,11 @@ const sponsorAssociatedOptions = [
   { value: "select", label: "已存在" },
 ];
 
-const makeEndpoint = () => `/admin/api/sponsorship_histories`;
+const EDITING_HISTORY = 1;
+const EDITING_ADDRESS = 2;
+
+const makeHistoriesEndpoint = () => `/admin/api/sponsorship_histories`;
+const makeAddressesEndpoint = () => `/admin/api/sponsorship_addresses`;
 
 const saveSponsorHistory = async ({
   id,
@@ -94,6 +98,33 @@ const saveSponsorHistory = async ({
   }).then((r) => camelizeJson(r));
 };
 
+const saveSponsorshipAddress = async ({
+  id,
+  name,
+  description,
+  text,
+  image,
+}) => {
+  let endpoint = "/admin/api/sponsorship_addresses";
+  let method = "POST";
+  if (id) {
+    endpoint = `/admin/api/sponsorship_addresses/${id}`;
+    method = "PUT";
+  }
+  return fetch(endpoint, {
+    method: method,
+    headers: {
+      "Content-Type": "application/json",
+    },
+    body: JSON.stringify({
+      name: name,
+      description: description,
+      text: text,
+      image: image,
+    }),
+  }).then((r) => camelizeJson(r));
+};
+
 const constructSponsor = (title, introduction, homepage, contact) => {
   if (title && contact) {
     return {
@@ -115,13 +146,31 @@ const hiddenSponsorHistory = async (id) => {
   }).then((r) => camelizeJson(r));
 };
 
+const deleteSponsorshipAddress = async (id) => {
+  const endpoint = `/admin/api/sponsorship_addresses/${id}`;
+  const method = "DELETE";
+  return fetch(endpoint, {
+    method: method,
+  }).then((r) => camelizeJson(r));
+};
+
 export default () => {
   const location = useLocation();
   const dispatch = useDispatch();
 
-  const { data, mutate, error } = useSWR(makeEndpoint());
-  const [isEditing, setIsEditing] = useState(false);
-  const [editingId, setEditingId] = useState(null);
+  const {
+    data: historiesData,
+    mutate: historiesMutate,
+    error: historiesError,
+  } = useSWR(makeHistoriesEndpoint());
+  const {
+    data: addressesData,
+    mutate: addressesMutate,
+    error: addressesError,
+  } = useSWR(makeAddressesEndpoint());
+  const [editingFlag, setEditingFlag] = useState(0);
+  const [editingHistoryId, setEditingHistoryId] = useState(null);
+  const [editingAddressId, setEditingAddressId] = useState(null);
   const [editingSponsorAssociated, setEditingSponsorAssociated] = useState(
     sponsorAssociatedOptions[0]
   );
@@ -139,11 +188,23 @@ export default () => {
     hasReachedOptions[0]
   );
 
-  const handleIsEditing = () => setIsEditing(!isEditing);
-  const initEditingContent = () => {
-    setIsEditing(false);
+  const [editingAddressName, setEditingAddressName] = useState("");
+  const [editingAddressDescription, setEditingAddressDescription] =
+    useState("");
+  const [editingAddressText, setEditingAddressText] = useState("");
+  const [editingAddressImage, setEditingAddressImage] = useState("");
 
-    setEditingId(null);
+  const handleIsEditing = useCallback(
+    (flag) => {
+      if (flag == editingFlag) setEditingFlag(0);
+      else setEditingFlag(flag);
+    },
+    [editingFlag]
+  );
+  const initEditingHistoryContent = () => {
+    setEditingFlag(0);
+
+    setEditingHistoryId(null);
     setEditingSponsorAssociated(sponsorAssociatedOptions[0]);
     setEditingSelectedSponsor(null);
     setEditingSponsorTitle("");
@@ -154,7 +215,17 @@ export default () => {
     setEditingReachedAt("");
     setEditingHasReached(hasReachedOptions[0]);
   };
-  const handleCancelEditing = () => initEditingContent();
+
+  const initEditingAddressContent = () => {
+    setEditingFlag(0);
+
+    setEditingAddressId(null);
+    setEditingAddressName("");
+    setEditingAddressDescription("");
+    setEditingAddressText("");
+    setEditingAddressImage("");
+  };
+  const handleCancelEditingHistoryClick = () => initEditingHistoryContent();
   const handleEditingSponsorAssociatedChange = (option) => {
     if (option.value === "create") {
       setEditingSelectedSponsor(null);
@@ -180,10 +251,23 @@ export default () => {
   const handleEditingHasReachedChange = (option) =>
     setEditingHasReached(option);
 
-  const isLoaded = () => !error && data && !data.errors;
+  const handleEditingAddressName = (e) => setEditingAddressName(e.target.value);
+  const handleEditingAddressDescription = (e) =>
+    setEditingAddressDescription(e.target.value);
+  const handleEditingAddressText = (e) => setEditingAddressText(e.target.value);
+  const handleEditingAddressImage = (e) =>
+    setEditingAddressImage(e.target.value);
+
+  const isLoaded = () =>
+    !historiesError &&
+    historiesData &&
+    !historiesData.errors &&
+    !addressesError &&
+    addressesData &&
+    !addressesData.errors;
 
   const checkEditintValid = useCallback(() => {
-    if (!isEditing) return EDITING_CHECK.NO_EDINTINT;
+    if (!editingFlag) return EDITING_CHECK.NO_EDINTINT;
 
     return (
       (editingSelectedSponsor ||
@@ -193,7 +277,7 @@ export default () => {
       EDITING_CHECK.VALID
     );
   }, [
-    isEditing,
+    editingFlag,
     editingSelectedSponsor,
     editingSponsorTitle,
     editingSponsorContact,
@@ -201,12 +285,28 @@ export default () => {
     editingHasReached,
   ]);
 
-  const handleSaveClick = useCallback(
+  const checkAddressEditintValid = useCallback(() => {
+    if (editingFlag == 0) return EDITING_CHECK.NO_EDINTINT;
+
+    return (
+      (editingAddressText.trim() || editingAddressImage) &&
+      editingAddressName.trim() &&
+      EDITING_CHECK.VALID
+    );
+  }, [
+    editingFlag,
+    editingAddressName,
+    editingAddressDescription,
+    editingAddressText,
+    editingAddressImage,
+  ]);
+
+  const handleSaveHistoryClick = useCallback(
     async (e) => {
       e.preventDefault();
 
       const result = await saveSponsorHistory({
-        id: editingId,
+        id: editingHistoryId,
         sponsor: constructSponsor(
           editingSponsorTitle,
           editingSponsorIntroduction,
@@ -224,13 +324,13 @@ export default () => {
       if (result.errors) toastErrors(result.errors);
       else {
         // 保存成功
-        mutate();
+        historiesMutate();
         // 初始化编辑内容
-        initEditingContent();
+        initEditingHistoryContent();
       }
     },
     [
-      editingId,
+      editingHistoryId,
       editingSelectedSponsor,
       editingSponsorTitle,
       editingSponsorIntroduction,
@@ -242,23 +342,61 @@ export default () => {
       editingHasReached,
     ]
   );
+  const handleSaveAddressClick = useCallback(
+    async (e) => {
+      e.preventDefault();
+
+      const result = await saveSponsorshipAddress({
+        id: editingAddressId,
+        name: editingAddressName,
+        description: editingAddressDescription,
+        text: editingAddressText,
+        image: editingAddressImage,
+      });
+
+      if (result.errors) toastErrors(result.errors);
+      else {
+        // 保存成功
+        addressesMutate();
+        // 初始化编辑内容
+        initEditingAddressContent();
+      }
+    },
+    [
+      editingAddressId,
+      editingAddressName,
+      editingAddressDescription,
+      editingAddressText,
+      editingAddressImage,
+    ]
+  );
 
   const handleHiddenClick = useCallback(
     (id) => {
       hiddenSponsorHistory(id).then((result) => {
         if (result.errors) toastErrors(result.errors);
-        else mutate();
+        else historiesMutate();
       });
     },
-    [data]
+    [historiesData]
   );
 
-  const handleEditClick = useCallback(
-    (index) => {
-      const sponsorshipHistory = data.sponsorshipHistories[index];
+  const handleAddressDeleteClick = useCallback(
+    (id) => {
+      deleteSponsorshipAddress(id).then((result) => {
+        if (result.errors) toastErrors(result.errors);
+        else addressesMutate();
+      });
+    },
+    [addressesData]
+  );
 
-      setIsEditing(true);
-      setEditingId(sponsorshipHistory.id);
+  const handleEditHistoryClick = useCallback(
+    (index) => {
+      const sponsorshipHistory = historiesData.sponsorshipHistories[index];
+
+      setEditingFlag(EDITING_HISTORY);
+      setEditingHistoryId(sponsorshipHistory.id);
       setEditingSponsorAssociated(sponsorAssociatedOptions[1]);
       if (sponsorshipHistory.sponsor) {
         setEditingSelectedSponsor({
@@ -275,17 +413,31 @@ export default () => {
           : hasReachedOptions[0]
       );
     },
-    [data]
+    [historiesData]
+  );
+
+  const handleEditAddressClick = useCallback(
+    (index) => {
+      const address = addressesData.sponsorshipAddresses[index];
+
+      setEditingFlag(EDITING_ADDRESS);
+      setEditingAddressId(address.id);
+      setEditingAddressName(address.name);
+      setEditingAddressDescription(address.description);
+      setEditingAddressText(address.text || "");
+      setEditingAddressImage(address.image || "");
+    },
+    [addressesData]
   );
 
   useEffect(() => {
     // 初始化编辑内容
-    initEditingContent();
+    initEditingHistoryContent();
   }, [location]);
 
   useEffect(() => {
-    if (data && data.sponsors) {
-      const sponsorOptions = data.sponsors.map((sponsor) => ({
+    if (historiesData && historiesData.sponsors) {
+      const sponsorOptions = historiesData.sponsors.map((sponsor) => ({
         value: sponsor.id,
         label: sponsor.title,
       }));
@@ -293,9 +445,10 @@ export default () => {
 
       setEditingSponsorOptions(sponsorOptions);
     }
-  }, [data]);
+  }, [historiesData]);
 
   const editingCheckResult = checkEditintValid();
+  const addressEditingCheckResult = checkAddressEditintValid();
 
   let title = "赞助记录";
 
@@ -305,8 +458,11 @@ export default () => {
   }, [location]);
 
   useEffect(() => {
-    if (data && data.errors) toastErrors(data.errors);
-  }, [data]);
+    if (historiesData && historiesData.errors)
+      toastErrors(historiesData.errors);
+    if (addressesData && addressesData.errors)
+      toastErrors(addressesData.errors);
+  }, [historiesData, addressesData]);
 
   return (
     <>
@@ -315,13 +471,15 @@ export default () => {
         <PageBody>
           <PageSection>
             <header>
-              <Title>记录列表</Title>
+              <Title>历史列表</Title>
             </header>
             <main>
-              {data.sponsorshipHistories.length > 0 ? (
+              {historiesData.sponsorshipHistories.length > 0 ? (
                 <div tw="mt-4">
-                  <ActionButton onClick={handleIsEditing}>
-                    + 添加赞助记录
+                  <ActionButton
+                    onClick={() => handleIsEditing(EDITING_HISTORY)}
+                  >
+                    + 添加赞助历史
                   </ActionButton>
                   <Table tw="shadow rounded">
                     <Thead>
@@ -334,7 +492,7 @@ export default () => {
                       </Tr>
                     </Thead>
                     <Tbody>
-                      {data.sponsorshipHistories.map(
+                      {historiesData.sponsorshipHistories.map(
                         (sponsorshipHistory, index) => (
                           <Tr key={sponsorshipHistory.id}>
                             <Td tw="break-all pr-0">
@@ -357,7 +515,7 @@ export default () => {
                             <Td tw="text-right">
                               <ActionButton
                                 tw="mr-1"
-                                onClick={() => handleEditClick(index)}
+                                onClick={() => handleEditHistoryClick(index)}
                               >
                                 编辑
                               </ActionButton>
@@ -377,10 +535,10 @@ export default () => {
                 </div>
               ) : (
                 <HintParagraph>
-                  当前未添加任何记录，
+                  当前未添加任何赞助历史，
                   <span
                     tw="underline cursor-pointer text-blue-300"
-                    onClick={handleIsEditing}
+                    onClick={() => handleIsEditing(EDITING_HISTORY)}
                   >
                     点此添加
                   </span>
@@ -391,10 +549,73 @@ export default () => {
           </PageSection>
           <PageSection>
             <header>
-              <Title>当前编辑的记录</Title>
+              <Title>地址列表</Title>
             </header>
             <main>
-              {isEditing ? (
+              {addressesData.sponsorshipAddresses.length > 0 ? (
+                <div tw="mt-4">
+                  <ActionButton
+                    onClick={() => handleIsEditing(EDITING_ADDRESS)}
+                  >
+                    + 添加赞助地址
+                  </ActionButton>
+                  <Table tw="shadow rounded">
+                    <Thead>
+                      <Tr>
+                        <Th tw="w-2/12">地址名称</Th>
+                        <Th tw="w-3/12">地址说明</Th>
+                        <Th tw="w-3/12">地址文本</Th>
+                        <Th tw="w-2/12">地址图片</Th>
+                        <Th tw="w-2/12 text-right">操作</Th>
+                      </Tr>
+                    </Thead>
+                    <Tbody>
+                      {addressesData.sponsorshipAddresses.map((address, i) => (
+                        <Tr key={address.id}>
+                          <Td tw="break-all">{address.name}</Td>
+                          <Td tw="break-all">{address.description}</Td>
+                          <Td tw="break-all">{address.text}</Td>
+                          <Td tw="break-all">{address.image || "无"}</Td>
+                          <Td tw="text-right">
+                            <ActionButton
+                              tw="mr-1"
+                              onClick={() => handleEditAddressClick(i)}
+                            >
+                              编辑
+                            </ActionButton>
+                            <ActionButton
+                              onClick={() =>
+                                handleAddressDeleteClick(address.id)
+                              }
+                            >
+                              删除
+                            </ActionButton>
+                          </Td>
+                        </Tr>
+                      ))}
+                    </Tbody>
+                  </Table>
+                </div>
+              ) : (
+                <HintParagraph>
+                  当前未添加任何赞助地址，
+                  <span
+                    tw="underline cursor-pointer text-blue-300"
+                    onClick={() => handleIsEditing(EDITING_ADDRESS)}
+                  >
+                    点此添加
+                  </span>
+                  。
+                </HintParagraph>
+              )}
+            </main>
+          </PageSection>
+          <PageSection>
+            <header>
+              <Title>正在编辑</Title>
+            </header>
+            <main>
+              {editingFlag == EDITING_HISTORY && (
                 <form>
                   <FormSection>
                     <FormLable>关联赞助人</FormLable>
@@ -493,7 +714,7 @@ export default () => {
                     <div tw="flex-1 pr-10">
                       <LabelledButton
                         label="cancel"
-                        onClick={handleCancelEditing}
+                        onClick={handleCancelEditingHistoryClick}
                       >
                         取消
                       </LabelledButton>
@@ -502,20 +723,79 @@ export default () => {
                       <LabelledButton
                         label="ok"
                         disabled={editingCheckResult !== EDITING_CHECK.VALID}
-                        onClick={handleSaveClick}
+                        onClick={handleSaveHistoryClick}
                       >
                         保存
                       </LabelledButton>
                     </div>
                   </div>
                 </form>
-              ) : (
+              )}
+
+              {editingFlag == EDITING_ADDRESS && (
+                <form>
+                  <FormSection>
+                    <FormLable>地址名称</FormLable>
+                    <FormInput
+                      tw="w-full lg:w-9/12"
+                      value={editingAddressName}
+                      onChange={handleEditingAddressName}
+                    />
+                  </FormSection>
+                  <FormSection>
+                    <FormLable>地址说明</FormLable>
+                    <FormInput
+                      tw="w-full lg:w-9/12"
+                      value={editingAddressDescription}
+                      onChange={handleEditingAddressDescription}
+                    />
+                  </FormSection>
+                  <FormSection>
+                    <FormLable>地址文本</FormLable>
+                    <FormInput
+                      tw="w-full lg:w-9/12"
+                      value={editingAddressText}
+                      onChange={handleEditingAddressText}
+                    />
+                  </FormSection>
+                  <FormSection>
+                    <FormLable>地址图片</FormLable>
+                    <FormInput
+                      tw="w-full lg:w-9/12"
+                      value={editingAddressImage}
+                      onChange={handleEditingAddressImage}
+                    />
+                  </FormSection>
+                  <div tw="flex mt-2">
+                    <div tw="flex-1 pr-10">
+                      <LabelledButton
+                        label="cancel"
+                        onClick={initEditingAddressContent}
+                      >
+                        取消
+                      </LabelledButton>
+                    </div>
+                    <div tw="flex-1 pl-10">
+                      <LabelledButton
+                        label="ok"
+                        disabled={
+                          addressEditingCheckResult !== EDITING_CHECK.VALID
+                        }
+                        onClick={handleSaveAddressClick}
+                      >
+                        保存
+                      </LabelledButton>
+                    </div>
+                  </div>
+                </form>
+              )}
+              {editingFlag == 0 && (
                 <HintParagraph>请选择或新增一个记录。</HintParagraph>
               )}
             </main>
           </PageSection>
         </PageBody>
-      ) : error ? (
+      ) : historiesError || addressesError ? (
         <PageReLoading mutate={mutate} />
       ) : (
         <PageLoading />
