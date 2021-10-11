@@ -16,4 +16,8 @@ defmodule PolicrMiniWeb.Admin.API.SponsorshipAddressView do
         render_many(sponsorship_addresses, __MODULE__, "sponsorship_address.json")
     }
   end
+
+  def render("result.json", %{ok: ok}) do
+    %{ok: ok}
+  end
 end

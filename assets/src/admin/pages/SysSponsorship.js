@@ -125,6 +125,21 @@ const saveSponsorshipAddress = async ({
   }).then((r) => camelizeJson(r));
 };
 
+const saveSponsorshipAddressIncludesImage = async (fd) => {
+  let endpoint = "/admin/api/sponsorship_addresses";
+  let method = "POST";
+  const id = fd.get("id");
+
+  if (id) {
+    endpoint = `/admin/api/sponsorship_addresses/${id}`;
+    method = "PUT";
+  }
+  return fetch(endpoint, {
+    method: method,
+    body: fd,
+  }).then((r) => camelizeJson(r));
+};
+
 const constructSponsor = (title, introduction, homepage, contact) => {
   if (title && contact) {
     return {
@@ -168,6 +183,9 @@ export default () => {
     mutate: addressesMutate,
     error: addressesError,
   } = useSWR(makeAddressesEndpoint());
+
+  const [imageInputNode, setImageInputNode] = useState(null);
+  const [selectedImage, setSelectedAddressImage] = useState(null);
   const [editingFlag, setEditingFlag] = useState(0);
   const [editingHistoryId, setEditingHistoryId] = useState(null);
   const [editingAddressId, setEditingAddressId] = useState(null);
@@ -193,6 +211,20 @@ export default () => {
     useState("");
   const [editingAddressText, setEditingAddressText] = useState("");
   const [editingAddressImage, setEditingAddressImage] = useState("");
+
+  const imageInputRef = useCallback((node) => {
+    if (node) {
+      setImageInputNode(node);
+
+      node.addEventListener("change", imageInputChange, false);
+
+      return () => node.removeEventListener("change", imageInputChange);
+    }
+  }, []);
+
+  const imageInputChange = (e) => {
+    setSelectedAddressImage(e.target.files[0]);
+  };
 
   const handleIsEditing = useCallback(
     (flag) => {
@@ -223,7 +255,7 @@ export default () => {
     setEditingAddressName("");
     setEditingAddressDescription("");
     setEditingAddressText("");
-    setEditingAddressImage("");
+    setSelectedAddressImage(undefined);
   };
   const handleCancelEditingHistoryClick = () => initEditingHistoryContent();
   const handleEditingSponsorAssociatedChange = (option) => {
@@ -342,16 +374,34 @@ export default () => {
       editingHasReached,
     ]
   );
+
   const handleSaveAddressClick = useCallback(
-    async (e) => {
+    (e) => {
       e.preventDefault();
 
+      if (selectedImage) {
+        handleSaveAddressIncludesImage();
+      } else {
+        handleSaveAddress();
+      }
+    },
+    [
+      editingAddressId,
+      editingAddressName,
+      editingAddressDescription,
+      editingAddressText,
+      editingAddressImage,
+      selectedImage,
+    ]
+  );
+
+  const handleSaveAddress = useCallback(
+    async (e) => {
       const result = await saveSponsorshipAddress({
         id: editingAddressId,
         name: editingAddressName,
         description: editingAddressDescription,
         text: editingAddressText,
-        image: editingAddressImage,
       });
 
       if (result.errors) toastErrors(result.errors);
@@ -367,7 +417,6 @@ export default () => {
       editingAddressName,
       editingAddressDescription,
       editingAddressText,
-      editingAddressImage,
     ]
   );
 
@@ -463,6 +512,38 @@ export default () => {
     if (addressesData && addressesData.errors)
       toastErrors(addressesData.errors);
   }, [historiesData, addressesData]);
+
+  const handleSelectLocalImage = useCallback(() => {
+    if (imageInputNode) {
+      imageInputNode.click();
+    }
+  }, [imageInputNode]);
+
+  const handleSaveAddressIncludesImage = useCallback(async () => {
+    const fd = new FormData();
+
+    fd.append("image_attach", selectedImage);
+    fd.append("id", editingAddressId);
+    fd.append("name", editingAddressName);
+    fd.append("description", editingAddressDescription);
+    fd.append("text", editingAddressText);
+
+    const result = await saveSponsorshipAddressIncludesImage(fd);
+
+    if (result.errors) toastErrors(result.errors);
+    else {
+      // 保存成功
+      addressesMutate();
+      // 初始化编辑内容
+      initEditingAddressContent();
+    }
+  }, [
+    selectedImage,
+    editingAddressId,
+    editingAddressName,
+    editingAddressDescription,
+    editingAddressText,
+  ]);
 
   return (
     <>
@@ -573,9 +654,9 @@ export default () => {
                       {addressesData.sponsorshipAddresses.map((address, i) => (
                         <Tr key={address.id}>
                           <Td tw="break-all">{address.name}</Td>
-                          <Td tw="break-all">{address.description}</Td>
+                          <Td tw="truncate">{address.description}</Td>
                           <Td tw="break-all">{address.text}</Td>
-                          <Td tw="break-all">{address.image || "无"}</Td>
+                          <Td tw="truncate">{address.image || "无"}</Td>
                           <Td tw="text-right">
                             <ActionButton
                               tw="mr-1"
@@ -760,11 +841,29 @@ export default () => {
                   </FormSection>
                   <FormSection>
                     <FormLable>地址图片</FormLable>
-                    <FormInput
-                      tw="w-full lg:w-9/12"
-                      value={editingAddressImage}
-                      onChange={handleEditingAddressImage}
-                    />
+                    <div tw="w-full lg:w-9/12 flex justify-between">
+                      {editingAddressImage && !selectedImage && (
+                        <span>{editingAddressImage}</span>
+                      )}
+                      {!editingAddressImage && !selectedImage && (
+                        <span tw="text-gray-500">无图片</span>
+                      )}
+                      {!editingAddressImage && selectedImage && (
+                        <span>{selectedImage.name}（待上传）</span>
+                      )}
+                      {editingAddressImage && selectedImage && (
+                        <span>{selectedImage.name}（已重新选择，待上传）</span>
+                      )}
+                      <ActionButton onClick={handleSelectLocalImage}>
+                        选择图片
+                      </ActionButton>
+                      <input
+                        ref={imageInputRef}
+                        type="file"
+                        accept=".jpg,.jpeg,.png,.webp"
+                        tw="hidden"
+                      />
+                    </div>
                   </FormSection>
                   <div tw="flex mt-2">
                     <div tw="flex-1 pr-10">
