@@ -105,6 +105,7 @@ defmodule PolicrMiniWeb.Router do
     pipe_through :browser
 
     get "/own_photo", PageController, :own_photo
+    get "/uploaded/:name", PageController, :uploaded
 
     get "/*path", PageController, :index
   end

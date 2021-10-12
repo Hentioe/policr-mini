@@ -26,4 +26,19 @@ defmodule PolicrMiniWeb.PageController do
 
     Phoenix.Controller.redirect(conn, to: photo_path)
   end
+
+  def uploaded(conn, %{"name" => name} = _params) do
+    file_path = Path.join(PolicrMiniWeb.uploaded_path(), name)
+
+    if File.exists?(file_path) do
+      content_type = MIME.from_path(file_path)
+      file = File.read!(file_path)
+
+      conn
+      |> put_resp_content_type(content_type)
+      |> send_resp(200, file)
+    else
+      resp(conn, 404, "Not Found")
+    end
+  end
 end

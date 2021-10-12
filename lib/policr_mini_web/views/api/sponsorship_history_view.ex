@@ -32,11 +32,21 @@ defmodule PolicrMiniWeb.API.SponsorshipHistoryView do
 
   def render("index.json", %{
         sponsorship_histories: sponsorship_histories,
+        sponsorship_addresses: sponsorship_addresses,
         hints: hints
       }) do
+    histories = render_many(sponsorship_histories, __MODULE__, "sponsorship_history.json")
+
+    addresses =
+      render_many(
+        sponsorship_addresses,
+        PolicrMiniWeb.API.SponsorshipAddressView,
+        "sponsorship_address.json"
+      )
+
     %{
-      sponsorship_histories:
-        render_many(sponsorship_histories, __MODULE__, "sponsorship_history.json"),
+      sponsorship_histories: histories,
+      sponsorship_addresses: addresses,
       hints: hints
     }
   end

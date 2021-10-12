@@ -46,6 +46,17 @@ const hintsToSelectOptions = (hints) =>
     amount: hint.amount,
   }));
 
+const addressesToSelectOptions = (addresses) =>
+  addresses.map((address) => ({
+    value: address.id,
+    label: address.name,
+    id: address.id,
+    name: address.name,
+    description: address.description,
+    image: address.image,
+    text: address.text,
+  }));
+
 const saveSponsorshipHistory = async ({
   token,
   uuid,
@@ -72,7 +83,7 @@ const saveSponsorshipHistory = async ({
 
 const isEmpty = (value) => value == null || value.toString().trim() == "";
 
-export default ({ hints = [], token = null }) => {
+export default ({ hints = [], addresses = [], token = null }) => {
   const dispatch = useDispatch();
 
   const [isUseUuid, setIsUseUuid] = useState(false);
@@ -84,6 +95,7 @@ export default ({ hints = [], token = null }) => {
   const [editingSponsorIntroduction, setEditingSponsorIntroduction] =
     useState(null);
   const [editingExpectedToOption, setEditingExpectedToOption] = useState(null);
+  const [editingAddressOption, setEditingAddressOption] = useState(null);
   const [editingAmount, setEditingAmount] = useState(null);
   const [postSuccessed, setPostSuccessed] = useState(false);
   const [successedUuid, setSuccessedUuid] = useState(null);
@@ -113,6 +125,11 @@ export default ({ hints = [], token = null }) => {
   };
   const handleEditingAmountChange = (e) =>
     setEditingAmount(e.target.value.trim());
+
+  const handleEditingAddressOptionChange = (option) => {
+    console.log(option);
+    setEditingAddressOption(option);
+  };
 
   const [errorMsg, setErrorMsg] = useState(null);
 
@@ -230,7 +247,7 @@ export default ({ hints = [], token = null }) => {
                       onChange={handleEditingSponsorContactChange}
                     />
                   </FormLine>
-                  <FromHint>当前仅限邮箱地址，此数据无法被外部获取</FromHint>
+                  <FromHint>用户名或邮箱，此数据无法被外部获取</FromHint>
                   <FormLine>
                     <FormLabel>您的主页</FormLabel>
                     <FormInput
@@ -308,19 +325,21 @@ export default ({ hints = [], token = null }) => {
         ) : (
           <>
             <div tw="flex flex-col">
-              <p tw="text-2xl text-center font-extrabold">
-                感谢您提交的赞助承诺
-              </p>
-              <p tw="text-gray-800 tracking-wide">
-                请牢记您的
-                UUID，它能代表您的赞助者身份。并且在未来它仍然会有新的作用。
-              </p>
-              <p tw="text-xl text-center font-bold text-red-600">
-                {successedUuid}
-              </p>
+              <p tw="text-2xl text-center font-extrabold">完成赞助</p>
 
-              <p tw="text-gray-800 tracking-wide">
-                <span>作者已在后台收到通知，请等候。亦可主动联系</span>
+              <FormLine>
+                <FormLabel>赞助地址</FormLabel>
+                <Select
+                  tw="w-8/12"
+                  placeholder="未选择"
+                  value={editingAddressOption}
+                  options={addressesToSelectOptions(addresses)}
+                  onChange={handleEditingAddressOptionChange}
+                  isSearchable={false}
+                />
+              </FormLine>
+              <FromHint>
+                加密货币、支付软件的地址，也可主动联系
                 <a
                   tw="text-gray-800"
                   target="_blank"
@@ -328,7 +347,40 @@ export default ({ hints = [], token = null }) => {
                 >
                   作者
                 </a>
-                。
+                咨询其他转账方式。
+              </FromHint>
+
+              {editingAddressOption ? (
+                <div tw="text-center">
+                  <p tw="text-sm text-gray-800">
+                    {editingAddressOption.description}
+                  </p>
+                  <img
+                    tw="w-52 md:w-64"
+                    src={`/uploaded/${editingAddressOption.image}`}
+                  />
+                  <p tw="text-sm text-gray-600">{editingAddressOption.text}</p>
+
+                  <p tw="text-left text-gray-800 text-sm">
+                    向以上地址转入（或支付）指定金额。经人工核实后将显示于首页以及特定页面，并永久保留赞助人关系。
+                  </p>
+                </div>
+              ) : (
+                <div>
+                  <p tw="text-2xl text-green-400 font-bold text-center">
+                    请选择赞助地址
+                  </p>
+                </div>
+              )}
+
+              <span tw="text-gray-800">
+                您的 UUID：
+                <code tw="font-bold text-red-600">{successedUuid}</code>
+              </span>
+
+              <p tw="text-gray-800 text-sm tracking-wide">
+                请牢记您的
+                UUID，它能代表您的赞助者身份。在未来它仍然会有新的作用。
               </p>
 
               <div tw="flex justify-between">

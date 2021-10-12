@@ -130,7 +130,7 @@ const saveSponsorshipAddressIncludesImage = async (fd) => {
   let method = "POST";
   const id = fd.get("id");
 
-  if (id) {
+  if (id != "null" && id != null) {
     endpoint = `/admin/api/sponsorship_addresses/${id}`;
     method = "PUT";
   }
@@ -255,6 +255,7 @@ export default () => {
     setEditingAddressName("");
     setEditingAddressDescription("");
     setEditingAddressText("");
+    setEditingAddressImage("");
     setSelectedAddressImage(undefined);
   };
   const handleCancelEditingHistoryClick = () => initEditingHistoryContent();
@@ -472,7 +473,7 @@ export default () => {
       setEditingFlag(EDITING_ADDRESS);
       setEditingAddressId(address.id);
       setEditingAddressName(address.name);
-      setEditingAddressDescription(address.description);
+      setEditingAddressDescription(address.description || "");
       setEditingAddressText(address.text || "");
       setEditingAddressImage(address.image || "");
     },
@@ -482,6 +483,7 @@ export default () => {
   useEffect(() => {
     // 初始化编辑内容
     initEditingHistoryContent();
+    initEditingAddressContent();
   }, [location]);
 
   useEffect(() => {

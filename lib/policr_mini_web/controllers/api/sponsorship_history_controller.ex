@@ -33,8 +33,11 @@ defmodule PolicrMiniWeb.API.SponsorshipHistoryController do
         order_by: @order_by
       )
 
+    sponsorship_addresses = Instances.find_sponsorship_addresses()
+
     render(conn, "index.json", %{
       sponsorship_histories: sponsorship_histories,
+      sponsorship_addresses: sponsorship_addresses,
       hints: @hints
     })
   end

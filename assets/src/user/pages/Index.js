@@ -249,6 +249,7 @@ export default () => {
             <Sponsorship
               token={sponsorshipToken}
               hints={sponsorshipHistoriesData.hints}
+              addresses={sponsorshipHistoriesData.sponsorship_addresses}
             />
           ),
         })
