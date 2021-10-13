@@ -58,7 +58,6 @@ defmodule PolicrMiniWeb.Admin.API.SponsorshipAddressController do
     if !File.exists?(uploaded_path), do: File.mkdir!(uploaded_path)
 
     file_path = image_attach.path
-    File.exists?(file_path) |> IO.inspect()
 
     image_name = gen_file_name(file_path, Path.extname(image_attach.filename))
     File.cp!(file_path, Path.join(uploaded_path, image_name))

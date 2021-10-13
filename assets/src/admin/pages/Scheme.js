@@ -240,8 +240,6 @@ export default () => {
       else if (imageAnswersCount === 5)
         setEditingImageAnswersCountOption(imageAnswersCountOptions[2]);
 
-      console.log(data.scheme);
-
       // 绑定服务消息清理。注意：必须保证默认状态都是 false。
       if (serviceMessageCleanup != null) {
         setEditingJoinedCleared(serviceMessageCleanup.includes("joined"));

@@ -127,7 +127,6 @@ export default ({ hints = [], addresses = [], token = null }) => {
     setEditingAmount(e.target.value.trim());
 
   const handleEditingAddressOptionChange = (option) => {
-    console.log(option);
     setEditingAddressOption(option);
   };
 
