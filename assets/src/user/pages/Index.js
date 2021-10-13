@@ -640,7 +640,12 @@ export default () => {
                     dispatch(
                       openModal({
                         content: (
-                          <Sponsorship hints={sponsorshipHistoriesData.hints} />
+                          <Sponsorship
+                            hints={sponsorshipHistoriesData.hints}
+                            addresses={
+                              sponsorshipHistoriesData.sponsorship_addresses
+                            }
+                          />
                         ),
                       })
                     )
