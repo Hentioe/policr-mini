@@ -69,7 +69,8 @@ defmodule PolicrMiniBot.Helper do
           {:parse_mode, parsemode | nil},
           {:disable_web_page_preview, boolean},
           {:reply_markup, Telegex.Model.InlineKeyboardMarkup.t()},
-          {:retry, integer}
+          {:retry, integer},
+          {:unescaped, boolean}
         ]
 
   @spec preprocess_send_message_args(message_text, send_message_opts) ::
@@ -81,13 +82,16 @@ defmodule PolicrMiniBot.Helper do
       |> Keyword.put_new(:parse_mode, @markdown_parse_mode)
       |> Keyword.put_new(:disable_web_page_preview, true)
       |> Keyword.put_new(:retry, 5)
+      |> Keyword.put_new(:unescaped, false)
       |> delete_keyword_nils()
 
     parse_mode = Keyword.get(options, :parse_mode)
+    unescaped = Keyword.get(options, :unescaped)
 
     case parse_mode do
       @markdown_parse_mode ->
-        text = escape_markdown(text)
+        text = if unescaped, do: text, else: escape_markdown(text)
+
         {text, options}
 
       @markdown_to_html_parse_mode ->
