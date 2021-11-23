@@ -416,7 +416,7 @@ defmodule PolicrMiniBot.Helper do
       end
 
     case options[:parse_mode] do
-      "MarkdownV2" -> "[#{Telegex.Marked.escape_text(name)}](tg://user?id=#{id})"
+      "MarkdownV2" -> "[#{escape_markdown(name)}](tg://user?id=#{id})"
       "HTML" -> ~s(<a href="tg://user?id=#{id}">#{Telegex.Tools.safe_html(name)}</a>)
     end
   end
@@ -456,7 +456,7 @@ defmodule PolicrMiniBot.Helper do
         :mosaic_full_name -> user |> fullname() |> mosaic_name()
       end
 
-    "[#{Telegex.Marked.escape_text(text)}](tg://user?id=#{id})"
+    "[#{escape_markdown(text)}](tg://user?id=#{id})"
   end
 
   @doc """

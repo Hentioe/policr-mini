@@ -155,7 +155,7 @@ defmodule PolicrMiniBot.RespStartCmdPlug do
       if Application.get_env(:policr_mini, :marked_enabled) do
         text =
           t("verification.template_issue_33", %{
-            chat_name: Telegex.Marked.escape_text(verification.chat.title),
+            chat_name: escape_markdown(verification.chat.title),
             question: data.question,
             seconds: time_left(verification)
           })

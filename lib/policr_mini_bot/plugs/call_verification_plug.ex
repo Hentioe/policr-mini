@@ -157,10 +157,10 @@ defmodule PolicrMiniBot.CallVerificationPlug do
         async(fn -> derestrict_chat_member(verification.chat_id, verification.target_user_id) end)
         # 更新验证结果
         async do
-          # 注意：此处默认以 `Telegex.Marked` 库转换文字，需要用 `Telegex.Marked.escape_text/1` 函数转义文本中的动态内容。
+          # 注意：此处默认以 `Telegex.Marked` 库转换文字，需要用 `escape_markdown/1` 函数转义文本中的动态内容。
           text =
             t("verification.passed.private", %{
-              chat_title: Telegex.Marked.escape_text(verification.chat.title)
+              chat_title: escape_markdown(verification.chat.title)
             })
 
           Cleaner.delete_message(verification.target_user_id, message_id)
@@ -226,10 +226,10 @@ defmodule PolicrMiniBot.CallVerificationPlug do
         # 添加操作记录（系统）。
         operation_create_fun.(verification)
 
-        # 注意：此处默认以 `Telegex.Marked` 库转换文字，需要用 `Telegex.Marked.escape_text/1` 函数转义文本中的动态内容。
+        # 注意：此处默认以 `Telegex.Marked` 库转换文字，需要用 `escape_markdown/1` 函数转义文本中的动态内容。
         text =
           t("verification.wronged.#{wrong_killing_method || :kick}.private", %{
-            chat_title: Telegex.Marked.escape_text(verification.chat.title)
+            chat_title: escape_markdown(verification.chat.title)
           })
 
         # 清理消息并私聊验证结果。
