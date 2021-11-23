@@ -39,14 +39,17 @@ defmodule PolicrMiniBot.Helper do
 
   @doc """
   转义 Markdown 中不能被 Telegram 发送的字符。
+
+  ## Examples
+      iex> PolicrMiniBot.Helper.escape_markdown("'_', '*', '[', ']', '(', ')', '~', '`', '>', '#', '+', '-', '=', '|', '{', '}', '.', '!'")
+      ~S"'\\_', '\\*', '\\[', '\\]', '\\(', '\\)', '\\~', '\\`', '\\>', '\\#', '\\+', '\\-', '\\=', '\\|', '\\{', '\\}', '\\.', '\\!'"
   """
-  @spec escape_markdown(String.t()) :: String.t()
   def escape_markdown(text) do
-    text
-    |> String.replace(".", "\\.")
-    |> String.replace("+", "\\+")
-    |> String.replace("-", "\\-")
-    |> String.replace("=", "\\=")
+    String.replace(
+      text,
+      ~r/(\_|\*|\[|\]|\(|\)|\~|\`|\>|\#|\+|\-|\=|\||\{|\}|\.|\!)/,
+      "\\\\\\g{1}"
+    )
   end
 
   # 过滤掉关键字列表中的 nil 值
