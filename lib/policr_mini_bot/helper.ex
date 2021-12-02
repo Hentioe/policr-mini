@@ -52,6 +52,15 @@ defmodule PolicrMiniBot.Helper do
     )
   end
 
+  @spec escape_marked(binary) :: binary
+  def escape_marked(text) do
+    text
+    |> String.replace(".", "\\.")
+    |> String.replace("+", "\\+")
+    |> String.replace("-", "\\-")
+    |> String.replace("=", "\\=")
+  end
+
   # 过滤掉关键字列表中的 nil 值
   defp delete_keyword_nils(keyword) when is_list(keyword) do
     keyword |> Enum.filter(fn {_, value} -> value != nil end)
@@ -90,12 +99,13 @@ defmodule PolicrMiniBot.Helper do
 
     case parse_mode do
       @markdown_parse_mode ->
-        text = if unescaped, do: text, else: escape_markdown(text)
+        text = if unescaped, do: text, else: escape_marked(text)
 
         {text, options}
 
       @markdown_to_html_parse_mode ->
         text = Telegex.Marked.as_html(text)
+
         {text, Keyword.put(options, :parse_mode, "HTML")}
 
       _ ->
