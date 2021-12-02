@@ -193,7 +193,7 @@ defmodule PolicrMiniBot.Helper do
     if caption = options[:caption] do
       case parse_mode do
         @markdown_parse_mode ->
-          caption = escape_markdown(caption)
+          caption = escape_marked(caption)
           Keyword.put(options, :caption, caption)
 
         @markdown_to_html_parse_mode ->
@@ -283,7 +283,7 @@ defmodule PolicrMiniBot.Helper do
 
     text =
       if(options |> Keyword.get(:parse_mode) == @markdown_parse_mode) do
-        escape_markdown(text)
+        escape_marked(text)
       else
         text
       end
