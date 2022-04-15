@@ -536,6 +536,7 @@ defmodule PolicrMiniBot.Helper do
           | :wkmethod
           | :mention_scheme
           | :acimage
+          | :smc
 
   @doc """
   获取默认配置。
