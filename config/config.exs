@@ -5,7 +5,7 @@
 # is restricted to this project.
 
 # General application configuration
-use Mix.Config
+import Config
 
 config :policr_mini,
   ecto_repos: [PolicrMini.Repo]

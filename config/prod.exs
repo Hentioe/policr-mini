@@ -1,4 +1,4 @@
-use Mix.Config
+import Config
 
 # Definition environment
 config :policr_mini, :environment, :prod
