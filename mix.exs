@@ -41,8 +41,8 @@ defmodule PolicrMini.MixProject do
   # Type `mix help deps` for examples and options.
   defp deps do
     [
-      {:credo, "~> 1.5", only: [:dev, :test], runtime: false},
       {:dialyxir, "~> 1.1", only: [:dev], runtime: false},
+      {:credo, "~> 1.6", only: [:dev, :test], runtime: false},
       {:telegex, "~> 0.1"},
       {:telegex_marked, "~> 0.0.8"},
       {:telegex_plug, "~> 0.3"},
