@@ -1,6 +1,10 @@
+import fetch from "unfetch";
 import camelize from "camelcase-keys";
 import { toast } from "react-toastify";
 import "lodash";
+
+const getFetcher = (...args) =>
+  fetch(...args).then((resp) => camelizeJson(resp));
 
 function getIdFromLocation(location) {
   const re = /^\/admin\/chats\/(-\d+)\//i;
@@ -128,6 +132,7 @@ function toastErrors(errors) {
 }
 
 export {
+  getFetcher,
   getIdFromLocation,
   updateInNewArray,
   camelizeJson,

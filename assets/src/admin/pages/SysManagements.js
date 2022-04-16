@@ -1,6 +1,6 @@
 import React, { useState, useEffect, useCallback } from "react";
 import tw, { styled } from "twin.macro";
-import { Link as RouteLink, useLocation, useHistory } from "react-router-dom";
+import { Link as RouteLink, useLocation, useNavigate } from "react-router-dom";
 import { useDispatch } from "react-redux";
 import useSWR from "swr";
 import { parseISO, format as formatDateTime } from "date-fns";
@@ -85,7 +85,7 @@ async function syncChat(id) {
 
 export default () => {
   const location = useLocation();
-  const history = useHistory();
+  const navigate = useNavigate();
   const dispatch = useDispatch();
 
   const searchParams = new URLSearchParams(location.search);
@@ -111,7 +111,7 @@ export default () => {
       if (keyCode != 13 || searchText.trim() == "") return;
       const queryString = makeAPIQueryString({ keywords: searchText });
 
-      history.push(`/admin/sys/managements${queryString}`);
+      navigate.push(`/admin/sys/managements${queryString}`);
     },
     [searchText, offset]
   );
@@ -121,7 +121,7 @@ export default () => {
     if (!isSearching) return;
     const queryString = makeAPIQueryString({ offset: 0 });
 
-    history.push(`/admin/sys/managements${queryString}`);
+    navigate.push(`/admin/sys/managements${queryString}`);
   }, [offset, isSearching]);
 
   const handleLeaveChat = async (id) => {

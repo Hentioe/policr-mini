@@ -2,7 +2,7 @@ import React, { useEffect, useState } from "react";
 import useSWR from "swr";
 import tw, { styled } from "twin.macro";
 import Select from "react-select";
-import { Link as RouteLink, useLocation, useHistory } from "react-router-dom";
+import { Link as RouteLink, useLocation, useNavigate } from "react-router-dom";
 import { useDispatch } from "react-redux";
 import MoonLoader from "react-spinners/MoonLoader";
 import { fromUnixTime, format as formatDateTime, getUnixTime } from "date-fns";
@@ -74,7 +74,7 @@ function makeQueryString(level, timeRange) {
 
 export default () => {
   const location = useLocation();
-  const history = useHistory();
+  const navigate = useNavigate();
   const dispatch = useDispatch();
 
   const searchParams = new URLSearchParams(location.search);
@@ -89,7 +89,7 @@ export default () => {
   const handleLevelChange = (option) => {
     setLevelOption(option);
     const queryString = makeQueryString(option.value, timeRange);
-    history.push(`/admin/sys/logs${queryString}`);
+    navigate.push(`/admin/sys/logs${queryString}`);
   };
 
   useEffect(() => {

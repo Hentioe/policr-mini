@@ -3,7 +3,7 @@ import { useSelector } from "react-redux";
 import useSWR from "swr";
 import tw, { styled } from "twin.macro";
 import { useDispatch } from "react-redux";
-import { useHistory, useLocation } from "react-router-dom";
+import { useNavigate, useLocation } from "react-router-dom";
 import MoonLoader from "react-spinners/MoonLoader";
 
 import { getIdFromLocation, isSysLink } from "../helper";
@@ -53,14 +53,14 @@ const defaultMenu = "scheme";
 
 export default () => {
   const dispatch = useDispatch();
-  const history = useHistory();
+  const navigate = useNavigate();
   const location = useLocation();
 
   const { data, error, mutate } = useSWR(endpoint);
   const chatsState = useSelector((state) => state.chats);
 
   const handleSelect = (chat) => {
-    history.push(`/admin/chats/${chat.id}/${defaultMenu}`);
+    navigate.push(`/admin/chats/${chat.id}/${defaultMenu}`);
     dispatch(loadSelected(chat));
   };
 
@@ -74,7 +74,7 @@ export default () => {
       if (isSysLink({ path: location.pathname })) {
         dispatch(selectChat(data.chats[0].id));
         dispatch(loadSelected(data.chats[0]));
-      } else history.push(`/admin/chats/${data.chats[0].id}/${defaultMenu}`);
+      } else navigate.push(`/admin/chats/${data.chats[0].id}/${defaultMenu}`);
     }
   }, [chatsState]);
 

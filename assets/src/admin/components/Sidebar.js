@@ -72,7 +72,7 @@ const MenuBox = ({
   );
 };
 
-const arrowDownIcon = (
+const ArrowDownIcon = () => (
   <svg
     xmlns="http://www.w3.org/2000/svg"
     tw="h-3"
@@ -87,7 +87,7 @@ const arrowDownIcon = (
   </svg>
 );
 
-const arrowUpIcon = (
+const ArrowUpIcon = () => (
   <svg
     xmlns="http://www.w3.org/2000/svg"
     tw="h-3"
@@ -318,9 +318,15 @@ export default () => {
                   <div tw="mt-2 text-xs lg:text-sm">
                     <span tw="text-gray-600">较昨日</span>
                     {["--", "rise"].includes(passedRate[0]) ? (
-                      <span tw="text-green-700"> {arrowUpIcon} </span>
+                      <span tw="text-green-700">
+                        {" "}
+                        <ArrowUpIcon />{" "}
+                      </span>
                     ) : (
-                      <span tw="text-red-700"> {arrowDownIcon} </span>
+                      <span tw="text-red-700">
+                        {" "}
+                        <ArrowDownIcon />{" "}
+                      </span>
                     )}
                     <span tw="text-black font-bold tracking-wide">
                       {Math.ceil(passedRate[1])}%
@@ -340,9 +346,15 @@ export default () => {
                   <div tw="mt-2 text-xs lg:text-sm">
                     <span tw="text-gray-600">较昨日</span>
                     {["--", "decline"].includes(notPassedRate[0]) ? (
-                      <span tw="text-green-700"> {arrowDownIcon} </span>
+                      <span tw="text-green-700">
+                        {" "}
+                        <ArrowDownIcon />{" "}
+                      </span>
                     ) : (
-                      <span tw="text-red-700"> {arrowUpIcon} </span>
+                      <span tw="text-red-700">
+                        {" "}
+                        <ArrowUpIcon />{" "}
+                      </span>
                     )}
                     <span tw="text-black font-bold tracking-wide">
                       {Math.ceil(notPassedRate[1])}%
