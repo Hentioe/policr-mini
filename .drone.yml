@@ -36,6 +36,21 @@ steps:
   - name: image-push
     image: plugins/docker
     settings:
+      repo: telestd/policr-mini
+      username: telestd
+      password:
+        from_secret: hub_pass_telestd
+      dockerfile: Dockerfile
+      tags: latest
+    when:
+      branch:
+        - master
+      event:
+        - push
+
+  - name: image-push-obsolete
+    image: plugins/docker
+    settings:
       repo: bluerain/policr-mini
       username: bluerain
       password:
