@@ -8,6 +8,7 @@ defmodule PolicrMiniBot.HandleAdminPermissionsChangePlug do
   alias PolicrMini.Logger
   alias PolicrMini.Instances.Chat
   alias PolicrMiniBot.Helper.Syncing
+  alias PolicrMiniBot.Worker
 
   @doc """
   根据更新消息中的 `chat_member` 字段，同步管理员权限变化。
@@ -121,7 +122,7 @@ defmodule PolicrMiniBot.HandleAdminPermissionsChangePlug do
 
       case send_message(chat_id, text, parse_mode: "HTML") do
         {:ok, msg} ->
-          Cleaner.delete_message(chat_id, msg.message_id, delay_seconds: 4)
+          Worker.async_delete_message(chat_id, msg.message_id, delay_secs: 4)
 
         e ->
           Logger.unitized_error("Sending of messages with synchronized permissions",

@@ -10,7 +10,7 @@ defmodule PolicrMiniBot.HandleUserLeftedGroupPlug do
   use PolicrMiniBot, plug: :preheater
 
   alias PolicrMini.{Logger, Chats, PermissionBusiness}
-  alias PolicrMiniBot.{State, Cleaner}
+  alias PolicrMiniBot.{State, Worker}
 
   @doc """
   根据更新消息中的 `chat_member` 字段，清理离开数据。
@@ -83,7 +83,7 @@ defmodule PolicrMiniBot.HandleUserLeftedGroupPlug do
 
           if Enum.member?(service_message_cleanup, :lefted) && update.message do
             # 删除服务消息。
-            Cleaner.delete_message(chat_id, update.message.message_id)
+            Worker.async_delete_message(chat_id, update.message.message_id)
           end
       end
 

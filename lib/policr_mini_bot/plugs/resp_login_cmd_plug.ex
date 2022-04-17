@@ -6,8 +6,8 @@ defmodule PolicrMiniBot.RespLoginCmdPlug do
   use PolicrMiniBot, plug: [commander: :login]
 
   alias PolicrMini.Logger
-
   alias PolicrMini.PermissionBusiness
+  alias PolicrMiniBot.Worker
 
   @doc """
   处理登录命令。
@@ -50,13 +50,13 @@ defmodule PolicrMiniBot.RespLoginCmdPlug do
 
     case reply_message(chat_id, message_id, text) do
       {:ok, sended_message} ->
-        Cleaner.delete_message(chat_id, sended_message.message_id, delay_seconds: 8)
+        Worker.async_delete_message(chat_id, sended_message.message_id, delay_secs: 8)
 
       e ->
         Logger.unitized_error("Command response", command: "/login", returns: e)
     end
 
-    Cleaner.delete_message(chat_id, message_id)
+    Worker.async_delete_message(chat_id, message_id)
 
     {:ok, %{state | deleted: true}}
   end

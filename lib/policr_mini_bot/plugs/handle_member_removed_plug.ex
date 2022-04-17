@@ -5,6 +5,8 @@ defmodule PolicrMiniBot.HandleMemberRemovedPlug do
 
   use PolicrMiniBot, plug: :message_handler
 
+  alias PolicrMiniBot.Worker
+
   @doc """
   匹配消息中是否包含已被机器人移除的群成员。
 
@@ -30,7 +32,7 @@ defmodule PolicrMiniBot.HandleMemberRemovedPlug do
 
   @impl true
   def handle(message, state) do
-    Cleaner.delete_message(message.chat.id, message.message_id)
+    Worker.async_delete_message(message.chat.id, message.message_id)
 
     {:ok, state}
   end

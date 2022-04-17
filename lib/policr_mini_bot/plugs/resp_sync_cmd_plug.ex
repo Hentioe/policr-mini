@@ -11,7 +11,7 @@ defmodule PolicrMiniBot.RespSyncCmdPlug do
 
   alias PolicrMini.{Instances, Chats}
   alias PolicrMini.Instances.Chat
-  alias PolicrMiniBot.SpeedLimiter
+  alias PolicrMiniBot.{SpeedLimiter, Worker}
   alias PolicrMiniBot.Helper.Syncing
 
   @doc """
@@ -34,7 +34,7 @@ defmodule PolicrMiniBot.RespSyncCmdPlug do
         # 添加 10 秒的速度限制记录。
         :ok = SpeedLimiter.put(speed_limit_key, 10)
 
-        Cleaner.delete_message(chat_id, message_id)
+        Worker.async_delete_message(chat_id, message_id)
 
       true ->
         # 添加 15 秒的速度限制记录。

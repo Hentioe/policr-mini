@@ -9,7 +9,7 @@ defmodule PolicrMiniBot.CallVerificationPlug do
   alias PolicrMini.Chats.Scheme
   alias PolicrMini.Schema.Verification
   alias PolicrMini.{VerificationBusiness, StatisticBusiness, OperationBusiness}
-  alias PolicrMiniBot.{HandleUserJoinedCleanupPlug, Disposable}
+  alias PolicrMiniBot.{HandleUserJoinedCleanupPlug, Disposable, Worker}
 
   @doc """
   回调处理函数。
@@ -57,8 +57,8 @@ defmodule PolicrMiniBot.CallVerificationPlug do
     %{id: callback_query_id, from: %{id: user_id} = from, message: %{message_id: message_id}} =
       callback_query
 
-    chosen = chosen |> String.to_integer()
-    verification_id = verification_id |> String.to_integer()
+    chosen = String.to_integer(chosen)
+    verification_id = String.to_integer(verification_id)
 
     handle_answer = fn verification, scheme ->
       wrong_killing_method = scheme.wrong_killing_method || default!(:wkmethod)
@@ -144,14 +144,16 @@ defmodule PolicrMiniBot.CallVerificationPlug do
 
       case send_message(verification.chat_id, text, parse_mode: "MarkdownV2ToHTML") do
         {:ok, sended_message} ->
-          Cleaner.delete_message(verification.chat_id, sended_message.message_id, delay_seconds: 8)
+          Worker.async_delete_message(verification.chat_id, sended_message.message_id,
+            delay_secs: 8
+          )
 
         e ->
           Logger.unitized_error("Verification passed notification", e)
       end
     end
 
-    case verification |> VerificationBusiness.update(%{status: :passed}) do
+    case VerificationBusiness.update(verification, %{status: :passed}) do
       {:ok, verification} ->
         # 解除限制
         async(fn -> derestrict_chat_member(verification.chat_id, verification.target_user_id) end)
@@ -163,7 +165,7 @@ defmodule PolicrMiniBot.CallVerificationPlug do
               chat_title: escape_markdown(verification.chat.title)
             })
 
-          Cleaner.delete_message(verification.target_user_id, message_id)
+          Worker.async_delete_message(verification.target_user_id, message_id)
           send_message(verification.target_user_id, text, parse_mode: "MarkdownV2ToHTML")
         end
 
@@ -198,7 +200,7 @@ defmodule PolicrMiniBot.CallVerificationPlug do
 
     cleaner_fun = fn notice_text ->
       async do
-        Cleaner.delete_message(verification.target_user_id, message_id)
+        Worker.async_delete_message(verification.target_user_id, message_id)
         send_message(verification.target_user_id, notice_text, parse_mode: "MarkdownV2ToHTML")
       end
     end
@@ -341,7 +343,7 @@ defmodule PolicrMiniBot.CallVerificationPlug do
 
     case send_message(chat_id, text, parse_mode: "MarkdownV2ToHTML") do
       {:ok, sended_message} ->
-        Cleaner.delete_message(chat_id, sended_message.message_id, delay_seconds: 8)
+        Worker.async_delete_message(chat_id, sended_message.message_id, delay_secs: 8)
 
         :ok
 

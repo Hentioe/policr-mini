@@ -11,7 +11,7 @@ defmodule PolicrMiniBot.HandleUserJoinedCleanupPlug do
   alias PolicrMini.Chats.Scheme
   alias PolicrMini.Schema.Verification
   alias PolicrMini.{VerificationBusiness, StatisticBusiness, OperationBusiness}
-  alias PolicrMiniBot.CallVerificationPlug
+  alias PolicrMiniBot.{CallVerificationPlug, Worker}
 
   # 过期时间：15 分钟
   @expired_seconds 60 * 15
@@ -45,7 +45,7 @@ defmodule PolicrMiniBot.HandleUserJoinedCleanupPlug do
 
         if Enum.member?(service_message_cleanup, :joined) do
           # 删除服务消息。
-          Cleaner.delete_message(chat_id, message.message_id)
+          Worker.async_delete_message(chat_id, message.message_id)
         end
     end
 
