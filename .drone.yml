@@ -33,7 +33,7 @@ steps:
       - mix phx.digest
       - mix release
 
-  - name: image-push
+  - name: image-push-develop
     image: plugins/docker
     settings:
       repo: telestd/policr-mini
@@ -41,10 +41,10 @@ steps:
       password:
         from_secret: hub_pass_telestd
       dockerfile: Dockerfile
-      tags: latest
+      tags: develop
     when:
       branch:
-        - master
+        - develop
       event:
         - push
 
