@@ -27,8 +27,7 @@ defmodule PolicrMini.MixProject do
   def application do
     [
       mod: {PolicrMini.Application, []},
-      extra_applications: [:logger, :runtime_tools],
-      included_applications: [:mnesia]
+      extra_applications: [:logger, :runtime_tools]
     ]
   end
 
@@ -72,7 +71,8 @@ defmodule PolicrMini.MixProject do
       {:not_qwerty123, "~> 2.3"},
       {:yaml_elixir, "~> 2.7"},
       {:unzip, "~> 0.6"},
-      {:mime, "~> 1.6"}
+      {:mime, "~> 1.6"},
+      {:honeydew, "~> 1.5"}
     ]
   end
 
