@@ -111,6 +111,7 @@ defmodule PolicrMiniBot.RespSyncCmdPlug do
           big_photo_id: big_photo_id,
           username: username,
           description: description,
+          left: false,
           tg_can_add_web_page_previews: chat_permissions.can_add_web_page_previews,
           tg_can_change_info: chat_permissions.can_change_info,
           tg_can_invite_users: chat_permissions.can_invite_users,

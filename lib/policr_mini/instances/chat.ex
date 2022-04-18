@@ -16,6 +16,7 @@ defmodule PolicrMini.Instances.Chat do
                       username
                       description
                       invite_link
+                      left
                       tg_can_add_web_page_previews
                       tg_can_change_info
                       tg_can_invite_users
@@ -36,6 +37,7 @@ defmodule PolicrMini.Instances.Chat do
     field :description, :string
     field :invite_link, :string
     field :is_take_over, :boolean
+    field :left, :boolean
     field :tg_can_add_web_page_previews, :boolean
     field :tg_can_change_info, :boolean
     field :tg_can_invite_users, :boolean

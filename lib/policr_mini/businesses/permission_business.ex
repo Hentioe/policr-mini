@@ -22,15 +22,24 @@ defmodule PolicrMini.PermissionBusiness do
   # TODO: 添加测试。
   @doc """
   获取指定用户在指定群组内的权限列表。
+
+  **注意：此函数对已离开的群组返回空权限**
   """
   @spec has_permissions(integer | binary, integer) :: [permission]
   def has_permissions(chat_id, user_id) do
     if permission = find(chat_id, user_id) do
-      permissions = if permission.writable, do: [:writable], else: []
-      permissions = if permission.readable, do: permissions ++ [:readable], else: permissions
-      permissions = if permission.tg_is_owner, do: permissions ++ [:owner], else: permissions
+      chat = Repo.preload(permission, [:chat]).chat
 
-      permissions
+      # 检查群组是否已离开
+      if chat.left == true do
+        []
+      else
+        permissions = if permission.writable, do: [:writable], else: []
+        permissions = if permission.readable, do: permissions ++ [:readable], else: permissions
+        permissions = if permission.tg_is_owner, do: permissions ++ [:owner], else: permissions
+
+        permissions
+      end
     else
       []
     end

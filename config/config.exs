@@ -30,10 +30,15 @@ config :policr_mini, PolicrMiniWeb, root_url: "http://0.0.0.0:4000/"
 # 任务调度配置。
 config :policr_mini, PolicrMiniBot.Scheduler,
   jobs: [
-    # 修正过期验证任务
+    # 修正过期验证
     {"*/5 * * * *", {PolicrMiniBot.Runner, :fix_expired_wait_status, []}},
-    # 检查工作状态任务
-    {"*/55 * * * *", {PolicrMiniBot.Runner, :check_working_status, []}}
+    # 工作状态检查
+    {"*/55 * * * *", {PolicrMiniBot.Runner, :check_working_status, []}},
+    # 已离开检查
+    left_check: [
+      schedule: "@daily",
+      task: {PolicrMiniBot.Runner.LeftCheck, :run, []}
+    ]
   ]
 
 # 配置 Marked

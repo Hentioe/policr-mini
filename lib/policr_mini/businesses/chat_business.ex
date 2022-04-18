@@ -9,20 +9,6 @@ defmodule PolicrMini.ChatBusiness do
 
   alias PolicrMini.Schema.Permission
 
-  # TODO：添加测试。
-  @doc """
-  通过用户查询群组列表。
-
-  将返回指定用户下具有可读权限的群组列表，并按照添加时间排序。
-  """
-  @spec find_list_by_user(integer) :: [Chat.t()]
-  def find_list_by_user(user_id) when is_integer(user_id) do
-    from(p in Permission, where: p.user_id == ^user_id and p.readable == true)
-    |> Repo.all()
-    |> Repo.preload([:chat])
-    |> Enum.map(fn p -> p.chat end)
-  end
-
   @max_limit 35
 
   @type column :: atom

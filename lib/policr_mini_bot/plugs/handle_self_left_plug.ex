@@ -64,13 +64,12 @@ defmodule PolicrMiniBot.HandleSelfLeftedPlug do
   def call(%{my_chat_member: my_chat_member} = _update, state) do
     %{chat: %{id: chat_id}} = my_chat_member
 
-    Logger.debug("The bot has left a group (#{chat_id}).")
+    Logger.debug("The bot has left a group, details: #{inspect(chat_id: chat_id)}")
     state = State.set_action(state, :self_lefted)
 
-    # 取消接管
+    # 更新群组
     case Chat.get(chat_id) do
-      {:ok, chat} -> Instances.cancel_chat_takeover(chat)
-      _ -> nil
+      {:ok, chat} -> Instances.chat_left_and_takeover_cancel(chat)
     end
 
     {:ok, %{state | done: true}}

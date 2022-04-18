@@ -114,12 +114,68 @@ defmodule PolicrMini.Instances do
     end
   end
 
+  @type find_chats_cont :: [taken_over: boolean, left_is_not: boolean]
+
+  # TODO: 添加测试。
+  @doc """
+  查找群组列表。
+  """
+  @spec find_chats(find_chats_cont) :: [Chat.t()]
+  def find_chats(cont \\ []) do
+    taken_over = Keyword.get(cont, :taken_over)
+    left_is_not = Keyword.get(cont, :left_is_not)
+
+    filter_taken_over = (taken_over != nil && dynamic([c], c.is_take_over == ^taken_over)) || true
+
+    filter_left_is_not =
+      (left_is_not != nil && dynamic([c], is_nil(c.left) or c.left != ^left_is_not)) || true
+
+    from(c in Chat,
+      where: ^filter_taken_over,
+      where: ^filter_left_is_not
+    )
+    |> Repo.all()
+  end
+
+  # TODO：添加测试。
+  @doc """
+  查询用户管理的群列表。
+
+  将返回指定用户下具有可读权限的群组列表，并按照添加时间排序。
+  **注意：函数不返回已离开的群组。**
+  """
+  @spec find_user_chats(integer) :: [Chat.t()]
+  def find_user_chats(user_id) when is_integer(user_id) do
+    from(p in Permission, where: p.user_id == ^user_id and p.readable == true)
+    |> Repo.all()
+    |> Repo.preload([:chat])
+    |> Enum.map(fn p -> p.chat end)
+    # TODO: 此处应基于 SQL 条件实现，而不是数据过滤
+    |> Enum.filter(fn chat -> chat.left != true end)
+  end
+
+  @doc """
+  已离开指定群组。
+  """
+  @spec chat_left(Chat.t()) :: chat_written_returns
+  def chat_left(chat) do
+    update_chat(chat, %{left: true})
+  end
+
   @doc """
   取消指定群组的接管。
   """
   @spec cancel_chat_takeover(Chat.t()) :: chat_written_returns
   def cancel_chat_takeover(chat) when is_struct(chat, Chat) do
     update_chat(chat, %{is_take_over: false})
+  end
+
+  @doc """
+  已离开群组且接管取消。
+  """
+  @spec chat_left_and_takeover_cancel(Chat.t()) :: chat_written_returns
+  def chat_left_and_takeover_cancel(chat) do
+    update_chat(chat, %{left: true, is_take_over: false})
   end
 
   @doc """
