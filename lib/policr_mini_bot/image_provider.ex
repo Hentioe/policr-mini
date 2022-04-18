@@ -261,20 +261,18 @@ defmodule PolicrMiniBot.ImageProvider do
 
     files = File.ls!(album_path)
 
-    format_included_fun = fn path ->
+    format_included = fn path ->
       format = path |> Path.extname() |> String.slice(1..-1)
 
       Enum.member?(include_formats, format)
     end
 
     files
-    # 将文件名转换为路径。
+    # 将文件名转换为路径
     |> Enum.map(fn f -> Path.join(album_path, f) end)
-    # 过滤掉子目录。
-    |> Enum.filter(fn path -> !File.dir?(path) end)
-    # 过滤掉不包含的格式。
-    |> Enum.filter(format_included_fun)
-    # 构造成图片结构体。
+    # 仅允许指定扩展名的文件（过滤掉子目录和不包含的格式）
+    |> Enum.filter(fn path -> !File.dir?(path) && format_included.(path) end)
+    # 构造成图片结构体
     |> Enum.map(fn path -> %Image{path: path} end)
   end
 end

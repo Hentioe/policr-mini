@@ -495,10 +495,9 @@ defmodule PolicrMiniBot.Helper do
     name
     |> String.graphemes()
     |> Enum.with_index()
-    |> Enum.map(fn {char, index} ->
+    |> Enum.map_join(fn {char, index} ->
       if index == 1, do: "░", else: char
     end)
-    |> Enum.join("")
   end
 
   defp mosaic_name_by_len(name, len) when is_integer(len) and len >= 3 and len <= 5 do
@@ -507,10 +506,9 @@ defmodule PolicrMiniBot.Helper do
     name
     |> String.graphemes()
     |> Enum.with_index()
-    |> Enum.map(fn {char, index} ->
+    |> Enum.map_join(fn {char, index} ->
       if index == 0 || index == last_index, do: char, else: "░"
     end)
-    |> Enum.join("")
   end
 
   defp mosaic_name_by_len(name, _len), do: "#{String.at(name, 0)}███#{String.at(name, -1)}"
