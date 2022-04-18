@@ -11,6 +11,9 @@ defmodule PolicrMiniBot.CallVerificationPlug do
   alias PolicrMini.{VerificationBusiness, StatisticBusiness, OperationBusiness}
   alias PolicrMiniBot.{HandleUserJoinedCleanupPlug, Disposable, Worker}
 
+  # 踢出用户后允许重新加入的秒数（必须大于 30）
+  @allow_join_again_seconds 60
+
   @doc """
   回调处理函数。
 
@@ -290,15 +293,6 @@ defmodule PolicrMiniBot.CallVerificationPlug do
   end
 
   @doc """
-  获取允许重新加入时长。
-  当前的实现会根据运行模式返回不同的值。
-  """
-  @spec allow_join_again_seconds :: integer()
-  def allow_join_again_seconds do
-    if PolicrMini.mix_env() == :dev, do: 15, else: 60 * 2
-  end
-
-  @doc """
   击杀用户。
 
   此函数会根据击杀方法做出指定动作，并结合击杀原因发送通知消息。若 `method` 参数的值为 `nil`，则默认表示击杀方法为 `:kick`。
@@ -309,20 +303,13 @@ defmodule PolicrMiniBot.CallVerificationPlug do
 
     case method do
       :kick ->
-        Telegex.kick_chat_member(chat_id, user.id)
-        # 解除限制以允许再次加入。
-        async(fn -> Telegex.unban_chat_member(chat_id, user.id) end,
-          seconds: allow_join_again_seconds()
-        )
+        kick_chat_member(chat_id, user.id)
 
       :ban ->
-        Telegex.kick_chat_member(chat_id, user.id)
+        Telegex.ban_chat_member(chat_id, user.id)
     end
 
-    time_text =
-      if allow_join_again_seconds() < 60,
-        do: "#{allow_join_again_seconds()} #{t("units.sec")}",
-        else: "#{to_string(trunc(allow_join_again_seconds() / 60))} #{t("units.min")}"
+    time_text = @allow_join_again_seconds
 
     text =
       case reason do
@@ -356,5 +343,29 @@ defmodule PolicrMiniBot.CallVerificationPlug do
 
         e
     end
+  end
+
+  defp kick_chat_member(chat_id, user_id) do
+    case PolicrMiniBot.config(:unban_method) do
+      :api_call ->
+        Telegex.ban_chat_member(chat_id, user_id)
+
+        # 调用 API 解除限制以允许再次加入。
+        async(fn -> Telegex.unban_chat_member(chat_id, user_id) end,
+          seconds: @allow_join_again_seconds
+        )
+
+      :until_date ->
+        Telegex.ban_chat_member(chat_id, user_id, until_date: until_date())
+    end
+  end
+
+  @spec until_date :: integer
+  defp until_date do
+    dt_now = DateTime.utc_now()
+    unix_now = DateTime.to_unix(dt_now)
+
+    # 当前时间加允许重现加入的秒数，确保能正常解除封禁。
+    unix_now + @allow_join_again_seconds
   end
 end

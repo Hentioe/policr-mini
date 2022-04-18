@@ -46,7 +46,8 @@ defmodule PolicrMiniWeb.Admin.API.VerificationController do
     %{chat: %{id: chat_id}, target_user_id: target_user_id} = verification
     is_ban = Keyword.get(options, :is_ban)
 
-    with {:ok, true} <- Telegex.kick_chat_member(chat_id, target_user_id),
+    with {:ok, true} <- Telegex.ban_chat_member(chat_id, target_user_id),
+         # 此处通过后台页面操作，立即解封
          {:ok, true} <-
            if(is_ban, do: {:ok, true}, else: Telegex.unban_chat_member(chat_id, target_user_id)) do
       {:ok, true}

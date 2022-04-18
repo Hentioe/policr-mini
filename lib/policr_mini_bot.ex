@@ -77,4 +77,11 @@ defmodule PolicrMiniBot do
 
   @official_bots ["policr_mini_bot", "policr_mini_test_bot"]
   def official_bots, do: @official_bots
+
+  @type config_key :: :auto_gen_commands | :owner_id | :name | :unban_method
+
+  @spec config(config_key, any) :: any
+  def config(key, default \\ nil) do
+    Application.get_env(:policr_mini, __MODULE__, key) || default
+  end
 end
