@@ -60,7 +60,7 @@ export default () => {
   const chatsState = useSelector((state) => state.chats);
 
   const handleSelect = (chat) => {
-    navigate.push(`/admin/chats/${chat.id}/${defaultMenu}`);
+    navigate(`/admin/chats/${chat.id}/${defaultMenu}`);
     dispatch(loadSelected(chat));
   };
 
@@ -74,7 +74,7 @@ export default () => {
       if (isSysLink({ path: location.pathname })) {
         dispatch(selectChat(data.chats[0].id));
         dispatch(loadSelected(data.chats[0]));
-      } else navigate.push(`/admin/chats/${data.chats[0].id}/${defaultMenu}`);
+      } else navigate(`/admin/chats/${data.chats[0].id}/${defaultMenu}`);
     }
   }, [chatsState]);
 

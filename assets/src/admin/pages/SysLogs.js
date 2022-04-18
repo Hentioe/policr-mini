@@ -89,7 +89,7 @@ export default () => {
   const handleLevelChange = (option) => {
     setLevelOption(option);
     const queryString = makeQueryString(option.value, timeRange);
-    navigate.push(`/admin/sys/logs${queryString}`);
+    navigate(`/admin/sys/logs${queryString}`);
   };
 
   useEffect(() => {

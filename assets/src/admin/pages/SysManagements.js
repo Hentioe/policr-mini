@@ -111,7 +111,7 @@ export default () => {
       if (keyCode != 13 || searchText.trim() == "") return;
       const queryString = makeAPIQueryString({ keywords: searchText });
 
-      navigate.push(`/admin/sys/managements${queryString}`);
+      navigate(`/admin/sys/managements${queryString}`);
     },
     [searchText, offset]
   );
@@ -121,7 +121,7 @@ export default () => {
     if (!isSearching) return;
     const queryString = makeAPIQueryString({ offset: 0 });
 
-    navigate.push(`/admin/sys/managements${queryString}`);
+    navigate(`/admin/sys/managements${queryString}`);
   }, [offset, isSearching]);
 
   const handleLeaveChat = async (id) => {
