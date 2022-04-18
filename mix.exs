@@ -42,7 +42,7 @@ defmodule PolicrMini.MixProject do
     [
       {:dialyxir, "~> 1.1", only: [:dev], runtime: false},
       {:credo, "~> 1.6", only: [:dev, :test], runtime: false},
-      {:telegex, "~> 0.1"},
+      {:telegex, git: "https://github.com/Hentioe/telegex.git", branch: "api_5.4-dev"},
       {:telegex_marked, "~> 0.0.8"},
       {:telegex_plug, "~> 0.3"},
       {:phoenix, "~> 1.5"},
