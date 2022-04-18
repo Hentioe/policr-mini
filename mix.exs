@@ -62,7 +62,7 @@ defmodule PolicrMini.MixProject do
       {:task_after, "~> 1.2"},
       {:exi18n, github: "Hentioe/exi18n"},
       {:typed_struct, "~> 0.2"},
-      {:quantum, "~> 3.3"},
+      {:quantum, "~> 3.4"},
       {:cachex, "~> 3.4"},
       {:httpoison, "~> 1.8"},
       {:proper_case, "~> 1.3"},
