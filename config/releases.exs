@@ -12,7 +12,6 @@ database_url =
     """
 
 config :policr_mini, PolicrMini.Repo,
-  # ssl: true,
   url: database_url,
   pool_size: String.to_integer(System.get_env("POLICR_MINI_DATABASE_POOL_SIZE") || "10"),
   migration_timestamps: [type: :utc_datetime]
@@ -32,10 +31,37 @@ config :policr_mini, PolicrMiniWeb.Endpoint,
   secret_key_base: secret_key_base,
   server: true
 
-# 配置是否自动生成命令。
+unban_method =
+  case System.get_env("POLICR_MINI_UNBAN_METHOD") do
+    "until_date" ->
+      :until_date
+
+    "api_call" ->
+      :api_call
+
+    other ->
+      raise """
+      Unknown value of variable POLICR_MINI_UNBAN_METHOD: #{other}
+      """
+  end
+
+# 配置机器人。
 config :policr_mini, PolicrMiniBot,
+  # 是否自动生成命令
   auto_gen_commands:
-    String.to_existing_atom(System.get_env("POLICR_MINI_BOT_AUTO_GEN_COMMANDS") || "false")
+    String.to_existing_atom(System.get_env("POLICR_MINI_BOT_AUTO_GEN_COMMANDS") || "false"),
+  # 拥有者 ID
+  owner_id:
+    String.to_integer(
+      System.get_env("POLICR_MINI_BOT_OWNER_ID") ||
+        raise("""
+        environment variable POLICR_MINI_BOT_OWNER_ID is missing.
+        """)
+    ),
+  # 机器人名称（用于显示）
+  name: System.get_env("POLICR_MINI_BOT_NAME"),
+  # 解封方法
+  unban_method: unban_method
 
 # 配置根链接。
 config :policr_mini, PolicrMiniWeb,
@@ -45,17 +71,6 @@ config :policr_mini, PolicrMiniWeb,
       environment variable POLICR_MINI_SERVER_ROOT_URL is missing.
       """)
 
-# Configures the owner id of the bot
-config :policr_mini, PolicrMiniBot,
-  owner_id:
-    String.to_integer(
-      System.get_env("POLICR_MINI_BOT_OWNER_ID") ||
-        raise("""
-        environment variable POLICR_MINI_BOT_OWNER_ID is missing.
-        """)
-    ),
-  name: System.get_env("POLICR_MINI_BOT_NAME")
-
 # Configures the image provider
 config :policr_mini, PolicrMiniBot.ImageProvider,
   root:
@@ -64,10 +79,11 @@ config :policr_mini, PolicrMiniBot.ImageProvider,
       environment variable POLICR_MINI_BOT_ASSETS_PATH is missing.
       """)
 
-# Configure marked
+# 配置 Markdown。
 config :policr_mini,
   marked_enabled: (System.get_env("POLICR_MINI_BOT_ISSUE_33") || "false") == "true"
 
+# 配置机器人 token。
 config :telegex,
   token:
     System.get_env("POLICR_MINI_BOT_TOKEN") ||
