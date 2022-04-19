@@ -36,7 +36,8 @@ defmodule PolicrMiniBot.Supervisor do
   @impl true
   def init(_init_arg) do
     # 初始化消息清理任务
-    PolicrMiniBot.Worker.init_message_cleaner_queue()
+    PolicrMiniBot.Worker.MessageCleaner.init_queue()
+    PolicrMiniBot.Worker.ValidationTerminator.init_queue()
 
     install_plugs([
       InitTakeoveredPlug,
