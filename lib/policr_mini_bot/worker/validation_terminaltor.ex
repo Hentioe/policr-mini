@@ -1,5 +1,7 @@
 defmodule PolicrMiniBot.Worker.ValidationTerminator do
-  @moduledoc false
+  @moduledoc """
+  负责终止验证（处理超时）的 Worker。
+  """
 
   use PolicrMiniBot.Worker
 
@@ -14,6 +16,11 @@ defmodule PolicrMiniBot.Worker.ValidationTerminator do
     :ok = Honeydew.start_workers(@queue_name, __MODULE__, num: @max_concurrency)
   end
 
+  @impl true
+  def job_key(:terminate, [chat_id, user_id, _]) do
+    "terminate-#{chat_id}-#{user_id}"
+  end
+
   @spec terminate(integer, integer, integer) :: :ok
   def terminate(chat_id, user_id, waiting_secs) do
     Logger.debug(
@@ -22,13 +29,31 @@ defmodule PolicrMiniBot.Worker.ValidationTerminator do
 
     Logger.debug("Timeout processing has ended")
 
+    # 从缓存中删除任务
+    JobCacher.delete_job(job_key(:terminate, [chat_id, user_id, waiting_secs]))
+
     :ok
   end
 
   @spec async_terminate(integer, integer, integer) :: Honeydew.Job.t()
   def async_terminate(chat_id, user_id, waiting_secs) do
+    job_key = job_key(:terminate, [chat_id, user_id, waiting_secs])
+
+    if job = JobCacher.get_job(job_key) do
+      # 已存在，取消任务
+      Logger.debug(
+        "Termination verification task already exists, cancel execution, details: #{inspect(chat_id: chat_id, user_id: user_id)}"
+      )
+
+      Honeydew.cancel(job)
+    end
+
     fun = {:terminate, [chat_id, user_id, waiting_secs]}
 
-    Honeydew.async(fun, @queue_name, delay_secs: waiting_secs)
+    job = Honeydew.async(fun, @queue_name, delay_secs: waiting_secs)
+
+    JobCacher.add_job(job_key, job)
+
+    job
   end
 end

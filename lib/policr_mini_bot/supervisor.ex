@@ -70,7 +70,9 @@ defmodule PolicrMiniBot.Supervisor do
 
     # !注意! 因为以上的验证排除条件，此模块需要保证在填充以上条件的模块的处理流程的后面。
     children = [
-      # 图片提供服务。
+      # 任务缓存
+      PolicrMiniBot.Worker.JobCacher,
+      # 图片提供服务
       PolicrMiniBot.ImageProvider,
       # 消息清理服务
       PolicrMiniBot.Cleaner,

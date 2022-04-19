@@ -1,5 +1,9 @@
 defmodule PolicrMiniBot.Worker.MessageCleaner do
-  @moduledoc false
+  @moduledoc """
+  负责消息清理的 Worker。
+
+  此模块当前没有加入任务缓存。
+  """
 
   use PolicrMiniBot.Worker
 
@@ -13,6 +17,11 @@ defmodule PolicrMiniBot.Worker.MessageCleaner do
   def init_queue do
     :ok = Honeydew.start_queue(@queue_name, failure_mode: @failure_mode)
     :ok = Honeydew.start_workers(@queue_name, __MODULE__, num: @max_concurrency)
+  end
+
+  @impl true
+  def job_key(:delete, [chat_id, message_id]) do
+    "delete-#{chat_id}-#{message_id}"
   end
 
   def delete(chat_id, message_id) do
