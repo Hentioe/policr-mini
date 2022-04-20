@@ -82,6 +82,6 @@ defmodule PolicrMiniBot do
 
   @spec config(config_key, any) :: any
   def config(key, default \\ nil) do
-    Application.get_env(:policr_mini, __MODULE__, key) || default
+    Application.get_env(:policr_mini, __MODULE__)[key] || default
   end
 end
