@@ -9,7 +9,7 @@ defmodule PolicrMini.ChatBusinessTest do
     user |> struct(attrs) |> Map.from_struct()
   end
 
-  test "find_list_by_user/1" do
+  test "find_user_chats/1" do
     chat_params = build_params()
     {:ok, chat1} = Instances.create_chat(chat_params)
     {:ok, chat2} = Instances.create_chat(chat_params |> Map.put(:id, 1_987_654_321))
@@ -27,12 +27,12 @@ defmodule PolicrMini.ChatBusinessTest do
         Factory.build(:permission, user_id: user.id)
       ])
 
-    chats = ChatBusiness.find_list_by_user(user.id)
+    chats = Instances.find_user_chats(user.id)
     assert length(chats) == 2
 
     {_, _} = PermissionBusiness.delete(chat1.id, user.id)
 
-    chats = ChatBusiness.find_list_by_user(user.id)
+    chats = Instances.find_user_chats(user.id)
     assert length(chats) == 1
     assert hd(chats) == chat2
   end

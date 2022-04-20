@@ -19,6 +19,7 @@ defmodule PolicrMini.Instances.ChatTest do
                  :description,
                  :invite_link,
                  :is_take_over,
+                 :left,
                  :tg_can_add_web_page_previews,
                  :tg_can_change_info,
                  :tg_can_invite_users,
