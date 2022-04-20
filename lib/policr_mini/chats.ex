@@ -85,14 +85,14 @@ defmodule PolicrMini.Chats do
           Repo.rollback(e)
 
         scheme ->
-          # 方案已存在。
-          migrate_default_in_trans(scheme)
+          # 方案已存在
+          migrate_scheme(scheme)
       end
     end)
   end
 
-  @spec migrate_default_in_trans(Scheme.t()) :: Scheme.t() | no_return
-  defp migrate_default_in_trans(scheme) do
+  @spec migrate_scheme(Scheme.t()) :: Scheme.t() | no_return
+  defp migrate_scheme(scheme) do
     attrs = %{}
 
     # 此处填充后续在方案中添加的新字段，避免方案已存在时这些字段出现 `nil` 值。
