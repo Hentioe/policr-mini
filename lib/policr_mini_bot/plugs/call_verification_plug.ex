@@ -66,6 +66,9 @@ defmodule PolicrMiniBot.CallVerificationPlug do
     handle_answer = fn verification, scheme ->
       wrong_killing_method = scheme.wrong_killing_method || default!(:wkmethod)
 
+      # 取消超时任务
+      Worker.cancel_terminate_validation_job(verification.chat_id, verification.target_user_id)
+
       if Enum.member?(verification.indices, chosen) do
         # 处理回答正确
         handle_correct(verification, message_id, from)
@@ -309,7 +312,7 @@ defmodule PolicrMiniBot.CallVerificationPlug do
         Telegex.ban_chat_member(chat_id, user.id)
     end
 
-    time_text = @allow_join_again_seconds
+    time_text = "#{@allow_join_again_seconds} #{t("units.sec")}"
 
     text =
       case reason do
