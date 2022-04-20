@@ -10,8 +10,8 @@ defmodule PolicrMiniBot.HandleUserJoinedCleanupPlug do
   alias PolicrMini.{Logger, Chats}
   alias PolicrMini.Chats.Scheme
   alias PolicrMini.Schema.Verification
-  alias PolicrMini.{VerificationBusiness, StatisticBusiness, OperationBusiness}
-  alias PolicrMiniBot.{CallVerificationPlug, Worker}
+  alias PolicrMini.VerificationBusiness
+  alias PolicrMiniBot.Worker
 
   # 过期时间：15 分钟
   @expired_seconds 60 * 15
@@ -139,13 +139,8 @@ defmodule PolicrMiniBot.HandleUserJoinedCleanupPlug do
       # 计数器自增（验证总数）
       PolicrMini.Counter.increment(:verification_total)
 
-      # 启动定时任务，读取验证记录并根据结果实施操作
-      start_timed_task(
-        verification,
-        scheme,
-        seconds,
-        reminder_message.message_id
-      )
+      # 异步延迟处理超时
+      Worker.async_terminate_validation(verification, scheme, seconds)
 
       {:ok, %{state | done: true, deleted: true}}
     else
@@ -227,93 +222,5 @@ defmodule PolicrMiniBot.HandleUserJoinedCleanupPlug do
     }
 
     {text, markup}
-  end
-
-  @spec start_timed_task(Verification.t(), Scheme.t(), integer, integer) :: :ok
-  @doc """
-  启动定时任务处理验证超时。
-  """
-  def start_timed_task(verification, scheme, seconds, reminder_msg_id)
-      when is_integer(seconds) and is_integer(reminder_msg_id) do
-    %{chat_id: chat_id, target_user_id: target_user_id, target_user_name: target_user_name} =
-      verification
-
-    target_user = %{id: target_user_id, fullname: target_user_name}
-
-    handle_verification_fun = fn latest_verification ->
-      # 为等待状态则实施操作
-      if latest_verification.status == :waiting do
-        # 自增统计数据（超时）。
-        async do
-          StatisticBusiness.increment_one(
-            verification.chat_id,
-            verification.target_user_language_code,
-            :timeout
-          )
-        end
-
-        timeout_killing_method = scheme.timeout_killing_method || default!(:tkmethod)
-
-        # 添加操作记录（系统）
-        create_operation(latest_verification, timeout_killing_method)
-
-        # 计数器自增（超时总数）
-        PolicrMini.Counter.increment(:verification_timeout_total)
-        # 更新状态为超时
-        latest_verification |> VerificationBusiness.update(%{status: :timeout})
-        # 击杀用户（原因为超时）。
-        CallVerificationPlug.kill(chat_id, target_user, :timeout, timeout_killing_method)
-      end
-    end
-
-    timed_task = fn ->
-      # 读取验证记录，并根据状态实时操作
-      case VerificationBusiness.get(verification.id) do
-        {:ok, latest_verification} ->
-          handle_verification_fun.(latest_verification)
-
-        e ->
-          Logger.unitized_error("After the scheduled task is executed, the verification finding",
-            verification_id: verification.id,
-            returns: e
-          )
-      end
-
-      # 如果还存在多条验证，更新入口消息
-      waiting_count = VerificationBusiness.get_unity_waiting_count(chat_id)
-
-      if waiting_count == 0 do
-        # 已经没有剩余验证，直接删除上一个入口消息
-        Cleaner.delete_latest_verification_message(chat_id)
-      else
-        # 如果还存在多条验证，更新入口消息
-        CallVerificationPlug.update_unity_message(
-          chat_id,
-          waiting_count,
-          scheme,
-          seconds
-        )
-      end
-    end
-
-    async(timed_task, seconds: seconds)
-  end
-
-  defp create_operation(verification, killing_method) do
-    operation_action = if killing_method == :ban, do: :ban, else: :kick
-    # 添加操作记录（系统）。
-    case OperationBusiness.create(%{
-           verification_id: verification.id,
-           action: operation_action,
-           role: :system
-         }) do
-      {:ok, _} = r ->
-        r
-
-      e ->
-        Logger.unitized_error("Operation creation", e)
-
-        e
-    end
   end
 end

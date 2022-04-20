@@ -49,7 +49,7 @@ defmodule PolicrMiniBot.Worker do
   end
 
   @callback init_queue :: :ok
-  @callback job_key(task :: atom, args :: [any]) :: any
+  @callback job_key(task :: atom, args :: any) :: any
 
   @doc """
   异步删除消息。
@@ -71,13 +71,12 @@ defmodule PolicrMiniBot.Worker do
   ## 提前结束任务
     当用户主动选择了验证答案后，任务应取消执行，因为超时情况已不存在。通过此函数的 `Honeydew.Job.t` 返回值，调用 `Honeydew.cancel/1` 即可取消。
   """
-  defdelegate async_terminate_validation(chat_id, user_id, waiting_secs),
+  defdelegate async_terminate_validation(veri, scheme, waiting_secs),
     to: __MODULE__.ValidationTerminator,
     as: :async_terminate
 
   def cancel_terminate_validation_job(chat_id, user_id) do
-    # 此处的第三次参数不重要，不参与 key 的生成。
-    key = __MODULE__.ValidationTerminator.job_key(:terminate, [chat_id, user_id, 0])
+    key = __MODULE__.ValidationTerminator.job_key(:terminate, [chat_id, user_id])
 
     if job = JobCacher.pop_job(key) do
       case Honeydew.cancel(job) do
