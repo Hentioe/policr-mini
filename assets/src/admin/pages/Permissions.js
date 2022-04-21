@@ -137,7 +137,7 @@ export default () => {
   useEffect(() => {
     // 初始化只读显示状态。
     dispatch(readonlyShown(false));
-  }, [location]);
+  }, []);
 
   useEffect(() => {
     if (data && data.errors) toastErrors(data.errors);

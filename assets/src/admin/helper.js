@@ -2,6 +2,7 @@ import fetch from "unfetch";
 import camelize from "camelcase-keys";
 import { toast } from "react-toastify";
 import "lodash";
+import { useEffect, useRef } from "react";
 
 const getFetcher = (...args) =>
   fetch(...args).then((resp) => camelizeJson(resp));
@@ -131,6 +132,16 @@ function toastErrors(errors) {
   toastMessage(errorsToString(errors), { type: "error" });
 }
 
+function usePrevious(value) {
+  const ref = useRef();
+
+  useEffect(() => {
+    ref.current = value; //assign the value of ref to the argument
+  }, [value]); //this code will run when the value of 'value' changes
+
+  return ref.current; //in the end, return the current ref value.
+}
+
 export {
   getFetcher,
   getIdFromLocation,
@@ -140,4 +151,5 @@ export {
   toastMessage,
   toastErrors,
   errorsToString,
+  usePrevious,
 };

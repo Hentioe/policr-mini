@@ -20,7 +20,7 @@ import {
   FloatingCard,
 } from "../components";
 import { Table, Thead, Tr, Th, Tbody, Td } from "../components/Tables";
-import { toastErrors } from "../helper";
+import { toastErrors, usePrevious } from "../helper";
 
 const TimeLink = styled(RouteLink)`
   ${tw`no-underline text-orange-600 hover:text-orange-400`}
@@ -160,6 +160,8 @@ export default () => {
   const [actionOption, _setActionOption] = useState(findActionOption(action));
   const [hoveredInfo, setHoveredInfo] = useState(undefined);
 
+  const prevLocaltion = usePrevious(location);
+
   const { data, error, mutate } = useSWR(
     chatsState && chatsState.isLoaded && chatsState.selected
       ? makeEndpoint(chatsState.selected, apiQueryString)
@@ -178,8 +180,11 @@ export default () => {
   if (isLoaded()) title += ` / ${data.chat.title}`;
 
   useEffect(() => {
-    // 初始化只读显示状态。
-    dispatch(readonlyShown(false));
+    // 避免二次点击链接后重新初始化
+    if (prevLocaltion == null || prevLocaltion.pathname != location.pathname) {
+      // 初始化只读显示状态
+      dispatch(readonlyShown(false));
+    }
   }, [location]);
 
   useEffect(() => {

@@ -23,7 +23,12 @@ import {
   FloatingCard,
 } from "../components";
 import { Table, Thead, Tr, Th, Tbody, Td } from "../components/Tables";
-import { updateInNewArray, camelizeJson, toastErrors } from "../helper";
+import {
+  updateInNewArray,
+  camelizeJson,
+  toastErrors,
+  usePrevious,
+} from "../helper";
 
 const FormSection = styled.div`
   ${tw`flex flex-wrap items-center py-4`}
@@ -155,6 +160,8 @@ export default () => {
   const [answers, setAnswers] = useState([initialAnswer]);
   const [attachmentError, setAttachmentError] = useState(null);
   const [hoveredInfo, setHoveredInfo] = useState(undefined);
+
+  const prevLocaltion = usePrevious(location);
 
   const handleIsEditing = () => setIsEditing(!isEditing);
   const initEditingContent = () => {
@@ -310,10 +317,13 @@ export default () => {
   const editingCheckResult = checkEditintValid();
 
   useEffect(() => {
-    // 初始化只读显示状态。
-    dispatch(readonlyShown(false));
-    // 初始化编辑内容。
-    initEditingContent();
+    // 避免二次点击链接后重新初始化
+    if (prevLocaltion == null || prevLocaltion.pathname != location.pathname) {
+      // 初始化只读显示状态
+      dispatch(readonlyShown(false));
+      // 初始化编辑内容。
+      initEditingContent();
+    }
   }, [location]);
 
   useEffect(() => {
