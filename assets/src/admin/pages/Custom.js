@@ -117,8 +117,14 @@ const checkAttachmentTextError = (attachmentText) => {
   return null;
 };
 
+function filterEmptyAnswers(answers) {
+  return answers.filter((ans) => ans.text != null && ans.text.trim() != "");
+}
+
 function answersToInlineKeyboard(answers) {
-  const inlineKeyboard = answers.map((ans) => [{ text: ans.text }]);
+  const inlineKeyboard = filterEmptyAnswers(answers).map((ans) => [
+    { text: ans.text },
+  ]);
 
   return inlineKeyboard;
 }
@@ -240,7 +246,7 @@ export default () => {
         chatId: chatsState.selected,
         id: editingId,
         title: editintTitle,
-        answers: answers.map(
+        answers: filterEmptyAnswers(answers).map(
           (ans) => `${ans.row.value ? "+" : "-"}${ans.text.trim()}`
         ),
         attachment: editingAttachment,
