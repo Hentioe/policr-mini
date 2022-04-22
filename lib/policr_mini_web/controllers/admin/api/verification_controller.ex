@@ -5,27 +5,34 @@ defmodule PolicrMiniWeb.Admin.API.VerificationController do
 
   use PolicrMiniWeb, :controller
 
-  alias PolicrMini.{VerificationBusiness, OperationBusiness}
-  alias PolicrMini.Logger
+  alias PolicrMini.{Logger, VerificationBusiness, OperationBusiness}
+  alias PolicrMini.Schema.Verification
+  alias PolicrMiniBot.Worker
 
   import PolicrMiniWeb.Helper
 
   action_fallback(PolicrMiniWeb.API.FallbackController)
 
-  def kick(conn, %{"id" => id, "ban" => ban} = _params) do
-    is_ban = ban == "true"
+  def kill(conn, %{"id" => id, "action" => action} = _params)
+      when action in ["manual_ban", "manual_kick"] do
+    status = String.to_existing_atom(action)
 
-    with {:ok, verification} <- VerificationBusiness.get(id, preload: [:chat]),
-         {:ok, _} <- check_permissions(conn, verification.chat.id, [:writable]),
-         {:ok, ok} <- kick_by_verification(verification, is_ban: is_ban) do
-      action = if is_ban, do: :ban, else: :kick
+    with {:ok, veri} <- VerificationBusiness.get(id, preload: [:chat]),
+         {:ok, _} <- check_permissions(conn, veri.chat.id, [:writable]),
+         {:ok, ok} <- kill_memeber(veri, is_ban: status == :manual_ban) do
+      action = if status == :manual_ban, do: :ban, else: :kick
 
-      # 添加操作记录（管理员）。
-      case OperationBusiness.create(%{
-             verification_id: verification.id,
-             action: action,
-             role: :admin
-           }) do
+      # 手动终止验证
+      :ok = Worker.manual_terminate_validation(veri, status)
+
+      # 添加操作记录（管理员）
+      params = %{
+        verification_id: veri.id,
+        action: action,
+        role: :admin
+      }
+
+      case OperationBusiness.create(params) do
         {:ok, _} = r ->
           r
 
@@ -34,17 +41,17 @@ defmodule PolicrMiniWeb.Admin.API.VerificationController do
           e
       end
 
-      render(conn, "kick.json", %{ok: ok, verification: verification})
+      render(conn, "kick.json", %{ok: ok, verification: veri})
     end
   end
 
-  @type kick_by_verification_opts :: [{:is_ban, boolean}]
+  @type kill_memeber_opts :: [{:is_ban, boolean}]
 
-  @spec kick_by_verification(PolicrMini.Schema.Verification.t(), kick_by_verification_opts) ::
-          {:ok, boolean} | {:error, map}
-  defp kick_by_verification(verification, options) do
+  # 通过验证记录击杀成员
+  @spec kill_memeber(Verification.t(), kill_memeber_opts) :: {:ok, boolean} | {:error, map}
+  defp kill_memeber(verification, opts) do
     %{chat: %{id: chat_id}, target_user_id: target_user_id} = verification
-    is_ban = Keyword.get(options, :is_ban)
+    is_ban = Keyword.get(opts, :is_ban)
 
     with {:ok, true} <- Telegex.ban_chat_member(chat_id, target_user_id),
          # 此处通过后台页面操作，立即解封

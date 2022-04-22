@@ -106,6 +106,14 @@ function statusUI(status) {
       color = "darkkhaki";
       text = "过期";
       break;
+    case "manual_ban":
+      color = "#26DBD9";
+      text = "手动封禁";
+      break;
+    case "manual_kick":
+      color = "#269DDB";
+      text = "手动踢出";
+      break;
 
     default:
       text = "未知";
@@ -121,9 +129,8 @@ const STATUS_BG_COLOR_MAPPING = {
   wronged: "#FFF1F1",
 };
 
-async function kickByVerification(id, { ban }) {
-  ban = ban === true;
-  const endpoint = `/admin/api/verifications/${id}/kick?ban=${ban}`;
+async function killByVerification(id, action) {
+  const endpoint = `/admin/api/verifications/${id}/kill?action=${action}`;
 
   return fetch(endpoint, { method: "PUT" }).then((r) => camelizeJson(r));
 }
@@ -159,7 +166,7 @@ export default () => {
   );
 
   const handleKickClick = async (id) => {
-    const result = await kickByVerification(id, { ban: false });
+    const result = await killByVerification(id, "manual_kick");
 
     if (result.errors) {
       toastErrors(result.errors);
@@ -167,13 +174,13 @@ export default () => {
       toastMessage(`踢出「${result.verification.targetUserName}」成功。`);
     } else {
       toastErrors(
-        `不太确定踢出「${result.verification.targetUserName}」是否成功。`
+        `无法确定踢出「${result.verification.targetUserName}」是否成功。`
       );
     }
   };
 
   const handleBanClick = async (id) => {
-    const result = await kickByVerification(id, { ban: true });
+    const result = await killByVerification(id, "manual_ban");
 
     if (result.errors) {
       toastErrors(result.errors);
@@ -181,7 +188,7 @@ export default () => {
       toastMessage(`封禁「${result.verification.targetUserName}」成功。`);
     } else {
       toastErrors(
-        `不太确定封禁「${result.verification.targetUserName}」是否成功。`
+        `无法确定封禁「${result.verification.targetUserName}」是否成功。`
       );
     }
   };
@@ -327,7 +334,7 @@ export default () => {
                       <Th tw="w-2/12">语言代码</Th>
                       <Th tw="w-3/12">加入时间</Th>
                       <Th tw="w-1/12 text-center">用时</Th>
-                      <Th tw="w-2/12">状态</Th>
+                      <Th tw="w-2/12 text-center">状态</Th>
                       <Th tw="w-2/12 text-right">操作</Th>
                     </Tr>
                   </Thead>
@@ -354,7 +361,7 @@ export default () => {
                             parseISO(v.insertedAt)
                           )}
                         </Td>
-                        <Td>{statusUI(v.status)}</Td>
+                        <Td tw="text-center">{statusUI(v.status)}</Td>
                         <Td tw="text-right">
                           <ActionButton
                             onClick={() => handleBanClick(v.id)}

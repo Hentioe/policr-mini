@@ -86,6 +86,13 @@ verification:
         过 %{time_text}后可再次尝试加入。
     ban:
       public: 刚刚 %{mentioned_user} 超时未验证，已被封禁。
+  manual:
+    kick:
+      public: |
+        刚刚 %{mentioned_user} 被手动踢出，针对 TA 个人的验证已取消。
+    ban:
+      public: |
+        刚刚 %{mentioned_user} 被手动封禁，针对 TA 个人的验证已取消。
 
 buttons:
   verification:

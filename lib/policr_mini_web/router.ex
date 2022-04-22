@@ -62,7 +62,7 @@ defmodule PolicrMiniWeb.Router do
 
     get "/statistics/find_recently", StatisticController, :find_recently
 
-    put "/verifications/:id/kick", VerificationController, :kick
+    put "/verifications/:id/kill", VerificationController, :kill
 
     get "/logs", LogController, :index
 

@@ -295,12 +295,15 @@ defmodule PolicrMiniBot.CallVerificationPlug do
     end
   end
 
+  @type killing_reason :: :wronged | :timeout | :kick | :ban | :manual_ban | :manual_kick
+  @type killing_method :: :ban | :kick
+
   @doc """
   击杀用户。
 
   此函数会根据击杀方法做出指定动作，并结合击杀原因发送通知消息。若 `method` 参数的值为 `nil`，则默认表示击杀方法为 `:kick`。
   """
-  @spec kill(integer, map, :wronged | :timeout, :kick | :ban | nil) :: :ok | {:error, map}
+  @spec kill(integer | binary, map, killing_reason, killing_method) :: :ok | {:error, map}
   def kill(chat_id, user, reason, method) do
     method = method || :kick
 
@@ -313,23 +316,9 @@ defmodule PolicrMiniBot.CallVerificationPlug do
     end
 
     time_text = "#{@allow_join_again_seconds} #{t("units.sec")}"
+    mentioned_user = mention(user, anonymization: false, mosaic: true)
 
-    text =
-      case reason do
-        :timeout ->
-          t("verification.timeout.#{method}.public", %{
-            mentioned_user: mention(user, anonymization: false, mosaic: true),
-            time_text: time_text
-          })
-
-        :wronged ->
-          t("verification.wronged.#{method}.public", %{
-            mentioned_user: mention(user, anonymization: false, mosaic: true),
-            time_text: time_text
-          })
-      end
-
-    async(fn -> chat_id |> typing() end)
+    text = build_kick_text(reason, method, mentioned_user, time_text)
 
     case send_message(chat_id, text, parse_mode: "MarkdownV2ToHTML") do
       {:ok, sended_message} ->
@@ -346,6 +335,30 @@ defmodule PolicrMiniBot.CallVerificationPlug do
 
         e
     end
+  end
+
+  # 构造击杀文字（公聊通知）
+  @spec build_kick_text(killing_reason, killing_method, String.t(), String.t()) :: String.t()
+  defp build_kick_text(:timeout, method, mentioned_user, time_text) do
+    t("verification.timeout.#{method}.public", %{
+      mentioned_user: mentioned_user,
+      time_text: time_text
+    })
+  end
+
+  defp build_kick_text(:wronged, method, mentioned_user, time_text) do
+    t("verification.wronged.#{method}.public", %{
+      mentioned_user: mentioned_user,
+      time_text: time_text
+    })
+  end
+
+  defp build_kick_text(:manual_ban, method, mentioned_user, _time_text) do
+    t("verification.manual.#{method}.public", %{mentioned_user: mentioned_user})
+  end
+
+  defp build_kick_text(:manual_kick, method, mentioned_user, _time_text) do
+    t("verification.manual.#{method}.public", %{mentioned_user: mentioned_user})
   end
 
   defp kick_chat_member(chat_id, user_id) do

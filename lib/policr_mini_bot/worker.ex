@@ -69,11 +69,21 @@ defmodule PolicrMiniBot.Worker do
   通过 `waiting_secs` 强制延迟执行，延迟秒数即验证倒计时的时间。
 
   ## 提前结束任务
-    当用户主动选择了验证答案后，任务应取消执行，因为超时情况已不存在。通过此函数的 `Honeydew.Job.t` 返回值，调用 `Honeydew.cancel/1` 即可取消。
+    当用户主动选择了验证答案后，任务应取消执行，因为超时情况已不存在。通过此函数的 `Honeydew.Job.t` 返回值，调用
+    `PolicrMiniBot.Worker.cancel_terminate_validation_job/2` 即可取消。
   """
   defdelegate async_terminate_validation(veri, scheme, waiting_secs),
     to: __MODULE__.ValidationTerminator,
     as: :async_terminate
+
+  @doc """
+  手动终止验证。
+
+  手动终止验证会取消超时处理任务，并更新验证入口消息。若验证的状态不是 `waiting` 则忽略处理。
+  """
+  defdelegate manual_terminate_validation(veri, status),
+    to: __MODULE__.ValidationTerminator,
+    as: :manual_terminate
 
   def cancel_terminate_validation_job(chat_id, user_id) do
     key = __MODULE__.ValidationTerminator.job_key(:terminate, [chat_id, user_id])
