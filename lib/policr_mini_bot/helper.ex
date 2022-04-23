@@ -7,8 +7,6 @@ defmodule PolicrMiniBot.Helper do
 
   alias PolicrMini.Logger
 
-  alias PolicrMini.Instances.Chat
-
   @type tgerror :: {:error, Telegex.Model.errors()}
   @type tgmsg :: Telegex.Model.Message.t()
 
@@ -354,30 +352,18 @@ defmodule PolicrMiniBot.Helper do
   @doc """
   解除聊天成员限制。
 
-  此调用产生的权限修改是动态的，它会将被限制用户的权限恢复为群组记录中的原始权限配置。
+  此调用会解除成员所有限制。根据 https://github.com/Hentioe/policr-mini/issues/126 中的测试，开放所有权限是安全的。
   """
   def derestrict_chat_member(chat_id, user_id) do
-    {:ok,
-     %{
-       tg_can_send_messages: can_send_messages,
-       tg_can_send_media_messages: can_send_media_messages,
-       tg_can_send_polls: can_send_polls,
-       tg_can_send_other_messages: can_send_other_messages,
-       tg_can_add_web_page_previews: can_add_web_page_previews,
-       tg_can_change_info: can_change_info,
-       tg_can_invite_users: can_invite_users,
-       tg_can_pin_messages: can_pin_messages
-     }} = Chat.get(chat_id)
-
     Telegex.restrict_chat_member(chat_id, user_id, %Telegex.Model.ChatPermissions{
-      can_send_messages: can_send_messages,
-      can_send_media_messages: can_send_media_messages,
-      can_send_polls: can_send_polls,
-      can_send_other_messages: can_send_other_messages,
-      can_add_web_page_previews: can_add_web_page_previews,
-      can_change_info: can_change_info,
-      can_invite_users: can_invite_users,
-      can_pin_messages: can_pin_messages
+      can_send_messages: true,
+      can_send_media_messages: true,
+      can_send_polls: true,
+      can_send_other_messages: true,
+      can_add_web_page_previews: true,
+      can_change_info: true,
+      can_invite_users: true,
+      can_pin_messages: true
     })
   end
 

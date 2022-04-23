@@ -101,6 +101,19 @@ defmodule PolicrMiniWeb.Admin.API.ChatView do
   end
 
   def render("chat.json", %{chat: chat}) do
-    chat |> Map.drop([:__meta__, :permissions]) |> Map.from_struct()
+    chat
+    |> Map.drop([
+      :__meta__,
+      :permissions,
+      :tg_can_add_web_page_previews,
+      :tg_can_change_info,
+      :tg_can_invite_users,
+      :tg_can_pin_messages,
+      :tg_can_send_media_messages,
+      :tg_can_send_messages,
+      :tg_can_send_other_messages,
+      :tg_can_send_polls
+    ])
+    |> Map.from_struct()
   end
 end
