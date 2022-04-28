@@ -406,6 +406,11 @@ export default () => {
           selected={isSysLink({ path: location.pathname, page: "profile" })}
         />
         <NavItem
+          title="系统任务"
+          href="/admin/sys/tasks"
+          selected={isSysLink({ path: location.pathname, page: "tasks" })}
+        />
+        <NavItem
           title="服务条款"
           href="/admin/sys/terms"
           selected={isSysLink({ path: location.pathname, page: "terms" })}
@@ -430,11 +435,6 @@ export default () => {
             })}
           />
         ) : undefined}
-        {/* <NavItem
-          title="定时任务"
-          href="/admin/sys/tasks"
-          selected={isSysLink({ path: location.pathname, page: "tasks" })}
-        /> */}
         {/* <NavItem
           title="模拟终端"
           href="/admin/sys/terminal"
