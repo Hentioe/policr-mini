@@ -1,7 +1,7 @@
 import "../styles/user.scss";
 
 import React, { useEffect } from "react";
-import ReactDOM from "react-dom";
+import { createRoot } from "react-dom/client";
 import { HelmetProvider } from "react-helmet-async";
 import { Provider } from "react-redux";
 import { configureStore } from "@reduxjs/toolkit";
@@ -9,7 +9,7 @@ import thunkMiddleware from "redux-thunk";
 import reduxLogger from "redux-logger";
 import { useSelector } from "react-redux";
 import "twin.macro";
-import { BrowserRouter as Router, Switch, Route } from "react-router-dom";
+import { BrowserRouter as Router, Routes, Route } from "react-router-dom";
 
 import { IndexPage, TermsPage, LoginPage } from "./user/pages";
 import { Header, Footer, ModalContainer } from "./user/components";
@@ -65,19 +65,11 @@ const Root = () => {
       <div tw="min-h-screen flex flex-col">
         <Router>
           <Header />
-
-          <Switch>
-            <Route path="/terms">
-              <TermsPage />
-            </Route>
-            <Route path="/login">
-              <LoginPage />
-            </Route>
-            <Route>
-              <IndexPage path="/" />
-            </Route>
-          </Switch>
-
+          <Routes>
+            <Route path="/terms" element={<TermsPage />} />
+            <Route path="/login" element={<LoginPage />} />
+            <Route path="/" element={<IndexPage />} />
+          </Routes>
           <Footer />
         </Router>
       </div>
@@ -89,5 +81,5 @@ let renderDelay = 600;
 if (DEBUG) renderDelay = 0;
 
 setTimeout(() => {
-  ReactDOM.render(<App />, document.getElementById("app"));
+  createRoot(document.getElementById("app")).render(<App />);
 }, renderDelay);
