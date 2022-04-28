@@ -29,7 +29,7 @@ const Job = styled.div`
 `;
 
 const JobName = styled.span`
-  ${tw`text-gray-600 font-bold text-sm tracking-wide`}
+  ${tw`text-gray-700 font-bold text-sm tracking-wide`}
 `;
 
 const JobDetail = styled.div`
@@ -37,11 +37,11 @@ const JobDetail = styled.div`
 `;
 
 const JobDetailName = styled.span`
-  ${tw`text-gray-600 inline-block w-40 mr-10 text-sm`}
+  ${tw`text-gray-700 inline-block w-40 mr-10 text-sm`}
 `;
 
 const JobDetailValue = styled.span`
-  ${tw`text-gray-500 text-sm`}
+  ${tw`text-gray-600 text-sm`}
 `;
 
 const makeEndpoint = () => `/admin/api/tasks`;
@@ -96,8 +96,8 @@ export default () => {
                 ))}
 
                 <div tw="pt-6">
-                  <span tw="text-gray-500 text-sm tracking-wider">
-                    定时任务通常是用于修复系统中存在的错误状态/数据的一系列特殊任务，它们由系统自身创建和调度
+                  <span tw="text-gray-600 text-xs tracking-wider">
+                    定时任务通常是用于修正系统中存在的错误状态或数据的一系列特殊任务，它们由系统自身创建和调度。
                   </span>
                 </div>
               </div>
