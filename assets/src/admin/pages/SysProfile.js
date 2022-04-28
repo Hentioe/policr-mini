@@ -154,7 +154,6 @@ export default () => {
     );
   }, [data]);
 
-  const [fileInputNode, setFileInputNode] = useState(null);
   const [selectedFile, setSelectedFile] = useState(null);
 
   const [modeValue, setModeValue] = useState(null);
@@ -173,6 +172,8 @@ export default () => {
     useState(null);
   const [editingJoinedCleared, setEditingJoinedCleared] = useState(false);
   const [editingLeftedCleared, setEditingLeftedCleared] = useState(false);
+
+  const fileInputRef = useRef(null);
 
   const rebind = useCallback(() => {
     setModeValue(getModeValueFromData());
@@ -333,25 +334,11 @@ export default () => {
     mutate();
   };
 
-  const fileInputRef = useCallback((node) => {
-    if (node) {
-      setFileInputNode(node);
-
-      node.addEventListener("change", fileInputChange, false);
-
-      return () => node.removeEventListener("change", fileInputChange);
-    }
-  }, []);
-
   const fileInputChange = (e) => {
     setSelectedFile(e.target.files[0]);
   };
 
-  const handleSelectLocalFile = useCallback(() => {
-    if (fileInputNode) {
-      fileInputNode.click();
-    }
-  }, [fileInputNode]);
+  const handleSelectLocalFile = () => fileInputRef.current.click();
 
   const handleUpload = useCallback(async () => {
     const fd = new FormData();
@@ -373,6 +360,17 @@ export default () => {
       mutate();
     }
   }, [selectedFile]);
+
+  useEffect(() => {
+    // 初始化文件输入事件
+    const element = fileInputRef.current;
+
+    if (element) {
+      element.addEventListener("change", fileInputChange, false);
+
+      return () => element.removeEventListener("change", fileInputChange);
+    }
+  }, [data, error]);
 
   const isLoaded = () => !error && data && !data.errors;
 
