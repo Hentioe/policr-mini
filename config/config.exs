@@ -31,13 +31,19 @@ config :policr_mini, PolicrMiniWeb, root_url: "http://0.0.0.0:4000/"
 config :policr_mini, PolicrMiniBot.Scheduler,
   jobs: [
     # 修正过期验证
-    {"*/5 * * * *", {PolicrMiniBot.Runner, :fix_expired_wait_status, []}},
+    expired_check: [
+      schedule: "*/5 * * * *",
+      task: {PolicrMiniBot.Runner.ExpiredChecker, :run, []}
+    ],
     # 工作状态检查
-    {"*/55 * * * *", {PolicrMiniBot.Runner, :check_working_status, []}},
+    working_check: [
+      schedule: "*/55 * * * *",
+      task: {PolicrMiniBot.Runner.WorkingChecker, :run, []}
+    ],
     # 已离开检查
     left_check: [
       schedule: "@daily",
-      task: {PolicrMiniBot.Runner.LeftCheck, :run, []}
+      task: {PolicrMiniBot.Runner.LeftChecker, :run, []}
     ]
   ]
 
