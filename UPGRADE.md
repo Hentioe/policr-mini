@@ -1,4 +1,4 @@
-# POLICR MINI 开发分支更新说明&更新教程
+# POLICR MINI 开发分支升级指南
 
 ## 介绍
 
@@ -6,7 +6,7 @@
 
 而新的代码长期以来都在另一个重要的次分支 [develop](https://github.com/Hentioe/policr-mini/tree/develop) 上继续提交，并且直到本文的发布也没有合并到主分支，也没有上线到官方实例中。大量的更新如果一次上线，因为长久未大规模测试，是非常危险的。所以短期内本文的更新并不会上线到官方实例中，**自行部署的用户可以更新到开发分支帮助测试**，以让更新能早日上线官方实例。
 
-## 更新教程
+## 升级教程
 
 一般来讲，部署 policr-mini 的方式几乎都是通过 Docker 和 docker-compose，因为这是官方教程中的内容。在 Docker 中，镜像是由某个集中式的 registry 服务器负责存储和分发的，当前的 registry 就是官方的 [DockerHub](https://hub.docker.com/)，所以你仍然能直接通过 `docker pull` 命令简单的升级镜像。
 
@@ -66,6 +66,12 @@ docker-compose pull server
 docker-compose up -d
 ```
 
-更新介绍
+查看日志：
 
-_还在编写中……_
+```
+docker logs policr-mini_server_1
+```
+
+确保启动时无异常内容输出，即升级成功。
+
+**注意：升级到 develop 分支以后，不能随意切换到基于 master 分支的镜像。如需降级，请咨询开发者。**
