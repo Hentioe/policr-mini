@@ -9,3 +9,6 @@
 
 ## Tweak GC to run more often
 ##-env ERL_FULLSWEEP_AFTER 10
+
+## 使用 Multi Time Warp 模式，避免 Honeydew 的启动警告。详情：http://erlang.org/doc/apps/erts/time_correction.html#multi-time-warp-mode
++C multi_time_warp
