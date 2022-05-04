@@ -194,4 +194,21 @@ defmodule PolicrMiniWeb.Helper do
       end
     end
   end
+
+  @doc """
+  定义赞助的选项。
+
+  此宏会生成 `@hints_map` 模块属性有用于查找，以及 `@hints_data` 模块属性用于序列化。
+  """
+  defmacro def_sp_opts(opts) do
+    quote do
+      @hints_map unquote(opts)
+                 |> Enum.with_index()
+                 |> Enum.into(%{}, fn {elem, index} -> {"@#{index}", elem} end)
+
+      @hints_data Enum.map(@hints_map, fn {ref, {expected_to, amount}} ->
+                    %{ref: ref, expected_to: expected_to, amount: amount}
+                  end)
+    end
+  end
 end

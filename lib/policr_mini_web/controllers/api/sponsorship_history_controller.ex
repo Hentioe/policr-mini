@@ -8,20 +8,20 @@ defmodule PolicrMiniWeb.API.SponsorshipHistoryController do
   alias PolicrMini.Instances
   alias PolicrMiniBot.SpeedLimiter
 
-  action_fallback(PolicrMiniWeb.API.FallbackController)
+  import PolicrMiniWeb.Helper
 
-  @hints_map %{
-    "@1" => {"给作者买单一份外卖", 25},
-    "@2" => {"为服务器续费一个月", 90},
-    "@5" => {"此星期内作者能为项目付出更多的时间", 150},
-    "@4" => {"项目功能的进一步完善", 199},
-    "@6" => {"让作者协助解决一些小的技术问题", 299},
-    "@7" => {"让作者协助解决一些技术难题", 599},
-    "@9" => {"宣传或展示企业、产品自身", 999}
-  }
-  @hints Enum.map(@hints_map, fn {ref, {expected_to, amount}} ->
-           %{ref: ref, expected_to: expected_to, amount: amount}
-         end)
+  action_fallback PolicrMiniWeb.API.FallbackController
+
+  def_sp_opts([
+    {"给作者买单一份外卖", 35},
+    {"给作者消除一个 Steam 愿望单", 65},
+    {"给服务器续费一个月", 120},
+    {"给域名续费一年", 125},
+    {"项目功能的进一步完善", 220},
+    {"让作者协助解决一些小的技术问题", 299},
+    {"让作者协助解决一些技术难题", 599},
+    {"宣传或展示企业、产品自身", 999}
+  ])
 
   @order_by [desc: :reached_at]
 
@@ -38,7 +38,7 @@ defmodule PolicrMiniWeb.API.SponsorshipHistoryController do
     render(conn, "index.json", %{
       sponsorship_histories: sponsorship_histories,
       sponsorship_addresses: sponsorship_addresses,
-      hints: @hints
+      hints: @hints_data
     })
   end
 

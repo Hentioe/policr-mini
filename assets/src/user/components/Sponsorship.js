@@ -235,9 +235,7 @@ export default ({ hints = [], addresses = [], token = null }) => {
                       onChange={handleEditingSponsorTitleChange}
                     />
                   </FormLine>
-                  <FromHint>
-                    个人可用昵称或 x 先生/女士，企业可用产品或公司名称
-                  </FromHint>
+                  <FromHint>个人可用昵称，企业可用产品或公司名称</FromHint>
                   <FormLine>
                     <FormLabel>联系方式</FormLabel>
                     <FormInput
@@ -246,7 +244,7 @@ export default ({ hints = [], addresses = [], token = null }) => {
                       onChange={handleEditingSponsorContactChange}
                     />
                   </FormLine>
-                  <FromHint>用户名或邮箱，此数据无法被外部获取</FromHint>
+                  <FromHint>TG 用户名或邮箱，此数据无法被外部获取</FromHint>
                   <FormLine>
                     <FormLabel>您的主页</FormLabel>
                     <FormInput
