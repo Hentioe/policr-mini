@@ -30,7 +30,7 @@ defmodule PolicrMiniWeb.TokenAuthentication do
           # 将 token 写入 cookie 并重定向到不带参数的 admin 页面
           # TODO: 此处不应该直接重定向到后台首页，而是当前页面
           conn
-          |> put_resp_cookie("token", token, max_age: @expired_sec)
+          |> put_resp_cookie("token", token, max_age: @expired_sec, path: "/admin")
           |> redirect_to_admin()
 
         :cookies ->
