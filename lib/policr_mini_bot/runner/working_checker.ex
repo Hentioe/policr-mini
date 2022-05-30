@@ -15,33 +15,35 @@ defmodule PolicrMiniBot.Runner.WorkingChecker do
   根据权限自动修正工作状态或退出群组。
   """
   def run do
-    Logger.debug("Start checking work status")
+    Logger.debug("Working status check starts")
 
     takeovred_chats = ChatBusiness.find_takeovered()
 
     _ =
       takeovred_chats
-      |> Stream.each(&check_group/1)
+      |> Stream.each(&check_chat/1)
       |> Enum.to_list()
 
-    Logger.debug("Work status check ended, details: #{inspect(count: length(takeovred_chats))}")
+    Logger.debug(
+      "Working status check ended, details: #{inspect(count: length(takeovred_chats))}"
+    )
 
     :ok
   end
 
   # 普通群，提示并退出。
-  defp check_group(%{id: chat_id, is_take_over: true, type: "group"}) do
+  defp check_chat(%{id: chat_id, is_take_over: true, type: "group"}) do
     BotHelper.send_message(chat_id, BotHelper.t("errors.no_super_group"))
 
     Telegex.leave_chat(chat_id)
   end
 
   # 频道，直接退出。
-  defp check_group(%{id: chat_id, is_take_over: true, type: "channel"}),
+  defp check_chat(%{id: chat_id, is_take_over: true, type: "channel"}),
     do: Telegex.leave_chat(chat_id)
 
   # 检查必要的权限，并在不满足时进行相对应的处理。
-  defp check_group(%{is_take_over: true} = chat) do
+  defp check_chat(%{is_take_over: true} = chat) do
     case Telegex.get_chat_member(chat.id, PolicrMiniBot.id()) do
       {:ok, member} ->
         # 检查权限并执行相应修正。
@@ -67,6 +69,16 @@ defmodule PolicrMiniBot.Runner.WorkingChecker do
 
           Logger.warn(msg)
         end
+
+      {:error, %Telegex.Model.RequestError{reason: :timeout}} ->
+        # 处理超时，自动重试。
+        msg =
+          "Requesting own permission timed out, waiting for retry, details: #{inspect(chat_id: chat.id)}"
+
+        Logger.warn(msg)
+
+        :timer.sleep(15)
+        check_chat(chat)
 
       {:error, error} ->
         # 检查时发生错误，进一步处理错误。
@@ -109,9 +121,10 @@ defmodule PolicrMiniBot.Runner.WorkingChecker do
     PermissionBusiness.delete_all(chat.id)
   end
 
-  # 未知错误
-  defp handle_check_error(error, chat) when is_struct(error, Telegex.Model.Error),
-    do: Logger.unitized_error("Bot permission check", chat_id: chat.id, error: error)
+  # 未知错误。
+  defp handle_check_error(error, chat)
+       when is_struct(error, Telegex.Model.Error) or is_struct(error, Telegex.Model.RequestError),
+       do: Logger.unitized_error("Bot permission check", chat_id: chat.id, error: error)
 
   @type cancel_takeover_opts :: [reason: atom, send_notification: boolean]
 
