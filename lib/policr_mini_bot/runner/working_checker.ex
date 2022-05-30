@@ -1,10 +1,12 @@
 defmodule PolicrMiniBot.Runner.WorkingChecker do
-  @moduledoc false
+  @moduledoc """
+  工作状态检查任务。
 
-  alias PolicrMini.Logger
-  alias PolicrMini.Instances
-  alias PolicrMini.Instances.Chat
-  alias PolicrMini.{ChatBusiness, PermissionBusiness}
+  此模块会定期检查被接管群组中的机器人权限、以及是否已离开等状态。在不满足最低权限要求时给予提示并自动取消接管，或对已离开的群组直接取消接管。
+  当发现普通群（非超级群）将直接取消接管，并删除所有权限记录。当发现频道时将直接取消接管。
+  """
+
+  alias PolicrMini.{Logger, Instances, Instances.Chat, ChatBusiness, PermissionBusiness}
   alias PolicrMiniBot.Helper, as: BotHelper
 
   @spec run :: :ok
@@ -13,83 +15,113 @@ defmodule PolicrMiniBot.Runner.WorkingChecker do
   根据权限自动修正工作状态或退出群组。
   """
   def run do
-    ChatBusiness.find_takeovered() |> Enum.each(&handle_check_result/1)
+    Logger.debug("Start checking work status")
+
+    takeovred_chats = ChatBusiness.find_takeovered()
+
+    _ =
+      takeovred_chats
+      |> Stream.each(&check_group/1)
+      |> Enum.to_list()
+
+    Logger.debug("Work status check ended, details: #{inspect(count: length(takeovred_chats))}")
 
     :ok
   end
 
-  defp handle_check_result(%{id: chat_id, is_take_over: true, type: "group"}) do
+  # 普通群，提示并退出。
+  defp check_group(%{id: chat_id, is_take_over: true, type: "group"}) do
     BotHelper.send_message(chat_id, BotHelper.t("errors.no_super_group"))
 
     Telegex.leave_chat(chat_id)
   end
 
-  defp handle_check_result(%{id: chat_id, is_take_over: true, type: "channel"}),
+  # 频道，直接退出。
+  defp check_group(%{id: chat_id, is_take_over: true, type: "channel"}),
     do: Telegex.leave_chat(chat_id)
 
-  defp handle_check_result(%{is_take_over: true} = chat) do
+  # 检查必要的权限，并在不满足时进行相对应的处理。
+  defp check_group(%{is_take_over: true} = chat) do
     case Telegex.get_chat_member(chat.id, PolicrMiniBot.id()) do
       {:ok, member} ->
         # 检查权限并执行相应修正。
 
         # 如果不是管理员，取消接管
-        unless member.status == "administrator", do: cancel_takeover(chat)
+        unless member.status == "administrator",
+          do: cancel_takeover(chat, reason: :no_admin)
+
         # 如果没有限制用户权限，取消接管
-        if member.can_restrict_members == false, do: cancel_takeover(chat)
+        if member.can_restrict_members == false,
+          do: cancel_takeover(chat, reason: :missing_permissions)
+
         # 如果没有删除消息权限，取消接管
-        if member.can_delete_messages == false, do: cancel_takeover(chat)
+        if member.can_delete_messages == false,
+          do: cancel_takeover(chat, reason: :missing_permissions)
+
         # 如果没有发消息权限，直接退出
         if member.can_send_messages == false do
           Telegex.leave_chat(chat.id)
-          Logger.info("Unable to send message in group `#{chat.id}`, has left automatically.")
+
+          msg =
+            "Missing permission to send messages, has left automatically, details: #{inspect(chat_id: chat.id)}"
+
+          Logger.warn(msg)
         end
 
       {:error, error} ->
-        handle_permission_check_error(error, chat)
+        # 检查时发生错误，进一步处理错误。
+        handle_check_error(error, chat)
     end
   end
 
   @error_description_bot_was_kicked "Forbidden: bot was kicked from the supergroup chat"
-  @error_description_bot_is_not_member "Forbidden: bot is not a member of the supergroup chat"
+  @error_description_bot_is_not_member [
+    # 超级群
+    "Forbidden: bot is not a member of the supergroup chat",
+    # 普通群
+    "Forbidden: bot is not a member of the group chat"
+  ]
   @error_description_chat_not_found "Bad Request: chat not found"
+  @error_description_was_upgraded_supergroup "Bad Request: group chat was upgraded to a supergroup chat"
 
-  # 机器人被封禁。
-  # 取消接管。
-  defp handle_permission_check_error(
-         %Telegex.Model.Error{description: @error_description_bot_was_kicked},
-         chat
-       ),
-       do: cancel_takeover(chat, false)
+  # 机器人被封禁，取消接管。
+  defp handle_check_error(%Telegex.Model.Error{description: description}, chat)
+       when description == @error_description_bot_was_kicked,
+       do: cancel_takeover(chat, reason: :kicked, send_notification: false)
 
-  # 机器人已不在群中。
-  # 取消接管。
-  defp handle_permission_check_error(
-         %Telegex.Model.Error{description: @error_description_bot_is_not_member},
-         chat
-       ),
-       do: cancel_takeover(chat, false)
+  # 机器人已不在群中，取消接管。
+  defp handle_check_error(%Telegex.Model.Error{description: description}, chat)
+       when description in @error_description_bot_is_not_member,
+       do: cancel_takeover(chat, reason: :left, send_notification: false)
 
-  # 群组已不存在。
-  # 取消接管，并删除与之相关的用户权限。
-  defp handle_permission_check_error(
-         %Telegex.Model.Error{description: @error_description_chat_not_found},
-         chat
-       ) do
-    cancel_takeover(chat, false)
+  # 已被升级为超级群，取消接管。
+  # 一些未经证实的猜测：
+  # 此错误提示表示旧群 ID 仍然被 TG 识别，但是 ID 的作用已被废弃。理论上这类群组需要清理，否则会出现资料重复的群组。
+  defp handle_check_error(%Telegex.Model.Error{description: description}, chat)
+       when description == @error_description_was_upgraded_supergroup,
+       do: cancel_takeover(chat, reason: :upgraded, send_notification: false)
+
+  # 群组已不存在。取消接管，并删除与之相关的用户权限。
+  defp handle_check_error(%Telegex.Model.Error{description: description}, chat)
+       when description == @error_description_chat_not_found do
+    cancel_takeover(chat, reason: :not_found, send_notification: false)
+
     PermissionBusiness.delete_all(chat.id)
   end
 
   # 未知错误
-  defp handle_permission_check_error(%Telegex.Model.Error{} = e, chat),
-    do: Logger.unitized_error("Bot permission check", chat_id: chat.id, error: e)
+  defp handle_check_error(error, chat) when is_struct(error, Telegex.Model.Error),
+    do: Logger.unitized_error("Bot permission check", chat_id: chat.id, error: error)
 
-  @spec cancel_takeover(Chat.t(), boolean()) :: :ok
+  @type cancel_takeover_opts :: [reason: atom, send_notification: boolean]
+
   # 取消接管
-  defp cancel_takeover(%Chat{id: chat_id} = chat, send_notification \\ true)
-       when is_integer(chat_id) and is_boolean(send_notification) do
+  @spec cancel_takeover(Chat.t(), cancel_takeover_opts) :: :ok
+  defp cancel_takeover(%Chat{id: chat_id} = chat, opts)
+       when is_integer(chat_id) and is_list(opts) do
     Instances.cancel_chat_takeover(chat)
 
-    if send_notification,
+    if Keyword.get(opts, :send_notification, true),
       do:
         BotHelper.async(fn ->
           BotHelper.send_message(
@@ -99,9 +131,12 @@ defmodule PolicrMiniBot.Runner.WorkingChecker do
           )
         end)
 
-    Logger.info(
-      "No permission in the group `#{chat_id}`, the takeover has been automatically cancelled"
-    )
+    reason = Keyword.get(opts, :reason, :none)
+
+    msg =
+      "Takeover is automatically cancelled, details: #{inspect(chat_id: chat_id, reason: reason)}"
+
+    Logger.warn(msg)
 
     :ok
   end
