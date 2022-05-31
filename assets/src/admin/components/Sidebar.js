@@ -19,18 +19,13 @@ const NavItemLink = styled(RouteLink)`
   ${tw`hover:bg-blue-100 hover:text-blue-500`}
   ${tw`border-0 border-l-2 border-r-2 border-solid border-transparent`}
   ${({ selected = false }) => selected && tw`text-blue-500 border-current`}
-  ${({ ending = ending }) => ending && tw`rounded-b`}
+  ${({ $ended = false }) => $ended && tw`rounded-b-lg`}
   border-right-color: transparent;
 `;
 
-const NavItem = ({
-  title: title,
-  href: href,
-  selected: selected,
-  ending: ending,
-}) => {
+const NavItem = ({ title, href, selected, ended }) => {
   return (
-    <NavItemLink to={href} selected={selected} ending={ending}>
+    <NavItemLink to={href} selected={selected} $ended={ended}>
       <span tw="xl:text-lg">{title}</span>
     </NavItemLink>
   );
@@ -298,7 +293,6 @@ export default () => {
           title="自定义"
           href={`/admin/chats/${chatsState.selected}/custom`}
           selected={isSelect("custom", location.pathname)}
-          ending={isOnOwnerMenu ? "true" : "false"}
         />
         {chatsState.loadedSelected && !isOnOwnerMenu ? (
           <>
@@ -414,32 +408,35 @@ export default () => {
           title="服务条款"
           href="/admin/sys/terms"
           selected={isSysLink({ path: location.pathname, page: "terms" })}
+          ended={__GLOBAL__.botInfo.isThirdParty}
         />
-        {!__GLOBAL__.botInfo.isThirdParty ? (
-          <NavItem
-            title="赞助记录"
-            href="/admin/sys/sponsorship"
-            selected={isSysLink({
-              path: location.pathname,
-              page: "sponsorship",
-            })}
-          />
-        ) : undefined}
-        {!__GLOBAL__.botInfo.isThirdParty ? (
-          <NavItem
-            title="第三方实例"
-            href="/admin/sys/third_parties"
-            selected={isSysLink({
-              path: location.pathname,
-              page: "third_parties",
-            })}
-          />
-        ) : undefined}
         {/* <NavItem
           title="模拟终端"
           href="/admin/sys/terminal"
           selected={isSysLink({ path: location.pathname, page: "terminal" })}
         /> */}
+        {!__GLOBAL__.botInfo.isThirdParty ? (
+          <>
+            <NavItem
+              title="赞助记录"
+              href="/admin/sys/sponsorship"
+              selected={isSysLink({
+                path: location.pathname,
+                page: "sponsorship",
+              })}
+            />
+
+            <NavItem
+              title="第三方实例"
+              href="/admin/sys/third_parties"
+              selected={isSysLink({
+                path: location.pathname,
+                page: "third_parties",
+              })}
+              ended={true}
+            />
+          </>
+        ) : undefined}
       </MenuBox>
     </nav>
   );
