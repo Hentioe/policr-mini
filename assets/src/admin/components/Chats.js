@@ -6,7 +6,7 @@ import { useDispatch } from "react-redux";
 import { useNavigate, useLocation } from "react-router-dom";
 import MoonLoader from "react-spinners/MoonLoader";
 
-import { getIdFromLocation, isSysLink } from "../helper";
+import { getIdFromLocation, isSysLink, toastMessage } from "../helper";
 import { receiveChats, selectChat, loadSelected } from "../slices/chats";
 import RetryButton from "../components/RetryButton";
 
@@ -65,7 +65,11 @@ export default () => {
   };
 
   useEffect(() => {
-    if (data) dispatch(receiveChats(data.chats));
+    if (data) {
+      if (!data.chats.length)
+        toastMessage("未发现与您相关的群组权限", { type: "error" });
+      else dispatch(receiveChats(data.chats));
+    }
   }, [data]);
 
   useEffect(() => {
