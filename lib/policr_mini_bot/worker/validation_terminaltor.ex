@@ -68,6 +68,7 @@ defmodule PolicrMiniBot.Worker.ValidationTerminator do
       )
 
       killing_method = scheme.timeout_killing_method || default!(:tkmethod)
+      delay_unban_secs = scheme.delay_unban_secs || default!(:delay_unban_secs)
 
       # 添加操作记录
       create_operation(last_veri, killing_method, :system)
@@ -77,7 +78,7 @@ defmodule PolicrMiniBot.Worker.ValidationTerminator do
       # 更新状态为超时
       VerificationBusiness.update(last_veri, %{status: :timeout})
       # 击杀用户（原因为超时）
-      CallVerificationPlug.kill(chat_id, user, :timeout, killing_method)
+      CallVerificationPlug.kill(chat_id, user, :timeout, killing_method, delay_unban_secs)
 
       # 如果还存在多条验证，更新入口消息
       waiting_count = VerificationBusiness.get_unity_waiting_count(chat_id)
@@ -134,6 +135,8 @@ defmodule PolicrMiniBot.Worker.ValidationTerminator do
       Logger.debug(msg)
 
       kmeth = if status == :manual_ban, do: :ban, else: :kick
+      delay_unban_secs = scheme.delay_unban_secs || default!(:delay_unban_secs)
+
       # 添加操作记录
       create_operation(veri, kmeth, :admin)
 
@@ -147,7 +150,7 @@ defmodule PolicrMiniBot.Worker.ValidationTerminator do
       # 更新状态为超时
       VerificationBusiness.update(veri, %{status: status})
       # 击杀用户（原因即状态）
-      CallVerificationPlug.kill(chat_id, user, status, kmeth)
+      CallVerificationPlug.kill(chat_id, user, status, kmeth, delay_unban_secs)
 
       # 如果还存在多条验证，更新入口消息
       waiting_count = VerificationBusiness.get_unity_waiting_count(chat_id)

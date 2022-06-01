@@ -471,7 +471,7 @@ export default () => {
                 </ProfileField>
                 <FromHint>单个用户的验证等待时间，单位：秒</FromHint>
                 <ProfileField>
-                  <ProfileFieldLabel>延时解封时长</ProfileFieldLabel>
+                  <ProfileFieldLabel>解封延时</ProfileFieldLabel>
                   <div tw="flex-1">
                     <FormInput
                       type="number"
@@ -486,7 +486,7 @@ export default () => {
                     />
                   </div>
                 </ProfileField>
-                <FromHint>封禁并延迟解封的延迟时间，单位：秒</FromHint>
+                <FromHint>封禁再延时解封的延迟时间，单位：秒</FromHint>
                 <ProfileField>
                   <ProfileFieldLabel>提及文本</ProfileFieldLabel>
                   <OwnSelect
@@ -615,7 +615,7 @@ export default () => {
                     </ProfileFieldValue>
                   </ProfileField>
                   <ProfileField>
-                    <ProfileFieldLabel>延时解封时长</ProfileFieldLabel>
+                    <ProfileFieldLabel>解封延时</ProfileFieldLabel>
                     <ProfileFieldValue>
                       {profileData.scheme.delayUnbanSecs}
                     </ProfileFieldValue>

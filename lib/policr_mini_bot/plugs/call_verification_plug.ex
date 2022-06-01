@@ -11,9 +11,6 @@ defmodule PolicrMiniBot.CallVerificationPlug do
   alias PolicrMini.{VerificationBusiness, StatisticBusiness, OperationBusiness}
   alias PolicrMiniBot.{HandleUserJoinedCleanupPlug, Disposable, Worker}
 
-  # 踢出用户后允许重新加入的秒数（必须大于 30）
-  @allow_join_again_seconds 60
-
   @doc """
   回调处理函数。
 
@@ -65,6 +62,7 @@ defmodule PolicrMiniBot.CallVerificationPlug do
 
     handle_answer = fn verification, scheme ->
       wrong_killing_method = scheme.wrong_killing_method || default!(:wkmethod)
+      delay_unban_secs = scheme.delay_unban_secs || default!(:delay_unban_secs)
 
       # 取消超时任务
       Worker.cancel_terminate_validation_job(verification.chat_id, verification.target_user_id)
@@ -74,7 +72,7 @@ defmodule PolicrMiniBot.CallVerificationPlug do
         handle_correct(verification, message_id, from)
       else
         # 处理回答错误
-        handle_wrong(verification, wrong_killing_method, message_id, from)
+        handle_wrong(verification, wrong_killing_method, delay_unban_secs, message_id, from)
       end
     end
 
@@ -192,9 +190,9 @@ defmodule PolicrMiniBot.CallVerificationPlug do
 
   将根据验证方案中的配置选择击杀方式对应的处理逻辑。
   """
-  @spec handle_wrong(Verification.t(), atom, integer, Telegex.Model.User.t()) ::
+  @spec handle_wrong(Verification.t(), atom, integer, integer, Telegex.Model.User.t()) ::
           {:ok, Verification.t()} | {:error, any}
-  def handle_wrong(verification, wrong_killing_method, message_id, from_user) do
+  def handle_wrong(verification, wrong_killing_method, delay_unban_secs, message_id, from_user) do
     # 自增统计数据（错误）。
     async do
       StatisticBusiness.increment_one(
@@ -243,12 +241,7 @@ defmodule PolicrMiniBot.CallVerificationPlug do
         # 清理消息并私聊验证结果。
         cleaner_fun.(text)
 
-        kill(
-          verification.chat_id,
-          from_user,
-          :wronged,
-          wrong_killing_method
-        )
+        kill(verification.chat_id, from_user, :wronged, wrong_killing_method, delay_unban_secs)
 
         {:ok, verification}
 
@@ -303,19 +296,20 @@ defmodule PolicrMiniBot.CallVerificationPlug do
 
   此函数会根据击杀方法做出指定动作，并结合击杀原因发送通知消息。若 `method` 参数的值为 `nil`，则默认表示击杀方法为 `:kick`。
   """
-  @spec kill(integer | binary, map, killing_reason, killing_method) :: :ok | {:error, map}
-  def kill(chat_id, user, reason, method) do
+  @spec kill(integer | binary, map, killing_reason, killing_method, integer) ::
+          :ok | {:error, map}
+  def kill(chat_id, user, reason, method, delay_unban_secs) do
     method = method || :kick
 
     case method do
       :kick ->
-        kick_chat_member(chat_id, user.id)
+        kick_chat_member(chat_id, user.id, delay_unban_secs)
 
       :ban ->
         Telegex.ban_chat_member(chat_id, user.id)
     end
 
-    time_text = "#{@allow_join_again_seconds} #{t("units.sec")}"
+    time_text = "#{delay_unban_secs} #{t("units.sec")}"
     mentioned_user = mention(user, anonymization: false, mosaic: true)
 
     text = build_kick_text(reason, method, mentioned_user, time_text)
@@ -361,27 +355,30 @@ defmodule PolicrMiniBot.CallVerificationPlug do
     t("verification.manual.#{method}.public", %{mentioned_user: mentioned_user})
   end
 
-  defp kick_chat_member(chat_id, user_id) do
+  @spec kick_chat_member(integer, integer, integer) :: {:ok, boolean} | Telegex.Model.errors()
+  defp kick_chat_member(chat_id, user_id, delay_unban_secs) do
     case PolicrMiniBot.config(:unban_method) do
       :api_call ->
-        Telegex.ban_chat_member(chat_id, user_id)
+        r = Telegex.ban_chat_member(chat_id, user_id)
 
         # 调用 API 解除限制以允许再次加入。
         async(fn -> Telegex.unban_chat_member(chat_id, user_id) end,
-          seconds: @allow_join_again_seconds
+          seconds: delay_unban_secs
         )
 
+        r
+
       :until_date ->
-        Telegex.ban_chat_member(chat_id, user_id, until_date: until_date())
+        Telegex.ban_chat_member(chat_id, user_id, until_date: until_date(delay_unban_secs))
     end
   end
 
-  @spec until_date :: integer
-  defp until_date do
+  @spec until_date(integer) :: integer
+  defp until_date(delay_unban_secs) do
     dt_now = DateTime.utc_now()
     unix_now = DateTime.to_unix(dt_now)
 
     # 当前时间加允许重现加入的秒数，确保能正常解除封禁。
-    unix_now + @allow_join_again_seconds
+    unix_now + delay_unban_secs
   end
 end

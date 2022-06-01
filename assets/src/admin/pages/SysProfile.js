@@ -470,7 +470,7 @@ export default () => {
                   提及验证用户时显示的内容，马赛克指用符号遮挡部分文字
                 </FromHint>
                 <FormLine>
-                  <FormLabel>延时解封时长</FormLabel>
+                  <FormLabel>解封延时</FormLabel>
                   <FormInput
                     type="number"
                     tw="w-8/12"
@@ -479,7 +479,7 @@ export default () => {
                     placeholder="在此填入秒数"
                   />
                 </FormLine>
-                <FromHint>封禁并延迟解封的延迟时间，单位：秒</FromHint>
+                <FromHint>封禁再延时解封的延迟时间，单位：秒</FromHint>
                 <FormLine>
                   <FormLabel>答案个数（图片验证）</FormLabel>
                   <OwnSelect

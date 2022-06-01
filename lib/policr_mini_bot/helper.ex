@@ -506,6 +506,7 @@ defmodule PolicrMiniBot.Helper do
     vseconds: :seconds,
     tkmethod: :timeout_killing_method,
     wkmethod: :wrong_killing_method,
+    delay_unban_secs: :delay_unban_secs,
     mention_scheme: :mention_text,
     acimage: :image_answers_count,
     smc: :service_message_cleanup
@@ -518,6 +519,7 @@ defmodule PolicrMiniBot.Helper do
           | :vseconds
           | :tkmethod
           | :wkmethod
+          | :delay_unban_secs
           | :mention_scheme
           | :acimage
           | :smc
@@ -532,6 +534,7 @@ defmodule PolicrMiniBot.Helper do
   - `:vseconds`: 验证超时时间。
   - `:tkmethod`: 超时击杀方法。
   - `:wkmethod`: 错误击杀方法。
+  - `:delay_unban_secs`: 延时解封秒数。
   - `:mention_scheme`: 提及方案。
   - `:smc`: 服务消息清理。
 
@@ -548,6 +551,8 @@ defmodule PolicrMiniBot.Helper do
       :kick
       iex> PolicrMiniBot.Helper.default!(:wkmethod)
       :kick
+      iex> PolicrMiniBot.Helper.default!(:delay_unban_secs)
+      60
       iex> PolicrMiniBot.Helper.default!(:mention_scheme)
       :mosaic_full_name
       iex> PolicrMiniBot.Helper.default!(:acimage)

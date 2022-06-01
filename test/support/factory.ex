@@ -49,6 +49,7 @@ defmodule PolicrMini.Factory do
       seconds: 80,
       timeout_killing_method: :kick,
       wrong_killing_method: :ban,
+      image_answers_count: 4,
       is_highlighted: true,
       service_message_cleanup: [:joined],
       delay_unban_secs: 60
