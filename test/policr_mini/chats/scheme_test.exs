@@ -22,6 +22,7 @@ defmodule PolicrMini.Chats.SchemeTest do
                  :mention_text,
                  :image_answers_count,
                  :service_message_cleanup,
+                 :delay_unban_secs,
                  :inserted_at,
                  :updated_at
                ]
@@ -39,6 +40,7 @@ defmodule PolicrMini.Chats.SchemeTest do
     updated_seconds = 120
     updated_wrong_killing_method = :kick
     updated_is_highlighted = false
+    updated_delay_unban_secs = 120
 
     params = %{
       "verification_mode" => updated_verification_mode,
@@ -46,7 +48,8 @@ defmodule PolicrMini.Chats.SchemeTest do
       "verification_occasion" => updated_verification_occasion,
       "seconds" => updated_seconds,
       "wrong_killing_method" => updated_wrong_killing_method,
-      "is_highlighted" => updated_is_highlighted
+      "is_highlighted" => updated_is_highlighted,
+      "delay_unban_secs" => updated_delay_unban_secs
     }
 
     changes = %{
@@ -55,7 +58,8 @@ defmodule PolicrMini.Chats.SchemeTest do
       verification_occasion: :private,
       seconds: updated_seconds,
       wrong_killing_method: :kick,
-      is_highlighted: updated_is_highlighted
+      is_highlighted: updated_is_highlighted,
+      delay_unban_secs: updated_delay_unban_secs
     }
 
     changeset = Scheme.changeset(scheme, params)

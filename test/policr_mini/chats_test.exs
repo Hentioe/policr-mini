@@ -46,6 +46,7 @@ defmodule PolicrMini.ChatsTest do
       updated_timeout_killing_method = :ban
       updated_is_highlighted = false
       updated_service_message_cleanup = [:joined, :lefted]
+      updated_delay_unban_secs = 120
 
       {:ok, scheme2} =
         update_scheme(scheme1, %{
@@ -55,7 +56,8 @@ defmodule PolicrMini.ChatsTest do
           seconds: updated_seconds,
           timeout_killing_method: updated_timeout_killing_method,
           is_highlighted: updated_is_highlighted,
-          service_message_cleanup: updated_service_message_cleanup
+          service_message_cleanup: updated_service_message_cleanup,
+          delay_unban_secs: updated_delay_unban_secs
         })
 
       assert scheme2.id == scheme1.id
@@ -66,6 +68,7 @@ defmodule PolicrMini.ChatsTest do
       assert scheme2.timeout_killing_method == :ban
       assert scheme2.is_highlighted == updated_is_highlighted
       assert scheme2.service_message_cleanup == updated_service_message_cleanup
+      assert scheme2.delay_unban_secs == updated_delay_unban_secs
     end
 
     test "find_scheme/1" do
@@ -105,6 +108,7 @@ defmodule PolicrMini.ChatsTest do
       assert default.wrong_killing_method == :kick
       assert default.is_highlighted == true
       assert default.service_message_cleanup == [:joined]
+      assert default.delay_unban_secs == 60
     end
   end
 end

@@ -14,9 +14,9 @@ defmodule PolicrMini.Chats do
     %Scheme{} |> Scheme.changeset(params) |> Repo.insert()
   end
 
-  @default_id 0
+  @default_scheme_chat_id 0
   def create_default_scheme(params) do
-    %Scheme{chat_id: @default_id} |> Scheme.changeset(params) |> Repo.insert()
+    %Scheme{chat_id: @default_scheme_chat_id} |> Scheme.changeset(params) |> Repo.insert()
   end
 
   def delete_scheme(scheme) when is_struct(scheme, Scheme) do
@@ -66,7 +66,8 @@ defmodule PolicrMini.Chats do
     is_highlighted: true,
     mention_text: :mosaic_full_name,
     image_answers_count: 4,
-    service_message_cleanup: [:joined]
+    service_message_cleanup: [:joined],
+    delay_unban_secs: 60
   }
 
   @doc """
@@ -75,7 +76,7 @@ defmodule PolicrMini.Chats do
   @spec fetch_default_scheme :: scheme_written_returns
   def fetch_default_scheme do
     Repo.transaction(fn ->
-      case find_scheme(@default_id) || create_default_scheme(@default_scheme) do
+      case find_scheme(@default_scheme_chat_id) || create_default_scheme(@default_scheme) do
         {:ok, scheme} ->
           # 创建了一个新的方案。
           scheme
@@ -93,24 +94,23 @@ defmodule PolicrMini.Chats do
 
   @spec migrate_scheme(Scheme.t()) :: Scheme.t() | no_return
   defp migrate_scheme(scheme) do
-    attrs = %{}
-
     # 此处填充后续在方案中添加的新字段，避免方案已存在时这些字段出现 `nil` 值。
-    attrs = if scheme.mention_text, do: attrs, else: %{mention_text: @default_scheme.mention_text}
-
     attrs =
-      if scheme.image_answers_count,
-        do: attrs,
-        else: Map.put(attrs, :image_answers_count, @default_scheme.image_answers_count)
-
-    attrs =
-      if scheme.service_message_cleanup,
-        do: attrs,
-        else: Map.put(attrs, :service_message_cleanup, @default_scheme.service_message_cleanup)
+      %{}
+      |> put_default_attr(scheme, :mention_text)
+      |> put_default_attr(scheme, :image_answers_count)
+      |> put_default_attr(scheme, :service_message_cleanup)
+      |> put_default_attr(scheme, :delay_unban_secs)
 
     case update_scheme(scheme, attrs) do
       {:ok, scheme} -> scheme
       {:error, e} -> Repo.rollback(e)
     end
+  end
+
+  defp put_default_attr(attrs, scheme, field_name) do
+    if Map.get(scheme, field_name) != nil,
+      do: attrs,
+      else: Map.put(attrs, field_name, @default_scheme[field_name])
   end
 end

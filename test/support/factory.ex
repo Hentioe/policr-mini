@@ -50,7 +50,8 @@ defmodule PolicrMini.Factory do
       timeout_killing_method: :kick,
       wrong_killing_method: :ban,
       is_highlighted: true,
-      service_message_cleanup: [:joined]
+      service_message_cleanup: [:joined],
+      delay_unban_secs: 60
     }
   end
 
