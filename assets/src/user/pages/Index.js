@@ -201,11 +201,10 @@ function calculatePassRate({ totals }) {
 }
 
 const makeThirdPartiesEndpoint = () => {
-  if (_GLOBAL.isThirdParty) {
+  if (_GLOBAL.isIndependent) return null;
+  else if (_GLOBAL.isThirdParty)
     return "https://mini.telestd.me/api/third_parties";
-  } else {
-    return "/api/third_parties";
-  }
+  else return "/api/third_parties";
 };
 
 export default () => {
@@ -216,6 +215,7 @@ export default () => {
     makeThirdPartiesEndpoint(),
     fetcher
   );
+
   const { data: sponsorshipHistoriesData, error: sponsorshipHistoriesError } =
     useSWR("/api/sponsorship_histories", fetcher);
 
@@ -511,10 +511,12 @@ export default () => {
             <div tw="my-6 text-gray-800">
               <span tw="text-2xl font-extrabold">社区中开放服务的实例</span>
             </div>
-            {thirdPartiesError ? (
+            {thirdPartiesError || _GLOBAL.isIndependent ? (
               <div tw="text-gray-700 text-left inline-block">
                 <span tw="pr-2 font-bold text-sm text-gray-700 inline">
-                  当前实例尚未注册，无法载入此列表
+                  {thirdPartiesError
+                    ? "当前实例尚未注册，无法载入此列表"
+                    : "独立运营实例，不获取此列表"}
                 </span>
                 <div tw="bg-gray-700 h-1 rounded-2xl "></div>
               </div>

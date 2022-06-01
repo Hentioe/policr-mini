@@ -18,11 +18,11 @@ config :policr_mini, PolicrMiniWeb.Endpoint,
   pubsub_server: PolicrMini.PubSub,
   live_view: [signing_salt: "hy+GpqGC"]
 
-# 配置图片服务。
+# 配置图片服务
 config :policr_mini, PolicrMiniBot.ImageProvider, root: "_assets"
 
-# 配置是否自动生成命令。
-config :policr_mini, PolicrMiniBot, auto_gen_commands: false
+# 配置机器人
+config :policr_mini, PolicrMiniBot, auto_gen_commands: false, opts: []
 
 # 配置根链接。
 config :policr_mini, PolicrMiniWeb, root_url: "http://0.0.0.0:4000/"

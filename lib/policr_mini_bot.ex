@@ -78,10 +78,27 @@ defmodule PolicrMiniBot do
   @official_bots ["policr_mini_bot", "policr_mini_test_bot"]
   def official_bots, do: @official_bots
 
-  @type config_key :: :auto_gen_commands | :owner_id | :name | :unban_method
+  @type config_key :: :auto_gen_commands | :owner_id | :name | :unban_method | :opts
 
   @spec config(config_key, any) :: any
   def config(key, default \\ nil) do
     Application.get_env(:policr_mini, __MODULE__)[key] || default
+  end
+
+  @config_opts ["--independent"]
+
+  @doc """
+  检查可选项是否存在。
+
+  ## 当前存在以下可选项：
+    - `--independent`: 启用独立运营
+
+  ## 例子
+      iex> PolicrMiniBot.opt_exist?("--independent")
+      false
+  """
+  @spec opt_exist?(String.t()) :: boolean
+  def opt_exist?(opt_name) when opt_name in @config_opts do
+    Enum.member?(config(:opts, []), opt_name)
   end
 end

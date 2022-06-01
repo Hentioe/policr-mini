@@ -45,7 +45,10 @@ unban_method =
       """
   end
 
-# 配置机器人。
+# 使用空白字符（一个或多个空格）间隔的可选项
+opts = String.split(System.get_env("POLICR_MINI_OPTS") || "")
+
+# 配置机器人
 config :policr_mini, PolicrMiniBot,
   # 是否自动生成命令
   auto_gen_commands:
@@ -61,9 +64,12 @@ config :policr_mini, PolicrMiniBot,
   # 机器人名称（用于显示）
   name: System.get_env("POLICR_MINI_BOT_NAME"),
   # 解封方法
-  unban_method: unban_method
+  unban_method: unban_method,
+  # 是否启用 Marked 库，注意：此配置可能已过时
+  marked_enabled: (System.get_env("POLICR_MINI_BOT_ISSUE_33") || "false") == "true",
+  opts: opts
 
-# 配置根链接。
+# 配置根链接
 config :policr_mini, PolicrMiniWeb,
   root_url:
     System.get_env("POLICR_MINI_SERVER_ROOT_URL") ||
@@ -79,11 +85,7 @@ config :policr_mini, PolicrMiniBot.ImageProvider,
       environment variable POLICR_MINI_BOT_ASSETS_PATH is missing.
       """)
 
-# 配置 Markdown。
-config :policr_mini,
-  marked_enabled: (System.get_env("POLICR_MINI_BOT_ISSUE_33") || "false") == "true"
-
-# 配置机器人 token。
+# 配置机器人 token
 config :telegex,
   token:
     System.get_env("POLICR_MINI_BOT_TOKEN") ||
