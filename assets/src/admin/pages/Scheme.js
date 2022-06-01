@@ -64,10 +64,10 @@ const modeMapping = {
 const customSecondsOption = { value: "custom", label: "自定义" };
 const defaultSecondsOption = { value: "default", label: "系统默认" };
 const secondsOptions = [
-  { value: 45, label: "自动生成：超短" },
-  { value: 75, label: "自动生成：较短" },
-  { value: 150, label: "自动生成：一般" },
-  { value: 300, label: "自动生成：较长" },
+  { value: 45, label: "生成：超短" },
+  { value: 75, label: "生成：较短" },
+  { value: 150, label: "生成：一般" },
+  { value: 300, label: "生成：较长" },
   defaultSecondsOption,
   customSecondsOption,
 ];
@@ -77,6 +77,17 @@ const killingMethodOptions = [
   { value: 1, label: "踢出（封禁再延时解禁）" },
   { value: 0, label: "封禁" },
   defaultKillingMethodOption,
+];
+
+const customDelayUnabnSecsOption = { value: "custom", label: "自定义" };
+const defaultDelayUnbanSecsOption = { value: "default", label: "系统默认" };
+const delayUnabnSecsOptions = [
+  { value: 60 * 1, label: "生成：1 分钟" },
+  { value: 60 * 3, label: "生成：3 分钟" },
+  { value: 60 * 10, label: "生成：10 分钟" },
+  { value: 60 * 30, label: "生成：30 分钟" },
+  defaultSecondsOption,
+  customSecondsOption,
 ];
 
 const defaultMentionTextOption = { value: null, label: "系统默认" };
@@ -185,6 +196,8 @@ export default () => {
   const [editingSeconds, setEditingSeconds] = useState(0);
   const [editingMentionTextOption, setEditingMentionTextOption] =
     useState(null);
+  const [editingDelayUnbanSecsOption, setEditingDelayUnbanSecsOption] =
+    useState(defaultDelayUnbanSecsOption);
   const [editingDelayUnbanSecs, setEditingDelayUnbanSecs] = useState(0);
   const [editingImageAnswersCountOption, setEditingImageAnswersCountOption] =
     useState(null);
@@ -220,6 +233,9 @@ export default () => {
       else if (timeoutKillingMethod == "ban")
         setEditingTimeoutKillingMethodOption(killingMethodOptions[1]);
 
+      if (delayUnbanSecs == null)
+        setEditingDelayUnbanSecsOption(defaultSecondsOption);
+      else setEditingDelayUnbanSecsOption(customDelayUnabnSecsOption);
       setEditingDelayUnbanSecs(delayUnbanSecs || "");
 
       if (wrongKillingMethod == null)
@@ -278,12 +294,12 @@ export default () => {
 
   const handleEditingSecondsChange = (e) => {
     setIsEdited(true);
-
     const value = e.target.value;
+
     if (![45, 75, 150, 300].includes(value)) {
       setEditingSecondsOption(customSecondsOption);
     }
-    setEditingSeconds(e.target.value);
+    setEditingSeconds(value);
   };
 
   const handleEditingTimeoutKillingMethodSelectChange = (option) => {
@@ -296,9 +312,25 @@ export default () => {
     setEditingWrongKillingMethodOption(option);
   };
 
+  const handleEditingDelayUnbanSecsSelectChange = (option) => {
+    setIsEdited(true);
+    setEditingDelayUnbanSecsOption(option);
+
+    if (!isNaN(option.value)) {
+      setEditingDelayUnbanSecs(option.value);
+    } else {
+      setEditingDelayUnbanSecs("");
+    }
+  };
+
   const handleEditingDelayUnbanSecsChange = (e) => {
     setIsEdited(true);
-    setEditingDelayUnbanSecs(e.target.value);
+    const value = e.target.value;
+
+    if (!delayUnabnSecsOptions.map(({ value }) => value).includes(value)) {
+      setEditingDelayUnbanSecsOption(customDelayUnabnSecsOption);
+    }
+    setEditingDelayUnbanSecs(value);
   };
 
   const handleEditingMentionTextOptionChange = (option) => {
@@ -472,18 +504,35 @@ export default () => {
                 <FromHint>单个用户的验证等待时间，单位：秒</FromHint>
                 <ProfileField>
                   <ProfileFieldLabel>解封延时</ProfileFieldLabel>
-                  <div tw="flex-1">
-                    <FormInput
-                      type="number"
-                      tw="w-full text-center"
-                      value={editingDelayUnbanSecs}
-                      onChange={handleEditingDelayUnbanSecsChange}
-                      placeholder={
-                        editingDelayUnbanSecs == ""
-                          ? "系统默认"
-                          : "在此填入秒数"
-                      }
-                    />
+                  <div tw="w-8/12 flex flex-1">
+                    <div tw="pr-2">
+                      <Select
+                        styles={{
+                          control: (provided) => ({
+                            ...provided,
+                            width: 200,
+                          }),
+                        }}
+                        options={delayUnabnSecsOptions}
+                        onChange={handleEditingDelayUnbanSecsSelectChange}
+                        isSearchable={false}
+                        value={editingDelayUnbanSecsOption}
+                      />
+                    </div>
+
+                    <div tw="flex-1">
+                      <FormInput
+                        type="number"
+                        tw="w-full text-center"
+                        value={editingDelayUnbanSecs}
+                        onChange={handleEditingDelayUnbanSecsChange}
+                        placeholder={
+                          editingDelayUnbanSecsOption.value == "default"
+                            ? "系统默认值"
+                            : "在此填入秒数"
+                        }
+                      />
+                    </div>
                   </div>
                 </ProfileField>
                 <FromHint>封禁再延时解封的延迟时间，单位：秒</FromHint>
