@@ -58,13 +58,19 @@ defmodule PolicrMini.Chats.Scheme do
     timestamps()
   end
 
-  # 针对默认 scheme 去掉一些约束检查。
+  # 用户输入的图片答案个数必须大于或等于 3，且小于或等于 5
+  @users_image_answers_count_validate [greater_than_or_equal_to: 3, less_than_or_equal_to: 5]
+  # 用户输入的延迟解封时长必须大于或等于 45 秒，且小于或等于 3600 秒。
+  @users_delay_unban_secs_validate [greater_than_or_equal_to: 45, less_than_or_equal_to: 3600]
+
+  # 针对默认 scheme 去掉一些约束检查
   def changeset(%{chat_id: 0} = struct, attrs)
       when is_struct(struct, __MODULE__) and is_map(attrs) do
     struct
     |> cast(attrs, @required_fields ++ @optional_fields)
     |> validate_required(@required_fields)
     |> unique_constraint(:chat_id)
+    |> validate_number(:delay_unban_secs, greater_than_or_equal_to: 45)
   end
 
   def changeset(struct, attrs) when is_struct(struct, __MODULE__) and is_map(attrs) do
@@ -72,5 +78,7 @@ defmodule PolicrMini.Chats.Scheme do
     |> cast(attrs, @required_fields ++ @optional_fields)
     |> validate_required(@required_fields)
     |> unique_constraint(:chat_id)
+    |> validate_number(:image_answers_count, @users_image_answers_count_validate)
+    |> validate_number(:delay_unban_secs, @users_delay_unban_secs_validate)
   end
 end

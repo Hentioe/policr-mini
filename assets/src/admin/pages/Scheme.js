@@ -121,6 +121,7 @@ const saveScheme = async ({
   seconds,
   timeoutKillingMethod,
   wrongKillingMethod,
+  delayUnbanSecs,
   mentionText,
   imageAnswersCount,
   serviceMessageCleanup,
@@ -129,12 +130,14 @@ const saveScheme = async ({
   let body = null;
   if (verificationMode === defaultModeOption.value) verificationMode = null;
   if (seconds == "") seconds = null;
+  if (delayUnbanSecs == "") delayUnbanSecs = null;
 
   body = {
     verification_mode: verificationMode,
     seconds: seconds,
     timeout_killing_method: timeoutKillingMethod,
     wrong_killing_method: wrongKillingMethod,
+    delay_unban_secs: delayUnbanSecs,
     mention_text: mentionText,
     image_answers_count: imageAnswersCount,
     service_message_cleanup: serviceMessageCleanup,
@@ -182,6 +185,7 @@ export default () => {
   const [editingSeconds, setEditingSeconds] = useState(0);
   const [editingMentionTextOption, setEditingMentionTextOption] =
     useState(null);
+  const [editingDelayUnbanSecs, setEditingDelayUnbanSecs] = useState(0);
   const [editingImageAnswersCountOption, setEditingImageAnswersCountOption] =
     useState(null);
   const [editingJoinedCleared, setEditingJoinedCleared] = useState(false);
@@ -199,6 +203,7 @@ export default () => {
         seconds,
         timeoutKillingMethod,
         wrongKillingMethod,
+        delayUnbanSecs,
         mentionText,
         imageAnswersCount,
         serviceMessageCleanup,
@@ -214,6 +219,8 @@ export default () => {
         setEditingTimeoutKillingMethodOption(killingMethodOptions[0]);
       else if (timeoutKillingMethod == "ban")
         setEditingTimeoutKillingMethodOption(killingMethodOptions[1]);
+
+      setEditingDelayUnbanSecs(delayUnbanSecs || "");
 
       if (wrongKillingMethod == null)
         setEditingWrongKillingMethodOption(defaultKillingMethodOption);
@@ -289,6 +296,11 @@ export default () => {
     setEditingWrongKillingMethodOption(option);
   };
 
+  const handleEditingDelayUnbanSecsChange = (e) => {
+    setIsEdited(true);
+    setEditingDelayUnbanSecs(e.target.value);
+  };
+
   const handleEditingMentionTextOptionChange = (option) => {
     setIsEdited(true);
     setEditingMentionTextOption(option);
@@ -334,6 +346,7 @@ export default () => {
       seconds: editingSeconds,
       timeoutKillingMethod: editingTimeoutKillingMethodOption.value,
       wrongKillingMethod: editingWrongKillingMethodOption.value,
+      delayUnbanSecs: editingDelayUnbanSecs,
       mentionText: editingMentionTextOption.value,
       imageAnswersCount: editingImageAnswersCountOption.value,
       serviceMessageCleanup: serviceMessageCleanup,
@@ -350,6 +363,7 @@ export default () => {
     editingSeconds,
     editingTimeoutKillingMethodOption,
     editingWrongKillingMethodOption,
+    editingDelayUnbanSecs,
     editingMentionTextOption,
     editingImageAnswersCountOption,
     editingJoinedCleared,
@@ -456,6 +470,23 @@ export default () => {
                   </div>
                 </ProfileField>
                 <FromHint>单个用户的验证等待时间，单位：秒</FromHint>
+                <ProfileField>
+                  <ProfileFieldLabel>延时解封时长</ProfileFieldLabel>
+                  <div tw="flex-1">
+                    <FormInput
+                      type="number"
+                      tw="w-full text-center"
+                      value={editingDelayUnbanSecs}
+                      onChange={handleEditingDelayUnbanSecsChange}
+                      placeholder={
+                        editingDelayUnbanSecs == ""
+                          ? "系统默认"
+                          : "在此填入秒数"
+                      }
+                    />
+                  </div>
+                </ProfileField>
+                <FromHint>封禁并延迟解封的延迟时间，单位：秒</FromHint>
                 <ProfileField>
                   <ProfileFieldLabel>提及文本</ProfileFieldLabel>
                   <OwnSelect
@@ -581,6 +612,12 @@ export default () => {
                     <ProfileFieldLabel>超时时间</ProfileFieldLabel>
                     <ProfileFieldValue>
                       {profileData.scheme.seconds}
+                    </ProfileFieldValue>
+                  </ProfileField>
+                  <ProfileField>
+                    <ProfileFieldLabel>延时解封时长</ProfileFieldLabel>
+                    <ProfileFieldValue>
+                      {profileData.scheme.delayUnbanSecs}
                     </ProfileFieldValue>
                   </ProfileField>
                   <ProfileField>

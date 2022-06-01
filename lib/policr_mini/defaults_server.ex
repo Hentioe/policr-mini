@@ -52,8 +52,8 @@ defmodule PolicrMini.DefaultsServer do
       {:ok, scheme} ->
         {:noreply, Map.put(state, :scheme, scheme)}
 
-      _ ->
-        Logger.unitized_error("Default scheme update", params: params)
+      {:error, reason} ->
+        Logger.unitized_error("Default scheme update", params: params, reason: reason)
 
         {:noreply, state}
     end

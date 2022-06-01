@@ -90,6 +90,7 @@ const saveScheme = async ({
   seconds,
   timeoutKillingMethod,
   wrongKillingMethod,
+  delayUnbanSecs,
   mentionText,
   imageAnswersCount,
   serviceMessageCleanup,
@@ -101,6 +102,7 @@ const saveScheme = async ({
     seconds: seconds,
     timeout_killing_method: timeoutKillingMethod,
     wrong_killing_method: wrongKillingMethod,
+    delay_unban_secs: delayUnbanSecs,
     mention_text: mentionText,
     image_answers_count: imageAnswersCount,
     service_message_cleanup: serviceMessageCleanup,
@@ -168,6 +170,7 @@ export default () => {
   const [editingSeconds, setEditingSeconds] = useState(0);
   const [editingMentionTextOption, setEditingMentionTextOption] =
     useState(null);
+  const [editingDelayUnbanSecs, setEditingDelayUnbanSecs] = useState(0);
   const [editingImageAnswersCountOption, setEditingImageAnswersCountOption] =
     useState(null);
   const [editingJoinedCleared, setEditingJoinedCleared] = useState(false);
@@ -183,6 +186,7 @@ export default () => {
         seconds,
         timeoutKillingMethod,
         wrongKillingMethod,
+        delayUnbanSecs,
         mentionText,
         imageAnswersCount,
         serviceMessageCleanup,
@@ -199,6 +203,8 @@ export default () => {
         setEditingWrongKillingMethodOption(killingMethodOptions[0]);
       else if (wrongKillingMethod == "ban")
         setEditingWrongKillingMethodOption(killingMethodOptions[1]);
+
+      setEditingDelayUnbanSecs(delayUnbanSecs || "");
 
       if (mentionText == "user_id")
         setEditingMentionTextOption(mentionTextOptions[0]);
@@ -245,6 +251,11 @@ export default () => {
     setEditingWrongKillingMethodOption(option);
   };
 
+  const handleEditingDelayUnbanSecsChange = (e) => {
+    setIsEdited(true);
+    setEditingDelayUnbanSecs(e.target.value);
+  };
+
   const handleEditingMentionTextOptionChange = (option) => {
     setIsEdited(true);
     setEditingMentionTextOption(option);
@@ -281,6 +292,7 @@ export default () => {
       seconds: editingSeconds,
       timeoutKillingMethod: editingTimeoutKillingMethodOption.value,
       wrongKillingMethod: editingWrongKillingMethodOption.value,
+      delayUnbanSecs: editingDelayUnbanSecs,
       mentionText: editingMentionTextOption.value,
       imageAnswersCount: editingImageAnswersCountOption.value,
       serviceMessageCleanup: serviceMessageCleanup,
@@ -298,6 +310,7 @@ export default () => {
     editingSeconds,
     editingTimeoutKillingMethodOption,
     editingWrongKillingMethodOption,
+    editingDelayUnbanSecs,
     editingMentionTextOption,
     editingImageAnswersCountOption,
     editingJoinedCleared,
@@ -435,7 +448,6 @@ export default () => {
                 <FromHint>针对验证结果为「错误」的用户采取的措施</FromHint>
                 <FormLine>
                   <FormLabel>超时时间</FormLabel>
-
                   <FormInput
                     type="number"
                     tw="w-8/12"
@@ -457,6 +469,17 @@ export default () => {
                 <FromHint>
                   提及验证用户时显示的内容，马赛克指用符号遮挡部分文字
                 </FromHint>
+                <FormLine>
+                  <FormLabel>延时解封时长</FormLabel>
+                  <FormInput
+                    type="number"
+                    tw="w-8/12"
+                    value={editingDelayUnbanSecs}
+                    onChange={handleEditingDelayUnbanSecsChange}
+                    placeholder="在此填入秒数"
+                  />
+                </FormLine>
+                <FromHint>封禁并延迟解封的延迟时间，单位：秒</FromHint>
                 <FormLine>
                   <FormLabel>答案个数（图片验证）</FormLabel>
                   <OwnSelect
