@@ -27,11 +27,8 @@ defmodule PolicrMini.ChatsTest do
 
       assert scheme.chat_id == scheme_params.chat_id
       assert scheme.verification_mode == :image
-      assert scheme.verification_entrance == :unity
-      assert scheme.verification_occasion == :private
       assert scheme.seconds == scheme_params.seconds
       assert scheme.wrong_killing_method == :ban
-      assert scheme.is_highlighted == scheme_params.is_highlighted
       assert scheme.service_message_cleanup == [:joined]
     end
 
@@ -40,33 +37,24 @@ defmodule PolicrMini.ChatsTest do
       {:ok, scheme1} = create_scheme(scheme_params)
 
       updated_verification_mode = 1
-      updated_verification_entrance = 1
-      updated_verification_occasion = 1
       updated_seconds = 120
       updated_timeout_killing_method = :ban
-      updated_is_highlighted = false
       updated_service_message_cleanup = [:joined, :lefted]
       updated_delay_unban_secs = 120
 
       {:ok, scheme2} =
         update_scheme(scheme1, %{
           verification_mode: updated_verification_mode,
-          verification_entrance: updated_verification_entrance,
-          verification_occasion: updated_verification_occasion,
           seconds: updated_seconds,
           timeout_killing_method: updated_timeout_killing_method,
-          is_highlighted: updated_is_highlighted,
           service_message_cleanup: updated_service_message_cleanup,
           delay_unban_secs: updated_delay_unban_secs
         })
 
       assert scheme2.id == scheme1.id
       assert scheme2.verification_mode == :custom
-      assert scheme2.verification_entrance == :independent
-      assert scheme2.verification_occasion == :public
       assert scheme2.seconds == updated_seconds
       assert scheme2.timeout_killing_method == :ban
-      assert scheme2.is_highlighted == updated_is_highlighted
       assert scheme2.service_message_cleanup == updated_service_message_cleanup
       assert scheme2.delay_unban_secs == updated_delay_unban_secs
     end
@@ -101,12 +89,9 @@ defmodule PolicrMini.ChatsTest do
 
       assert default.chat_id == 0
       assert default.verification_mode == :image
-      assert default.verification_entrance == :unity
-      assert default.verification_occasion == :private
       assert default.seconds == 300
       assert default.timeout_killing_method == :kick
       assert default.wrong_killing_method == :kick
-      assert default.is_highlighted == true
       assert default.service_message_cleanup == [:joined]
       assert default.delay_unban_secs == 60
     end

@@ -58,8 +58,6 @@ defmodule PolicrMini.Chats do
 
   @default_scheme %{
     verification_mode: :image,
-    verification_entrance: :unity,
-    verification_occasion: :private,
     seconds: 300,
     timeout_killing_method: :kick,
     wrong_killing_method: :kick,

@@ -44,13 +44,10 @@ defmodule PolicrMini.Factory do
   def build(:scheme) do
     %PolicrMini.Chats.Scheme{
       verification_mode: 0,
-      verification_entrance: 0,
-      verification_occasion: 0,
       seconds: 80,
       timeout_killing_method: :kick,
       wrong_killing_method: :ban,
       image_answers_count: 4,
-      is_highlighted: true,
       service_message_cleanup: [:joined],
       delay_unban_secs: 60
     }

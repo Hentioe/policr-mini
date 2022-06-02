@@ -60,19 +60,17 @@ defmodule PolicrMiniBot.HandleUserJoinedCleanupPlug do
         _ -> DateTime.utc_now()
       end
 
-    entrance = scheme.verification_entrance || default!(:ventrance)
     mode = scheme.verification_mode || default!(:vmode)
-    occasion = scheme.verification_occasion || default!(:voccasion)
     seconds = scheme.seconds || default!(:vseconds)
 
     if DateTime.diff(DateTime.utc_now(), joined_datetime) >= @expired_seconds do
       # 处理过期验证
-      handle_expired(entrance, chat_id, new_chat_member, state)
+      handle_expired(chat_id, new_chat_member, state)
     else
       # 异步限制新用户
       async(fn -> restrict_chat_member(chat_id, new_chat_member.id) end)
 
-      handle_it(mode, entrance, occasion, seconds, chat_id, new_chat_member, state)
+      handle_it(mode, seconds, chat_id, new_chat_member, state)
     end
   end
 
@@ -80,14 +78,15 @@ defmodule PolicrMiniBot.HandleUserJoinedCleanupPlug do
   处理过期验证。
   当前仅限制用户，并不发送验证消息。
   """
-  @spec handle_expired(atom, integer, map, State.t()) :: {:error, State.t()} | {:ok, State.t()}
-  def handle_expired(entrance, chat_id, new_chat_member, state) do
+  @spec handle_expired(integer, map, State.t()) :: {:error, State.t()} | {:ok, State.t()}
+  def handle_expired(chat_id, new_chat_member, state) do
     verification_params = %{
       chat_id: chat_id,
       target_user_id: new_chat_member.id,
       target_user_name: fullname(new_chat_member),
       target_user_language_code: new_chat_member.language_code,
-      entrance: entrance,
+      # 当前只存在统一入口
+      entrance: :unity,
       seconds: 0,
       status: :expired
     }
@@ -115,7 +114,7 @@ defmodule PolicrMiniBot.HandleUserJoinedCleanupPlug do
   @doc """
   统一入口 + 私聊方案的细节实现。
   """
-  def handle_it(_, :unity, :private, seconds, chat_id, new_chat_member, state) do
+  def handle_it(_, seconds, chat_id, new_chat_member, state) do
     verification_params = %{
       chat_id: chat_id,
       target_user_id: new_chat_member.id,

@@ -501,8 +501,6 @@ defmodule PolicrMiniBot.Helper do
 
   @defaults_key_mapping [
     vmode: :verification_mode,
-    ventrance: :verification_entrance,
-    voccasion: :verification_occasion,
     vseconds: :seconds,
     tkmethod: :timeout_killing_method,
     wkmethod: :wrong_killing_method,
@@ -514,8 +512,6 @@ defmodule PolicrMiniBot.Helper do
 
   @type default_keys ::
           :vmode
-          | :ventrance
-          | :voccasion
           | :vseconds
           | :tkmethod
           | :wkmethod
@@ -530,7 +526,6 @@ defmodule PolicrMiniBot.Helper do
   ## 当前 `key` 可以是以下值
   - `:vmode`: 验证方式。
   - `:ventrance`: 验证入口。
-  - `:voccasion`: 验证场合。
   - `:vseconds`: 验证超时时间。
   - `:tkmethod`: 超时击杀方法。
   - `:wkmethod`: 错误击杀方法。
@@ -541,10 +536,6 @@ defmodule PolicrMiniBot.Helper do
   ## 例子
       iex> PolicrMiniBot.Helper.default!(:vmode)
       :image
-      iex> PolicrMiniBot.Helper.default!(:ventrance)
-      :unity
-      iex> PolicrMiniBot.Helper.default!(:voccasion)
-      :private
       iex> PolicrMiniBot.Helper.default!(:vseconds)
       300
       iex> PolicrMiniBot.Helper.default!(:tkmethod)

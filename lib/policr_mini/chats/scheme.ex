@@ -8,8 +8,6 @@ defmodule PolicrMini.Chats.Scheme do
   alias PolicrMini.EctoEnums.{
     VerificationModeEnum,
     KillingMethodEnum,
-    VerificationEntranceEnum,
-    VerificationOccasionEnum,
     MentionText,
     ServiceMessage
   }
@@ -17,12 +15,9 @@ defmodule PolicrMini.Chats.Scheme do
   @required_fields ~w(chat_id)a
   @optional_fields ~w(
                       verification_mode
-                      verification_entrance
-                      verification_occasion
                       seconds
                       timeout_killing_method
                       wrong_killing_method
-                      is_highlighted
                       mention_text
                       image_answers_count
                       service_message_cleanup
@@ -34,18 +29,12 @@ defmodule PolicrMini.Chats.Scheme do
     field :chat_id, :integer
     # 验证模式
     field :verification_mode, VerificationModeEnum
-    # 验证入口
-    field :verification_entrance, VerificationEntranceEnum
-    # 验证场合
-    field :verification_occasion, VerificationOccasionEnum
     # 验证时长
     field :seconds, :integer
     # 超时结果的击杀方法
     field :timeout_killing_method, KillingMethodEnum
     # 错误结果的击杀方法
     field :wrong_killing_method, KillingMethodEnum
-    # 是否突出显示
-    field :is_highlighted, :boolean
     # 提及文本
     field :mention_text, MentionText
     # 图片验证的答案个数
