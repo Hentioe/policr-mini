@@ -51,34 +51,45 @@ defmodule PolicrMini.StatisticBusiness do
     |> Repo.one()
   end
 
+  def fetch_today(chat_id, status, params) do
+    Repo.transaction(fn ->
+      case find_today(chat_id, status) || create(params) do
+        {:ok, statistic} ->
+          # 创建了一个新的
+          statistic
+
+        {:error, e} ->
+          # 创建时发生错误
+          Repo.rollback(e)
+
+        statistic ->
+          # 已存在
+          statistic
+      end
+    end)
+  end
+
   @doc """
   自增一个当天的统计。
   """
   @spec increment_one(integer, String.t(), status) :: {:ok, Statistic.t()} | {:error, any}
   def increment_one(chat_id, language_code, status) do
     language_code = language_code || "unknown"
+    {begin_at, end_at} = today_datetimes()
 
-    fetch_stat = fn ->
-      case find_today(chat_id, status) do
-        nil ->
-          {begin_at, end_at} = today_datetimes()
+    params = %{
+      chat_id: chat_id,
+      verifications_count: 0,
+      languages_top: %{language_code => 0},
+      begin_at: begin_at,
+      end_at: end_at,
+      verification_status: status
+    }
 
-          create(%{
-            chat_id: chat_id,
-            verifications_count: 0,
-            languages_top: %{language_code => 0},
-            begin_at: begin_at,
-            end_at: end_at,
-            verification_status: status
-          })
-
-        stat ->
-          {:ok, stat}
-      end
-    end
+    fetch_one = fn -> fetch_today(chat_id, status, params) end
 
     trans_fun = fn ->
-      trans_r = increment_trans(fetch_stat, language_code)
+      trans_r = increment_trans(fetch_one, language_code)
 
       case trans_r do
         {:ok, r} -> r
