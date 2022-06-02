@@ -1,8 +1,8 @@
-defmodule PolicrMini.Schema.ThirdPartyTest do
+defmodule PolicrMini.Instances.ThirdPartyTest do
   use ExUnit.Case
 
   alias PolicrMini.Factory
-  alias PolicrMini.Schema.ThirdParty
+  alias PolicrMini.Instances.ThirdParty
 
   describe "schema" do
     test "schema metadata" do

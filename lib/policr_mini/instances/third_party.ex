@@ -1,4 +1,4 @@
-defmodule PolicrMini.Schema.ThirdParty do
+defmodule PolicrMini.Instances.ThirdParty do
   @moduledoc """
   第三方实例模型。
   """

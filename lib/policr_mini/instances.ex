@@ -9,7 +9,7 @@ defmodule PolicrMini.Instances do
 
   alias PolicrMini.{Repo, PermissionBusiness}
   alias PolicrMini.Schema.Permission
-  alias __MODULE__.{Term, Chat, Sponsor, SponsorshipHistory, SponsorshipAddress}
+  alias __MODULE__.{Term, Chat, Sponsor, SponsorshipHistory, SponsorshipAddress, ThirdParty}
 
   @type term_written_returns ::
           {:ok, Term.t()} | {:error, Ecto.Changeset.t()}
@@ -21,6 +21,8 @@ defmodule PolicrMini.Instances do
           {:ok, SponsorshipHistory.t()} | {:error, Ecto.Changeset.t()}
   @type sponsorship_addresses_written_returns ::
           {:ok, SponsorshipAddress.t()} | {:error, Ecto.Changeset.t()}
+  @type third_party_written_returns ::
+          {:ok, ThirdParty.t()} | {:error, Ecto.Changeset.t()}
 
   @term_id 1
 
@@ -385,5 +387,25 @@ defmodule PolicrMini.Instances do
   @spec find_sponsorship_addresses(find_sponsorship_addresses_cont) :: [SponsorshipAddress.t()]
   def find_sponsorship_addresses(_find_sponsorship_addresses_cont \\ []) do
     from(s in SponsorshipAddress) |> Repo.all()
+  end
+
+  @spec create_third_party(map) :: third_party_written_returns
+  def create_third_party(params) do
+    %ThirdParty{} |> ThirdParty.changeset(params) |> Repo.insert()
+  end
+
+  @spec update_third_party(ThirdParty.t(), map) :: third_party_written_returns
+  def update_third_party(third_party, params) do
+    third_party |> ThirdParty.changeset(params) |> Repo.update()
+  end
+
+  def delete_third_party(third_party) when is_struct(third_party, ThirdParty) do
+    Repo.delete(third_party)
+  end
+
+  @spec find_third_parties(keyword) :: [ThirdParty.t()]
+  def find_third_parties(_find_list_conts \\ []) do
+    from(t in ThirdParty, order_by: [desc: t.running_days])
+    |> Repo.all()
   end
 end

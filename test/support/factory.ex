@@ -103,7 +103,7 @@ defmodule PolicrMini.Factory do
   end
 
   def build(:third_party) do
-    %PolicrMini.Schema.ThirdParty{
+    %PolicrMini.Instances.ThirdParty{
       name: "开发实例",
       bot_username: "policr_mini_dev_bot",
       homepage: "https://mini-dev.telestd.me",

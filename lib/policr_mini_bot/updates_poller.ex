@@ -1,12 +1,13 @@
 defmodule PolicrMiniBot.UpdatesPoller do
   @moduledoc """
-  获取消息更新的轮询服务。
+  轮询获取消息更新。
   """
 
   use GenServer
 
   alias PolicrMini.Logger
   alias PolicrMiniBot.Consumer
+  alias PolicrMiniBot.Runner.ThirdPartiesMaintainer
 
   defmodule BotInfo do
     @moduledoc false
@@ -20,6 +21,9 @@ defmodule PolicrMiniBot.UpdatesPoller do
             photo_file_id: binary,
             is_third_party: boolean
           }
+    def from(bot_info: bot_info) when is_struct(bot_info, __MODULE__) do
+      bot_info
+    end
   end
 
   @doc """
@@ -29,11 +33,16 @@ defmodule PolicrMiniBot.UpdatesPoller do
   """
   def start_link(default \\ []) when is_list(default) do
     # 初始化 bot。
-    if :ets.whereis(BotInfo) == :undefined, do: init_bot()
+    bot_info =
+      if :ets.whereis(BotInfo) == :undefined,
+        do: init_bot(),
+        else: BotInfo.from(:ets.lookup(BotInfo, :bot_info))
 
     Logger.info("Updates poller has started")
 
-    GenServer.start_link(__MODULE__, %{offset: 0}, name: __MODULE__)
+    GenServer.start_link(__MODULE__, %{offset: 0, is_third_party: bot_info.is_third_party},
+      name: __MODULE__
+    )
   end
 
   defp init_bot do
@@ -52,11 +61,16 @@ defmodule PolicrMiniBot.UpdatesPoller do
     if Application.get_env(:policr_mini, PolicrMiniBot)[:auto_gen_commands] do
       {:ok, _} = username |> gen_commands() |> Telegex.set_my_commands()
     end
+
+    bot_info
   end
 
   @impl true
   def init(state) do
     schedule_pull_updates()
+
+    # 非第三方实例，添加第三方实例的维护任务
+    if !state.is_third_party, do: ThirdPartiesMaintainer.add_job()
 
     {:ok, state}
   end

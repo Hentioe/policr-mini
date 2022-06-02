@@ -37,6 +37,10 @@ defmodule PolicrMiniBot.Runner do
     def put_text(%{name: :left_check} = job) do
       %{job | name_text: "退出检查", schedule_text: "每日"}
     end
+
+    def put_text(%{name: :third_parties_running_days_update} = job) do
+      %{job | name_text: "第三方实例运行天数更新", schedule_text: "每日"}
+    end
   end
 
   @spec jobs() :: [Job.t()]

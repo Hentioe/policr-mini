@@ -1,4 +1,4 @@
-defmodule PolcirMiniBot.Runner.LeftChecker do
+defmodule PolicrMiniBot.Runner.LeftChecker do
   @moduledoc false
 
   alias PolicrMini.Logger

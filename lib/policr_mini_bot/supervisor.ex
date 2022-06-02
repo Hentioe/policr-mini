@@ -80,12 +80,12 @@ defmodule PolicrMiniBot.Supervisor do
       PolicrMiniBot.Disposable,
       # 速度限制。
       PolicrMiniBot.SpeedLimiter,
+      # 任务调度服务
+      PolicrMiniBot.Scheduler,
       # 拉取更新消息
       PolicrMiniBot.UpdatesPoller,
       # 消费消息的动态主管
-      PolicrMiniBot.Consumer,
-      # 任务调度服务
-      PolicrMiniBot.Scheduler
+      PolicrMiniBot.Consumer
     ]
 
     # See https://hexdocs.pm/elixir/Supervisor.html

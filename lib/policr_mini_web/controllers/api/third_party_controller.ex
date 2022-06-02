@@ -5,7 +5,7 @@ defmodule PolicrMiniWeb.API.ThirdPartyController do
 
   use PolicrMiniWeb, :controller
 
-  alias PolicrMini.ThirdPartyBusiness
+  alias PolicrMini.Instances
 
   action_fallback PolicrMiniWeb.API.FallbackController
 
@@ -14,7 +14,7 @@ defmodule PolicrMiniWeb.API.ThirdPartyController do
   @project_start_date ~D[2020-06-01]
 
   def offical_bot do
-    %PolicrMini.Schema.ThirdParty{
+    %PolicrMini.Instances.ThirdParty{
       name: "Policr Mini",
       bot_username: "policr_mini_bot",
       homepage: "https://mini.telestd.me",
@@ -25,7 +25,7 @@ defmodule PolicrMiniWeb.API.ThirdPartyController do
   end
 
   def index(conn, _params) do
-    third_parties = ThirdPartyBusiness.find_list()
+    third_parties = Instances.find_third_parties()
 
     {current_index, official_index, third_parties} =
       case get_req_header(conn, "referer") do
@@ -75,7 +75,7 @@ defmodule PolicrMiniWeb.API.ThirdPartyController do
 
   # TODO: 使用专门的 Plug 缓存 `third_parties` 数据，以避免在 API 实现中出现重复查询。
   def load_origins do
-    third_parties = ThirdPartyBusiness.find_list()
+    third_parties = Instances.find_third_parties()
 
     Enum.map(third_parties, fn third_party -> third_party.homepage end)
   end

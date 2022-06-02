@@ -7,13 +7,14 @@ defmodule PolicrMiniWeb.Admin.API.ThirdPartyController do
 
   import PolicrMiniWeb.Helper
 
-  alias PolicrMini.ThirdPartyBusiness
+  alias PolicrMini.Instances
+  alias PolicrMini.Instances.ThirdParty
 
   action_fallback PolicrMiniWeb.API.FallbackController
 
   def index(conn, _params) do
     with {:ok, _} <- check_sys_permissions(conn) do
-      third_parties = ThirdPartyBusiness.find_list()
+      third_parties = Instances.find_third_parties()
 
       render(conn, "index.json", %{third_parties: third_parties})
     end
@@ -21,23 +22,23 @@ defmodule PolicrMiniWeb.Admin.API.ThirdPartyController do
 
   def add(conn, params) do
     with {:ok, _} <- check_sys_permissions(conn),
-         {:ok, third_party} <- ThirdPartyBusiness.create(params) do
+         {:ok, third_party} <- Instances.create_third_party(params) do
       render(conn, "third_party.json", %{third_party: third_party})
     end
   end
 
   def update(conn, %{"id" => id} = params) do
     with {:ok, _} <- check_sys_permissions(conn),
-         {:ok, third_party} <- ThirdPartyBusiness.get(id),
-         {:ok, third_party} <- ThirdPartyBusiness.update(third_party, params) do
+         {:ok, third_party} <- ThirdParty.get(id),
+         {:ok, third_party} <- Instances.update_third_party(third_party, params) do
       render(conn, "third_party.json", %{third_party: third_party})
     end
   end
 
   def delete(conn, %{"id" => id} = _params) do
     with {:ok, _} <- check_sys_permissions(conn),
-         {:ok, third_party} <- ThirdPartyBusiness.get(id),
-         {:ok, third_party} <- ThirdPartyBusiness.delete(third_party) do
+         {:ok, third_party} <- ThirdParty.get(id),
+         {:ok, third_party} <- Instances.delete_third_party(third_party) do
       render(conn, "third_party.json", %{third_party: third_party})
     end
   end
