@@ -479,7 +479,7 @@ export default () => {
                     placeholder="在此填入秒数"
                   />
                 </FormLine>
-                <FromHint>封禁再延时解封的延迟时间，单位：秒</FromHint>
+                <FromHint>封禁再延时解封的延迟时长，单位：秒</FromHint>
                 <FormLine>
                   <FormLabel>答案个数（图片验证）</FormLabel>
                   <OwnSelect

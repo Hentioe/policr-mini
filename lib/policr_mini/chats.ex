@@ -65,7 +65,7 @@ defmodule PolicrMini.Chats do
     mention_text: :mosaic_full_name,
     image_answers_count: 4,
     service_message_cleanup: [:joined],
-    delay_unban_secs: 60
+    delay_unban_secs: 300
   }
 
   @doc """

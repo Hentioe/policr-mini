@@ -82,10 +82,11 @@ const killingMethodOptions = [
 const customDelayUnabnSecsOption = { value: "custom", label: "自定义" };
 const defaultDelayUnbanSecsOption = { value: "default", label: "系统默认" };
 const delayUnabnSecsOptions = [
-  { value: 60 * 1, label: "生成：1 分钟" },
-  { value: 60 * 3, label: "生成：3 分钟" },
-  { value: 60 * 10, label: "生成：10 分钟" },
-  { value: 60 * 30, label: "生成：30 分钟" },
+  { value: 60 * 5, label: "生成：5 分钟" },
+  { value: 60 * 15, label: "生成：15 分钟" },
+  { value: 3600 * 1, label: "生成：1 小时" },
+  { value: 3600 * 3, label: "生成：3 小时" },
+  { value: 3600 * 5, label: "生成：5 小时" },
   defaultSecondsOption,
   customSecondsOption,
 ];
@@ -535,7 +536,7 @@ export default () => {
                     </div>
                   </div>
                 </ProfileField>
-                <FromHint>封禁再延时解封的延迟时间，单位：秒</FromHint>
+                <FromHint>封禁再延时解封的延迟时长，单位：秒</FromHint>
                 <ProfileField>
                   <ProfileFieldLabel>提及文本</ProfileFieldLabel>
                   <OwnSelect
