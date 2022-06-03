@@ -9,7 +9,7 @@ defmodule PolicrMini.CustomKitBusiness do
 
   @type writed_result :: {:ok, CustomKit.t()} | {:error, Ecto.Changeset.t()}
 
-  @max_count 12
+  @max_count 55
 
   @spec create(map()) :: writed_result | {:error, %{description: String.t()}}
   def create(params) do
