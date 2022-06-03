@@ -379,6 +379,7 @@ defmodule PolicrMiniBot.CallVerificationPlug do
     unix_now = DateTime.to_unix(dt_now)
 
     # 当前时间加允许重现加入的秒数，确保能正常解除封禁。
-    unix_now + delay_unban_secs
+    # +1 是为了抵消网络延迟
+    unix_now + delay_unban_secs + 1
   end
 end
