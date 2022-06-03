@@ -6,6 +6,7 @@ defmodule PolicrMiniBot.Consumer do
   use DynamicSupervisor
 
   alias PolicrMiniBot.State
+  alias PolicrMini.Logger
 
   def start_link(default \\ []) when is_list(default) do
     DynamicSupervisor.start_link(__MODULE__, %{}, name: __MODULE__)
@@ -19,7 +20,14 @@ defmodule PolicrMiniBot.Consumer do
   def receive(%Telegex.Model.Update{} = update) do
     DynamicSupervisor.start_child(
       __MODULE__,
-      {Task, fn -> Telegex.Plug.Pipeline.call(update, %State{}) end}
+      {Task,
+       fn ->
+         try do
+           Telegex.Plug.Pipeline.call(update, %State{})
+         rescue
+           e -> Logger.error("Uncaught Error: #{inspect(e)}")
+         end
+       end}
     )
   end
 end
