@@ -50,7 +50,7 @@ defmodule PolicrMini.Chats.Scheme do
   # 用户输入的图片答案个数必须大于或等于 3，且小于或等于 5
   @users_image_answers_count_validate [greater_than_or_equal_to: 3, less_than_or_equal_to: 5]
   # 用户输入的延迟解封时长必须大于或等于 45 秒，且小于或等于 18000 秒（5 个小时）。
-  @users_delay_unban_secs_validate [greater_than_or_equal_to: 45, less_than_or_equal_to: 18000]
+  @users_delay_unban_secs_validate [greater_than_or_equal_to: 45, less_than_or_equal_to: 18_000]
 
   # 针对默认 scheme 去掉一些约束检查
   def changeset(%{chat_id: 0} = struct, attrs)
