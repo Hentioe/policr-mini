@@ -68,7 +68,7 @@ defmodule PolicrMiniBot.HandleUserJoinedCleanupPlug do
       handle_expired(chat_id, new_chat_member, state)
     else
       # 异步限制新用户
-      async(fn -> restrict_chat_member(chat_id, new_chat_member.id) end)
+      async_run(fn -> restrict_chat_member(chat_id, new_chat_member.id) end)
 
       handle_it(mode, seconds, chat_id, new_chat_member, state)
     end
@@ -96,7 +96,7 @@ defmodule PolicrMiniBot.HandleUserJoinedCleanupPlug do
         # 计数器自增（验证总数）
         PolicrMini.Counter.increment(:verification_total)
         # 异步限制新用户
-        async(fn -> restrict_chat_member(chat_id, new_chat_member.id) end)
+        async_run(fn -> restrict_chat_member(chat_id, new_chat_member.id) end)
 
         {:ok, state}
 

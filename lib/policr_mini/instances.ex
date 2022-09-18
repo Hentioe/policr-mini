@@ -215,7 +215,9 @@ defmodule PolicrMini.Instances do
 
   @spec create_sponsor(map) :: sponsor_written_returns
   def create_sponsor(params) do
-    %Sponsor{uuid: UUID.uuid4()} |> Sponsor.changeset(params) |> Repo.insert()
+    uuid = :uuid.get_v4() |> :uuid.uuid_to_string() |> List.to_string()
+
+    %Sponsor{uuid: uuid} |> Sponsor.changeset(params) |> Repo.insert()
   end
 
   @spec update_sponsor(Sponsor.t(), map) :: sponsor_written_returns

@@ -136,7 +136,7 @@ defmodule PolicrMiniBot.Runner.WorkingChecker do
 
     if Keyword.get(opts, :send_notification, true),
       do:
-        BotHelper.async(fn ->
+        BotHelper.async_run(fn ->
           BotHelper.send_message(
             chat.id,
             BotHelper.t("errors.no_permission", %{bot_username: PolicrMiniBot.username()}),

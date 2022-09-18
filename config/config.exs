@@ -69,8 +69,6 @@ config :logger, :queryable_log, level: :warn
 
 # Use Jason for JSON parsing in Phoenix
 config :phoenix, :json_library, Jason
-# Task global configuration
-config :task_after, global_name: TaskAfter
 
 # Internationalization of bot messages
 config :exi18n,

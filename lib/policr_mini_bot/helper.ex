@@ -324,7 +324,7 @@ defmodule PolicrMiniBot.Helper do
 
     if delay_seconds do
       delay_seconds = if delay_seconds < 0, do: 0, else: delay_seconds
-      async(fn -> Telegex.delete_message(chat_id, message_id) end, seconds: delay_seconds)
+      async_run(fn -> Telegex.delete_message(chat_id, message_id) end, delay_secs: delay_seconds)
 
       {:ok, true}
     else
@@ -585,30 +585,19 @@ defmodule PolicrMiniBot.Helper do
     end
   end
 
-  @doc """
-  异步执行函数，不指定延迟时间。
-  """
-  @spec async(function() | [do: term]) :: :ok
-  def async(callback) when is_function(callback) do
-    TaskAfter.task_after(0, callback)
+  @spec async_run(function, delay_secs: integer) :: Honeydew.Job.t() | no_return
+  defdelegate async_run(fun, opts \\ []), to: PolicrMini.Worker.GeneralRun, as: :async_run
 
-    :ok
+  defmacro async({:fn, _, _} = lambda) do
+    quote do
+      PolicrMiniBot.Helper.async_run(unquote(lambda))
+    end
   end
 
-  def async(do: block) do
-    TaskAfter.task_after(0, fn -> block end)
-
-    :ok
-  end
-
-  @doc """
-  异步执行函数，可指定单位为秒的延迟时间。
-  """
-  @spec async(function, [{:seconds, integer}, ...]) :: :ok
-  def async(callback, [{:seconds, seconds}]) when is_integer(seconds) and is_function(callback) do
-    TaskAfter.task_after(seconds * 1000, callback)
-
-    :ok
+  defmacro async(do: block) do
+    quote do
+      PolicrMiniBot.Helper.async_run(fn -> unquote(block) end)
+    end
   end
 
   @doc """

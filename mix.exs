@@ -64,15 +64,11 @@ defmodule PolicrMini.MixProject do
       {:plug_cowboy, "~> 2.5"},
       {:quantum, "~> 3.5"},
       {:honeydew, "~> 1.5"},
-      # TODO: 使用 `honeydew` 替代此库功能。
-      {:task_after, "~> 1.2"},
       {:cachex, "~> 3.4"},
       {:httpoison, "~> 1.8"},
-      # TODO: 使用 `casex` 替代此库功能。
-      {:proper_case, "~> 1.3"},
+      {:casex, "~> 0.4.2"},
       {:earmark, "~> 1.4"},
-      # TODO: 使用 `uuid_erl` 替代此库功能。
-      {:elixir_uuid, "~> 1.2"},
+      {:uuid, "~> 2.0", hex: :uuid_erl},
       {:not_qwerty123, "~> 2.3"},
       {:yaml_elixir, "~> 2.7"},
       {:unzip, "~> 0.6"},

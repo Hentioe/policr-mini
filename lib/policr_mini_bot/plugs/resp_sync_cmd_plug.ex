@@ -40,7 +40,7 @@ defmodule PolicrMiniBot.RespSyncCmdPlug do
         # 添加 15 秒的速度限制记录。
         :ok = SpeedLimiter.put(speed_limit_key, 15)
 
-        async(fn -> typing(chat_id) end)
+        async_run(fn -> typing(chat_id) end)
 
         # 同步群组和管理员信息，并自动设置接管状态。
         # 注意，同步完成后需进一步确保方案存在。
@@ -75,7 +75,7 @@ defmodule PolicrMiniBot.RespSyncCmdPlug do
                 )
             end
 
-          async(fn -> send_message(chat_id, message_text) end)
+          async_run(fn -> send_message(chat_id, message_text) end)
         else
           {:error, e} ->
             Logger.unitized_error("Group data synchronization", e)

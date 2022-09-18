@@ -7,6 +7,7 @@ defmodule PolicrMini.Application do
 
   def start(_type, _args) do
     PolicrMini.Mnesia.init()
+    PolicrMini.Worker.GeneralRun.init_queue()
 
     children = [
       # Start the Ecto repository

@@ -160,7 +160,10 @@ defmodule PolicrMiniBot.CallVerificationPlug do
     case VerificationBusiness.update(verification, %{status: :passed}) do
       {:ok, verification} ->
         # 解除限制
-        async(fn -> derestrict_chat_member(verification.chat_id, verification.target_user_id) end)
+        async do
+          derestrict_chat_member(verification.chat_id, verification.target_user_id)
+        end
+
         # 更新验证结果
         async do
           # 注意：此处默认以 `Telegex.Marked` 库转换文字，需要用 `escape_markdown/1` 函数转义文本中的动态内容。
@@ -176,7 +179,7 @@ defmodule PolicrMiniBot.CallVerificationPlug do
         async(fn -> verification.chat_id |> typing() end)
 
         # 发送通知
-        async(notice_fun)
+        async_run(notice_fun)
 
         {:ok, verification}
 
@@ -362,8 +365,8 @@ defmodule PolicrMiniBot.CallVerificationPlug do
         r = Telegex.ban_chat_member(chat_id, user_id)
 
         # 调用 API 解除限制以允许再次加入。
-        async(fn -> Telegex.unban_chat_member(chat_id, user_id) end,
-          seconds: delay_unban_secs
+        async_run(fn -> Telegex.unban_chat_member(chat_id, user_id) end,
+          delay_secs: delay_unban_secs
         )
 
         r

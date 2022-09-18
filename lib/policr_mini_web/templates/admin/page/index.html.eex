@@ -1,5 +1,5 @@
 <script type="text/javascript">
-  __GLOBAL__ = <%= {:safe, @global |> ProperCase.to_camel_case() |> Jason.encode!()} %>;
+  __GLOBAL__ = <%= {:safe, @global |> Casex.to_camel_case() |> Jason.encode!()} %>;
 </script>
 <div id="app"></div>
 <link

@@ -4,6 +4,9 @@ defmodule PolicrMiniBot.Runner.ExpiredChecker do
   alias PolicrMini.Logger
   alias PolicrMini.{VerificationBusiness, StatisticBusiness}
 
+  require PolicrMiniBot.Helper
+  import PolicrMiniBot.Helper
+
   @spec run :: :ok
 
   @doc """
@@ -25,7 +28,7 @@ defmodule PolicrMiniBot.Runner.ExpiredChecker do
     verifications
     |> Enum.each(fn verification ->
       # 自增统计数据（其它）。
-      PolicrMiniBot.Helper.async do
+      async do
         StatisticBusiness.increment_one(
           verification.chat_id,
           verification.target_user_language_code,
