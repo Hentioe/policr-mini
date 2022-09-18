@@ -33,13 +33,11 @@ npm-debug.log
 # this depending on your deployment strategy.
 /priv/static/
 
-# ElixirLS
-/.elixir_ls
-
-# Secret configuration
+# Secret configuration files.
 /config/*.secret.exs
 
-# Mnesia
+# Mnesia dir.
 /Mnesia.*/
 
+# Rersistent assets.
 /_assets/
