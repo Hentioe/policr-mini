@@ -25,7 +25,7 @@ config :policr_mini, PolicrMiniWeb.Endpoint,
   code_reloader: true,
   check_origin: false,
   watchers: [
-    npm: [
+    pnpm: [
       "run",
       "watch",
       cd: Path.expand("../assets", __DIR__)

@@ -53,7 +53,17 @@ module.exports = (_env, options) => {
         },
         {
           test: /\.[s]?css$/,
-          use: [MiniCssExtractPlugin.loader, "css-loader", "sass-loader"],
+          use: [
+            MiniCssExtractPlugin.loader,
+            "css-loader",
+            {
+              loader: "sass-loader",
+              options: {
+                // `dart-sass` 是首选
+                implementation: require("sass"),
+              },
+            },
+          ],
         },
         {
           test: /\.svg/,
