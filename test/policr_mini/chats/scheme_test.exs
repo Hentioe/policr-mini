@@ -60,7 +60,7 @@ defmodule PolicrMini.Chats.SchemeTest do
 
     assert changeset.validations == [
              {:delay_unban_secs,
-              {:number, [greater_than_or_equal_to: 45, less_than_or_equal_to: 3600]}},
+              {:number, [greater_than_or_equal_to: 45, less_than_or_equal_to: 18000]}},
              {:image_answers_count,
               {:number, [greater_than_or_equal_to: 3, less_than_or_equal_to: 5]}}
            ]

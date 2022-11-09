@@ -543,7 +543,7 @@ defmodule PolicrMiniBot.Helper do
       iex> PolicrMiniBot.Helper.default!(:wkmethod)
       :kick
       iex> PolicrMiniBot.Helper.default!(:delay_unban_secs)
-      60
+      300
       iex> PolicrMiniBot.Helper.default!(:mention_scheme)
       :mosaic_full_name
       iex> PolicrMiniBot.Helper.default!(:acimage)

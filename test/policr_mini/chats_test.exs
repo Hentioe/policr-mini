@@ -93,7 +93,7 @@ defmodule PolicrMini.ChatsTest do
       assert default.timeout_killing_method == :kick
       assert default.wrong_killing_method == :kick
       assert default.service_message_cleanup == [:joined]
-      assert default.delay_unban_secs == 60
+      assert default.delay_unban_secs == 300
     end
   end
 end
