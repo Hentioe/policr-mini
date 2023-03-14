@@ -5,7 +5,7 @@ name: default
 
 steps:
   - name: app-compile
-    image: elixir:1.14.1-slim
+    image: elixir:1.14.3-slim
     environment:
       MIX_ENV: prod
     commands:
@@ -18,12 +18,12 @@ steps:
   - name: assets-build
     image: node:18-buster
     commands:
-      - npm install --location=global pnpm@7.9.0
+      - npm install --location=global pnpm@7.29.1
       - pnpm --prefix assets install
       - pnpm --prefix assets run deploy
 
   - name: app-build
-    image: elixir:1.14.1-slim
+    image: elixir:1.14.3-slim
     pull: always
     environment:
       MIX_ENV: prod
