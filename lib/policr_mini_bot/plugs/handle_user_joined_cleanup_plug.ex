@@ -85,8 +85,6 @@ defmodule PolicrMiniBot.HandleUserJoinedCleanupPlug do
       target_user_id: new_chat_member.id,
       target_user_name: fullname(new_chat_member),
       target_user_language_code: new_chat_member.language_code,
-      # 当前只存在统一入口
-      entrance: :unity,
       seconds: 0,
       status: :expired
     }
@@ -120,7 +118,6 @@ defmodule PolicrMiniBot.HandleUserJoinedCleanupPlug do
       target_user_id: new_chat_member.id,
       target_user_name: fullname(new_chat_member),
       target_user_language_code: new_chat_member.language_code,
-      entrance: :unity,
       seconds: seconds,
       status: :waiting
     }

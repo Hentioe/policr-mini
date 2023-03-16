@@ -68,7 +68,6 @@ defmodule PolicrMini.Factory do
     %PolicrMini.Schema.Verification{
       target_user_id: 491_837_624,
       target_user_name: "小明",
-      entrance: 0,
       message_id: 1234,
       indices: [1, 3],
       seconds: 60,

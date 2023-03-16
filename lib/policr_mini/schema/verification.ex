@@ -5,11 +5,11 @@ defmodule PolicrMini.Schema.Verification do
 
   use PolicrMini.Schema
 
-  alias PolicrMini.EctoEnums.{VerificationEntranceEnum, VerificationStatusEnum}
+  alias PolicrMini.EctoEnums.VerificationStatusEnum
   alias PolicrMini.Instances.Chat
   alias PolicrMini.Schema.MessageSnapshot
 
-  @required_fields ~w(chat_id target_user_id entrance seconds status)a
+  @required_fields ~w(chat_id target_user_id seconds status)a
   @optional_fields ~w(message_snapshot_id target_user_name target_user_language_code message_id indices chosen)a
 
   schema "verifications" do
@@ -19,7 +19,6 @@ defmodule PolicrMini.Schema.Verification do
     field :target_user_id, :integer
     field :target_user_name, :string
     field :target_user_language_code, :string
-    field :entrance, VerificationEntranceEnum
     field :message_id, :integer
     field :indices, {:array, :integer}
     field :seconds, :integer

@@ -1,7 +1,10 @@
 defmodule PolicrMini.Repo.Migrations.DeleteSchemesVerificationOccasion do
   use PolicrMini.Migration
 
-  alias PolicrMini.EctoEnums.VerificationOccasionEnum
+  import EctoEnum
+
+  # 验证场合。此枚举已经删除，但继续被历史 migrations 使用
+  defenum(VerificationOccasionEnum, private: 0, public: 1)
 
   def up do
     alter table("schemes") do

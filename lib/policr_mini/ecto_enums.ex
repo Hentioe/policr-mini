@@ -22,11 +22,6 @@ defmodule PolicrMini.EctoEnums do
     manual_kick: 5,
     manual_ban: 6
 
-  # 验证入口。此枚举在 scheme 中已经删除，但继续被历史 migrations 和 verification schema 使用
-  defenum VerificationEntranceEnum, unity: 0, independent: 1
-
-  # 验证场合。此枚举在 scheme 中已经删除，但继续被历史 migrations 使用
-  defenum VerificationOccasionEnum, private: 0, public: 1
   defenum KillingMethodEnum, ban: 0, kick: 1
   defenum OperationActionEnum, kick: 0, ban: 1
   defenum OperationRoleEnum, system: 0, admin: 1

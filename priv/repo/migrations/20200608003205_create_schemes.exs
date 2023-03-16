@@ -1,12 +1,15 @@
 defmodule PolicrMini.Repo.Migrations.CreateSchemes do
   use PolicrMini.Migration
 
-  alias PolicrMini.EctoEnums.{
-    VerificationModeEnum,
-    VerificationEntranceEnum,
-    VerificationOccasionEnum,
-    KillingMethodEnum
-  }
+  alias PolicrMini.EctoEnums.{VerificationModeEnum, KillingMethodEnum}
+
+  import EctoEnum
+
+  # 验证入口。此枚举已经删除，但继续被历史 migrations 使用
+  defenum(VerificationEntranceEnum, unity: 0, independent: 1)
+
+  # 验证场合。此枚举已经删除，但继续被历史 migrations 使用
+  defenum(VerificationOccasionEnum, private: 0, public: 1)
 
   def change do
     create table(:schemes) do

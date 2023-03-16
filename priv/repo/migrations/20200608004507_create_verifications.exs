@@ -1,6 +1,11 @@
 defmodule PolicrMini.Repo.Migrations.CreateVerifications do
   use PolicrMini.Migration
-  alias PolicrMini.EctoEnums.{VerificationEntranceEnum, VerificationStatusEnum}
+  alias PolicrMini.EctoEnums.VerificationStatusEnum
+
+  import EctoEnum
+
+  # 验证入口。此枚举已经删除，但继续被历史 migrations 使用
+  defenum(VerificationEntranceEnum, unity: 0, independent: 1)
 
   def change do
     create table(:verifications) do

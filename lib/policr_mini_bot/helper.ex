@@ -525,7 +525,6 @@ defmodule PolicrMiniBot.Helper do
 
   ## 当前 `key` 可以是以下值
   - `:vmode`: 验证方式。
-  - `:ventrance`: 验证入口。
   - `:vseconds`: 验证超时时间。
   - `:tkmethod`: 超时击杀方法。
   - `:wkmethod`: 错误击杀方法。
