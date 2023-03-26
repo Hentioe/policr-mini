@@ -1,5 +1,8 @@
 start:
-  response: 访问[这里](https://github.com/Hentioe/policr-mini)了解了解我吧～
+  response: |
+    你好，我是一个专注于新成员验证的机器人。具有稳定并不断优化和增强的核心功能，以及便于操作的网页后台。同时我是开源的，可自由复制部署的。
+
+    访问[这里](https://github.com/Hentioe/policr-mini)更加了解一下我吧\~
 
 self_joined:
   text: |

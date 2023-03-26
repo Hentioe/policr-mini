@@ -148,6 +148,12 @@ defmodule PolicrMiniBot.HandleSelfJoinedPlug do
             text: t("self_joined.markup_text.subscribe"),
             url: "https://t.me/policr_changelog"
           }
+        ],
+        [
+          %InlineKeyboardButton{
+            text: "设置为管理员",
+            url: "https://t.me/#{PolicrMiniBot.username()}?startgroup=added"
+          }
         ]
       ]
     }

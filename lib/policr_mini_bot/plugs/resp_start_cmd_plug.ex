@@ -11,6 +11,7 @@ defmodule PolicrMiniBot.RespStartCmdPlug do
   alias PolicrMini.{Logger, Chats, VerificationBusiness, MessageSnapshotBusiness}
   alias PolicrMini.Schema.Verification
   alias PolicrMiniBot.{ArithmeticCaptcha, CustomCaptcha, FallbackCaptcha, ImageCaptcha}
+  alias Telegex.Model.{InlineKeyboardMarkup, InlineKeyboardButton}
 
   @fallback_captcha_module FallbackCaptcha
 
@@ -49,15 +50,28 @@ defmodule PolicrMiniBot.RespStartCmdPlug do
   def handle(message, state) do
     %{chat: %{id: chat_id}, text: text} = message
 
-    splited_text = text |> String.split(" ")
+    args = String.split(text, " ")
 
-    if length(splited_text) == 2 do
-      splited_text |> List.last() |> dispatch(message)
+    if length(args) == 2 do
+      args |> List.last() |> dispatch(message)
     else
-      send_message(chat_id, t("start.response"))
+      send_message(chat_id, t("start.response"), reply_markup: default_markup())
     end
 
     {:ok, state}
+  end
+
+  defp default_markup do
+    %InlineKeyboardMarkup{
+      inline_keyboard: [
+        [
+          %InlineKeyboardButton{
+            text: "添加到群聊",
+            url: "https://t.me/#{PolicrMiniBot.username()}?startgroup=added"
+          }
+        ]
+      ]
+    }
   end
 
   @doc """
