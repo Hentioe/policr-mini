@@ -18,7 +18,7 @@ steps:
   - name: assets-build
     image: node:18-buster
     commands:
-      - npm install --location=global pnpm@7.29.1
+      - npm install --location=global pnpm@7.30.4
       - pnpm --prefix assets install
       - pnpm --prefix assets run deploy
 
