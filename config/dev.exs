@@ -30,8 +30,7 @@ config :policr_mini, PolicrMiniWeb.Endpoint,
       "watch",
       cd: Path.expand("../assets", __DIR__)
     ]
-  ],
-  server: true
+  ]
 
 # ## SSL Support
 #

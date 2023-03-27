@@ -3,6 +3,8 @@ import Config
 # Definition environment
 config :policr_mini, :environment, :prod
 
+config :policr_mini, PolicrMini.Application, runtime_migrate: true, tg_serve: true
+
 # For production, don't forget to configure the url host
 # to something meaningful, Phoenix uses this information
 # when generating URLs.
@@ -14,7 +16,8 @@ config :policr_mini, :environment, :prod
 # before starting your production server.
 config :policr_mini, PolicrMiniWeb.Endpoint,
   cache_static_manifest: "priv/static/cache_manifest.json",
-  check_origin: false
+  check_origin: false,
+  server: true
 
 # Do not print debug messages in production
 config :logger, level: :info

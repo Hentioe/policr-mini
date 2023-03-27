@@ -9,29 +9,31 @@ defmodule PolicrMini.Application do
     PolicrMini.Mnesia.init()
     PolicrMini.Worker.GeneralRun.init_queue()
 
-    children = [
-      # Start the Ecto repository
-      PolicrMini.Repo,
-      # 缓存
-      PolicrMini.Cache,
-      # 线上操作数据库服务
-      PolicrMini.DBServer,
-      # 计数器
-      PolicrMini.Counter,
-      # 获取并维护全局默认值。
-      PolicrMini.DefaultsServer,
-      # Start the Telemetry supervisor
-      PolicrMiniWeb.Telemetry,
-      # Start the PubSub system
-      {Phoenix.PubSub, name: PolicrMini.PubSub},
-      # Start the Endpoint (http/https)
-      PolicrMiniWeb.Endpoint
-    ]
+    config = Application.get_env(:policr_mini, __MODULE__)
+
+    runtime_migrate? = config[:runtime_migrate] || false
+    tg_serve? = config[:tg_serve] || false
 
     children =
-      if PolicrMini.mix_env() == :test,
-        do: children,
-        else: children ++ [PolicrMiniBot.Supervisor]
+      []
+      # Start the Ecto repository
+      |> serve_children(PolicrMini.Repo, true)
+      # Start the Cacher
+      |> serve_children(PolicrMini.Cache, true)
+      # Start the runtime migrator
+      |> serve_children(PolicrMini.DBServer, runtime_migrate?)
+      # Start the Counter
+      |> serve_children(PolicrMini.Counter, true)
+      # Start the defaults server
+      |> serve_children(PolicrMini.DefaultsServer, true)
+      # Start the Telemetry supervisor
+      |> serve_children(PolicrMiniWeb.Telemetry, true)
+      # Start the PubSub system
+      |> serve_children({Phoenix.PubSub, name: PolicrMini.PubSub}, true)
+      # Start the Endpoint (http/https)
+      |> serve_children(PolicrMiniWeb.Endpoint, true)
+      # Start the Telegram bot
+      |> serve_children(PolicrMiniBot.Supervisor, tg_serve?)
 
     # See https://hexdocs.pm/elixir/Supervisor.html
     # for other strategies and supported options
@@ -44,5 +46,14 @@ defmodule PolicrMini.Application do
   def config_change(changed, _new, removed) do
     PolicrMiniWeb.Endpoint.config_change(changed, removed)
     :ok
+  end
+
+  defp serve_children(children, child, server?) do
+    children ++
+      if server? do
+        [child]
+      else
+        []
+      end
   end
 end

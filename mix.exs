@@ -17,7 +17,7 @@ defmodule PolicrMini.MixProject do
 
   def dialyzer do
     [
-      plt_add_apps: [:mnesia]
+      plt_add_apps: [:mnesia, :iex, :mix]
     ]
   end
 
