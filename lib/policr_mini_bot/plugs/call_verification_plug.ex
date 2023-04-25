@@ -82,7 +82,7 @@ defmodule PolicrMiniBot.CallVerificationPlug do
          {:ok, verification} <- handle_answer.(verification, scheme),
          # 更新验证记录中的选择索引
          {:ok, _} <- VerificationBusiness.update(verification, %{chosen: chosen}) do
-      count = VerificationBusiness.get_unity_waiting_count(verification.chat_id)
+      count = VerificationBusiness.get_waiting_count(verification.chat_id)
 
       # 如果没有等待验证了，立即删除入口消息
       if count == 0 do
@@ -264,10 +264,16 @@ defmodule PolicrMiniBot.CallVerificationPlug do
       user = %{id: verification.target_user_id, fullname: verification.target_user_name}
 
       {text, markup} =
-        HandleUserJoinedCleanupPlug.make_unity_content(chat_id, user, count, scheme, max_seconds)
+        HandleUserJoinedCleanupPlug.make_message_content(
+          chat_id,
+          user,
+          count,
+          scheme,
+          max_seconds
+        )
 
       # 获取最新的验证入口消息编号
-      message_id = VerificationBusiness.find_last_unity_message_id(chat_id)
+      message_id = VerificationBusiness.find_last_verification_message_id(chat_id)
 
       edit_message_text(text, chat_id: chat_id, message_id: message_id, reply_markup: markup)
     else

@@ -88,7 +88,7 @@ defmodule PolicrMiniBot.RespStartCmdPlug do
   def handle_args(["verification", "v1", target_chat_id], %{chat: %{id: from_user_id}} = message) do
     target_chat_id = target_chat_id |> String.to_integer()
 
-    if verification = VerificationBusiness.find_unity_waiting(target_chat_id, from_user_id) do
+    if verification = VerificationBusiness.find_waiting_verification(target_chat_id, from_user_id) do
       # 读取验证方案（当前的实现没有实际根据方案数据动态决定什么）
       with {:ok, scheme} <- Chats.fetch_scheme(target_chat_id),
            # 发送验证消息
@@ -158,7 +158,7 @@ defmodule PolicrMiniBot.RespStartCmdPlug do
         {captcha_maker, captcha_maker.make!(chat_id, scheme)}
       rescue
         e ->
-          Logger.unitized_error("Verification data generation", chat_id: chat_id, returns: e)
+          Logger.warn("Validation data generation error: #{inspect(chat_id: chat_id, error: e)}")
 
           {@fallback_captcha_module, @fallback_captcha_module.make!(chat_id, scheme)}
       end

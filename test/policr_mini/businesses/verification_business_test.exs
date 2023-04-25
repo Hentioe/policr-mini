@@ -90,14 +90,14 @@ defmodule PolicrMini.VerificationBusinessTest do
     assert last == verification2
   end
 
-  test "get_unity_waiting_count/1" do
+  test "get_waiting_count/1" do
     verification_params = build_params()
     {:ok, _} = VerificationBusiness.create(verification_params)
     {:ok, _} = VerificationBusiness.create(verification_params)
     {:ok, _} = VerificationBusiness.create(verification_params)
     {:ok, _} = VerificationBusiness.create(verification_params |> Map.put(:status, 1))
 
-    assert VerificationBusiness.get_unity_waiting_count(verification_params.chat_id) == 3
+    assert VerificationBusiness.get_waiting_count(verification_params.chat_id) == 3
   end
 
   test "get_total/0" do
