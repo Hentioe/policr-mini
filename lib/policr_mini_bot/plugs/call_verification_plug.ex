@@ -260,7 +260,7 @@ defmodule PolicrMiniBot.CallVerificationPlug do
           :not_found | {:error, Telegex.Model.errors()} | {:ok, Message.t()}
   def update_unity_message(chat_id, count, scheme, max_seconds) do
     # 提及当前最新的等待验证记录中的用户
-    if verification = VerificationBusiness.find_last_unity_waiting(chat_id) do
+    if verification = VerificationBusiness.find_last_waiting_verification(chat_id) do
       user = %{id: verification.target_user_id, fullname: verification.target_user_name}
 
       {text, markup} =

@@ -38,29 +38,16 @@ defmodule PolicrMini.VerificationBusiness do
   end
 
   @waiting_status VerificationStatusEnum.__enum_map__()[:waiting]
+
   @doc """
-  查找最后一个正在等待的验证。
+  查找特定群聊中最后一个正在等待的验证。
   """
-  @spec find_last_unity_waiting(integer()) :: Verification.t() | nil
-  def find_last_unity_waiting(chat_id) when is_integer(chat_id) do
+  @spec find_last_waiting_verification(integer | binary) :: Verification.t() | nil
+  def find_last_waiting_verification(chat_id) do
     from(p in Verification,
       where: p.chat_id == ^chat_id,
       where: p.status == ^@waiting_status,
       order_by: [desc: p.message_id],
-      limit: 1
-    )
-    |> Repo.one()
-  end
-
-  @doc """
-  查找统一入口下最早的等待验证。
-  """
-  @spec find_first_unity_waiting(integer()) :: Verification.t() | nil
-  def find_first_unity_waiting(chat_id) when is_integer(chat_id) do
-    from(p in Verification,
-      where: p.chat_id == ^chat_id,
-      where: p.status == ^@waiting_status,
-      order_by: [asc: p.message_id],
       limit: 1
     )
     |> Repo.one()
