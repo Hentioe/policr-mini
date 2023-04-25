@@ -64,7 +64,7 @@ verification:
     您还剩 __%{seconds}__ 秒，通过可解除封印。
   passed:
     private: |
-      恭喜您通过了『*%{chat_title}*』的加群验证，已权限恢复。
+      恭喜您通过了『*%{chat_title}*』的加群验证，权限已恢复。
 
       _提示：如果限制仍未解除请主动联系群管理。_
     notice: 刚刚 %{mentioned_user} 通过了验证，用时 %{seconds} 秒。
