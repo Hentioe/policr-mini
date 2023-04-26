@@ -1,6 +1,9 @@
 defmodule PolicrMiniWeb.Endpoint do
   use Phoenix.Endpoint, otp_app: :policr_mini
 
+  # 限制上传最大为 256MB
+  @max_multipart_length 1024 * 1024 * 256
+
   # The session will be stored in the cookie and signed,
   # this means its contents can be read but not tampered with.
   # Set :encryption_salt if you would also like to encrypt it.
@@ -43,7 +46,7 @@ defmodule PolicrMiniWeb.Endpoint do
   plug Plug.Telemetry, event_prefix: [:phoenix, :endpoint]
 
   plug Plug.Parsers,
-    parsers: [:urlencoded, :multipart, :json],
+    parsers: [:urlencoded, {:multipart, length: @max_multipart_length}, :json],
     pass: ["*/*"],
     json_decoder: Phoenix.json_library()
 
