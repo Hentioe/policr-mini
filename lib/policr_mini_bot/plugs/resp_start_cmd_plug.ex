@@ -11,7 +11,7 @@ defmodule PolicrMiniBot.RespStartCmdPlug do
   alias PolicrMini.{Logger, Chats, VerificationBusiness, MessageSnapshotBusiness}
   alias PolicrMini.Schema.Verification
   alias PolicrMiniBot.{ArithmeticCaptcha, CustomCaptcha, FallbackCaptcha, ImageCaptcha}
-  alias Telegex.Model.{InlineKeyboardMarkup, InlineKeyboardButton}
+  alias Telegex.Model.{Message, InlineKeyboardMarkup, InlineKeyboardButton}
 
   @fallback_captcha_module FallbackCaptcha
 
@@ -80,11 +80,9 @@ defmodule PolicrMiniBot.RespStartCmdPlug do
   """
   def dispatch(arg, message), do: arg |> String.split("_") |> handle_args(message)
 
-  @spec handle_args([String.t(), ...], Telegex.Model.Message.t()) ::
-          :ok | {:error, Telegex.Model.errors()}
-  @doc """
-  处理 v1 版本的验证参数。
-  """
+  @spec handle_args([binary, ...], Message.t()) :: :ok | {:error, Telegex.Model.errors()}
+
+  # 处理 v1 版本的验证参数。
   def handle_args(["verification", "v1", target_chat_id], %{chat: %{id: from_user_id}} = message) do
     target_chat_id = target_chat_id |> String.to_integer()
 
@@ -110,20 +108,29 @@ defmodule PolicrMiniBot.RespStartCmdPlug do
              }),
            # 更新验证记录：关联消息快照、存储正确答案
            {:ok, _} <-
-             verification
-             |> VerificationBusiness.update(%{
+             VerificationBusiness.update(verification, %{
                message_snapshot_id: message_snapshot.id,
                indices: captcha_data.correct_indices
              }) do
+        :ok
       else
-        e ->
+        {:error, %{error_code: 403}} = e ->
+          Logger.warn(
+            "Verification creation failed due to user blocking: #{inspect(chat_id: target_chat_id, user_id: from_user_id)}"
+          )
+
+          e
+
+        {:error, reason} = e ->
           Logger.unitized_error("Verification creation",
             chat_id: target_chat_id,
             user_id: from_user_id,
-            returns: e
+            reason: reason
           )
 
           send_message(from_user_id, t("errors.unknown"))
+
+          e
       end
     else
       send_message(from_user_id, t("errors.verification_no_wating"))
