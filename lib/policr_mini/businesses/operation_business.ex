@@ -3,7 +3,7 @@ defmodule PolicrMini.OperationBusiness do
   操作的业务功能实现。
   """
 
-  use PolicrMini, business: PolicrMini.Schema.Operation
+  use PolicrMini, business: PolicrMini.Chats.Operation
 
   alias PolicrMini.Schema.Verification
 

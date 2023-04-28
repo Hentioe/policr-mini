@@ -1,4 +1,4 @@
-defmodule PolicrMini.Schema.Operation do
+defmodule PolicrMini.Chats.Operation do
   @moduledoc """
   操作模型。
   """

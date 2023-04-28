@@ -76,7 +76,7 @@ defmodule PolicrMini.Factory do
   end
 
   def build(:operation) do
-    %PolicrMini.Schema.Operation{
+    %PolicrMini.Chats.Operation{
       verification_id: 10_000,
       action: :kick,
       role: :system
