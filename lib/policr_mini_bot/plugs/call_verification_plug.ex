@@ -8,7 +8,7 @@ defmodule PolicrMiniBot.CallVerificationPlug do
   alias PolicrMini.{Logger, Chats}
   alias PolicrMini.Chats.Scheme
   alias PolicrMini.Schema.Verification
-  alias PolicrMini.{VerificationBusiness, StatisticBusiness, OperationBusiness}
+  alias PolicrMini.{VerificationBusiness, StatisticBusiness}
   alias PolicrMiniBot.{HandleUserJoinedCleanupPlug, Disposable, Worker}
 
   @doc """
@@ -18,8 +18,10 @@ defmodule PolicrMiniBot.CallVerificationPlug do
   """
   @impl true
   def handle(%{data: data} = callback_query, _state) do
-    %{id: callback_query_id, message: %{message_id: message_id, chat: %{id: chat_id}}} =
-      callback_query
+    %{
+      id: callback_query_id,
+      message: %{message_id: message_id, chat: %{id: chat_id}}
+    } = callback_query
 
     processing_key = "#{chat_id}_#{message_id}"
 
@@ -35,12 +37,18 @@ defmodule PolicrMiniBot.CallVerificationPlug do
         result
 
       {:repeat, :processing} ->
-        Telegex.answer_callback_query(callback_query_id, text: "有请求正在处理中……", show_alert: true)
+        Telegex.answer_callback_query(callback_query_id,
+          text: "有请求正在处理中……",
+          show_alert: true
+        )
 
         :error
 
       {:repeat, :done} ->
-        Telegex.answer_callback_query(callback_query_id, text: "此任务已被处理过了～", show_alert: true)
+        Telegex.answer_callback_query(callback_query_id,
+          text: "此任务已被处理过了～",
+          show_alert: true
+        )
 
         :error
     end
@@ -52,10 +60,14 @@ defmodule PolicrMiniBot.CallVerificationPlug do
   此版本的数据参数格式为「被选择答案索引:验证编号」。
   TODO: 应该根据验证记录中的入口动态决定的 chat_id（当前因为默认私聊的关系直接使用了 user_id）。
   """
-  @spec handle_data({String.t(), [String.t(), ...]}, CallbackQuery.t()) :: :error | :ok
+  @spec handle_data({String.t(), [String.t(), ...]}, CallbackQuery.t()) ::
+          :error | :ok
   def handle_data({"v1", [chosen, verification_id]}, callback_query) do
-    %{id: callback_query_id, from: %{id: user_id} = from, message: %{message_id: message_id}} =
-      callback_query
+    %{
+      id: callback_query_id,
+      from: %{id: user_id} = from,
+      message: %{message_id: message_id}
+    } = callback_query
 
     chosen = String.to_integer(chosen)
     verification_id = String.to_integer(verification_id)
@@ -65,14 +77,23 @@ defmodule PolicrMiniBot.CallVerificationPlug do
       delay_unban_secs = scheme.delay_unban_secs || default!(:delay_unban_secs)
 
       # 取消超时任务
-      Worker.cancel_terminate_validation_job(verification.chat_id, verification.target_user_id)
+      Worker.cancel_terminate_validation_job(
+        verification.chat_id,
+        verification.target_user_id
+      )
 
       if Enum.member?(verification.indices, chosen) do
         # 处理回答正确
         handle_correct(verification, message_id, from)
       else
         # 处理回答错误
-        handle_wrong(verification, wrong_killing_method, delay_unban_secs, message_id, from)
+        handle_wrong(
+          verification,
+          wrong_killing_method,
+          delay_unban_secs,
+          message_id,
+          from
+        )
       end
     end
 
@@ -81,7 +102,8 @@ defmodule PolicrMiniBot.CallVerificationPlug do
          # 处理回答。
          {:ok, verification} <- handle_answer.(verification, scheme),
          # 更新验证记录中的选择索引
-         {:ok, _} <- VerificationBusiness.update(verification, %{chosen: chosen}) do
+         {:ok, _} <-
+           VerificationBusiness.update(verification, %{chosen: chosen}) do
       count = VerificationBusiness.get_unity_waiting_count(verification.chat_id)
 
       # 如果没有等待验证了，立即删除入口消息
@@ -112,7 +134,10 @@ defmodule PolicrMiniBot.CallVerificationPlug do
         :error
 
       e ->
-        answer_callback_query(callback_query_id, text: t("errors.unknown"), show_alert: true)
+        answer_callback_query(callback_query_id,
+          text: t("errors.unknown"),
+          show_alert: true
+        )
 
         Logger.unitized_error("Answer verification processing", e)
     end
@@ -146,9 +171,13 @@ defmodule PolicrMiniBot.CallVerificationPlug do
           seconds: seconds
         })
 
-      case send_message(verification.chat_id, text, parse_mode: "MarkdownV2ToHTML") do
+      case send_message(verification.chat_id, text,
+             parse_mode: "MarkdownV2ToHTML"
+           ) do
         {:ok, sended_message} ->
-          Worker.async_delete_message(verification.chat_id, sended_message.message_id,
+          Worker.async_delete_message(
+            verification.chat_id,
+            sended_message.message_id,
             delay_secs: 8
           )
 
@@ -161,7 +190,10 @@ defmodule PolicrMiniBot.CallVerificationPlug do
       {:ok, verification} ->
         # 解除限制
         async do
-          derestrict_chat_member(verification.chat_id, verification.target_user_id)
+          derestrict_chat_member(
+            verification.chat_id,
+            verification.target_user_id
+          )
         end
 
         # 更新验证结果
@@ -173,7 +205,10 @@ defmodule PolicrMiniBot.CallVerificationPlug do
             })
 
           Worker.async_delete_message(verification.target_user_id, message_id)
-          send_message(verification.target_user_id, text, parse_mode: "MarkdownV2ToHTML")
+
+          send_message(verification.target_user_id, text,
+            parse_mode: "MarkdownV2ToHTML"
+          )
         end
 
         async(fn -> verification.chat_id |> typing() end)
@@ -193,9 +228,21 @@ defmodule PolicrMiniBot.CallVerificationPlug do
 
   将根据验证方案中的配置选择击杀方式对应的处理逻辑。
   """
-  @spec handle_wrong(Verification.t(), atom, integer, integer, Telegex.Model.User.t()) ::
+  @spec handle_wrong(
+          Verification.t(),
+          atom,
+          integer,
+          integer,
+          Telegex.Model.User.t()
+        ) ::
           {:ok, Verification.t()} | {:error, any}
-  def handle_wrong(verification, wrong_killing_method, delay_unban_secs, message_id, from_user) do
+  def handle_wrong(
+        verification,
+        wrong_killing_method,
+        delay_unban_secs,
+        message_id,
+        from_user
+      ) do
     # 自增统计数据（错误）。
     async do
       StatisticBusiness.increment_one(
@@ -208,14 +255,18 @@ defmodule PolicrMiniBot.CallVerificationPlug do
     cleaner_fun = fn notice_text ->
       async do
         Worker.async_delete_message(verification.target_user_id, message_id)
-        send_message(verification.target_user_id, notice_text, parse_mode: "MarkdownV2ToHTML")
+
+        send_message(verification.target_user_id, notice_text,
+          parse_mode: "MarkdownV2ToHTML"
+        )
       end
     end
 
     operation_create_fun = fn verification ->
       operation_action = if wrong_killing_method == :ban, do: :ban, else: :kick
 
-      case OperationBusiness.create(%{
+      case Chats.create_operation(%{
+             chat_id: verification.chat_id,
              verification_id: verification.id,
              action: operation_action,
              role: :system
@@ -244,7 +295,13 @@ defmodule PolicrMiniBot.CallVerificationPlug do
         # 清理消息并私聊验证结果。
         cleaner_fun.(text)
 
-        kill(verification.chat_id, from_user, :wronged, wrong_killing_method, delay_unban_secs)
+        kill(
+          verification.chat_id,
+          from_user,
+          :wronged,
+          wrong_killing_method,
+          delay_unban_secs
+        )
 
         {:ok, verification}
 
@@ -261,15 +318,28 @@ defmodule PolicrMiniBot.CallVerificationPlug do
   def update_unity_message(chat_id, count, scheme, max_seconds) do
     # 提及当前最新的等待验证记录中的用户
     if verification = VerificationBusiness.find_last_unity_waiting(chat_id) do
-      user = %{id: verification.target_user_id, fullname: verification.target_user_name}
+      user = %{
+        id: verification.target_user_id,
+        fullname: verification.target_user_name
+      }
 
       {text, markup} =
-        HandleUserJoinedCleanupPlug.make_unity_content(chat_id, user, count, scheme, max_seconds)
+        HandleUserJoinedCleanupPlug.make_unity_content(
+          chat_id,
+          user,
+          count,
+          scheme,
+          max_seconds
+        )
 
       # 获取最新的验证入口消息编号
       message_id = VerificationBusiness.find_last_unity_message_id(chat_id)
 
-      edit_message_text(text, chat_id: chat_id, message_id: message_id, reply_markup: markup)
+      edit_message_text(text,
+        chat_id: chat_id,
+        message_id: message_id,
+        reply_markup: markup
+      )
     else
       :not_found
     end
@@ -278,20 +348,30 @@ defmodule PolicrMiniBot.CallVerificationPlug do
   @doc """
   检查验证数据是否有效。
   """
-  @spec validity_check(integer(), integer()) :: {:ok, Verification.t()} | {:error, String.t()}
+  @spec validity_check(integer(), integer()) ::
+          {:ok, Verification.t()} | {:error, String.t()}
   def validity_check(user_id, verification_id) do
-    with {:ok, verification} <- Verification.get(verification_id, preload: [:chat]),
-         {:check_user, true} <- {:check_user, verification.target_user_id == user_id},
-         {:check_status, true} <- {:check_status, verification.status == :waiting} do
+    with {:ok, verification} <-
+           Verification.get(verification_id, preload: [:chat]),
+         {:check_user, true} <-
+           {:check_user, verification.target_user_id == user_id},
+         {:check_status, true} <-
+           {:check_status, verification.status == :waiting} do
       {:ok, verification}
     else
-      {:error, :not_found, _} -> {:error, :known, t("errors.verification_not_found")}
-      {:check_user, false} -> {:error, :known, t("errors.verification_target_incorrect")}
-      {:check_status, false} -> {:error, :known, t("errors.verification_expired")}
+      {:error, :not_found, _} ->
+        {:error, :known, t("errors.verification_not_found")}
+
+      {:check_user, false} ->
+        {:error, :known, t("errors.verification_target_incorrect")}
+
+      {:check_status, false} ->
+        {:error, :known, t("errors.verification_expired")}
     end
   end
 
-  @type killing_reason :: :wronged | :timeout | :kick | :ban | :manual_ban | :manual_kick
+  @type killing_reason ::
+          :wronged | :timeout | :kick | :ban | :manual_ban | :manual_kick
   @type killing_method :: :ban | :kick
 
   @doc """
@@ -319,7 +399,9 @@ defmodule PolicrMiniBot.CallVerificationPlug do
 
     case send_message(chat_id, text, parse_mode: "MarkdownV2ToHTML") do
       {:ok, sended_message} ->
-        Worker.async_delete_message(chat_id, sended_message.message_id, delay_secs: 8)
+        Worker.async_delete_message(chat_id, sended_message.message_id,
+          delay_secs: 8
+        )
 
         :ok
 
@@ -335,7 +417,8 @@ defmodule PolicrMiniBot.CallVerificationPlug do
   end
 
   # 构造击杀文字（公聊通知）
-  @spec build_kick_text(killing_reason, killing_method, String.t(), String.t()) :: String.t()
+  @spec build_kick_text(killing_reason, killing_method, String.t(), String.t()) ::
+          String.t()
   defp build_kick_text(:timeout, method, mentioned_user, time_text) do
     t("verification.timeout.#{method}.public", %{
       mentioned_user: mentioned_user,
@@ -358,7 +441,8 @@ defmodule PolicrMiniBot.CallVerificationPlug do
     t("verification.manual.#{method}.public", %{mentioned_user: mentioned_user})
   end
 
-  @spec kick_chat_member(integer, integer, integer) :: {:ok, boolean} | Telegex.Model.errors()
+  @spec kick_chat_member(integer, integer, integer) ::
+          {:ok, boolean} | Telegex.Model.errors()
   defp kick_chat_member(chat_id, user_id, delay_unban_secs) do
     case PolicrMiniBot.config(:unban_method) do
       :api_call ->
@@ -372,7 +456,9 @@ defmodule PolicrMiniBot.CallVerificationPlug do
         r
 
       :until_date ->
-        Telegex.ban_chat_member(chat_id, user_id, until_date: until_date(delay_unban_secs))
+        Telegex.ban_chat_member(chat_id, user_id,
+          until_date: until_date(delay_unban_secs)
+        )
     end
   end
 

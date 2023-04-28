@@ -11,8 +11,7 @@ defmodule PolicrMiniWeb.Admin.API.ChatController do
     ChatBusiness,
     CustomKitBusiness,
     PermissionBusiness,
-    VerificationBusiness,
-    OperationBusiness
+    VerificationBusiness
   }
 
   alias PolicrMini.Instances.Chat
@@ -162,31 +161,15 @@ defmodule PolicrMiniWeb.Admin.API.ChatController do
     offset = params["offset"]
     _time_range = params["timeRange"]
 
-    role =
-      try do
-        String.to_existing_atom(params["role"])
-      rescue
-        _ -> :all
-      end
-
-    action =
-      try do
-        String.to_existing_atom(params["action"])
-      rescue
-        _ -> :all
-      end
-
-    cont = [
+    conts = [
       chat_id: chat_id,
       offset: offset,
-      role: role,
-      action: action,
       preload: [:verification]
     ]
 
     with {:ok, perms} <- check_permissions(conn, chat_id),
          {:ok, chat} <- Chat.get(chat_id) do
-      operations = OperationBusiness.find_list(cont)
+      operations = Chats.find_operations(conts)
 
       render(conn, "operations.json", %{
         chat: chat,

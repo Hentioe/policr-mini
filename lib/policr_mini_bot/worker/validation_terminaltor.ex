@@ -11,7 +11,6 @@ defmodule PolicrMiniBot.Worker.ValidationTerminator do
     Chats,
     VerificationBusiness,
     StatisticBusiness,
-    OperationBusiness
   }
 
   alias PolicrMini.Schema.Verification
@@ -186,12 +185,13 @@ defmodule PolicrMiniBot.Worker.ValidationTerminator do
     action = if killing_method == :ban, do: :ban, else: :kick
 
     params = %{
+      chat_id: verification.chat_id,
       verification_id: verification.id,
       action: action,
       role: role
     }
 
-    case OperationBusiness.create(params) do
+    case Chats.create_operation(params) do
       {:ok, _} = r ->
         r
 

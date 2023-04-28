@@ -12,6 +12,7 @@ defmodule PolicrMini.Chats.OperationTest do
                [
                  :id,
                  :verification_id,
+                 :chat_id,
                  :action,
                  :role,
                  :inserted_at,
@@ -45,6 +46,7 @@ defmodule PolicrMini.Chats.OperationTest do
     assert changeset.validations == []
 
     assert changeset.required == [
+             :chat_id,
              :verification_id,
              :action,
              :role

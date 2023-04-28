@@ -16,6 +16,6 @@ defmodule PolicrMiniWeb.Admin.API.OperationView do
 
     operation = %{operation | verification: verification}
 
-    operation |> Map.drop([:__meta__]) |> Map.from_struct()
+    operation |> Map.drop([:__meta__, :chat]) |> Map.from_struct()
   end
 end

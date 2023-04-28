@@ -5,7 +5,7 @@ defmodule PolicrMiniWeb.Admin.API.VerificationController do
 
   use PolicrMiniWeb, :controller
 
-  alias PolicrMini.{Logger, VerificationBusiness, OperationBusiness}
+  alias PolicrMini.{Logger, Chats, VerificationBusiness}
   alias PolicrMini.Schema.Verification
   alias PolicrMiniBot.Worker
 
@@ -17,7 +17,7 @@ defmodule PolicrMiniWeb.Admin.API.VerificationController do
       when action in ["manual_ban", "manual_kick"] do
     status = String.to_existing_atom(action)
 
-    with {:ok, veri} <- VerificationBusiness.get(id, preload: [:chat]),
+    with {:ok, veri = v} <- VerificationBusiness.get(id, preload: [:chat]),
          {:ok, _} <- check_permissions(conn, veri.chat.id, [:writable]),
          {:ok, ok} <- kill_memeber(veri, is_ban: status == :manual_ban) do
       action = if status == :manual_ban, do: :ban, else: :kick
@@ -27,12 +27,13 @@ defmodule PolicrMiniWeb.Admin.API.VerificationController do
 
       # 添加操作记录（管理员）
       params = %{
+        chat_id: v.chat_id,
         verification_id: veri.id,
         action: action,
         role: :admin
       }
 
-      case OperationBusiness.create(params) do
+      case Chats.create_operation(params) do
         {:ok, _} = r ->
           r
 

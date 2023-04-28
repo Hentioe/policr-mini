@@ -6,9 +6,10 @@ defmodule PolicrMini.Chats do
   import Ecto.Query, only: [from: 2, dynamic: 2]
 
   alias PolicrMini.Repo
-  alias PolicrMini.Chats.Scheme
+  alias PolicrMini.Chats.{Scheme, Operation}
 
   @type scheme_written_returns :: {:ok, Scheme.t()} | {:error, Ecto.Changeset.t()}
+  @type operation_written_result :: {:ok, Operation.t()} | {:error, Ecto.Changeset.t()}
 
   def create_scheme(params) do
     %Scheme{} |> Scheme.changeset(params) |> Repo.insert()
@@ -110,5 +111,75 @@ defmodule PolicrMini.Chats do
     if Map.get(scheme, field_name) != nil,
       do: attrs,
       else: Map.put(attrs, field_name, @default_scheme[field_name])
+  end
+
+  # TODO：添加测试。
+  @doc """
+  创建操作记录。
+  """
+  @spec create_operation(map()) :: operation_written_result
+  def create_operation(params) do
+    %Operation{} |> Operation.changeset(params) |> Repo.insert()
+  end
+
+  @type find_operations_conts :: [
+          {:chat_id, integer},
+          {:actions, [:kick | :ban]},
+          {:roles, [:system | :admin]},
+          {:offset, integer},
+          {:limit, integer},
+          {:order_by, [{:asc | :desc, atom | [atom]}]},
+          {:preload, [:verification]}
+        ]
+
+  @default_find_operations_count 25
+  @max_find_operations_count 35
+
+  # TODO：添加测试。
+  @doc """
+  查询操作列表。
+
+  可选查询条件，部分条件存在默认和最大值限制。
+
+  ## 查询条件
+  - `chat_id`: 群聊的 ID。
+  - `actions`: 包含的执行动作列表，可选值有 `:kick` 和 `:ban`。默认为 `[:kick, :ban]`，不过滤任何执行动作。
+  - `roles`: 包含的角色列表，可选值有 `:system` 和 `:admin`。默认为 `[:system, :admin]`，不过滤任何角色。
+  - `offset`: 偏移量。默认值为 `0`。
+  - `limit`: 数量限制。默认值为 `25`，最大值为 `35`。如果条件中的值大于最大值将会被默认值重写。
+  - `order_by`: 排序方式。默认值为 `[desc: :inserted_at]`。
+  - `preload`: 预加载的引用数据。
+  """
+  @spec find_operations(find_operations_conts) :: [Operation.t()]
+  def find_operations(conts \\ []) do
+    filter_chat_id =
+      if chat_id = Keyword.get(conts, :chat_id) do
+        dynamic([o], o.chat_id == ^chat_id)
+      end
+
+    actions = Keyword.get(conts, :actions, [:kick, :ban])
+    roles = Keyword.get(conts, :roles, [:system, :admin])
+
+    offset = Keyword.get(conts, :offset, 0)
+
+    limit =
+      if limit = Keyword.get(conts, :limit) do
+        if limit > @max_find_operations_count, do: @default_find_operations_count, else: limit
+      else
+        @default_find_operations_count
+      end
+
+    order_by = Keyword.get(conts, :order_by, desc: :inserted_at)
+    preload = Keyword.get(conts, :preload, [])
+
+    from(o in Operation,
+      where: ^filter_chat_id,
+      where: o.role in ^roles and o.action in ^actions,
+      offset: ^offset,
+      limit: ^limit,
+      order_by: ^order_by
+    )
+    |> Repo.all()
+    |> Repo.preload(preload)
   end
 end
