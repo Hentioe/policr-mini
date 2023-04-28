@@ -23,7 +23,7 @@ defmodule PolicrMini.VerificationBusiness do
   """
   @spec fetch(%{optional(atom() | String.t()) => any()}) :: written_returns()
   def fetch(%{chat_id: chat_id, target_user_id: target_user_id} = params) do
-    case find_unity_waiting(chat_id, target_user_id) do
+    case find_waiting_verification(chat_id, target_user_id) do
       nil -> create(params)
       r -> {:ok, r}
     end
@@ -38,11 +38,12 @@ defmodule PolicrMini.VerificationBusiness do
   end
 
   @waiting_status VerificationStatusEnum.__enum_map__()[:waiting]
+
   @doc """
-  查找最后一个正在等待的验证。
+  查找特定群聊中最后一个正在等待的验证。
   """
-  @spec find_last_unity_waiting(integer()) :: Verification.t() | nil
-  def find_last_unity_waiting(chat_id) when is_integer(chat_id) do
+  @spec find_last_waiting_verification(integer | binary) :: Verification.t() | nil
+  def find_last_waiting_verification(chat_id) do
     from(p in Verification,
       where: p.chat_id == ^chat_id,
       where: p.status == ^@waiting_status,
@@ -53,24 +54,10 @@ defmodule PolicrMini.VerificationBusiness do
   end
 
   @doc """
-  查找统一入口下最早的等待验证。
+  获取统特定群聊的等待验证数量。
   """
-  @spec find_first_unity_waiting(integer()) :: Verification.t() | nil
-  def find_first_unity_waiting(chat_id) when is_integer(chat_id) do
-    from(p in Verification,
-      where: p.chat_id == ^chat_id,
-      where: p.status == ^@waiting_status,
-      order_by: [asc: p.message_id],
-      limit: 1
-    )
-    |> Repo.one()
-  end
-
-  @doc """
-  获取统一入口的等待验证数量。
-  """
-  @spec get_unity_waiting_count(integer()) :: integer()
-  def get_unity_waiting_count(chat_id) do
+  @spec get_waiting_count(integer | binary) :: integer
+  def get_waiting_count(chat_id) do
     from(p in Verification,
       select: count(p.id),
       where: p.chat_id == ^chat_id,
@@ -80,10 +67,11 @@ defmodule PolicrMini.VerificationBusiness do
   end
 
   @doc """
-  查找统一入口的等待验证。
+  查找指定用户在特定群聊中等待的验证。
   """
-  @spec find_unity_waiting(integer(), integer()) :: Verification.t() | nil
-  def find_unity_waiting(chat_id, user_id) when is_integer(chat_id) and is_integer(user_id) do
+  @spec find_waiting_verification(integer | binary, integer | binary) :: Verification.t() | nil
+  def find_waiting_verification(chat_id, user_id)
+      when is_integer(chat_id) and is_integer(user_id) do
     from(p in Verification,
       where: p.chat_id == ^chat_id,
       where: p.target_user_id == ^user_id,
@@ -96,10 +84,10 @@ defmodule PolicrMini.VerificationBusiness do
   end
 
   @doc """
-  获取最后一个统一入口的验证消息编号。
+  获取特定群聊中最后一个验证的消息编号。
   """
-  @spec find_last_unity_message_id(integer()) :: integer() | nil
-  def find_last_unity_message_id(chat_id) do
+  @spec find_last_verification_message_id(integer | binary) :: integer | nil
+  def find_last_verification_message_id(chat_id) do
     from(p in Verification,
       select: p.message_id,
       where: p.chat_id == ^chat_id,
@@ -111,10 +99,10 @@ defmodule PolicrMini.VerificationBusiness do
   end
 
   @doc """
-  查找所有的还在等待的统一入口验证。
+  查找所有等待中的验证列表。
   """
-  @spec find_all_unity_waiting() :: [Verification.t()]
-  def find_all_unity_waiting() do
+  @spec find_all_waiting_verifications :: [Verification.t()]
+  def find_all_waiting_verifications do
     from(p in Verification,
       where: p.status == ^@waiting_status,
       order_by: [asc: p.inserted_at]

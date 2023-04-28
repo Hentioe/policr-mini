@@ -5,7 +5,7 @@ name: default
 
 steps:
   - name: app-compile
-    image: elixir:1.14.3-slim
+    image: elixir:1.14.4-slim
     environment:
       MIX_ENV: prod
     commands:
@@ -16,14 +16,14 @@ steps:
       - mix compile
 
   - name: assets-build
-    image: node:18-buster
+    image: node:lts-hydrogen
     commands:
-      - npm install --location=global pnpm@7.30.4
+      - npm install --location=global pnpm@8.3.1
       - pnpm --prefix assets install
       - pnpm --prefix assets run deploy
 
   - name: app-build
-    image: elixir:1.14.3-slim
+    image: elixir:1.14.4-slim
     pull: always
     environment:
       MIX_ENV: prod
@@ -56,21 +56,6 @@ steps:
       username: telestd
       password:
         from_secret: hub_pass_telestd
-      dockerfile: Dockerfile
-      tags: latest
-    when:
-      branch:
-        - master
-      event:
-        - push
-
-  - name: image-push-obsolete
-    image: plugins/docker
-    settings:
-      repo: bluerain/policr-mini
-      username: bluerain
-      password:
-        from_secret: docker_password
       dockerfile: Dockerfile
       tags: latest
     when:

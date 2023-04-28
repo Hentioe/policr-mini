@@ -102,9 +102,9 @@ defmodule PolicrMiniBot.CallVerificationPlug do
          # 处理回答。
          {:ok, verification} <- handle_answer.(verification, scheme),
          # 更新验证记录中的选择索引
-         {:ok, _} <-
-           VerificationBusiness.update(verification, %{chosen: chosen}) do
-      count = VerificationBusiness.get_unity_waiting_count(verification.chat_id)
+
+         {:ok, _} <- VerificationBusiness.update(verification, %{chosen: chosen}) do
+      count = VerificationBusiness.get_waiting_count(verification.chat_id)
 
       # 如果没有等待验证了，立即删除入口消息
       if count == 0 do
@@ -171,9 +171,7 @@ defmodule PolicrMiniBot.CallVerificationPlug do
           seconds: seconds
         })
 
-      case send_message(verification.chat_id, text,
-             parse_mode: "MarkdownV2ToHTML"
-           ) do
+      case send_message(verification.chat_id, text, parse_mode: "MarkdownV2ToHTML") do
         {:ok, sended_message} ->
           Worker.async_delete_message(
             verification.chat_id,
@@ -206,9 +204,7 @@ defmodule PolicrMiniBot.CallVerificationPlug do
 
           Worker.async_delete_message(verification.target_user_id, message_id)
 
-          send_message(verification.target_user_id, text,
-            parse_mode: "MarkdownV2ToHTML"
-          )
+          send_message(verification.target_user_id, text, parse_mode: "MarkdownV2ToHTML")
         end
 
         async(fn -> verification.chat_id |> typing() end)
@@ -256,9 +252,7 @@ defmodule PolicrMiniBot.CallVerificationPlug do
       async do
         Worker.async_delete_message(verification.target_user_id, message_id)
 
-        send_message(verification.target_user_id, notice_text,
-          parse_mode: "MarkdownV2ToHTML"
-        )
+        send_message(verification.target_user_id, notice_text, parse_mode: "MarkdownV2ToHTML")
       end
     end
 
@@ -317,14 +311,12 @@ defmodule PolicrMiniBot.CallVerificationPlug do
           :not_found | {:error, Telegex.Model.errors()} | {:ok, Message.t()}
   def update_unity_message(chat_id, count, scheme, max_seconds) do
     # 提及当前最新的等待验证记录中的用户
-    if verification = VerificationBusiness.find_last_unity_waiting(chat_id) do
-      user = %{
-        id: verification.target_user_id,
-        fullname: verification.target_user_name
-      }
+
+    if verification = VerificationBusiness.find_last_waiting_verification(chat_id) do
+      user = %{id: verification.target_user_id, fullname: verification.target_user_name}
 
       {text, markup} =
-        HandleUserJoinedCleanupPlug.make_unity_content(
+        HandleUserJoinedCleanupPlug.make_message_content(
           chat_id,
           user,
           count,
@@ -333,7 +325,7 @@ defmodule PolicrMiniBot.CallVerificationPlug do
         )
 
       # 获取最新的验证入口消息编号
-      message_id = VerificationBusiness.find_last_unity_message_id(chat_id)
+      message_id = VerificationBusiness.find_last_verification_message_id(chat_id)
 
       edit_message_text(text,
         chat_id: chat_id,
@@ -399,9 +391,7 @@ defmodule PolicrMiniBot.CallVerificationPlug do
 
     case send_message(chat_id, text, parse_mode: "MarkdownV2ToHTML") do
       {:ok, sended_message} ->
-        Worker.async_delete_message(chat_id, sended_message.message_id,
-          delay_secs: 8
-        )
+        Worker.async_delete_message(chat_id, sended_message.message_id, delay_secs: 8)
 
         :ok
 
@@ -456,9 +446,7 @@ defmodule PolicrMiniBot.CallVerificationPlug do
         r
 
       :until_date ->
-        Telegex.ban_chat_member(chat_id, user_id,
-          until_date: until_date(delay_unban_secs)
-        )
+        Telegex.ban_chat_member(chat_id, user_id, until_date: until_date(delay_unban_secs))
     end
   end
 

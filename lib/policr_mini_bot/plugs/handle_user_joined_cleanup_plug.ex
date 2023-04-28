@@ -13,6 +13,8 @@ defmodule PolicrMiniBot.HandleUserJoinedCleanupPlug do
   alias PolicrMini.VerificationBusiness
   alias PolicrMiniBot.Worker
 
+  @type user :: PolicrMiniBot.Helper.mention_user()
+
   # 过期时间：15 分钟
   @expired_seconds 60 * 15
 
@@ -168,26 +170,24 @@ defmodule PolicrMiniBot.HandleUserJoinedCleanupPlug do
     new_chat_member = %{id: target_user_id, fullname: target_user_name}
 
     # 读取等待验证的人数并根据人数分别响应不同的文本内容
-    waiting_count = VerificationBusiness.get_unity_waiting_count(chat_id)
+    waiting_count = VerificationBusiness.get_waiting_count(chat_id)
 
-    make_unity_content(chat_id, new_chat_member, waiting_count, scheme, seconds)
+    make_message_content(chat_id, new_chat_member, waiting_count, scheme, seconds)
   end
 
   @doc """
-  生成统一验证入口消息。
-
-  参数 `user` 需要满足 `PolicrMiniBot.Helper.fullname/1` 函数子句的匹配。
+  生成验证入口消息内容。
   """
-  @spec make_unity_content(
-          integer,
-          PolicrMiniBot.Helper.mention_user(),
+  @spec make_message_content(
+          integer | binary,
+          user,
           integer,
           Scheme.t(),
           integer
         ) ::
           {String.t(), InlineKeyboardMarkup.t()}
 
-  def make_unity_content(chat_id, user, waiting_count, scheme, seconds)
+  def make_message_content(chat_id, user, waiting_count, scheme, seconds)
       when is_struct(scheme, Scheme) do
     # 读取等待验证的人数并根据人数分别响应不同的文本内容
     mention_scheme = scheme.mention_text || default!(:mention_scheme)

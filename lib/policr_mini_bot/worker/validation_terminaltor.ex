@@ -10,7 +10,7 @@ defmodule PolicrMiniBot.Worker.ValidationTerminator do
     Repo,
     Chats,
     VerificationBusiness,
-    StatisticBusiness,
+    StatisticBusiness
   }
 
   alias PolicrMini.Schema.Verification
@@ -80,7 +80,7 @@ defmodule PolicrMiniBot.Worker.ValidationTerminator do
       CallVerificationPlug.kill(chat_id, user, :timeout, killing_method, delay_unban_secs)
 
       # 如果还存在多条验证，更新入口消息
-      waiting_count = VerificationBusiness.get_unity_waiting_count(chat_id)
+      waiting_count = VerificationBusiness.get_waiting_count(chat_id)
 
       if waiting_count == 0 do
         # 已经没有剩余验证，直接删除上一个入口消息
@@ -152,7 +152,7 @@ defmodule PolicrMiniBot.Worker.ValidationTerminator do
       CallVerificationPlug.kill(chat_id, user, status, kmeth, delay_unban_secs)
 
       # 如果还存在多条验证，更新入口消息
-      waiting_count = VerificationBusiness.get_unity_waiting_count(chat_id)
+      waiting_count = VerificationBusiness.get_waiting_count(chat_id)
 
       if waiting_count == 0 do
         # 已经没有剩余验证，直接删除上一个入口消息

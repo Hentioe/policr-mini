@@ -14,7 +14,7 @@ defmodule PolicrMiniBot.Runner.ExpiredChecker do
   """
   def run do
     # 获取所有处于等待状态的验证
-    verifications = VerificationBusiness.find_all_unity_waiting()
+    verifications = VerificationBusiness.find_all_waiting_verifications()
     # 计算已经过期的验证
     verifications =
       verifications
