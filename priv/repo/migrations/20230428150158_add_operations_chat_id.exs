@@ -20,4 +20,10 @@ defmodule PolicrMini.Repo.Migrations.AddOperationsChatId do
 
     PolicrMini.Repo.query!(sql)
   end
+
+  def down do
+    alter table("operations") do
+      remove :chat_id
+    end
+  end
 end
