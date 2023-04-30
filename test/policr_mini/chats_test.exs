@@ -230,7 +230,7 @@ defmodule PolicrMini.ChatsTest do
     end
 
     test "increment_statistic/3" do
-      {:ok, chat} = Instances.create_chat(Factory.build(:chat) |> Map.from_struct())
+      {:ok, chat} = :chat |> Factory.build() |> Map.from_struct() |> Instances.create_chat()
 
       {:ok, _} = increment_statistic(chat.id, "zh-hans", :passed)
       {:ok, _} = increment_statistic(chat.id, "zh-hans", :passed)

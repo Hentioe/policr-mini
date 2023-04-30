@@ -225,22 +225,11 @@ defmodule PolicrMini.Chats do
     statistic |> Statistic.changeset(params) |> Repo.update()
   end
 
-  def fetch_today_stat(chat_id, status, params) do
-    Repo.transaction(fn ->
-      case find_today_stat(chat_id, status) || create_statistic(params) do
-        {:ok, statistic} ->
-          # 创建了一个新的
-          statistic
-
-        {:error, e} ->
-          # 创建时发生错误
-          Repo.rollback(e)
-
-        statistic ->
-          # 已存在
-          statistic
-      end
-    end)
+  def get_or_create_today_stat(chat_id, status, params) do
+    case find_today_stat(chat_id, status) do
+      nil -> create_statistic(params)
+      stat -> {:ok, stat}
+    end
   end
 
   @doc """
@@ -261,23 +250,7 @@ defmodule PolicrMini.Chats do
       verification_status: status
     }
 
-    fetch_one = fn -> fetch_today_stat(chat_id, status, params) end
-
-    trans_fun = fn ->
-      trans_r = inc_stat_trans(fetch_one, language_code)
-
-      case trans_r do
-        {:ok, r} -> r
-        e -> e
-      end
-    end
-
-    # TODO: 此处的事务需保证具有回滚的能力并能够返回错误结果。
-    Repo.transaction(trans_fun)
-  end
-
-  defp inc_stat_trans(fetch_stat, language_code) do
-    case fetch_stat.() do
+    case get_or_create_today_stat(chat_id, status, params) do
       {:ok, stat} ->
         verifications_count = stat.verifications_count + 1
 
