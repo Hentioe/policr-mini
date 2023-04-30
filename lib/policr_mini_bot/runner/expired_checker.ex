@@ -1,10 +1,12 @@
 defmodule PolicrMiniBot.Runner.ExpiredChecker do
   @moduledoc false
 
-  alias PolicrMini.Logger
+  alias PolicrMini.Schema.Verification
   alias PolicrMini.{VerificationBusiness, StatisticBusiness}
 
+  require Logger
   require PolicrMiniBot.Helper
+
   import PolicrMiniBot.Helper
 
   @spec run :: :ok
@@ -16,17 +18,14 @@ defmodule PolicrMiniBot.Runner.ExpiredChecker do
     # 获取所有处于等待状态的验证
     verifications = VerificationBusiness.find_all_waiting_verifications()
     # 计算已经过期的验证
-    verifications =
-      verifications
-      |> Enum.filter(fn v ->
+    verifications =  Enum.filter(verifications, fn v ->
         remaining_seconds = DateTime.diff(DateTime.utc_now(), v.inserted_at)
         remaining_seconds - (v.seconds + 30) > 0
       end)
 
     # 修正状态
     # TODO: 待优化：在同一个事物中更新所有验证记录
-    verifications
-    |> Enum.each(fn verification ->
+    Enum.each(verifications, fn verification ->
       # 自增统计数据（其它）。
       async do
         StatisticBusiness.increment_one(
@@ -36,11 +35,27 @@ defmodule PolicrMiniBot.Runner.ExpiredChecker do
         )
       end
 
-      verification |> VerificationBusiness.update(%{status: :expired})
+      VerificationBusiness.update(verification, %{status: :expired})
     end)
 
-    len = length(verifications)
-    if len > 0, do: Logger.info("Automatically correct #{len} expired verifications")
+    log_auto_corrected(verifications)
+  end
+
+  @spec log_auto_corrected([Verification.t()]) :: :ok | :ignore
+  defp log_auto_corrected([v]) do
+    Logger.warning(
+      "Auto-corrected 1 verification: #{inspect(id: v.id, chat_id: v.chat_id, user_id: v.target_user_id)}"
+    )
+
+    :ok
+  end
+
+  defp log_auto_corrected([]) do
+    :ignore
+  end
+
+  defp log_auto_corrected(vs) do
+    Logger.warning("Auto-corrected #{length(vs)} verifications")
 
     :ok
   end
