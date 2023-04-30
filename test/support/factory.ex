@@ -90,7 +90,7 @@ defmodule PolicrMini.Factory do
     begin_at = DateTime.new!(utc_now_date, ~T[00:00:00], "Etc/UTC")
     end_at = DateTime.add(begin_at, 3600 * 24 - 1, :second)
 
-    %PolicrMini.Schema.Statistic{
+    %PolicrMini.Chats.Statistic{
       verifications_count: 0,
       languages_top: %{},
       begin_at: begin_at,

@@ -5,7 +5,7 @@ defmodule PolicrMiniWeb.Admin.API.StatisticController do
 
   use PolicrMiniWeb, :controller
 
-  alias PolicrMini.StatisticBusiness
+  alias PolicrMini.Chats
 
   import PolicrMiniWeb.Helper
 
@@ -16,15 +16,15 @@ defmodule PolicrMiniWeb.Admin.API.StatisticController do
 
     with {:ok, _} <- check_permissions(conn, chat_id, [:readable]) do
       today = %{
-        passed_statistic: StatisticBusiness.find_today(chat_id, :passed),
-        timeout_statistic: StatisticBusiness.find_today(chat_id, :timeout),
-        wronged_statistic: StatisticBusiness.find_today(chat_id, :wronged)
+        passed_statistic: Chats.find_today_stat(chat_id, :passed),
+        timeout_statistic: Chats.find_today_stat(chat_id, :timeout),
+        wronged_statistic: Chats.find_today_stat(chat_id, :wronged)
       }
 
       yesterday = %{
-        passed_statistic: StatisticBusiness.find_yesterday(chat_id, :passed),
-        timeout_statistic: StatisticBusiness.find_yesterday(chat_id, :timeout),
-        wronged_statistic: StatisticBusiness.find_yesterday(chat_id, :wronged)
+        passed_statistic: Chats.find_yesterday_stat(chat_id, :passed),
+        timeout_statistic: Chats.find_yesterday_stat(chat_id, :timeout),
+        wronged_statistic: Chats.find_yesterday_stat(chat_id, :wronged)
       }
 
       render(conn, "recently.json", %{

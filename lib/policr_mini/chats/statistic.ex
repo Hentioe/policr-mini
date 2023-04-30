@@ -1,4 +1,4 @@
-defmodule PolicrMini.Schema.Statistic do
+defmodule PolicrMini.Chats.Statistic do
   @moduledoc """
   统计模型。
   """
@@ -28,5 +28,25 @@ defmodule PolicrMini.Schema.Statistic do
     |> cast(attrs, @required_fields ++ @optional_fields)
     |> validate_required(@required_fields)
     |> assoc_constraint(:chat)
+  end
+
+  @day_seconds 3600 * 24
+  @midnight ~T[00:00:00]
+
+  def today_datetimes do
+    begin_at = DateTime.new!(Date.utc_today(), @midnight, "Etc/UTC")
+    end_at = DateTime.add(begin_at, @day_seconds - 1, :second)
+
+    {begin_at, end_at}
+  end
+
+  def yesterday_datetimes do
+    today_date = Date.utc_today()
+    yesterday_date = Date.add(today_date, -1)
+
+    begin_at = DateTime.new!(yesterday_date, @midnight, "Etc/UTC")
+    end_at = DateTime.add(begin_at, @day_seconds - 1, :second)
+
+    {begin_at, end_at}
   end
 end

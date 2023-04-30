@@ -6,10 +6,13 @@ defmodule PolicrMini.Chats do
   import Ecto.Query, only: [from: 2, dynamic: 2]
 
   alias PolicrMini.Repo
-  alias PolicrMini.Chats.{Scheme, Operation}
+  alias PolicrMini.Chats.{Scheme, Operation, Statistic}
 
   @type scheme_written_returns :: {:ok, Scheme.t()} | {:error, Ecto.Changeset.t()}
   @type operation_written_result :: {:ok, Operation.t()} | {:error, Ecto.Changeset.t()}
+  @type statistic_written_result :: {:ok, Statistic.t()} | {:error, Ecto.Changeset.t()}
+
+  @type stat_status :: :passed | :timeout | :wronged | :other
 
   def create_scheme(params) do
     %Scheme{} |> Scheme.changeset(params) |> Repo.insert()
@@ -181,5 +184,117 @@ defmodule PolicrMini.Chats do
     )
     |> Repo.all()
     |> Repo.preload(preload)
+  end
+
+  @spec find_today_stat(integer, stat_status) :: Statistic.t() | nil
+  def find_today_stat(chat_id, status), do: find_statistic(chat_id, status, range: :today)
+
+  @spec find_yesterday_stat(integer, stat_status) :: Statistic.t() | nil
+  def find_yesterday_stat(chat_id, status), do: find_statistic(chat_id, status, range: :yesterday)
+
+  @type stat_dt_cont ::
+          [{:range, :today | :yesterday}] | [{:begin_at, DateTime.t()}, {:end_at, DateTime.t()}]
+
+  @spec find_statistic(integer, stat_status, stat_dt_cont) :: Statistic.t() | nil
+  defp find_statistic(chat_id, status, stat_dt_cont) do
+    {begin_at, end_at} =
+      case Keyword.get(stat_dt_cont, :range) do
+        :today -> Statistic.today_datetimes()
+        :yesterday -> Statistic.yesterday_datetimes()
+        nil -> {Keyword.get(stat_dt_cont, :begin_at), Keyword.get(stat_dt_cont, :end_at)}
+      end
+
+    from(
+      s in Statistic,
+      where:
+        s.chat_id == ^chat_id and
+          s.verification_status == ^status and
+          s.begin_at == ^begin_at and
+          s.end_at == ^end_at
+    )
+    |> Repo.one()
+  end
+
+  @spec create_statistic(map) :: statistic_written_result
+  def create_statistic(params) do
+    %Statistic{} |> Statistic.changeset(params) |> Repo.insert()
+  end
+
+  @spec update_statistic(Statistic.t(), map) :: statistic_written_result
+  def update_statistic(statistic, params) do
+    statistic |> Statistic.changeset(params) |> Repo.update()
+  end
+
+  def fetch_today_stat(chat_id, status, params) do
+    Repo.transaction(fn ->
+      case find_today_stat(chat_id, status) || create_statistic(params) do
+        {:ok, statistic} ->
+          # 创建了一个新的
+          statistic
+
+        {:error, e} ->
+          # 创建时发生错误
+          Repo.rollback(e)
+
+        statistic ->
+          # 已存在
+          statistic
+      end
+    end)
+  end
+
+  @doc """
+  自增一个统计。
+  """
+  @spec increment_statistic(integer | binary, String.t(), stat_status) :: statistic_written_result
+
+  def increment_statistic(chat_id, language_code, status) do
+    language_code = language_code || "unknown"
+    {begin_at, end_at} = Statistic.today_datetimes()
+
+    params = %{
+      chat_id: chat_id,
+      verifications_count: 0,
+      languages_top: %{language_code => 0},
+      begin_at: begin_at,
+      end_at: end_at,
+      verification_status: status
+    }
+
+    fetch_one = fn -> fetch_today_stat(chat_id, status, params) end
+
+    trans_fun = fn ->
+      trans_r = inc_stat_trans(fetch_one, language_code)
+
+      case trans_r do
+        {:ok, r} -> r
+        e -> e
+      end
+    end
+
+    # TODO: 此处的事务需保证具有回滚的能力并能够返回错误结果。
+    Repo.transaction(trans_fun)
+  end
+
+  defp inc_stat_trans(fetch_stat, language_code) do
+    case fetch_stat.() do
+      {:ok, stat} ->
+        verifications_count = stat.verifications_count + 1
+
+        languages_top =
+          if count = stat.languages_top[language_code] do
+            Map.put(stat.languages_top, language_code, count + 1)
+          else
+            Map.put(stat.languages_top, language_code, 1)
+          end
+
+        update_statistic(stat, %{
+          verifications_count: verifications_count,
+          languages_top: languages_top
+        })
+
+      e ->
+        e
+    end
   end
 end

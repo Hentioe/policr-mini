@@ -6,11 +6,11 @@ defmodule PolicrMiniBot.Worker.ValidationTerminator do
   use PolicrMiniBot.Worker
 
   alias PolicrMini.{
+    Chats,
     Logger,
     Repo,
     Chats,
-    VerificationBusiness,
-    StatisticBusiness
+    VerificationBusiness
   }
 
   alias PolicrMini.Schema.Verification
@@ -45,7 +45,7 @@ defmodule PolicrMiniBot.Worker.ValidationTerminator do
   终止超时验证。
   """
   @spec terminate(Verification.t(), Scheme.t(), integer) :: :ok
-  def terminate(veri, scheme, waiting_secs)
+  def terminate(veri = v, scheme, waiting_secs)
       when is_struct(veri, Verification) and is_struct(scheme, Scheme) do
     %{chat_id: chat_id, target_user_id: user_id, target_user_name: user_name} = veri
     user = %{id: user_id, fullname: user_name}
@@ -60,11 +60,7 @@ defmodule PolicrMiniBot.Worker.ValidationTerminator do
     # 为等待状态才实施操作
     if last_veri.status == :waiting do
       # 自增统计数据（超时）
-      StatisticBusiness.increment_one(
-        veri.chat_id,
-        veri.target_user_language_code,
-        :timeout
-      )
+      Chats.increment_statistic(v.chat_id, v.target_user_language_code, :timeout)
 
       killing_method = scheme.timeout_killing_method || default!(:tkmethod)
       delay_unban_secs = scheme.delay_unban_secs || default!(:delay_unban_secs)
@@ -140,7 +136,7 @@ defmodule PolicrMiniBot.Worker.ValidationTerminator do
       create_operation(veri, kmeth, :admin)
 
       # 添加统计（其它）
-      StatisticBusiness.increment_one(
+      Chats.increment_statistic(
         veri.chat_id,
         veri.target_user_language_code,
         :other

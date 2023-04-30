@@ -5,10 +5,9 @@ defmodule PolicrMiniBot.CallVerificationPlug do
 
   use PolicrMiniBot, plug: [caller: [prefix: "verification:"]]
 
-  alias PolicrMini.{Logger, Chats}
+  alias PolicrMini.{Logger, Chats, VerificationBusiness}
   alias PolicrMini.Chats.Scheme
   alias PolicrMini.Schema.Verification
-  alias PolicrMini.{VerificationBusiness, StatisticBusiness}
   alias PolicrMiniBot.{HandleUserJoinedCleanupPlug, Disposable, Worker}
 
   @doc """
@@ -151,7 +150,7 @@ defmodule PolicrMiniBot.CallVerificationPlug do
   def handle_correct(verification, message_id, from_user) do
     # 自增统计数据（通过）。
     async do
-      StatisticBusiness.increment_one(
+      Chats.increment_statistic(
         verification.chat_id,
         verification.target_user_language_code,
         :passed
@@ -241,7 +240,7 @@ defmodule PolicrMiniBot.CallVerificationPlug do
       ) do
     # 自增统计数据（错误）。
     async do
-      StatisticBusiness.increment_one(
+      Chats.increment_statistic(
         verification.chat_id,
         verification.target_user_language_code,
         :wronged
