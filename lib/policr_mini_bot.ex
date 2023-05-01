@@ -8,7 +8,9 @@ defmodule PolicrMiniBot do
   defmacro __using__(plug: opts) do
     quote do
       import PolicrMiniBot.Helper
+      import PolicrMiniBot.State
 
+      # TODO: 将这些模块别名全部删除
       alias PolicrMiniBot.{State, Cleaner}
 
       alias Telegex.Model.{

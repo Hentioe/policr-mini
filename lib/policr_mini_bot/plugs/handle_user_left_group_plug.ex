@@ -1,4 +1,4 @@
-defmodule PolicrMiniBot.HandleUserLeftedGroupPlug do
+defmodule PolicrMiniBot.HandleUserLeftGroupPlug do
   @moduledoc """
   群成员离开的处理器。
   """
@@ -9,8 +9,10 @@ defmodule PolicrMiniBot.HandleUserLeftedGroupPlug do
 
   use PolicrMiniBot, plug: :preheater
 
-  alias PolicrMini.{Logger, Chats, PermissionBusiness}
-  alias PolicrMiniBot.{State, Worker}
+  alias PolicrMini.{Chats, PermissionBusiness}
+  alias PolicrMiniBot.Worker
+
+  require Logger
 
   @doc """
   根据更新消息中的 `chat_member` 字段，清理离开数据。
@@ -67,21 +69,27 @@ defmodule PolicrMiniBot.HandleUserLeftedGroupPlug do
   def call(%{chat_member: chat_member} = update, state) do
     %{chat: %{id: chat_id}, new_chat_member: %{user: %{id: lefted_user_id} = user}} = chat_member
 
-    Logger.debug("A member (#{lefted_user_id}) has lefted the group (#{chat_id}).")
-    state = State.set_action(state, :user_lefted)
+    Logger.debug("A group member has left: #{inspect(chat_id: chat_id, user_id: lefted_user_id)}")
+
+    state = action(state, :user_lefted)
 
     if lefted_user_id == bot_id() do
       # 跳过机器人自身
       {:ignored, state}
     else
-      # 检测并删除服务消息。
       # TOD0: 将 scheme 的获取放在一个独立的 plug 中，通过状态传递。
-      # TODO: 将存在 message 的清理代码放在一个独立的 plug 中。
+      # 检测并删除服务消息
+      # 注意：此处的代码不确定是否有效，同样的功能在 `PolicrMiniBot.HandleGroupMemberLeftMessagePlug` 模块中已实现。
+      # 但尚不明确此处的服务消息删除代码是否还有必要，因为 TG 疑似已将退出服务消息在作为独立消息发送。此代码仍然保留。
       case Chats.fetch_scheme(chat_id) do
         {:ok, scheme} ->
           service_message_cleanup = scheme.service_message_cleanup || default!(:smc) || []
 
           if Enum.member?(service_message_cleanup, :lefted) && update.message do
+            Logger.debug(
+              "Deleting member left message: #{inspect(chat_id: chat_id, message_id: update.message.message_id)}"
+            )
+
             # 删除服务消息。
             Worker.async_delete_message(chat_id, update.message.message_id)
           end

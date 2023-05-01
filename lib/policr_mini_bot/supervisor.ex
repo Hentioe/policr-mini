@@ -8,7 +8,6 @@ defmodule PolicrMiniBot.Supervisor do
     InitFromPlug,
     InitUserJoinedActionPlug,
     HandleUserJoinedGroupPlug,
-    HandleUserLeftedGroupPlug,
     HandleSelfJoinedPlug,
     HandleSelfLeftedPlug,
     HandleAdminPermissionsChangePlug,
@@ -50,10 +49,11 @@ defmodule PolicrMiniBot.Supervisor do
       RespSponsorshipCmdPlug,
       # ↓此模块↓ 需保证安装在 `InitUserJoinedActionPlug` 模块的后面。
       HandleUserJoinedGroupPlug,
-      HandleUserLeftedGroupPlug,
+      PolicrMiniBot.HandleUserLeftGroupPlug,
+      PolicrMiniBot.HandleGroupMemberLeftMessagePlug,
       HandleSelfJoinedPlug,
       HandleSelfLeftedPlug,
-      # ↓此模块↓ 需保证安装在 `HandleUserLeftedGroupPlug` 模块的后面。
+      # ↓此模块↓ 需保证安装在 `HandleUserLeftGroupPlug` 模块的后面。
       HandleAdminPermissionsChangePlug,
       # ↓此模块↓ 需保证安装在 `InitUserJoinedActionPlug` 和 `HandleSelfLeftedPlug` 模块的后面。
       HandleSelfPermissionsChangePlug,

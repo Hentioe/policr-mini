@@ -19,11 +19,20 @@ defmodule PolicrMiniBot.State do
 
   在一个状态中，动作只允许设置一次。如果出现多次设置，则表示某个插件出现了匹配错误。
   """
+  @deprecated "Use `action/2` instead."
   def set_action(state, action) when is_struct(state, __MODULE__) do
     if state.action == nil do
       %{state | action: action}
     else
       raise "Repeat setting the action field, details: #{inspect(action: action, state: state)}"
     end
+  end
+
+  def action(%{action: nil} = state, action) do
+    %{state | action: action}
+  end
+
+  def action(state, action) do
+    raise "Repeat set action field\n  Details: #{inspect(action: action, state: state)}"
   end
 end
