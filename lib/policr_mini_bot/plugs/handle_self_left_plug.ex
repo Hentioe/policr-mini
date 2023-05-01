@@ -11,8 +11,8 @@ defmodule PolicrMiniBot.HandleSelfLeftedPlug do
 
   alias PolicrMini.Instances
   alias PolicrMini.Instances.Chat
-  alias PolicrMini.Logger
-  alias PolicrMiniBot.State
+
+  require Logger
 
   @doc """
   根据更新消息中的 `my_chat_member` 字段，执行退出流程。
@@ -64,8 +64,9 @@ defmodule PolicrMiniBot.HandleSelfLeftedPlug do
   def call(%{my_chat_member: my_chat_member} = _update, state) do
     %{chat: %{id: chat_id}} = my_chat_member
 
-    Logger.debug("The bot has left a group, details: #{inspect(chat_id: chat_id)}")
-    state = State.set_action(state, :self_lefted)
+    Logger.info("I have left group: #{inspect(chat_id: chat_id)}")
+
+    state = action(state, :self_lefted)
 
     # 更新群组
     case Chat.get(chat_id) do

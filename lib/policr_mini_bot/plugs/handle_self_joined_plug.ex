@@ -10,7 +10,7 @@ defmodule PolicrMiniBot.HandleSelfJoinedPlug do
   use PolicrMiniBot, plug: :preheater
   alias PolicrMini.{Logger, Chats}
   alias PolicrMiniBot.Helper.Syncing
-  alias PolicrMiniBot.{RespSyncCmdPlug, State}
+  alias PolicrMiniBot.RespSyncCmdPlug
 
   @doc """
   根据更新消息中的 `my_chat_member` 字段，处理自身加入。
@@ -75,7 +75,7 @@ defmodule PolicrMiniBot.HandleSelfJoinedPlug do
     %{chat: %{id: chat_id, type: chat_type}} = my_chat_member
 
     Logger.debug("The bot is invited to a group (#{chat_id}).")
-    state = State.set_action(state, :self_joined)
+    state = action(state, :self_joined)
 
     # 非超级群直接退出。
     if chat_type != "supergroup", do: exits(chat_type, chat_id), else: handle_it(chat_id)

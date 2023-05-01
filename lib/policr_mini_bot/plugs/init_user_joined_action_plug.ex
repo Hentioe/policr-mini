@@ -9,8 +9,6 @@ defmodule PolicrMiniBot.InitUserJoinedActionPlug do
 
   use PolicrMiniBot, plug: :preheater
 
-  alias PolicrMiniBot.State
-
   @doc """
   根据更新消息中的 `chat_member` 字段，设置状态中的动作为 `user_joined`。
 
@@ -60,7 +58,7 @@ defmodule PolicrMiniBot.InitUserJoinedActionPlug do
 
   @impl true
   def call(_update, state) do
-    state = State.set_action(state, :user_joined)
+    state = action(state, :user_joined)
 
     {:ok, state}
   end
