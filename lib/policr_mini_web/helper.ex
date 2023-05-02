@@ -3,7 +3,7 @@ defmodule PolicrMiniWeb.Helper do
 
   alias PolicrMini.PermissionBusiness
 
-  alias PolicrMini.Logger
+  require Logger
 
   @type perm :: PermissionBusiness.permission()
 
@@ -169,8 +169,8 @@ defmodule PolicrMiniWeb.Helper do
       {:ok, %HTTPoison.Response{} = response} ->
         fetch_fun.(response)
 
-      e ->
-        Logger.unitized_error("Photo download", e)
+      {:error, reason} ->
+        Logger.error("Download of the photo failed: #{inspect(reason: reason, url: file_url)}")
 
         fallback_photo
     end
@@ -187,8 +187,8 @@ defmodule PolicrMiniWeb.Helper do
         :ok ->
           "/images/#{filename}"
 
-        e ->
-          Logger.unitized_error("Photo writing", e)
+        {:error, reason} ->
+          Logger.error("Writing of the photo failed: #{inspect(reason: reason)}")
 
           fallback_photo
       end

@@ -1,11 +1,12 @@
 defmodule PolicrMiniBot.Runner.LeftChecker do
   @moduledoc false
 
-  alias PolicrMini.Logger
   alias PolicrMini.Instances
 
+  require Logger
+
   def run do
-    Logger.info("Left check task has started")
+    Logger.info("Left check job has started")
 
     # 查找未接管且未离开状态的群
     chats = Instances.find_chats(taken_over: false, left_is_not: true)
@@ -20,7 +21,7 @@ defmodule PolicrMiniBot.Runner.LeftChecker do
     # 流计算，避免获取状态时长时间阻塞导致群数据在更新前过时
     _ = Enum.to_list(stream)
 
-    Logger.info("Left check task has ended")
+    Logger.info("Left check job has ended")
   end
 
   defp status(chat_id) do

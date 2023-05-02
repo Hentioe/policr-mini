@@ -5,11 +5,13 @@ defmodule PolicrMiniWeb.Admin.API.VerificationController do
 
   use PolicrMiniWeb, :controller
 
-  alias PolicrMini.{Logger, Chats, VerificationBusiness}
+  import PolicrMiniWeb.Helper
+
+  alias PolicrMini.{Chats, VerificationBusiness}
   alias PolicrMini.Schema.Verification
   alias PolicrMiniBot.Worker
 
-  import PolicrMiniWeb.Helper
+  require Logger
 
   action_fallback(PolicrMiniWeb.API.FallbackController)
 
@@ -37,8 +39,9 @@ defmodule PolicrMiniWeb.Admin.API.VerificationController do
         {:ok, _} = r ->
           r
 
-        e ->
-          Logger.unitized_error("Operation creation", e)
+        {:error, reason} = e ->
+          Logger.error("Create operation failed: #{inspect(reason: reason)}")
+
           e
       end
 

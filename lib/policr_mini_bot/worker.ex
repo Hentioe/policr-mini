@@ -3,7 +3,7 @@ defmodule PolicrMiniBot.Worker do
 
   # TODO: 持久化任务缓存。
 
-  alias PolicrMini.Logger
+  require Logger
 
   defmodule JobCacher do
     @moduledoc false
@@ -92,7 +92,7 @@ defmodule PolicrMiniBot.Worker do
       case Honeydew.cancel(job) do
         :ok ->
           Logger.debug(
-            "Terminate verification task has been canceled, details: #{inspect(chat_id: chat_id, user_id: user_id)}"
+            "Termination of verification job has been canceled: #{inspect(chat_id: chat_id, user_id: user_id)}"
           )
 
         _ ->

@@ -7,10 +7,12 @@ defmodule PolicrMiniWeb.Admin.API.ProfileController do
 
   import PolicrMiniWeb.Helper
 
-  alias PolicrMini.{Logger, DefaultsServer}
+  alias PolicrMini.DefaultsServer
   alias PolicrMiniBot.{ImageProvider, UpdatesPoller}
 
-  action_fallback(PolicrMiniWeb.API.FallbackController)
+  require Logger
+
+  action_fallback PolicrMiniWeb.API.FallbackController
 
   def index(conn, _params) do
     # 此 API 调用无需系统权限
@@ -60,7 +62,7 @@ defmodule PolicrMiniWeb.Admin.API.ProfileController do
         render(conn, "result.json", %{ok: true})
       rescue
         e ->
-          Logger.unitized_error("Resources upload", returns: e)
+          Logger.error("Processing uploaded resources failed: #{inspect(error: e)}")
 
           render(conn, "result.json", %{ok: false})
       end
@@ -107,7 +109,7 @@ defmodule PolicrMiniWeb.Admin.API.ProfileController do
       end
     rescue
       e ->
-        Logger.unitized_error("Albums update", exception: e)
+        Logger.error("Deployment of image set failed: #{inspect(error: e)}")
 
         Supervisor.restart_child(PolicrMiniBot.Supervisor, ImageProvider)
         Supervisor.restart_child(PolicrMiniBot.Supervisor, UpdatesPoller)

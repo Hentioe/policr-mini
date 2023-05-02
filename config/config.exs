@@ -56,16 +56,10 @@ config :telegex,
   timeout: 1000 * 30,
   recv_timeout: 1000 * 45
 
-config :logger,
-  backends: [:console, {PolicrMini.Logger.Backend, :queryable_log}],
-  utc_log: true
-
 # Configures Elixir's Logger
 config :logger, :console,
   format: "$time $metadata[$level] $message\n",
   metadata: [:request_id]
-
-config :logger, :queryable_log, level: :warn
 
 # Use Jason for JSON parsing in Phoenix
 config :phoenix, :json_library, Jason

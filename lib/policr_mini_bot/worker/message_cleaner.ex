@@ -7,7 +7,7 @@ defmodule PolicrMiniBot.Worker.MessageCleaner do
 
   use PolicrMiniBot.Worker
 
-  alias PolicrMini.Logger
+  require Logger
 
   @queue_name :message_cleaner
   @failure_mode {Honeydew.FailureMode.Retry, times: 5}
@@ -38,7 +38,7 @@ defmodule PolicrMiniBot.Worker.MessageCleaner do
         e
 
       {:error, reason} = e ->
-        Logger.warn(
+        Logger.warning(
           "Message deletion failed: #{inspect(reason: reason, chat_id: chat_id, message_id: message_id)}"
         )
 

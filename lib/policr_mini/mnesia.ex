@@ -3,7 +3,6 @@ defmodule PolicrMini.Mnesia do
 
   alias :mnesia, as: Mnesia
 
-  alias PolicrMini.Logger.Record, as: LoggerRecord
   alias PolicrMini.Counter.State, as: CounterState
   alias __MODULE__.Sequence
 
@@ -29,7 +28,6 @@ defmodule PolicrMini.Mnesia do
     Mnesia.start()
 
     :ok = check_init(Sequence, node_list)
-    :ok = check_init(LoggerRecord, node_list)
     :ok = check_init(CounterState, node_list)
 
     Mnesia.wait_for_tables([Sequence, LoggerRecord, CounterState], 5000)

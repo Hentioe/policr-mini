@@ -7,11 +7,13 @@ defmodule PolicrMiniBot.HandleUserJoinedCleanupPlug do
 
   use PolicrMiniBot, plug: :message_handler
 
-  alias PolicrMini.{Logger, Chats}
+  alias PolicrMini.Chats
   alias PolicrMini.Chats.Scheme
   alias PolicrMini.Schema.Verification
   alias PolicrMini.VerificationBusiness
   alias PolicrMiniBot.Worker
+
+  require Logger
 
   @type user :: PolicrMiniBot.Helper.mention_user()
 
@@ -100,11 +102,9 @@ defmodule PolicrMiniBot.HandleUserJoinedCleanupPlug do
 
         {:ok, state}
 
-      e ->
-        Logger.unitized_error("Verification acquisition",
-          chat_id: chat_id,
-          user_id: new_chat_member.id,
-          returns: e
+      {:error, reason} ->
+        Logger.error(
+          "Verification getting failed: #{inspect(chat_id: chat_id, user_id: new_chat_member.id, reason: reason)}"
         )
 
         {:error, state}
@@ -142,8 +142,10 @@ defmodule PolicrMiniBot.HandleUserJoinedCleanupPlug do
 
       {:ok, %{state | done: true, deleted: true}}
     else
-      e ->
-        Logger.unitized_error("Verification entrance creation", chat_id: chat_id, returns: e)
+      {:error, reason} ->
+        Logger.error(
+          "Create validation entry failed: #{inspect(chat_id: chat_id, reason: reason)}"
+        )
 
         text =
           t("errors.verification_created_failed", %{mentioned_user: mention(new_chat_member)})

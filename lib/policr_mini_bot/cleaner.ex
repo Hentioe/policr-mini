@@ -3,11 +3,11 @@ defmodule PolicrMiniBot.Cleaner do
   提供消息清理服务的模块，委托验证消息发送和删除。
   """
 
-  alias PolicrMini.Logger
-
   use GenServer
 
   alias PolicrMiniBot.{Helper, Worker}
+
+  require Logger
 
   @impl true
   def init(state) do
@@ -32,7 +32,8 @@ defmodule PolicrMiniBot.Cleaner do
 
   @impl true
   def handle_cast(msg, state) do
-    Logger.unitized_error("The cleaner received an unknown case message", msg)
+    Logger.warning("The cleaner received an unknown cast message: #{inspect(msg)}")
+
     {:noreply, state}
   end
 
@@ -43,7 +44,7 @@ defmodule PolicrMiniBot.Cleaner do
 
   @impl true
   def handle_info(msg, state) do
-    Logger.unitized_error("The cleaner received an unknown info message", msg)
+    Logger.warning("The cleaner received an unknown cast message: #{inspect(msg)}")
 
     {:noreply, state}
   end

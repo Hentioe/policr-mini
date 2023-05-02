@@ -5,14 +5,14 @@ defmodule PolicrMiniBot.RespSyncCmdPlug do
   此命令存在速度限制，15 秒内只能调用一次。
   """
 
-  alias PolicrMini.Logger
-
   use PolicrMiniBot, plug: [commander: :sync]
 
   alias PolicrMini.{Instances, Chats}
   alias PolicrMini.Instances.Chat
   alias PolicrMiniBot.{SpeedLimiter, Worker}
   alias PolicrMiniBot.Helper.Syncing
+
+  require Logger
 
   @doc """
   同步群组数据：群组信息、管理员列表。
@@ -77,8 +77,9 @@ defmodule PolicrMiniBot.RespSyncCmdPlug do
 
           async_run(fn -> send_message(chat_id, message_text) end)
         else
-          {:error, e} ->
-            Logger.unitized_error("Group data synchronization", e)
+          {:error, reason} ->
+            Logger.error("Sync of permissions failed: #{inspect(reason: reason)}")
+
             send_message(chat_id, t("errors.sync_failed"))
         end
     end

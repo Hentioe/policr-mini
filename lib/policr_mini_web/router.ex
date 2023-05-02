@@ -64,8 +64,6 @@ defmodule PolicrMiniWeb.Router do
 
     put "/verifications/:id/kill", VerificationController, :kill
 
-    get "/logs", LogController, :index
-
     get "/third_parties", ThirdPartyController, :index
     post "/third_parties", ThirdPartyController, :add
     put "/third_parties/:id", ThirdPartyController, :update

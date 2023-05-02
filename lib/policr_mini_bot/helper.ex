@@ -5,7 +5,7 @@ defmodule PolicrMiniBot.Helper do
   通过 `use PolicrMiniBot, plug: ...` 实现的插件会自动导入本模块的所有函数。
   """
 
-  alias PolicrMini.Logger
+  require Logger
 
   @type tgerror :: {:error, Telegex.Model.errors()}
   @type tgmsg :: Telegex.Model.Message.t()
@@ -134,9 +134,8 @@ defmodule PolicrMiniBot.Helper do
         retry = options |> Keyword.get(:retry)
 
         if retry && retry > 0 do
-          Logger.unitized_warn("Message sending timed out, prepare to try again",
-            remaining_times: retry - 1,
-            chat_id: chat_id
+          Logger.warning(
+            "Message sending timeout, waiting for retry: #{inspect(remaining_times: retry - 1, chat_id: chat_id)}"
           )
 
           options = options |> Keyword.put(:retry, retry - 1)
@@ -150,9 +149,8 @@ defmodule PolicrMiniBot.Helper do
         retry = options |> Keyword.get(:retry)
 
         if retry && retry > 0 do
-          Logger.unitized_warn("Too many requests are restricted to be sent",
-            remaining_times: retry - 1,
-            chat_id: chat_id
+          Logger.warning(
+            "Too many requests have been limited from sending messages: #{inspect(remaining_times: retry - 1, chat_id: chat_id)}"
           )
 
           options = options |> Keyword.put(:retry, retry - 1)
@@ -163,12 +161,14 @@ defmodule PolicrMiniBot.Helper do
         end
 
       {:error, %{error_code: 403}} = e ->
-        Logger.warn("Message sending failed due to user blocking: #{inspect(chat_id: chat_id)}")
+        Logger.warning(
+          "Message sending failed due to user blocking: #{inspect(chat_id: chat_id)}"
+        )
 
         e
 
-      e ->
-        Logger.unitized_error("Message sending", e: e, text: text)
+      {:error, reason} = e ->
+        Logger.error("Message sending failed: #{inspect(text: text, reason: reason)}")
 
         e
     end
@@ -236,9 +236,8 @@ defmodule PolicrMiniBot.Helper do
         retry = options |> Keyword.get(:retry)
 
         if retry && retry > 0 do
-          Logger.unitized_warn("Message sending timed out, prepare to try again",
-            remaining_times: retry - 1,
-            chat_id: chat_id
+          Logger.warning(
+            "Message sending timeout, waiting for retry: #{inspect(remaining_times: retry - 1, chat_id: chat_id)}"
           )
 
           options = options |> Keyword.put(:retry, retry - 1)
@@ -252,9 +251,8 @@ defmodule PolicrMiniBot.Helper do
         retry = options |> Keyword.get(:retry)
 
         if retry && retry > 0 do
-          Logger.unitized_warn("Too many requests are restricted to be sent",
-            remaining_times: retry - 1,
-            chat_id: chat_id
+          Logger.warning(
+            "Too many requests have been limited from sending messages: #{inspect(remaining_times: retry - 1, chat_id: chat_id)}"
           )
 
           options = options |> Keyword.put(:retry, retry - 1)
@@ -583,9 +581,9 @@ defmodule PolicrMiniBot.Helper do
       ExI18n.t(locale, key, values)
     rescue
       e ->
-        Logger.unitized_error("Translation search", key: key, raises: e)
+        Logger.error("Translation search failed: #{inspect(key: key, error: e)}")
 
-        "#{locale}:#{key}" |> String.replace("_", "\\_")
+        String.replace("#{locale}:#{key}", "_", "\\_")
     end
   end
 

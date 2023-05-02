@@ -6,8 +6,10 @@ defmodule PolicrMiniBot.Runner.WorkingChecker do
   当发现普通群（非超级群）将直接取消接管，并删除所有权限记录。当发现频道时将直接取消接管。
   """
 
-  alias PolicrMini.{Logger, Instances, Instances.Chat, ChatBusiness, PermissionBusiness}
+  alias PolicrMini.{Instances, Instances.Chat, ChatBusiness, PermissionBusiness}
   alias PolicrMiniBot.Helper, as: BotHelper
+
+  require Logger
 
   @spec run :: :ok
 
@@ -15,7 +17,7 @@ defmodule PolicrMiniBot.Runner.WorkingChecker do
   根据权限自动修正工作状态或退出群组。
   """
   def run do
-    Logger.debug("Working status check starts")
+    Logger.info("Working status check started")
 
     takeovred_chats = ChatBusiness.find_takeovered()
 
@@ -24,8 +26,8 @@ defmodule PolicrMiniBot.Runner.WorkingChecker do
       |> Stream.each(&check_chat/1)
       |> Enum.to_list()
 
-    Logger.debug(
-      "Working status check ended, details: #{inspect(count: length(takeovred_chats))}"
+    Logger.info(
+      "Working status check finished: #{inspect(takeovred_count: length(takeovred_chats))}"
     )
 
     :ok
@@ -64,20 +66,20 @@ defmodule PolicrMiniBot.Runner.WorkingChecker do
         if member.can_send_messages == false do
           Telegex.leave_chat(chat.id)
 
-          msg =
-            "Missing permission to send messages, has left automatically, details: #{inspect(chat_id: chat.id)}"
-
-          Logger.warn(msg)
+          Logger.warning(
+            "Missing permission to send message, automatically left the chat: #{inspect(chat_id: chat.id)}"
+          )
         end
 
       {:error, %Telegex.Model.RequestError{reason: :timeout}} ->
-        # 处理超时，自动重试。
-        msg =
-          "Requesting own permission timed out, waiting for retry, details: #{inspect(chat_id: chat.id)}"
+        # 处理超时，自动重试
 
-        Logger.warn(msg)
+        Logger.warning(
+          "Checking own permission timeout, waiting for retry: #{inspect(chat_id: chat.id)}"
+        )
 
         :timer.sleep(15)
+
         check_chat(chat)
 
       {:error, error} ->
@@ -121,10 +123,11 @@ defmodule PolicrMiniBot.Runner.WorkingChecker do
     PermissionBusiness.delete_all(chat.id)
   end
 
-  # 未知错误。
+  # 未知错误
   defp handle_check_error(error, chat)
-       when is_struct(error, Telegex.Model.Error) or is_struct(error, Telegex.Model.RequestError),
-       do: Logger.unitized_error("Bot permission check", chat_id: chat.id, error: error)
+       when is_struct(error, Telegex.Model.Error) or is_struct(error, Telegex.Model.RequestError) do
+    Logger.error("Self-permissions check failed", chat_id: chat.id, error: error)
+  end
 
   @type cancel_takeover_opts :: [reason: atom, send_notification: boolean]
 
@@ -146,10 +149,9 @@ defmodule PolicrMiniBot.Runner.WorkingChecker do
 
     reason = Keyword.get(opts, :reason, :none)
 
-    msg =
-      "Takeover is automatically cancelled, details: #{inspect(chat_id: chat_id, reason: reason)}"
-
-    Logger.warn(msg)
+    Logger.warning(
+      "The takeover has been automatically cancelled: #{inspect(chat_id: chat_id, reason: reason)}"
+    )
 
     :ok
   end

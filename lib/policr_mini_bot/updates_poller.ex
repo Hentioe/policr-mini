@@ -5,9 +5,10 @@ defmodule PolicrMiniBot.UpdatesPoller do
 
   use GenServer
 
-  alias PolicrMini.Logger
   alias PolicrMiniBot.Consumer
   alias PolicrMiniBot.Runner.ThirdPartiesMaintainer
+
+  require Logger
 
   defmodule BotInfo do
     @moduledoc false
@@ -89,12 +90,14 @@ defmodule PolicrMiniBot.UpdatesPoller do
       case Telegex.get_updates(offset: last_offset, allowed_updates: @allowed_updates) do
         {:ok, updates} ->
           # 消费消息
-          updates |> Enum.each(&Consumer.receive/1)
+          Enum.each(updates, &Consumer.receive/1)
 
-          if Enum.empty?(updates),
-            do: last_offset,
-            # 获取新的 offset
-            else: List.last(updates).update_id + 1
+          if Enum.empty?(updates) do
+            last_offset
+          else
+            # 计算新的 offset
+            List.last(updates).update_id + 1
+          end
 
         {:error, %Telegex.Model.Error{description: "Bad Gateway"}} ->
           # Telegram 服务器故障，大幅度降低请求频率
@@ -102,8 +105,9 @@ defmodule PolicrMiniBot.UpdatesPoller do
 
           last_offset
 
-        e ->
-          Logger.unitized_warn("Message pull", e)
+        {:error, reason} ->
+          Logger.warning("Pulling messages has failed: #{inspect(reason: reason)}")
+
           # 发生错误，降低请求频率
           :timer.sleep(200)
 
@@ -119,7 +123,7 @@ defmodule PolicrMiniBot.UpdatesPoller do
   #  如果收到 `{:ssl_closed, _}` 消息，会输出错误日志，目前没有做任何网络检查或试图挽救的措施。
   @impl true
   def handle_info({:ssl_closed, _} = msg, state) do
-    Logger.unitized_error("SSL connection", msg)
+    Logger.error("SSL connection closed: #{inspect(msg: msg)}")
 
     {:noreply, state}
   end
@@ -190,11 +194,11 @@ defmodule PolicrMiniBot.UpdatesPoller do
         }
 
       {:error, %{reason: :timeout}} ->
-        Logger.warn("Checking bot information has timed out. Retrying...")
+        Logger.warning("Checking bot information timeout, retrying...")
 
       {:error, %{reason: :closed}} ->
         :timer.sleep(100)
-        Logger.warn("The connection to check bot information is closed. Retrying...")
+        Logger.warning("Network error while checking bot information, retrying...")
 
         get_bot_info()
 

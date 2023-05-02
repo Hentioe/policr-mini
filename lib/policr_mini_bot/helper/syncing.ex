@@ -3,12 +3,13 @@ defmodule PolicrMiniBot.Helper.Syncing do
   提供同步相关的函数。
   """
 
-  alias PolicrMini.Logger
   alias PolicrMini.Instances
   alias PolicrMini.Instances.Chat
   alias PolicrMini.Schema.{User, Permission}
   alias PolicrMini.UserBusiness
   alias Telegex.Model.ChatMember
+
+  require Logger
 
   @doc """
   同步 chat 的权限列表。
@@ -52,7 +53,7 @@ defmodule PolicrMiniBot.Helper.Syncing do
           {:ok, chat}
         rescue
           e ->
-            Logger.unitized_error("Permission synchronization", catched: e)
+            Logger.error("Sync permissions failed: #{inspect(error: e, chat_id: chat.id)}")
 
             {:error, e}
         end

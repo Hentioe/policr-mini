@@ -5,10 +5,11 @@ defmodule PolicrMiniBot.HandleAdminPermissionsChangePlug do
 
   use PolicrMiniBot, plug: :preheater
 
-  alias PolicrMini.Logger
   alias PolicrMini.Instances.Chat
   alias PolicrMiniBot.Helper.Syncing
   alias PolicrMiniBot.Worker
+
+  require Logger
 
   @doc """
   根据更新消息中的 `chat_member` 字段，同步管理员权限变化。
@@ -107,7 +108,7 @@ defmodule PolicrMiniBot.HandleAdminPermissionsChangePlug do
     %{chat: %{id: chat_id}, new_chat_member: %{user: %{id: user_id} = user}} = chat_member
 
     Logger.debug(
-      "The permissions of an administrator have changed. #{inspect(chat_id: chat_id, user_id: user_id)}"
+      "An administrator permissions has changed: #{inspect(chat_id: chat_id, user_id: user_id)}"
     )
 
     # TODO: 优化管理员权限的自动同步过程。改为对单个用户权限的更新或删除，而非根据 API 调用结果同步所有数据。
@@ -124,24 +125,26 @@ defmodule PolicrMiniBot.HandleAdminPermissionsChangePlug do
         {:ok, msg} ->
           Worker.async_delete_message(chat_id, msg.message_id, delay_secs: 4)
 
-        e ->
-          Logger.unitized_error("Sending of messages with synchronized permissions",
-            chat_id: chat_id,
-            returns: e
+        {:error, reason} ->
+          Logger.warning(
+            "Send permission synchronization message failed: #{inspect(chat_id: chat_id, reason: reason)}"
           )
       end
     else
-      e ->
+      {:error, reason} ->
         send_message(
           chat_id,
           "检测到用户 #{mention(user, anonymization: false)} 的管理权限变化，但由于某些原因同步到后台权限失败了。"
         )
 
-        Logger.unitized_error("Automatically sync administrator permissions",
-          chat_id: chat_id,
-          user_id: user_id,
-          returns: e
+        Logger.error(
+          "Auto sync of chat permissions failed: #{inspect(chat_id: chat_id, user_id: user_id, reason: reason)}"
         )
+
+      {:error, :not_found, _} ->
+        # TODO: 保存群聊数据，并执行同步
+
+        Logger.error("Chat not found: #{inspect(chat_id: chat_id)}")
     end
 
     {:ok, state}

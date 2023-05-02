@@ -5,10 +5,12 @@ defmodule PolicrMiniBot.HandleSelfPermissionsChangePlug do
 
   use PolicrMiniBot, plug: :preheater
 
-  alias PolicrMini.{Logger, Instances}
+  alias PolicrMini.Instances
   alias PolicrMini.Instances.Chat
   alias PolicrMiniBot.Helper.Syncing
   alias Telegex.Model.{InlineKeyboardMarkup, InlineKeyboardButton}
+
+  require Logger
 
   @doc """
   根据更新消息中的 `my_chat_member` 字段，处理自身权限变化。
@@ -132,7 +134,7 @@ defmodule PolicrMiniBot.HandleSelfPermissionsChangePlug do
       when status_new in ["restricted", "member"] and status_old == "administrator" do
     %{chat: %{id: chat_id}} = my_chat_member
 
-    Logger.debug("The bot has been demoted to a normal member (#{chat_id}).")
+    Logger.debug("I have been demoted to a regular member: #{inspect(chat_id: chat_id)}")
 
     if new_chat_member.can_send_messages == false do
       # 如果没有发送消息权限，将直接退群。
@@ -325,8 +327,8 @@ defmodule PolicrMiniBot.HandleSelfPermissionsChangePlug do
       {:empty, false} ->
         :no_empty
 
-      e ->
-        Logger.unitized_error("Empty rights fixing", returns: e)
+      {:error, reason} ->
+        Logger.error("Fixing empty permissions failed: #{inspect(reason: reason)}")
 
         :error
     end

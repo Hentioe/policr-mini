@@ -7,7 +7,6 @@ defmodule PolicrMiniBot.Worker.ValidationTerminator do
 
   alias PolicrMini.{
     Chats,
-    Logger,
     Repo,
     Chats,
     VerificationBusiness
@@ -18,6 +17,8 @@ defmodule PolicrMiniBot.Worker.ValidationTerminator do
   alias PolicrMiniBot.{Cleaner, CallVerificationPlug}
 
   import PolicrMiniBot.Helper
+
+  require Logger
 
   @queue_name :validation_terminator
   @max_concurrency 9999
@@ -50,10 +51,9 @@ defmodule PolicrMiniBot.Worker.ValidationTerminator do
     %{chat_id: chat_id, target_user_id: user_id, target_user_name: user_name} = veri
     user = %{id: user_id, fullname: user_name}
 
-    msg =
-      "[#{veri.id}] Validation validity time is about to end, start processing timeout, details: #{inspect(chat_id: chat_id, user_id: user_id)}"
-
-    Logger.debug(msg)
+    Logger.debug(
+      "[#{v.id}] Verification timeout processing has started: #{inspect(chat_id: chat_id, user_id: user_id)}"
+    )
 
     # 读取最新的验证数据，因为用户参与验证可能会同时发生
     last_veri = Repo.reload(veri)
@@ -91,10 +91,12 @@ defmodule PolicrMiniBot.Worker.ValidationTerminator do
         )
       end
     else
-      Logger.debug("[#{veri.id}] Validation ends prematurely, ignoring timeout handling")
+      Logger.debug("[#{v.id}] Verification has ended, ignoring timeout processing")
     end
 
-    Logger.debug("[#{veri.id}] Timeout processing has ended")
+    Logger.debug(
+      "[#{v.id}] Verification processing has ended for timeout: #{inspect(chat_id: chat_id, user_id: user_id)}"
+    )
 
     # 从缓存中删除任务
     JobCacher.delete_job(job_key(:terminate, veri))
@@ -108,14 +110,13 @@ defmodule PolicrMiniBot.Worker.ValidationTerminator do
   手动终止验证。
   """
   @spec manual_terminate(Verification.t(), operation_status) :: :ok
-  def manual_terminate(veri, status) when status in [:manual_ban, :manual_kick] do
+  def manual_terminate(veri = v, status) when status in [:manual_ban, :manual_kick] do
     %{chat_id: chat_id, target_user_id: user_id, target_user_name: user_name} = veri
     user = %{id: user_id, fullname: user_name}
 
-    msg =
-      "[#{veri.id}] Manual termination verification started, details: #{inspect(chat_id: chat_id, user_id: user_id)}"
-
-    Logger.debug(msg)
+    Logger.debug(
+      "[#{v.id}] Manual verification termination started: #{inspect(chat_id: chat_id, user_id: user_id)}"
+    )
 
     # 为等待状态才实施操作
     if veri.status == :waiting do
@@ -124,10 +125,9 @@ defmodule PolicrMiniBot.Worker.ValidationTerminator do
 
       {:ok, scheme} = Chats.fetch_scheme(chat_id)
 
-      msg =
-        "[#{veri.id}] Validation was manually terminated by administrator, details: #{inspect(chat_id: chat_id, user_id: user_id)}"
-
-      Logger.debug(msg)
+      Logger.debug(
+        "[#{v.id}] Verification manually terminated by the administrator: #{inspect(chat_id: chat_id, user_id: user_id)}"
+      )
 
       kmeth = if status == :manual_ban, do: :ban, else: :kick
       delay_unban_secs = scheme.delay_unban_secs || default!(:delay_unban_secs)
@@ -163,14 +163,14 @@ defmodule PolicrMiniBot.Worker.ValidationTerminator do
         )
       end
 
-      Logger.debug("[#{veri.id}] Manual termination verification has ended")
+      Logger.debug(
+        "[#{v.id}] Manual verification termination completed: #{inspect(chat_id: chat_id, user_id: user_id)}"
+      )
 
       # 从缓存中删除任务
       JobCacher.delete_job(job_key(:terminate, veri))
     else
-      msg = "[#{veri.id}] Validation is not in progress and does not need to be terminated"
-
-      Logger.debug(msg)
+      Logger.debug("[#{v.id}] Verification has ended, ignoring termination")
     end
 
     :ok
@@ -191,24 +191,24 @@ defmodule PolicrMiniBot.Worker.ValidationTerminator do
       {:ok, _} = r ->
         r
 
-      e ->
-        Logger.unitized_error("Operation creation", e)
+      {:error, reason} = e ->
+        Logger.error("Creating operation failed: #{inspect(reason: reason)}")
 
         e
     end
   end
 
   @spec async_terminate(Verification.t(), Scheme.t(), integer) :: Honeydew.Job.t()
-  def async_terminate(veri, scheme, waiting_secs) do
+  def async_terminate(veri = v, scheme, waiting_secs) do
     %{chat_id: chat_id, target_user_id: user_id} = veri
     job_key = job_key(:terminate, veri)
 
     if job = JobCacher.get_job(job_key) do
       # 已存在
-      msg =
-        "[#{veri.id}] Termination verification task already exists, details: #{inspect(chat_id: chat_id, user_id: user_id)}"
 
-      Logger.debug(msg)
+      Logger.debug(
+        "[#{v.id}] Verification termination job already exists: #{inspect(chat_id: chat_id, user_id: user_id)}"
+      )
 
       job
     else
@@ -218,7 +218,7 @@ defmodule PolicrMiniBot.Worker.ValidationTerminator do
       JobCacher.add_job(job_key, job)
 
       msg =
-        "Created async termination task, details: #{inspect(chat_id: chat_id, user_id: user_id, waiting_secs: waiting_secs)}"
+        "Async verification termination job has been created: #{inspect(chat_id: chat_id, user_id: user_id, waiting_secs: waiting_secs)}"
 
       Logger.debug(msg)
 

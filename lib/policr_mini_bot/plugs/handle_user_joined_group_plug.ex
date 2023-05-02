@@ -10,7 +10,9 @@ defmodule PolicrMiniBot.HandleUserJoinedGroupPlug do
   use PolicrMiniBot, plug: :preheater
 
   alias PolicrMiniBot.HandleUserJoinedCleanupPlug
-  alias PolicrMini.{Logger, Chats}
+  alias PolicrMini.Chats
+
+  require Logger
 
   @doc """
   根据更新消息中的 `chat_member` 字段，验证用户。
@@ -59,14 +61,18 @@ defmodule PolicrMiniBot.HandleUserJoinedGroupPlug do
   def call(%{chat_member: chat_member} = _update, state) do
     %{chat: %{id: chat_id}, new_chat_member: %{user: new_user}, date: date} = chat_member
 
-    Logger.debug("A new member (#{new_user.id}) has joined the group (#{chat_id}).")
+    Logger.debug(
+      "A new member has joined the group: #{inspect(chat_id: chat_id, user_id: new_user.id)}"
+    )
 
     case Chats.fetch_scheme(chat_id) do
       {:ok, scheme} ->
         HandleUserJoinedCleanupPlug.handle_one(chat_id, new_user, date, scheme, state)
 
-      e ->
-        Logger.unitized_error("Verification scheme fetching", chat_id: chat_id, returns: e)
+      {:error, reason} ->
+        Logger.error(
+          "Verification scheme getting failed: #{inspect(chat_id: chat_id, reason: reason)}"
+        )
 
         send_message(chat_id, t("errors.scheme_fetch_failed"))
 

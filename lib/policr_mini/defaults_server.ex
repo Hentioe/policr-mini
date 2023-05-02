@@ -5,7 +5,9 @@ defmodule PolicrMini.DefaultsServer do
 
   use GenServer
 
-  alias PolicrMini.{Logger, Chats}
+  alias PolicrMini.Chats
+
+  require Logger
 
   def start_link(_) do
     {:ok, scheme} = Chats.fetch_default_scheme()
@@ -53,7 +55,7 @@ defmodule PolicrMini.DefaultsServer do
         {:noreply, Map.put(state, :scheme, scheme)}
 
       {:error, reason} ->
-        Logger.unitized_error("Default scheme update", params: params, reason: reason)
+        Logger.error("Updating default scheme failed: #{inspect(params: params, reason: reason)}")
 
         {:noreply, state}
     end

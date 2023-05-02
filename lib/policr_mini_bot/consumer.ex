@@ -6,7 +6,8 @@ defmodule PolicrMiniBot.Consumer do
   use DynamicSupervisor
 
   alias PolicrMiniBot.State
-  alias PolicrMini.Logger
+
+  require Logger
 
   def start_link(default \\ []) when is_list(default) do
     DynamicSupervisor.start_link(__MODULE__, %{}, name: __MODULE__)

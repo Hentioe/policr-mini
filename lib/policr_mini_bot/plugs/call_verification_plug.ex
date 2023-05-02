@@ -5,10 +5,12 @@ defmodule PolicrMiniBot.CallVerificationPlug do
 
   use PolicrMiniBot, plug: [caller: [prefix: "verification:"]]
 
-  alias PolicrMini.{Logger, Chats, VerificationBusiness}
+  alias PolicrMini.{Chats, VerificationBusiness}
   alias PolicrMini.Chats.Scheme
   alias PolicrMini.Schema.Verification
   alias PolicrMiniBot.{HandleUserJoinedCleanupPlug, Disposable, Worker}
+
+  require Logger
 
   @doc """
   回调处理函数。
@@ -118,7 +120,7 @@ defmodule PolicrMiniBot.CallVerificationPlug do
       :ok
     else
       {:error, %Ecto.Changeset{} = changeset} ->
-        Logger.unitized_error("Answer verification processing", changeset)
+        Logger.error("Processing of verification answer failed: #{inspect(reason: changeset)}")
 
         answer_callback_query(callback_query_id,
           text: t("errors.check_answer_failed"),
@@ -132,13 +134,15 @@ defmodule PolicrMiniBot.CallVerificationPlug do
 
         :error
 
-      e ->
+      {:error, reason} ->
         answer_callback_query(callback_query_id,
           text: t("errors.unknown"),
           show_alert: true
         )
 
-        Logger.unitized_error("Answer verification processing", e)
+        Logger.error("Processing of verification answer failed: #{inspect(reason: reason)}")
+
+        :error
     end
   end
 
@@ -178,8 +182,8 @@ defmodule PolicrMiniBot.CallVerificationPlug do
             delay_secs: 8
           )
 
-        e ->
-          Logger.unitized_error("Verification passed notification", e)
+        {:error, reason} ->
+          Logger.error("Sending verification notification failed: #{inspect(reason: reason)}")
       end
     end
 
@@ -267,8 +271,8 @@ defmodule PolicrMiniBot.CallVerificationPlug do
         {:ok, _} = r ->
           r
 
-        e ->
-          Logger.unitized_error("Operation creation", e)
+        {:error, reason} = e ->
+          Logger.error("Operation creation failed: #{inspect(reason: reason)}")
 
           e
       end
@@ -394,11 +398,9 @@ defmodule PolicrMiniBot.CallVerificationPlug do
 
         :ok
 
-      e ->
-        Logger.unitized_error("Send notification of user killed",
-          chat_id: chat_id,
-          user_id: user.id,
-          returns: e
+      {:error, reason} = e ->
+        Logger.warning(
+          "Send kill user notification failed: #{inspect(chat_id: chat_id, user_id: user.id, reason: reason)}"
         )
 
         e

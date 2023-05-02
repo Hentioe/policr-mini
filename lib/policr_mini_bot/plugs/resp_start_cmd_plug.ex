@@ -8,10 +8,12 @@ defmodule PolicrMiniBot.RespStartCmdPlug do
 
   use PolicrMiniBot, plug: [commander: :start]
 
-  alias PolicrMini.{Logger, Chats, VerificationBusiness, MessageSnapshotBusiness}
+  alias PolicrMini.{Chats, VerificationBusiness, MessageSnapshotBusiness}
   alias PolicrMini.Schema.Verification
   alias PolicrMiniBot.{ArithmeticCaptcha, CustomCaptcha, FallbackCaptcha, ImageCaptcha}
   alias Telegex.Model.{Message, InlineKeyboardMarkup, InlineKeyboardButton}
+
+  require Logger
 
   @fallback_captcha_module FallbackCaptcha
 
@@ -115,17 +117,15 @@ defmodule PolicrMiniBot.RespStartCmdPlug do
         :ok
       else
         {:error, %{error_code: 403}} = e ->
-          Logger.warn(
+          Logger.warning(
             "Verification creation failed due to user blocking: #{inspect(chat_id: target_chat_id, user_id: from_user_id)}"
           )
 
           e
 
         {:error, reason} = e ->
-          Logger.unitized_error("Verification creation",
-            chat_id: target_chat_id,
-            user_id: from_user_id,
-            reason: reason
+          Logger.error(
+            "Create verification failed: #{inspect(chat_id: target_chat_id, user_id: from_user_id, reason: reason)}"
           )
 
           send_message(from_user_id, t("errors.unknown"))
@@ -165,7 +165,9 @@ defmodule PolicrMiniBot.RespStartCmdPlug do
         {captcha_maker, captcha_maker.make!(chat_id, scheme)}
       rescue
         e ->
-          Logger.warn("Validation data generation error: #{inspect(chat_id: chat_id, error: e)}")
+          Logger.warning(
+            "Verification data generation failed: #{inspect(chat_id: chat_id, error: e)}"
+          )
 
           {@fallback_captcha_module, @fallback_captcha_module.make!(chat_id, scheme)}
       end

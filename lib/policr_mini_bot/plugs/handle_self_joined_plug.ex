@@ -8,9 +8,12 @@ defmodule PolicrMiniBot.HandleSelfJoinedPlug do
   # !注意! 此模块功能依赖对 `my_chat_member` 更新的接收。
 
   use PolicrMiniBot, plug: :preheater
-  alias PolicrMini.{Logger, Chats}
+
+  alias PolicrMini.Chats
   alias PolicrMiniBot.Helper.Syncing
   alias PolicrMiniBot.RespSyncCmdPlug
+
+  require Logger
 
   @doc """
   根据更新消息中的 `my_chat_member` 字段，处理自身加入。
@@ -74,7 +77,8 @@ defmodule PolicrMiniBot.HandleSelfJoinedPlug do
   def call(%{my_chat_member: my_chat_member} = _update, state) do
     %{chat: %{id: chat_id, type: chat_type}} = my_chat_member
 
-    Logger.debug("The bot is invited to a group (#{chat_id}).")
+    Logger.debug("I have been invited to a group: #{inspect(chat_id: chat_id)}")
+
     state = action(state, :self_joined)
 
     # 非超级群直接退出。
@@ -127,8 +131,8 @@ defmodule PolicrMiniBot.HandleSelfJoinedPlug do
       {:error, %Telegex.Model.Error{description: "Bad Request: have no rights to send a message"}} ->
         Telegex.leave_chat(chat_id)
 
-      e ->
-        Logger.unitized_error("Bot was invited to process", e)
+      {:error, reason} ->
+        Logger.error("The invitation processing failed: #{inspect(reason: reason)}")
 
         send_message(chat_id, t("self_joined.error"))
     end
