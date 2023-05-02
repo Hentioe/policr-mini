@@ -390,11 +390,6 @@ export default () => {
           selected={isSysLink({ path: location.pathname, page: "managements" })}
         />
         <NavItem
-          title="查阅日志"
-          href="/admin/sys/logs"
-          selected={isSysLink({ path: location.pathname, page: "logs" })}
-        />
-        <NavItem
           title="全局属性"
           href="/admin/sys/profile"
           selected={isSysLink({ path: location.pathname, page: "profile" })}

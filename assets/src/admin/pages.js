@@ -7,7 +7,6 @@ import PropertiesPage from "./pages/Properties";
 import PermissionsPage from "./pages/Permissions";
 import CustomPage from "./pages/Custom";
 import SysManagementsPage from "./pages/SysManagements";
-import SysLogsPage from "./pages/SysLogs";
 import SysTasksPage from "./pages/SysTasks";
 import SysTerminalPage from "./pages/SysTerminal";
 import SysTermsPage from "./pages/SysTerms";
@@ -24,7 +23,6 @@ export {
   PermissionsPage,
   PropertiesPage,
   CustomPage,
-  SysLogsPage,
   SysManagementsPage,
   SysTasksPage,
   SysTerminalPage,

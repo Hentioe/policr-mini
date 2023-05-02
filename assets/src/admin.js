@@ -26,7 +26,6 @@ import {
   CustomPage,
   SysProfilePage,
   SysManagementsPage,
-  SysLogsPage,
   SysTasksPage,
   SysTerminalPage,
   SysThirdPartiesPage,
@@ -121,7 +120,6 @@ const App = () => {
                       element={<SysProfilePage />}
                     />
                     <Route path="/admin/sys/tasks" element={<SysTasksPage />} />
-                    <Route path="/admin/sys/logs" element={<SysLogsPage />} />
                     <Route path="/admin/sys/terms" element={<SysTermsPage />} />
                     <Route
                       path="/admin/sys/terminal"
