@@ -35,7 +35,7 @@ defmodule PolicrMiniBot.Runner.WorkingChecker do
 
   # 普通群，提示并退出。
   defp check_chat(%{id: chat_id, is_take_over: true, type: "group"}) do
-    BotHelper.send_message(chat_id, BotHelper.t("errors.no_super_group"))
+    BotHelper.send_message(chat_id, BotHelper.t("errors.non_super_group"))
 
     Telegex.leave_chat(chat_id)
   end

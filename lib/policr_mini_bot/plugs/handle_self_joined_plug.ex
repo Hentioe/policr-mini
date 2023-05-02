@@ -89,7 +89,7 @@ defmodule PolicrMiniBot.HandleSelfJoinedPlug do
 
   # 退出普通群。
   defp exits("group", chat_id) do
-    send_message(chat_id, t("errors.no_super_group"))
+    send_message(chat_id, t("errors.non_super_group"))
 
     Telegex.leave_chat(chat_id)
   end
