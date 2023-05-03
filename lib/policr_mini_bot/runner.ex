@@ -13,7 +13,7 @@ defmodule PolicrMiniBot.Runner do
       field :name_text, String.t()
       field :schedule_text, String.t()
       field :next_run_datetime, NaiveDateTime.t()
-      field :timezone, String
+      field :timezone, String.t()
     end
 
     def from({name, job}) when is_atom(name) and is_struct(job, Quantum.Job) do
@@ -31,7 +31,7 @@ defmodule PolicrMiniBot.Runner do
     end
 
     def put_text(%{name: :working_check} = job) do
-      %{job | name_text: "工作状态检查", schedule_text: "每 55 分钟"}
+      %{job | name_text: "工作状态检查", schedule_text: "每 4 小时"}
     end
 
     def put_text(%{name: :left_check} = job) do

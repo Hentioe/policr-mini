@@ -35,9 +35,9 @@ config :policr_mini, PolicrMiniBot.Scheduler,
       schedule: "*/5 * * * *",
       task: {PolicrMiniBot.Runner.ExpiredChecker, :run, []}
     ],
-    # 工作状态检查，每 55 分钟。
+    # 工作状态检查，每 4 小时。
     working_check: [
-      schedule: "*/55 * * * *",
+      schedule: "0 */4 * * *",
       task: {PolicrMiniBot.Runner.WorkingChecker, :run, []}
     ],
     # 已离开检查，每日。
