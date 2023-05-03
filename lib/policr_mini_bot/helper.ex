@@ -5,6 +5,12 @@ defmodule PolicrMiniBot.Helper do
   通过 `use PolicrMiniBot, plug: ...` 实现的插件会自动导入本模块的所有函数。
   """
 
+  alias __MODULE__.{
+    CheckRequiredPermissions
+  }
+
+  alias Telegex.Model.ChatMember
+
   require Logger
 
   @type tgerror :: {:error, Telegex.Model.errors()}
@@ -657,4 +663,14 @@ defmodule PolicrMiniBot.Helper do
         e
     end
   end
+
+  @doc """
+  检查接管所需权限。当成员不是管理员时返回 `non_admin`，缺失的管理权限时返回 `{:missing, [permission]}` ，满足接管所需权限时 `:ok`。
+  """
+  @spec check_tokeover_permissions(ChatMember.t()) ::
+          {:missing, [CheckRequiredPermissions.permission()]}
+          | :nonadm
+          | :ok
+
+  defdelegate check_tokeover_permissions(member), to: CheckRequiredPermissions
 end

@@ -47,32 +47,36 @@ defmodule PolicrMiniBot.RespSyncCmdPlug do
         with {:ok, chat} <- synchronize_chat(chat_id),
              {:ok, chat} <- Syncing.sync_for_chat_permissions(chat),
              {:ok, _scheme} <- Chats.fetch_scheme(chat_id),
-             # 获取自身权限
              {:ok, member} <- Telegex.get_chat_member(chat_id, PolicrMiniBot.id()) do
-          is_admin = member.status == "administrator"
+          # 检查是否具备接管权限，如果具备则自动接管验证
+          has_takeover_permissions = check_tokeover_permissions(member) == :ok
 
-          last_is_take_over = chat.is_take_over
+          is_taken_over =
+            if has_takeover_permissions do
+              Instances.update_chat(chat, %{is_take_over: true})
 
-          if is_admin do
-            Instances.update_chat(chat, %{is_take_over: true})
-          else
-            Instances.cancel_chat_takeover(chat)
-          end
+              true
+            else
+              Instances.cancel_chat_takeover(chat)
 
-          message_text = t("sync.success")
+              false
+            end
+
+          message_text = t("sync.success") <> "\n\n"
 
           message_text =
-            if is_admin do
-              message_text <>
-                t("sync.have_permissions") <>
-                if last_is_take_over, do: t("sync.already_takeover"), else: t("sync.has_takeover")
+            if has_takeover_permissions do
+              takeover_text =
+                if is_taken_over, do: t("sync.already_taken_over"), else: t("sync.taken_over")
+
+              message_text <> t("sync.has_permissions") <> takeover_text
             else
-              message_text <>
-                t("sync.no_permission") <>
-                if(last_is_take_over,
+              takeover_text =
+                if is_taken_over,
                   do: t("sync.cancelled_takeover"),
-                  else: t("sync.unable_takeover")
-                )
+                  else: t("sync.unable_to_takeover")
+
+              message_text <> t("sync.no_permission") <> takeover_text
             end
 
           async_run(fn -> send_message(chat_id, message_text) end)
