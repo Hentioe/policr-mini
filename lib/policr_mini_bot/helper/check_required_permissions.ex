@@ -4,12 +4,12 @@ defmodule PolicrMiniBot.Helper.CheckRequiredPermissions do
   @type permission :: :can_send_messages | :can_restrict_members | :can_delete_messages
 
   # TODO: 添加测试
-  def check_tokeover_permissions(%{status: status} = _member)
+  def check_takeover_permissions(%{status: status} = _member)
       when status != "administrator" do
     :nonadm
   end
 
-  def check_tokeover_permissions(member) do
+  def check_takeover_permissions(member) do
     missing_permissions =
       []
       |> check_and_append_missing_permission(member, :can_send_messages)

@@ -193,7 +193,7 @@ defmodule PolicrMiniBot.HandleSelfPermissionsChangePlug do
 
     Logger.debug("The bot administrator rights have been changed (#{chat_id}).")
 
-    # TODO: 此处的权限检查使用 `check_tokeover_permissions/1` 函数替代，以保证每一处的权限检查逻辑相同。
+    # TODO: 此处的权限检查使用 `check_takeover_permissions/1` 函数替代，以保证每一处的权限检查逻辑相同。
     case rights_change_action(my_chat_member) do
       :restore_rights ->
         # 重新启用必要的权限。

@@ -49,7 +49,7 @@ defmodule PolicrMiniBot.RespSyncCmdPlug do
              {:ok, _scheme} <- Chats.fetch_scheme(chat_id),
              {:ok, member} <- Telegex.get_chat_member(chat_id, PolicrMiniBot.id()) do
           # 检查是否具备接管权限，如果具备则自动接管验证
-          has_takeover_permissions = check_tokeover_permissions(member) == :ok
+          has_takeover_permissions = check_takeover_permissions(member) == :ok
 
           is_taken_over =
             if has_takeover_permissions do

@@ -667,10 +667,10 @@ defmodule PolicrMiniBot.Helper do
   @doc """
   检查接管所需权限。当成员不是管理员时返回 `non_admin`，缺失的管理权限时返回 `{:missing, [permission]}` ，满足接管所需权限时 `:ok`。
   """
-  @spec check_tokeover_permissions(ChatMember.t()) ::
+  @spec check_takeover_permissions(ChatMember.t()) ::
           {:missing, [CheckRequiredPermissions.permission()]}
           | :nonadm
           | :ok
 
-  defdelegate check_tokeover_permissions(member), to: CheckRequiredPermissions
+  defdelegate check_takeover_permissions(member), to: CheckRequiredPermissions
 end
