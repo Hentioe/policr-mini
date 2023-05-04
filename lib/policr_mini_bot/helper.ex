@@ -665,6 +665,15 @@ defmodule PolicrMiniBot.Helper do
   end
 
   defmacro commands_text(msg_id) do
+    msg_id =
+      cond do
+        is_binary(msg_id) ->
+          String.trim(msg_id)
+
+        true ->
+          msg_id
+      end
+
     quote do
       dgettext("commands", unquote(msg_id))
     end

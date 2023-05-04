@@ -57,7 +57,14 @@ defmodule PolicrMiniBot.RespStartCmdPlug do
     if length(args) == 2 do
       args |> List.last() |> dispatch(message)
     else
-      send_message(chat_id, t("start.response"), reply_markup: default_markup())
+      ttext =
+        commands_text("""
+        你好，我是一个专注于新成员验证的机器人。具有稳定的服务，便于操作的网页后台，不断增强与优化的核心功能，并保持长期维护。同时我是开源的，可自由复制部署的。
+
+        访问<a href="https://github.com/Hentioe/policr-mini">这里</a>更加了解一下我吧~
+        """)
+
+      send_message(chat_id, ttext, reply_markup: default_markup(), parse_mode: "HTML")
     end
 
     {:ok, state}
