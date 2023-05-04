@@ -39,7 +39,7 @@ sync:
   has_permissions: 因为本机器人具备权限，
   already_taken_over: 新成员验证已处于接管状态。
   taken_over: 已接管新成员验证。
-  no_permission: 因本机器人不是管理员或缺失必要管理权限，
+  no_permission: 由于机器人缺失必要管理权限，
   cancelled_takeover: 已取消对新成员验证的接管。
   unable_to_takeover: 没有接管新成员验证的能力。
 
