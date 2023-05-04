@@ -1,0 +1,33 @@
+## This file is a PO Template file.
+##
+## "msgid"s here are often extracted from source code.
+## Add new translations manually only if they're dynamic
+## translations that can't be statically extracted.
+##
+## Run "mix gettext.extract" to bring this file up to
+## date. Leave "msgstr"s empty as changing them here has no
+## effect: edit them in PO (.po) files instead.
+msgid ""
+msgstr ""
+
+#: lib/policr_mini_bot/plugs/handle_self_permissions_change_plug.ex:386
+#, elixir-autogen, elixir-format
+msgid "我已经具备必要管理权限了，是否立即接管新成员验证？"
+msgstr ""
+
+#: lib/policr_mini_bot/plugs/handle_self_permissions_change_plug.ex:216
+#, elixir-autogen, elixir-format
+msgid "我已经具备必要管理权限了，是否重新接管新成员验证？"
+msgstr ""
+
+#: lib/policr_mini_bot/plugs/handle_self_permissions_change_plug.ex:217
+#: lib/policr_mini_bot/plugs/handle_self_permissions_change_plug.ex:387
+#, elixir-autogen, elixir-format
+msgid "提示：群管理可直接通过按钮启用，亦可随时进入后台页面操作。"
+msgstr ""
+
+#: lib/policr_mini_bot/plugs/handle_self_permissions_change_plug.ex:234
+#: lib/policr_mini_bot/plugs/handle_self_permissions_change_plug.ex:373
+#, elixir-autogen, elixir-format
+msgid "- 删除消息（Delete messages）\n- 封禁成员（Ban users）"
+msgstr ""
