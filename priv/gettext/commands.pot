@@ -31,3 +31,8 @@ msgstr ""
 #, elixir-autogen, elixir-format
 msgid "- 删除消息（Delete messages）\n- 封禁成员（Ban users）"
 msgstr ""
+
+#: lib/policr_mini_bot/plugs/resp_start_cmd_plug.ex:61
+#, elixir-autogen, elixir-format
+msgid "你好，我是一个专注于新成员验证的机器人。具有稳定的服务，便于操作的网页后台，不断增强与优化的核心功能，并保持长期维护。同时我是开源的，可自由复制部署的。\n\n访问<a href=\"https://github.com/Hentioe/policr-mini\">这里</a>更加了解一下我吧~"
+msgstr ""
