@@ -10,7 +10,16 @@ defmodule PolicrMiniBot.HandleSelfPermissionsChangePlug do
   alias PolicrMiniBot.Helper.Syncing
   alias Telegex.Model.{InlineKeyboardMarkup, InlineKeyboardButton}
 
+  import PolicrMiniBot.Helper.CheckRequiredPermissions,
+    only: [has_takeover_permissions: 1]
+
   require Logger
+
+  @required_permissons_msg """
+                           - 删除消息（Delete messages）
+                           - 封禁成员（Ban users）
+                           """
+                           |> String.trim()
 
   @doc """
   根据更新消息中的 `my_chat_member` 字段，处理自身权限变化。
@@ -59,7 +68,8 @@ defmodule PolicrMiniBot.HandleSelfPermissionsChangePlug do
   end
 
   @impl true
-  def call(_update, %{action: action} = state) when action in [:self_joined, :self_lefted] do
+  def call(_update, %{action: action} = state)
+      when action in [:self_joined, :self_lefted] do
     {:ignored, state}
   end
 
@@ -73,7 +83,8 @@ defmodule PolicrMiniBot.HandleSelfPermissionsChangePlug do
         },
         state
       )
-      when status_new in ["member", "restricted"] and status_old in ["member", "restricted"] do
+      when status_new in ["member", "restricted"] and
+             status_old in ["member", "restricted"] do
     {:ignored, state}
   end
 
@@ -131,7 +142,8 @@ defmodule PolicrMiniBot.HandleSelfPermissionsChangePlug do
         } = _update,
         state
       )
-      when status_new in ["restricted", "member"] and status_old == "administrator" do
+      when status_new in ["restricted", "member"] and
+             status_old == "administrator" do
     %{chat: %{id: chat_id}} = my_chat_member
 
     Logger.debug("I have been demoted to a regular member: #{inspect(chat_id: chat_id)}")
@@ -149,7 +161,10 @@ defmodule PolicrMiniBot.HandleSelfPermissionsChangePlug do
 
         markup = make_leave_markup(chat_id)
 
-        Telegex.send_message(chat_id, text, reply_markup: markup, parse_mode: "HTML")
+        Telegex.send_message(chat_id, text,
+          reply_markup: markup,
+          parse_mode: "HTML"
+        )
 
         cancel_takevoder(chat_id)
       end
@@ -170,13 +185,14 @@ defmodule PolicrMiniBot.HandleSelfPermissionsChangePlug do
         } = _update,
         state
       )
-      when status_new == "administrator" and status_old in ["restricted", "member"] do
+      when status_new == "administrator" and
+             status_old in ["restricted", "member"] do
     handle_self_promoted(my_chat_member)
 
     {:ok, state}
   end
 
-  # 管理权限的更新。
+  # 管理权限被更新
   @impl true
   def call(
         %{
@@ -191,32 +207,38 @@ defmodule PolicrMiniBot.HandleSelfPermissionsChangePlug do
       when status_new == "administrator" and status_old == "administrator" do
     %{chat: %{id: chat_id}} = my_chat_member
 
-    Logger.debug("The bot administrator rights have been changed (#{chat_id}).")
+    Logger.debug("My permissions have changed: #{inspect(chat_id: chat_id)}")
 
-    # TODO: 此处的权限检查使用 `check_takeover_permissions/1` 函数替代，以保证每一处的权限检查逻辑相同。
     case rights_change_action(my_chat_member) do
       :restore_rights ->
-        # 重新启用必要的权限。
+        # 重新启用必要的权限
+
+        ttitle = commands_text("我已经具备必要管理权限了，是否重新接管新成员验证？")
+        tcomment = commands_text("提示：群管理可直接通过按钮启用，亦可随时进入后台页面操作。")
 
         text = """
-        本机器人现在已经具备必要管理权限了，是否重新接管新成员验证？
+        #{ttitle}
 
-        <i>提示：群管理可直接通过按钮启用，亦可随时进入后台页面操作。</i>
+        <i>#{tcomment}</i>
         """
 
         markup = make_enable_markup(chat_id)
 
-        {:ok, _} = Telegex.send_message(chat_id, text, reply_markup: markup, parse_mode: "HTML")
+        {:ok, _} =
+          Telegex.send_message(chat_id, text,
+            reply_markup: markup,
+            parse_mode: "HTML"
+          )
 
       :missing_rights ->
-        # 必要权限被关闭。
+        trequired_permissions = commands_text(@required_permissons_msg)
+
         if taken_over?(chat_id) do
           text = """
           由于必要权限被关闭，已自动取消对新成员验证的接管。
 
           若想重新启用，请至少赋予以下权限：
-          - 删除消息（Delete messages）
-          - 封禁成员（Ban users）
+          #{trequired_permissions}
 
           <i>提示：权限修改后会自动提供启用功能的按钮，亦可随时进入后台页面操作。</i>
           """
@@ -238,10 +260,9 @@ defmodule PolicrMiniBot.HandleSelfPermissionsChangePlug do
          new_chat_member: new_chat_member,
          old_chat_member: old_chat_member
        })
-       when (old_chat_member.can_restrict_members == false or
-               old_chat_member.can_delete_messages == false) and
-              (new_chat_member.can_restrict_members == true and
-                 new_chat_member.can_delete_messages == true) do
+       # 之前没有接管权限，现在有了
+       when not has_takeover_permissions(old_chat_member) and
+              has_takeover_permissions(new_chat_member) do
     :restore_rights
   end
 
@@ -249,10 +270,9 @@ defmodule PolicrMiniBot.HandleSelfPermissionsChangePlug do
          new_chat_member: new_chat_member,
          old_chat_member: old_chat_member
        })
-       when old_chat_member.can_restrict_members == true and
-              old_chat_member.can_delete_messages == true and
-              (new_chat_member.can_restrict_members == false or
-                 new_chat_member.can_delete_messages == false) do
+       # 之前有接管权限，现在没了
+       when has_takeover_permissions(old_chat_member) and
+              not has_takeover_permissions(new_chat_member) do
     :missing_rights
   end
 
@@ -301,10 +321,12 @@ defmodule PolicrMiniBot.HandleSelfPermissionsChangePlug do
     }
   end
 
-  @typep fix_chat_empty_admins_arg :: Telegex.Model.ChatMemberUpdated.t() | Chat.t()
+  @typep fix_chat_empty_admins_arg ::
+           Telegex.Model.ChatMemberUpdated.t() | Chat.t()
   @typep fix_chat_empty_admins_returns :: :fixed | :no_empty | :error
 
-  @spec fix_chat_empty_admins(fix_chat_empty_admins_arg) :: fix_chat_empty_admins_returns
+  @spec fix_chat_empty_admins(fix_chat_empty_admins_arg) ::
+          fix_chat_empty_admins_returns
   defp fix_chat_empty_admins(my_chat_member)
        when is_struct(my_chat_member, Telegex.Model.ChatMemberUpdated) do
     %{chat: %{id: chat_id} = chat} = my_chat_member
@@ -321,7 +343,7 @@ defmodule PolicrMiniBot.HandleSelfPermissionsChangePlug do
          chat <- PolicrMini.Repo.preload(chat, [:permissions]),
          {:empty, true} <- {:empty, Enum.empty?(chat.permissions)},
          {:ok, _chat} <- Syncing.sync_for_chat_permissions(chat) do
-      # 已成功修正。
+      # 已成功修正
 
       :fixed
     else
@@ -339,36 +361,43 @@ defmodule PolicrMiniBot.HandleSelfPermissionsChangePlug do
   defp handle_self_promoted(my_chat_member) do
     %{chat: %{id: chat_id}, new_chat_member: new_chat_member} = my_chat_member
 
-    Logger.debug("The bot has been promoted to administrator (#{chat_id}).")
+    Logger.debug("I was promoted to administrator: #{inspect(chat_id: chat_id)}")
 
     # 尝试修正群管理员个数为零导致的权限问题。
     fix_chat_empty_admins(my_chat_member)
 
     if new_chat_member.can_restrict_members == false ||
          new_chat_member.can_delete_messages == false do
-      # 最少权限不完整。
+      # 最少权限不完整
+
+      trequired_permissions = commands_text(@required_permissons_msg)
 
       text = """
-      本机器人已经成为管理员了，但缺乏必要权限，尚无法启用接管验证相关功能。
+      我已是管理员了，但缺乏必要权限，尚无法启用接管验证相关功能。
 
       请至少赋予以下权限：
-      - 删除消息（Delete messages）
-      - 封禁成员（Ban users）
+      #{trequired_permissions}
 
       <i>提示：权限修改后会自动提供启用功能的按钮，亦可随时进入后台页面操作。</i>
       """
 
       Telegex.send_message(chat_id, text, parse_mode: "HTML")
     else
-      text = """
-      本机器人已经具备相关管理权限了，是否接管新成员验证？
+      ttitle = commands_text("我已经具备必要管理权限了，是否立即接管新成员验证？")
+      tcomment = commands_text("提示：群管理可直接通过按钮启用，亦可随时进入后台页面操作。")
 
-      <i>提示：群管理员可直接通过按钮启用，亦可随时进入后台页面操作。</i>
+      text = """
+      #{ttitle}
+
+      <i>#{tcomment}</i>
       """
 
       markup = make_enable_markup(chat_id)
 
-      Telegex.send_message(chat_id, text, reply_markup: markup, parse_mode: "HTML")
+      Telegex.send_message(chat_id, text,
+        reply_markup: markup,
+        parse_mode: "HTML"
+      )
     end
   end
 end

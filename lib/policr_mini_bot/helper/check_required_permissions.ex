@@ -24,4 +24,8 @@ defmodule PolicrMiniBot.Helper.CheckRequiredPermissions do
       missing_permissions
     end
   end
+
+  defguard has_takeover_permissions(chat_member)
+           when chat_member.can_restrict_members == true and
+                  chat_member.can_delete_messages == true
 end

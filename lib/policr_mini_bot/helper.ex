@@ -664,6 +664,12 @@ defmodule PolicrMiniBot.Helper do
     end
   end
 
+  defmacro commands_text(msg_id) do
+    quote do
+      dgettext("commands", unquote(msg_id))
+    end
+  end
+
   @doc """
   检查接管所需权限。当成员不是管理员时返回 `non_admin`，缺失的管理权限时返回 `{:missing, [permission]}` ，满足接管所需权限时 `:ok`。
   """
