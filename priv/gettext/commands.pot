@@ -36,3 +36,73 @@ msgstr ""
 #, elixir-autogen, elixir-format
 msgid "你好，我是一个专注于新成员验证的机器人。具有稳定的服务，便于操作的网页后台，不断增强与优化的核心功能，并保持长期维护。同时我是开源的，可自由复制部署的。\n\n访问<a href=\"https://github.com/Hentioe/policr-mini\">这里</a>更加了解一下我吧~"
 msgstr ""
+
+#: lib/policr_mini_bot/plugs/call_verification_plug.ex:479
+#, elixir-autogen, elixir-format
+msgid "刚刚 %{user} 被管理员手动封禁，针对他个人的验证已取消。"
+msgstr ""
+
+#: lib/policr_mini_bot/plugs/call_verification_plug.ex:475
+#, elixir-autogen, elixir-format
+msgid "刚刚 %{user} 被管理员手动踢出，针对他个人的验证已取消。"
+msgstr ""
+
+#: lib/policr_mini_bot/plugs/call_verification_plug.ex:439
+#, elixir-autogen, elixir-format
+msgid "刚刚 %{user} 超时未验证，已经移出本群。\n\n过 %{time_text}后可再次尝试加入。"
+msgstr ""
+
+#: lib/policr_mini_bot/plugs/call_verification_plug.ex:451
+#, elixir-autogen, elixir-format
+msgid "刚刚 %{user} 超时未验证，已被封禁。"
+msgstr ""
+
+#: lib/policr_mini_bot/plugs/call_verification_plug.ex:469
+#, elixir-autogen, elixir-format
+msgid "刚刚 %{user} 验证错误，已被封禁。"
+msgstr ""
+
+#: lib/policr_mini_bot/plugs/call_verification_plug.ex:457
+#, elixir-autogen, elixir-format
+msgid "刚刚 %{user} 验证错误，已被移出本群。\n\n过 %{time_text}后可再次尝试加入。"
+msgstr ""
+
+#: lib/policr_mini_bot/plugs/call_verification_plug.ex:126
+#, elixir-autogen, elixir-format
+msgid "出现了一些未意料的错误，验证答案校验失败。请联系群管理员并通知开发者。"
+msgstr ""
+
+#: lib/policr_mini_bot/plugs/call_verification_plug.ex:172
+#, elixir-autogen, elixir-format
+msgid "刚刚 %{user} 通过了验证，用时 %{seconds} 秒。"
+msgstr ""
+
+#: lib/policr_mini_bot/plugs/call_verification_plug.ex:139
+#, elixir-autogen, elixir-format
+msgid "发生了一些未预料的情况，请向开发者反馈。"
+msgstr ""
+
+#: lib/policr_mini_bot/plugs/call_verification_plug.ex:206
+#, elixir-autogen, elixir-format
+msgid "恭喜您通过了『*%{chat_title}*』的加群验证，权限已恢复。\n\n_提示：如果限制仍未解除请主动联系群管理。_"
+msgstr ""
+
+#: lib/policr_mini_bot/plugs/call_verification_plug.ex:309
+#, elixir-autogen, elixir-format
+msgid "抱歉，您未通过『*%{chat_title}*』的加群验证。已被封禁。"
+msgstr ""
+
+#: lib/policr_mini_bot/plugs/call_verification_plug.ex:299
+#, elixir-autogen, elixir-format
+msgid "抱歉，您未通过『*%{chat_title}*』的加群验证。已被移出该群。\n\n_提示：可稍后重新尝试，但无法立刻再次加入。_"
+msgstr ""
+
+#: lib/policr_mini_bot/plugs/call_verification_plug.ex:42
+#, elixir-autogen, elixir-format
+msgid "有请求正在处理中……"
+msgstr ""
+
+#: lib/policr_mini_bot/plugs/call_verification_plug.ex:50
+#, elixir-autogen, elixir-format
+msgid "此任务已被处理过了~"
+msgstr ""

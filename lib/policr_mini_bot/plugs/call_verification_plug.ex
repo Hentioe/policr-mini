@@ -39,7 +39,7 @@ defmodule PolicrMiniBot.CallVerificationPlug do
 
       {:repeat, :processing} ->
         Telegex.answer_callback_query(callback_query_id,
-          text: "有请求正在处理中……",
+          text: commands_text("有请求正在处理中……"),
           show_alert: true
         )
 
@@ -47,7 +47,7 @@ defmodule PolicrMiniBot.CallVerificationPlug do
 
       {:repeat, :done} ->
         Telegex.answer_callback_query(callback_query_id,
-          text: "此任务已被处理过了～",
+          text: commands_text("此任务已被处理过了~"),
           show_alert: true
         )
 
@@ -74,7 +74,7 @@ defmodule PolicrMiniBot.CallVerificationPlug do
     verification_id = String.to_integer(verification_id)
 
     handle_answer = fn verification, scheme ->
-      wrong_killing_method = scheme.wrong_killing_method || default!(:wkmethod)
+      wrong_kmethod = scheme.wrong_killing_method || default!(:wkmethod)
       delay_unban_secs = scheme.delay_unban_secs || default!(:delay_unban_secs)
 
       # 取消超时任务
@@ -90,7 +90,7 @@ defmodule PolicrMiniBot.CallVerificationPlug do
         # 处理回答错误
         handle_wrong(
           verification,
-          wrong_killing_method,
+          wrong_kmethod,
           delay_unban_secs,
           message_id,
           from
@@ -123,7 +123,7 @@ defmodule PolicrMiniBot.CallVerificationPlug do
         Logger.error("Processing of verification answer failed: #{inspect(reason: changeset)}")
 
         answer_callback_query(callback_query_id,
-          text: t("errors.check_answer_failed"),
+          text: commands_text("出现了一些未意料的错误，验证答案校验失败。请联系群管理员并通知开发者。"),
           show_alert: true
         )
 
@@ -136,7 +136,7 @@ defmodule PolicrMiniBot.CallVerificationPlug do
 
       {:error, reason} ->
         answer_callback_query(callback_query_id,
-          text: t("errors.unknown"),
+          text: commands_text("发生了一些未预料的情况，请向开发者反馈。"),
           show_alert: true
         )
 
@@ -169,10 +169,10 @@ defmodule PolicrMiniBot.CallVerificationPlug do
       seconds = DateTime.diff(DateTime.utc_now(), verification.inserted_at)
 
       text =
-        t("verification.passed.notice", %{
-          mentioned_user: mention(from_user, anonymization: !marked_enabled),
+        commands_text("刚刚 %{user} 通过了验证，用时 %{seconds} 秒。",
+          user: mention(from_user, anonymization: !marked_enabled),
           seconds: seconds
-        })
+        )
 
       case send_message(verification.chat_id, text, parse_mode: "MarkdownV2ToHTML") do
         {:ok, sended_message} ->
@@ -199,11 +199,18 @@ defmodule PolicrMiniBot.CallVerificationPlug do
 
         # 更新验证结果
         async do
-          # 注意：此处默认以 `Telegex.Marked` 库转换文字，需要用 `escape_markdown/1` 函数转义文本中的动态内容。
+          # 注意：此处默认以 `Telegex.Marked` 库转换文字，需要用 `escape_markdown/1` 函数转义文本中的动态内容
+          chat_title = escape_markdown(verification.chat.title)
+
           text =
-            t("verification.passed.private", %{
-              chat_title: escape_markdown(verification.chat.title)
-            })
+            commands_text(
+              """
+              恭喜您通过了『*%{chat_title}*』的加群验证，权限已恢复。
+
+              _提示：如果限制仍未解除请主动联系群管理。_
+              """,
+              chat_title: chat_title
+            )
 
           Worker.async_delete_message(verification.target_user_id, message_id)
 
@@ -237,7 +244,7 @@ defmodule PolicrMiniBot.CallVerificationPlug do
           {:ok, Verification.t()} | {:error, any}
   def handle_wrong(
         verification,
-        wrong_killing_method,
+        wrong_kmethod,
         delay_unban_secs,
         message_id,
         from_user
@@ -260,7 +267,7 @@ defmodule PolicrMiniBot.CallVerificationPlug do
     end
 
     operation_create_fun = fn verification ->
-      operation_action = if wrong_killing_method == :ban, do: :ban, else: :kick
+      operation_action = if wrong_kmethod == :ban, do: :ban, else: :kick
 
       case Chats.create_operation(%{
              chat_id: verification.chat_id,
@@ -272,7 +279,7 @@ defmodule PolicrMiniBot.CallVerificationPlug do
           r
 
         {:error, reason} = e ->
-          Logger.error("Operation creation failed: #{inspect(reason: reason)}")
+          Logger.error("Create operation failed: #{inspect(reason: reason)}")
 
           e
       end
@@ -284,10 +291,23 @@ defmodule PolicrMiniBot.CallVerificationPlug do
         operation_create_fun.(verification)
 
         # 注意：此处默认以 `Telegex.Marked` 库转换文字，需要用 `escape_markdown/1` 函数转义文本中的动态内容。
+        chat_title = escape_markdown(verification.chat.title)
+
         text =
-          t("verification.wronged.#{wrong_killing_method || :kick}.private", %{
-            chat_title: escape_markdown(verification.chat.title)
-          })
+          case wrong_kmethod || :kick do
+            :kick ->
+              commands_text(
+                """
+                抱歉，您未通过『*%{chat_title}*』的加群验证。已被移出该群。
+
+                _提示：可稍后重新尝试，但无法立刻再次加入。_
+                """,
+                chat_title: chat_title
+              )
+
+            :ban ->
+              commands_text("抱歉，您未通过『*%{chat_title}*』的加群验证。已被封禁。", chat_title: chat_title)
+          end
 
         # 清理消息并私聊验证结果。
         cleaner_fun.(text)
@@ -296,7 +316,7 @@ defmodule PolicrMiniBot.CallVerificationPlug do
           verification.chat_id,
           from_user,
           :wronged,
-          wrong_killing_method,
+          wrong_kmethod,
           delay_unban_secs
         )
 
@@ -365,16 +385,22 @@ defmodule PolicrMiniBot.CallVerificationPlug do
     end
   end
 
-  @type killing_reason ::
-          :wronged | :timeout | :kick | :ban | :manual_ban | :manual_kick
-  @type killing_method :: :ban | :kick
+  @type kreason ::
+          :wronged
+          | :timeout
+          | :kick
+          | :ban
+          | :manual_ban
+          | :manual_kick
+
+  @type kmethod :: :ban | :kick
 
   @doc """
   击杀用户。
 
   此函数会根据击杀方法做出指定动作，并结合击杀原因发送通知消息。若 `method` 参数的值为 `nil`，则默认表示击杀方法为 `:kick`。
   """
-  @spec kill(integer | binary, map, killing_reason, killing_method, integer) ::
+  @spec kill(integer | binary, map, kreason, kmethod, integer) ::
           :ok | {:error, map}
   def kill(chat_id, user, reason, method, delay_unban_secs) do
     method = method || :kick
@@ -407,29 +433,50 @@ defmodule PolicrMiniBot.CallVerificationPlug do
     end
   end
 
-  # 构造击杀文字（公聊通知）
-  @spec build_kick_text(killing_reason, killing_method, String.t(), String.t()) ::
-          String.t()
-  defp build_kick_text(:timeout, method, mentioned_user, time_text) do
-    t("verification.timeout.#{method}.public", %{
-      mentioned_user: mentioned_user,
+  # 构造公聊通知击杀消息文字
+  @spec build_kick_text(kreason, kmethod, binary, binary) :: String.t()
+  defp build_kick_text(:timeout, :kick, mentioned_user, time_text) do
+    commands_text(
+      """
+      刚刚 %{user} 超时未验证，已经移出本群。
+
+      过 %{time_text}后可再次尝试加入。
+      """,
+      user: mentioned_user,
       time_text: time_text
-    })
+    )
   end
 
-  defp build_kick_text(:wronged, method, mentioned_user, time_text) do
-    t("verification.wronged.#{method}.public", %{
-      mentioned_user: mentioned_user,
+  defp build_kick_text(:timeout, :ban, mentioned_user, _time_text) do
+    commands_text("刚刚 %{user} 超时未验证，已被封禁。",
+      user: mentioned_user
+    )
+  end
+
+  defp build_kick_text(:wronged, :kick, mentioned_user, time_text) do
+    commands_text(
+      """
+      刚刚 %{user} 验证错误，已被移出本群。
+
+      过 %{time_text}后可再次尝试加入。
+      """,
+      user: mentioned_user,
       time_text: time_text
-    })
+    )
   end
 
-  defp build_kick_text(:manual_ban, method, mentioned_user, _time_text) do
-    t("verification.manual.#{method}.public", %{mentioned_user: mentioned_user})
+  defp build_kick_text(:wronged, :ban, mentioned_user, _time_text) do
+    commands_text("刚刚 %{user} 验证错误，已被封禁。",
+      user: mentioned_user
+    )
   end
 
-  defp build_kick_text(:manual_kick, method, mentioned_user, _time_text) do
-    t("verification.manual.#{method}.public", %{mentioned_user: mentioned_user})
+  defp build_kick_text(:manual_kick, :kick, mentioned_user, _time_text) do
+    commands_text("刚刚 %{user} 被管理员手动踢出，针对他个人的验证已取消。", user: mentioned_user)
+  end
+
+  defp build_kick_text(:manual_ban, :ban, mentioned_user, _time_text) do
+    commands_text("刚刚 %{user} 被管理员手动封禁，针对他个人的验证已取消。", user: mentioned_user)
   end
 
   @spec kick_chat_member(integer, integer, integer) ::
