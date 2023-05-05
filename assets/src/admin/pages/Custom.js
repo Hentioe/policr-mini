@@ -68,7 +68,6 @@ const WRONG_FLAG = { value: ROW.WRONG, label: "错误" };
 
 const answerROWOptions = [RIGHT_FLAG, WRONG_FLAG];
 
-const initialEditingTitle = "";
 const initialEditingId = 0;
 const initialAnswer = { row: answerROWOptions[1], text: "" };
 const dateTimeFormat = "yyyy-MM-dd HH:mm:ss";
@@ -155,7 +154,7 @@ export default () => {
   const [isEditing, setIsEditing] = useState(false);
   const [includedAttachment, setIsIncludesAttachment] = useState(false);
   const [editingId, setEditingId] = useState(initialEditingId);
-  const [editintTitle, setEditingTitle] = useState(initialEditingTitle);
+  const [editintTitle, setEditingTitle] = useState("");
   const [editingAttachment, setEditingAttachment] = useState("");
   const [answers, setAnswers] = useState([initialAnswer]);
   const [attachmentError, setAttachmentError] = useState(null);
@@ -167,13 +166,13 @@ export default () => {
   const initEditingContent = () => {
     setIsEditing(false);
     setIsIncludesAttachment(false);
-    setEditingTitle(initialEditingTitle);
+    setEditingTitle("");
     setEditingId(initialEditingId);
     setAnswers([initialAnswer]);
     setEditingAttachment("");
   };
   const handleCancelEditing = () => initEditingContent();
-  const handleTitleChange = (e) => setEditingTitle(e.target.value.trim());
+  const handleTitleChange = (e) => setEditingTitle(e.target.value);
   const handleAttachmentTextChange = (e) => {
     setEditingAttachment(e.target.value);
 
@@ -245,14 +244,14 @@ export default () => {
     return EDITING_CHECK.VALID;
   }, [isEditing, editintTitle, answers, attachmentError]);
 
-  const handleSave = useCallback(
+  const handleSaveCustomKit = useCallback(
     async (e) => {
       e.preventDefault();
 
       const result = await saveCustomKit({
         chatId: chatsState.selected,
         id: editingId,
-        title: editintTitle,
+        title: editintTitle.trim(),
         answers: filterEmptyAnswers(answers).map(
           (ans) => `${ans.row.value ? "+" : "-"}${ans.text.trim()}`
         ),
@@ -529,7 +528,7 @@ export default () => {
                       <LabelledButton
                         label="ok"
                         disabled={editingCheckResult !== EDITING_CHECK.VALID}
-                        onClick={handleSave}
+                        onClick={handleSaveCustomKit}
                       >
                         保存
                       </LabelledButton>
