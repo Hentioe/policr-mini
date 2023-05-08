@@ -144,7 +144,8 @@ defmodule PolicrMiniBot.HandleUserJoinedCleanupPlug do
     else
       {:error, reason} ->
         Logger.error(
-          "Create validation entry failed: #{inspect(chat_id: chat_id, reason: reason)}"
+          "Create verification failed: #{inspect(reason: reason)}",
+          chat_id: chat_id
         )
 
         text =

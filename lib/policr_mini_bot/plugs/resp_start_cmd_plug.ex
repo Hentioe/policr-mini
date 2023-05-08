@@ -125,14 +125,16 @@ defmodule PolicrMiniBot.RespStartCmdPlug do
       else
         {:error, %{error_code: 403}} = e ->
           Logger.warning(
-            "Verification creation failed due to user blocking: #{inspect(chat_id: target_chat_id, user_id: from_user_id)}"
+            "Verification creation failed due to user blocking: #{inspect(user_id: from_user_id)}",
+            chat_id: target_chat_id
           )
 
           e
 
         {:error, reason} = e ->
           Logger.error(
-            "Create verification failed: #{inspect(chat_id: target_chat_id, user_id: from_user_id, reason: reason)}"
+            "Create verification failed: #{inspect(user_id: from_user_id, reason: reason)}",
+            chat_id: target_chat_id
           )
 
           send_message(from_user_id, t("errors.unknown"))
@@ -173,7 +175,8 @@ defmodule PolicrMiniBot.RespStartCmdPlug do
       rescue
         e ->
           Logger.warning(
-            "Verification data generation failed: #{inspect(chat_id: chat_id, error: e)}"
+            "Verification data generation failed: #{inspect(error: e)}",
+            chat_id: chat_id
           )
 
           {@fallback_captcha_module, @fallback_captcha_module.make!(chat_id, scheme)}
