@@ -1,12 +1,3 @@
-sync:
-  success: 同步成功，已更新群组资料和管理员权限数据。
-  has_permissions: 因为本机器人具备权限，
-  already_taken_over: 新成员验证已处于接管状态。
-  taken_over: 已接管新成员验证。
-  no_permission: 由于机器人缺失必要管理权限，
-  cancelled_takeover: 已取消对新成员验证的接管。
-  unable_to_takeover: 没有接管新成员验证的能力。
-
 verification:
   unity:
     single_waiting: |
@@ -39,7 +30,6 @@ buttons:
 errors:
   dont_understand: 很抱歉，我未能理解您的意图。
   unknown: 发生了一些未预料的情况，请向开发者反馈。
-  sync_failed: 出现了一些问题，同步失败。请联系开发者。
   scheme_fetch_failed: 发生了一些错误，没有读取到本群的验证方案。如果重复出现此问题，请取消机器人的接管状态并通知开发者。
   verification_created_failed: |
     发生了一些错误，针对 %{mentioned_user} 的验证创建失败。建议管理员自行鉴别再决定取消限制或手动封禁。

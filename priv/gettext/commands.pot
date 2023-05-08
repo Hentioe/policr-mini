@@ -166,3 +166,48 @@ msgstr ""
 #, elixir-autogen, elixir-format
 msgid "撤销机器人的管理员或必要管理权限并不会导致机器人退群，也是被认可的取消接管方式。但将机器人禁言是毫无意义的，机器人只能选择退出。"
 msgstr ""
+
+#: lib/policr_mini_bot/plugs/resp_sync_cmd_plug.ex:108
+#, elixir-autogen, elixir-format
+msgid "出现了一些问题，同步失败。请联系开发者。"
+msgstr ""
+
+#: lib/policr_mini_bot/plugs/resp_sync_cmd_plug.ex:70
+#, elixir-autogen, elixir-format
+msgid "同步成功"
+msgstr ""
+
+#: lib/policr_mini_bot/plugs/resp_sync_cmd_plug.ex:33
+#, elixir-autogen, elixir-format
+msgid "同步过于频繁，请在 %{waiting_sec} 秒后重试。"
+msgstr ""
+
+#: lib/policr_mini_bot/plugs/resp_sync_cmd_plug.ex:80
+#, elixir-autogen, elixir-format
+msgid "因为本机器人具备权限，已接管新成员验证。"
+msgstr ""
+
+#: lib/policr_mini_bot/plugs/resp_sync_cmd_plug.ex:89
+#, elixir-autogen, elixir-format
+msgid "因为本机器人缺失必要管理权限，所以无法接管新成员验证。"
+msgstr ""
+
+#: lib/policr_mini_bot/plugs/resp_sync_cmd_plug.ex:72
+#, elixir-autogen, elixir-format
+msgid "已更新管理员权限。"
+msgstr ""
+
+#: lib/policr_mini_bot/plugs/resp_sync_cmd_plug.ex:71
+#, elixir-autogen, elixir-format
+msgid "已更新群组资料。"
+msgstr ""
+
+#: lib/policr_mini_bot/plugs/resp_sync_cmd_plug.ex:78
+#, elixir-autogen, elixir-format
+msgid "新成员验证已处于接管状态。"
+msgstr ""
+
+#: lib/policr_mini_bot/plugs/resp_sync_cmd_plug.ex:87
+#, elixir-autogen, elixir-format
+msgid "由于本机器人缺失必要管理权限，已取消对新成员验证的接管。"
+msgstr ""
