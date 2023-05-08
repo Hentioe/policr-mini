@@ -141,7 +141,7 @@ defmodule PolicrMiniBot.HandleSelfJoinedPlug do
         Telegex.leave_chat(chat_id)
 
       {:error, reason} ->
-        Logger.error("The invitation processing failed: #{inspect(reason: reason)}")
+        Logger.error("Invitation handling failed: #{inspect(reason: reason)}", chat_id: chat_id)
 
         send_message(chat_id, commands_text("出现了一些问题，群组登记失败。请联系开发者。"))
     end

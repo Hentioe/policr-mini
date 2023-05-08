@@ -45,7 +45,8 @@ defmodule PolicrMiniBot.Runner.ExpiredChecker do
   @spec log_auto_corrected([Verification.t()]) :: :ok | :ignore
   defp log_auto_corrected([v]) do
     Logger.warning(
-      "Auto-corrected 1 verification: #{inspect(id: v.id, chat_id: v.chat_id, user_id: v.target_user_id)}"
+      "Auto-corrected a verification: #{inspect(id: v.id, user_id: v.target_user_id)}",
+      chat_id: v.chat_id
     )
 
     :ok
@@ -55,8 +56,8 @@ defmodule PolicrMiniBot.Runner.ExpiredChecker do
     :ignore
   end
 
-  defp log_auto_corrected(vs) do
-    Logger.warning("Auto-corrected #{length(vs)} verifications")
+  defp log_auto_corrected(verifications) do
+    Logger.warning("Auto-corrected #{length(verifications)} verifications")
 
     :ok
   end

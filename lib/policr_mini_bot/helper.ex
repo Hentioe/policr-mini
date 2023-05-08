@@ -168,13 +168,16 @@ defmodule PolicrMiniBot.Helper do
 
       {:error, %{error_code: 403}} = e ->
         Logger.warning(
-          "Message sending failed due to user blocking: #{inspect(chat_id: chat_id)}"
+          "Message sending failed due to user blocking",
+          chat_id: chat_id
         )
 
         e
 
       {:error, reason} = e ->
-        Logger.error("Message sending failed: #{inspect(text: text, reason: reason)}")
+        Logger.error("Message sending failed: #{inspect(text: text, reason: reason)}",
+          chat_id: chat_id
+        )
 
         e
     end
