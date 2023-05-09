@@ -141,7 +141,8 @@ defmodule PolicrMiniBot.Helper do
 
         if retry && retry > 0 do
           Logger.warning(
-            "Message sending timeout, waiting for retry: #{inspect(remaining_times: retry - 1, chat_id: chat_id)}"
+            "Send message timed out: #{inspect(remaining_times: retry - 1)}",
+            chat_id: chat_id
           )
 
           options = options |> Keyword.put(:retry, retry - 1)
@@ -156,7 +157,8 @@ defmodule PolicrMiniBot.Helper do
 
         if retry && retry > 0 do
           Logger.warning(
-            "Too many requests have been limited from sending messages: #{inspect(remaining_times: retry - 1, chat_id: chat_id)}"
+            "Message sending is limited due to the excessive number of requests: #{inspect(remaining_times: retry - 1)}",
+            chat_id: chat_id
           )
 
           options = options |> Keyword.put(:retry, retry - 1)
@@ -168,14 +170,14 @@ defmodule PolicrMiniBot.Helper do
 
       {:error, %{error_code: 403}} = e ->
         Logger.warning(
-          "Message sending failed due to user blocking",
+          "Send message failed due to user blocking",
           chat_id: chat_id
         )
 
         e
 
       {:error, reason} = e ->
-        Logger.error("Message sending failed: #{inspect(text: text, reason: reason)}",
+        Logger.error("Send message failed: #{inspect(text: text, reason: reason)}",
           chat_id: chat_id
         )
 
@@ -246,7 +248,8 @@ defmodule PolicrMiniBot.Helper do
 
         if retry && retry > 0 do
           Logger.warning(
-            "Message sending timeout, waiting for retry: #{inspect(remaining_times: retry - 1, chat_id: chat_id)}"
+            "Send message timed out: #{inspect(remaining_times: retry - 1)}",
+            chat_id: chat_id
           )
 
           options = options |> Keyword.put(:retry, retry - 1)
@@ -261,7 +264,8 @@ defmodule PolicrMiniBot.Helper do
 
         if retry && retry > 0 do
           Logger.warning(
-            "Too many requests have been limited from sending messages: #{inspect(remaining_times: retry - 1, chat_id: chat_id)}"
+            "Message sending is limited due to the excessive number of requests: #{inspect(remaining_times: retry - 1)}",
+            chat_id: chat_id
           )
 
           options = options |> Keyword.put(:retry, retry - 1)
