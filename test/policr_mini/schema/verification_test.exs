@@ -21,6 +21,7 @@ defmodule PolicrMini.Schema.VerificationTest do
                  :seconds,
                  :status,
                  :chosen,
+                 :source,
                  :inserted_at,
                  :updated_at
                ]
@@ -64,7 +65,8 @@ defmodule PolicrMini.Schema.VerificationTest do
              :chat_id,
              :target_user_id,
              :seconds,
-             :status
+             :status,
+             :source
            ]
 
     assert changeset.valid?

@@ -71,7 +71,8 @@ defmodule PolicrMini.Factory do
       message_id: 1234,
       indices: [1, 3],
       seconds: 60,
-      status: 0
+      status: 0,
+      source: :joined
     }
   end
 

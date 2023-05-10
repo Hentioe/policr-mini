@@ -28,4 +28,11 @@ defmodule PolicrMini.EctoEnums do
   defenum StatVerificationStatus, passed: 0, timeout: 1, wronged: 2, other: 3
   defenum MentionText, user_id: 0, full_name: 1, mosaic_full_name: 2
   defenum ServiceMessage, joined: 0, lefted: 1
+
+  # 验证来源
+  defenum VerificationSource,
+    # 已加入
+    joined: 0,
+    # 加入请求
+    join_request: 1
 end
