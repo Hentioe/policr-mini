@@ -49,18 +49,6 @@ verification:
 
       请主动完成验证以解除限制，验证有效时间不超过 __%{seconds}__ 秒。
       过期会被踢出或封禁，请尽快。
-  template: |
-    请确认问题并选择您认为正确的答案：
-
-    *%{question}*
-
-    您还剩 %{seconds} 秒，通过可解除封印。
-  template_issue_33: |
-    _来自『*%{chat_name}*』的验证，请确认问题并选择您认为正确的答案。_
-
-    *%{question}*
-
-    您还剩 __%{seconds}__ 秒，通过可解除封印。
   passed:
     private: |
       恭喜您通过了『*%{chat_title}*』的加群验证，权限已恢复。
