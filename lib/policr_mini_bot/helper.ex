@@ -6,14 +6,15 @@ defmodule PolicrMiniBot.Helper do
   """
 
   alias __MODULE__.{
-    CheckRequiredPermissions
+    CheckRequiredPermissions,
+    Sender
   }
 
   alias Telegex.Model.ChatMember
 
   require Logger
 
-  @type tgerror :: {:error, Telegex.Model.errors()}
+  @type tgerr :: {:error, Telegex.Model.errors()}
   @type tgmsg :: Telegex.Model.Message.t()
 
   @doc """
@@ -127,7 +128,7 @@ defmodule PolicrMiniBot.Helper do
   - `disable_web_page_preview`: 默认值为 `false`。
   - `retry`: 附加参数，表示发送失败时自动重试的最大次数，默认值为 `5`。
   """
-  @spec send_message(integer, String.t(), send_message_opts) :: {:ok, tgmsg} | tgerror()
+  @spec send_message(integer, String.t(), send_message_opts) :: {:ok, tgmsg} | tgerr()
   def send_message(chat_id, text, options \\ []) do
     {text, options} = preprocess_send_message_args(text, options)
 
@@ -141,7 +142,8 @@ defmodule PolicrMiniBot.Helper do
 
         if retry && retry > 0 do
           Logger.warning(
-            "Message sending timeout, waiting for retry: #{inspect(remaining_times: retry - 1, chat_id: chat_id)}"
+            "Send message timed out: #{inspect(remaining_times: retry - 1)}",
+            chat_id: chat_id
           )
 
           options = options |> Keyword.put(:retry, retry - 1)
@@ -156,7 +158,8 @@ defmodule PolicrMiniBot.Helper do
 
         if retry && retry > 0 do
           Logger.warning(
-            "Too many requests have been limited from sending messages: #{inspect(remaining_times: retry - 1, chat_id: chat_id)}"
+            "Message sending is limited due to the excessive number of requests: #{inspect(remaining_times: retry - 1)}",
+            chat_id: chat_id
           )
 
           options = options |> Keyword.put(:retry, retry - 1)
@@ -168,110 +171,17 @@ defmodule PolicrMiniBot.Helper do
 
       {:error, %{error_code: 403}} = e ->
         Logger.warning(
-          "Message sending failed due to user blocking",
+          "Send message failed due to user blocking",
           chat_id: chat_id
         )
 
         e
 
       {:error, reason} = e ->
-        Logger.error("Message sending failed: #{inspect(text: text, reason: reason)}",
+        Logger.error("Send message failed: #{inspect(text: text, reason: reason)}",
           chat_id: chat_id
         )
 
-        e
-    end
-  end
-
-  @type send_photo_opts :: [
-          {:caption, String.t()},
-          {:disable_notification, boolean},
-          {:parse_mode, parsemode | nil},
-          {:reply_markup, Telegex.Model.InlineKeyboardMarkup.t()},
-          {:retry, integer}
-        ]
-
-  @spec preprocess_send_photo_options(send_photo_opts) :: send_photo_opts
-  defp preprocess_send_photo_options(options) do
-    options =
-      options
-      |> Keyword.put_new(:disable_notification, true)
-      |> Keyword.put_new(:parse_mode, @markdown_parse_mode)
-      |> Keyword.put_new(:retry, 5)
-      |> delete_keyword_nils()
-
-    parse_mode = Keyword.get(options, :parse_mode)
-
-    if caption = options[:caption] do
-      case parse_mode do
-        @markdown_parse_mode ->
-          caption = escape_marked(caption)
-          Keyword.put(options, :caption, caption)
-
-        @markdown_to_html_parse_mode ->
-          caption = Telegex.Marked.as_html(caption)
-
-          options
-          |> Keyword.put(:caption, caption)
-          |> Keyword.put(:parse_mode, "HTML")
-
-        _ ->
-          options
-      end
-    else
-      options
-    end
-  end
-
-  @doc """
-  发送图片。
-
-  参数 `options` 参考 `Telegex.send_photo/3` 的 `optinal` 说明。除此之外，还有一些附加参数支持以及默认值。
-  ## 附加可选参数和默认值
-  - `disable_notification`: 默认值为 `true`。
-  - `parse_mode`: 默认值为 `MarkdownV2`。
-  - `retry`: 附加参数，表示发送失败时自动重试的最大次数，默认值为 `5`。
-  """
-  @spec send_photo(integer, String.t(), send_photo_opts) :: {:ok, tgmsg} | tgerror
-  def send_photo(chat_id, photo, options \\ []) do
-    options = preprocess_send_photo_options(options)
-
-    case Telegex.send_photo(chat_id, photo, options) do
-      {:ok, message} ->
-        {:ok, message}
-
-      {:error, %Telegex.Model.RequestError{reason: :timeout}} = e ->
-        # 处理重试（减少次数并递归）
-        retry = options |> Keyword.get(:retry)
-
-        if retry && retry > 0 do
-          Logger.warning(
-            "Message sending timeout, waiting for retry: #{inspect(remaining_times: retry - 1, chat_id: chat_id)}"
-          )
-
-          options = options |> Keyword.put(:retry, retry - 1)
-          send_photo(chat_id, photo, options)
-        else
-          e
-        end
-
-      {:error, %Telegex.Model.Error{description: <<"Too Many Requests: retry after">> <> _rest}} =
-          e ->
-        retry = options |> Keyword.get(:retry)
-
-        if retry && retry > 0 do
-          Logger.warning(
-            "Too many requests have been limited from sending messages: #{inspect(remaining_times: retry - 1, chat_id: chat_id)}"
-          )
-
-          options = options |> Keyword.put(:retry, retry - 1)
-          :timer.sleep(trunc(800 * retry * Enum.random(@time_seeds)))
-          send_photo(chat_id, photo, options)
-        else
-          e
-        end
-
-      e ->
         e
     end
   end
@@ -283,7 +193,7 @@ defmodule PolicrMiniBot.Helper do
   - `parse_mode`: `"MarkdownV2"`
   - `disable_web_page_preview`: `false`
   """
-  @spec edit_message_text(String.t(), keyword) :: {:ok, tgmsg} | tgerror
+  @spec edit_message_text(String.t(), keyword) :: {:ok, tgmsg} | tgerr
   def edit_message_text(text, options \\ []) do
     options =
       options
@@ -328,7 +238,7 @@ defmodule PolicrMiniBot.Helper do
   附加的 `options` 参数可配置 `delay_seconds` 实现延迟删除。
   注意，延迟删除无法直接获得请求结果，将直接返回 `:ok`。
   """
-  @spec delete_message(integer, integer, [{atom, any}]) :: {:ok, true} | tgerror
+  @spec delete_message(integer, integer, [{atom, any}]) :: {:ok, true} | tgerr
   def delete_message(chat_id, message_id, options \\ []) do
     delay_seconds =
       options
@@ -382,7 +292,7 @@ defmodule PolicrMiniBot.Helper do
   @doc """
   让机器人显示正常打字的动作。
   """
-  @spec typing(integer) :: {:ok, boolean} | tgerror
+  @spec typing(integer) :: {:ok, boolean} | tgerr
   def typing(chat_id) do
     Telegex.send_chat_action(chat_id, "typing")
   end
@@ -691,4 +601,7 @@ defmodule PolicrMiniBot.Helper do
           | :ok
 
   defdelegate check_takeover_permissions(member), to: CheckRequiredPermissions
+
+  defdelegate send_attachment(chat_id, attachment, opts \\ []), to: Sender
+  defdelegate send_text(chat_id, text, opts \\ []), to: Sender
 end

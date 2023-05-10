@@ -34,9 +34,10 @@ defmodule PolicrMiniBot.Consumer do
 
         chat_id = parse_chat_id(update)
 
-        Logger.error("Uncaught Error: #{inspect(e)}", chat_id: chat_id)
-
-        reraise e, __STACKTRACE__
+        Logger.error(
+          "Uncaught Error: #{inspect(exception: e)}\n#{Exception.format(:error, e, __STACKTRACE__)}",
+          chat_id: chat_id
+        )
     end
   end
 end

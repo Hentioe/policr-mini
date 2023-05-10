@@ -15,6 +15,10 @@ defmodule PolicrMiniBot.RespStartCmdPlug do
 
   require Logger
 
+  @type captcha_data :: PolicrMiniBot.Captcha.Data.t()
+  @type tgerr :: Telegex.Model.errors()
+  @type tgmsg :: Telegex.Model.Message.t()
+
   @fallback_captcha_module FallbackCaptcha
 
   @captchas_mapping [
@@ -164,50 +168,40 @@ defmodule PolicrMiniBot.RespStartCmdPlug do
   def send_verify_message(verification, scheme, chat_id, user_id) do
     mode = scheme.verification_mode || default!(:vmode)
 
-    captcha_maker = @captchas_mapping[mode] || @fallback_captcha_module
+    captcha_module = @captchas_mapping[mode] || @fallback_captcha_module
 
-    # 获取验证数据。
-    # 如果构造验证数据的过程中出现异常，会使用备用验证模块。
-    # 所以最终采用的验证模块也需要重新返回。
-    {captcha_maker, data} =
+    data =
       try do
-        {captcha_maker, captcha_maker.make!(chat_id, scheme)}
+        captcha_module.make!(chat_id, scheme)
       rescue
         e ->
           Logger.warning(
-            "Verification data generation failed: #{inspect(error: e)}",
+            "Verification data generation failed: #{inspect(exception: e)}",
             chat_id: chat_id
           )
 
-          {@fallback_captcha_module, @fallback_captcha_module.make!(chat_id, scheme)}
+          @fallback_captcha_module.make!(chat_id, scheme)
       end
 
     markup = PolicrMiniBot.Captcha.build_markup(data.candidates, verification.id)
 
-    {text, parse_mode} =
-      if Application.get_env(:policr_mini, :marked_enabled) do
-        text =
-          t("verification.template_issue_33", %{
-            chat_name: escape_markdown(verification.chat.title),
-            question: data.question,
-            seconds: time_left(verification)
-          })
+    ttitle =
+      commands_text("来自『%{chat_title}』的验证，请确认问题并选择您认为正确的答案。",
+        chat_title: "*#{escape_markdown(verification.chat.title)}*"
+      )
 
-        {text, "MarkdownV2ToHTML"}
-      else
-        text =
-          t("verification.template", %{
-            question: data.question,
-            seconds: time_left(verification)
-          })
+    tfooter = commands_text("您还剩 %{sec} 秒，通过可解除限制。", sec: "__#{time_left_text(verification)}__")
 
-        {text, "MarkdownV2"}
-      end
+    text = """
+    #{ttitle}
 
-    send_fun = make_send_fun(captcha_maker, user_id, text, data, parse_mode, markup)
+    *#{escape_markdown(data.question)}*
+
+    #{tfooter}
+    """
 
     # 发送验证消息
-    case send_fun.() do
+    case send_verification(user_id, text, data, markup, "MarkdownV2") do
       {:ok, sended_message} ->
         {:ok, {sended_message, markup, data}}
 
@@ -216,153 +210,47 @@ defmodule PolicrMiniBot.RespStartCmdPlug do
     end
   end
 
+  @spec send_verification(integer, String.t(), captcha_data, InlineKeyboardMarkup.t(), binary) ::
+          {:ok, tgmsg} | {:error, tgerr}
+
+  # 发送图片验证消息
+  def send_verification(chat_id, text, %{photo: photo} = _data, markup, parse_mode)
+      when photo != nil do
+    send_attachment(chat_id, "photo/#{photo}",
+      caption: text,
+      reply_markup: markup,
+      parse_mode: parse_mode,
+      logging: true
+    )
+  end
+
+  # 发送附件验证消息
+  def send_verification(chat_id, text, %{attachment: attachment} = _data, markup, parse_mode)
+      when attachment != nil do
+    send_attachment(chat_id, attachment,
+      caption: text,
+      reply_markup: markup,
+      parse_mode: parse_mode,
+      logging: true
+    )
+  end
+
+  # 发送文本验证消息
+  def send_verification(chat_id, text, _data, markup, parse_mode) do
+    send_text(chat_id, text,
+      reply_markup: markup,
+      parse_mode: parse_mode
+    )
+  end
+
   @type captchas :: ImageCaptcha | CustomCaptcha | ArithmeticCaptcha | FallbackCaptcha
   @type send_returns :: {:ok, Message.t()} | {:error, Telegex.Model.errors()}
 
   @doc """
-  制作一个发送消息的函数。
-
-  此函数的主要目的是为不同的验证方式生成不同类型的消息的发送函数。
-  """
-  @spec make_send_fun(
-          captchas,
-          integer,
-          String.t(),
-          PolicrMiniBot.Captcha.Data.t(),
-          String.t(),
-          InlineKeyboardMarkup.t()
-        ) :: (() -> send_returns)
-  def make_send_fun(ImageCaptcha, chat_id, text, data, parse_mode, markup) do
-    fn ->
-      send_photo(chat_id, data.photo,
-        caption: text,
-        reply_markup: markup,
-        parse_mode: parse_mode
-      )
-    end
-  end
-
-  def make_send_fun(
-        CustomCaptcha,
-        chat_id,
-        text,
-        %{attachment: <<"photo/" <> file_id>>} = _captcha_data,
-        parse_mode,
-        markup
-      ) do
-    fn ->
-      send_photo(chat_id, file_id,
-        reply_markup: markup,
-        parse_mode: parse_mode,
-        caption: text
-      )
-    end
-  end
-
-  def make_send_fun(
-        CustomCaptcha,
-        chat_id,
-        text,
-        %{attachment: <<"video/" <> file_id>>} = _captcha_data,
-        _parse_mode,
-        markup
-      ) do
-    fn ->
-      text = Telegex.Marked.as_html(text)
-
-      send_extended retry: 5 do
-        Telegex.send_video(chat_id, file_id,
-          reply_markup: markup,
-          caption: text,
-          parse_mode: "HTML"
-        )
-      end
-    end
-  end
-
-  def make_send_fun(
-        CustomCaptcha,
-        chat_id,
-        text,
-        %{attachment: <<"audio/" <> file_id>>} = _captcha_data,
-        _parse_mode,
-        markup
-      ) do
-    fn ->
-      text = Telegex.Marked.as_html(text)
-
-      send_extended retry: 5 do
-        Telegex.send_audio(chat_id, file_id,
-          reply_markup: markup,
-          caption: text,
-          parse_mode: "HTML"
-        )
-      end
-    end
-  end
-
-  def make_send_fun(
-        CustomCaptcha,
-        chat_id,
-        text,
-        %{attachment: <<"document/" <> file_id>>} = _captcha_data,
-        _parse_mode,
-        markup
-      ) do
-    fn ->
-      text = Telegex.Marked.as_html(text)
-
-      send_extended retry: 5 do
-        Telegex.send_document(chat_id, file_id,
-          reply_markup: markup,
-          caption: text,
-          parse_mode: "HTML"
-        )
-      end
-    end
-  end
-
-  def make_send_fun(CustomCaptcha, chat_id, text, _captcha_data, parse_mode, markup) do
-    fn ->
-      send_message(chat_id, text,
-        reply_markup: markup,
-        parse_mode: parse_mode
-      )
-    end
-  end
-
-  def make_send_fun(ArithmeticCaptcha, chat_id, text, _data, parse_mode, markup) do
-    fn ->
-      send_message(chat_id, text,
-        reply_markup: markup,
-        parse_mode: parse_mode
-      )
-    end
-  end
-
-  def make_send_fun(FallbackCaptcha, chat_id, text, _data, parse_mode, markup) do
-    fn ->
-      send_message(chat_id, text,
-        reply_markup: markup,
-        parse_mode: parse_mode
-      )
-    end
-  end
-
-  def make_send_fun(_, chat_id, text, _data, parse_mode, markup) do
-    fn ->
-      send_message(chat_id, text,
-        reply_markup: markup,
-        parse_mode: parse_mode
-      )
-    end
-  end
-
-  @doc """
   根据验证记录计算剩余时间
   """
-  @spec time_left(Verification.t()) :: integer()
-  def time_left(%Verification{seconds: seconds, inserted_at: inserted_at}) do
+  @spec time_left_text(Verification.t()) :: integer()
+  def time_left_text(%Verification{seconds: seconds, inserted_at: inserted_at}) do
     seconds - DateTime.diff(DateTime.utc_now(), inserted_at)
   end
 

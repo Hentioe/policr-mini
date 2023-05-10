@@ -31,7 +31,7 @@ defmodule PolicrMiniBot.Worker.MessageCleaner do
     case Telegex.delete_message(chat_id, message_id) do
       {:error, %Telegex.Model.RequestError{reason: reason}} ->
         raise Error,
-          message: "Send message delete request failed: #{inspect(reason: reason)}"
+          message: "Send deletion request failed: #{inspect(reason: reason)}"
 
       {:error, %{error_code: 400}} = e ->
         # 忽略处理消息不存在的错误
@@ -39,7 +39,8 @@ defmodule PolicrMiniBot.Worker.MessageCleaner do
 
       {:error, reason} = e ->
         Logger.warning(
-          "Message deletion failed: #{inspect(reason: reason, chat_id: chat_id, message_id: message_id)}"
+          "Delete message failed: #{inspect(reason: reason, message_id: message_id)}",
+          chat_id: chat_id
         )
 
         e
