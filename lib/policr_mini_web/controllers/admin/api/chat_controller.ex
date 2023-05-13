@@ -72,11 +72,23 @@ defmodule PolicrMiniWeb.Admin.API.ChatController do
   def update_scheme(conn, %{"chat_id" => chat_id} = params) do
     with {:ok, _} <- check_permissions(conn, chat_id, [:writable]),
          {:ok, chat} <- Chat.get(chat_id),
+         :ok <- check_vmethod(params),
          {:ok, scheme} <- Chats.fetch_scheme(chat_id),
          {:ok, scheme} <- Chats.update_scheme(scheme, params) do
       render(conn, "scheme.json", %{chat: chat, scheme: scheme, writable: true})
     end
   end
+
+  # 检查自定义验证是否存在问答
+  defp check_vmethod(%{"chat_id" => chat_id, "verification_mode" => vmethod}) when vmethod == 1 do
+    if Chats.get_custom_kits_count(chat_id) > 0 do
+      :ok
+    else
+      {:error, %{description: "请在自定义页面添加问答"}}
+    end
+  end
+
+  defp check_vmethod(_), do: :ok
 
   def change_takeover(conn, %{"chat_id" => chat_id, "value" => is_takeover} = _params) do
     with {:ok, _} <- check_permissions(conn, chat_id, [:writable]),

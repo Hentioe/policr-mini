@@ -7,6 +7,7 @@ defmodule PolicrMini.Chats do
 
   alias PolicrMini.Repo
   alias PolicrMini.Chats.{Scheme, Operation, Statistic}
+  alias PolicrMini.Schema.CustomKit
 
   @type scheme_written_returns :: {:ok, Scheme.t()} | {:error, Ecto.Changeset.t()}
   @type operation_written_result :: {:ok, Operation.t()} | {:error, Ecto.Changeset.t()}
@@ -92,6 +93,17 @@ defmodule PolicrMini.Chats do
           migrate_scheme(scheme)
       end
     end)
+  end
+
+  # TODO: 添加测试
+  def upsert_scheme(chat_id, params) do
+    set = Enum.into(params, [])
+
+    Repo.insert(
+      %Scheme{chat_id: chat_id},
+      on_conflict: [set: set],
+      conflict_target: :chat_id
+    )
   end
 
   @spec migrate_scheme(Scheme.t()) :: Scheme.t() | no_return
@@ -269,5 +281,15 @@ defmodule PolicrMini.Chats do
       e ->
         e
     end
+  end
+
+  # TODO: 添加测试
+  @spec get_custom_kits_count(integer | binary) :: integer()
+  def get_custom_kits_count(chat_id) do
+    from(c in CustomKit,
+      select: count(c.id),
+      where: ^dynamic([c], c.chat_id == ^chat_id)
+    )
+    |> Repo.one()
   end
 end
