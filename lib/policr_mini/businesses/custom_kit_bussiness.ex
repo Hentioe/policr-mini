@@ -5,7 +5,7 @@ defmodule PolicrMini.CustomKitBusiness do
 
   use PolicrMini, business: PolicrMini.Schema.CustomKit
 
-  import Ecto.Query, only: [from: 2, dynamic: 2]
+  import Ecto.Query, only: [from: 2]
 
   @type writed_result :: {:ok, CustomKit.t()} | {:error, Ecto.Changeset.t()}
 
@@ -15,8 +15,8 @@ defmodule PolicrMini.CustomKitBusiness do
   def create(params) do
     chat_id = params[:chat_id] || params["chat_id"]
 
-    if find_count(chat_id: chat_id) >= @max_count do
-      {:error, %{description: "the total number of custom kits has reached the upper limit"}}
+    if PolicrMini.Chats.get_custom_kits_count(chat_id) >= @max_count do
+      {:error, %{description: "自定义问答已达到数量上限"}}
     else
       %CustomKit{} |> CustomKit.changeset(params) |> Repo.insert()
     end
@@ -38,18 +38,5 @@ defmodule PolicrMini.CustomKitBusiness do
   def random_one(chat_id) do
     from(c in CustomKit, where: c.chat_id == ^chat_id, order_by: fragment("RANDOM()"), limit: 1)
     |> Repo.one()
-  end
-
-  @type find_count_opts :: [{:chat_id, integer()}]
-
-  # TODO: 添加测试
-  @spec find_count(any) :: integer()
-  def find_count(options \\ []) do
-    filter_chat_id =
-      if chat_id = Keyword.get(options, :chat_id),
-        do: dynamic([c], c.chat_id == ^chat_id),
-        else: true
-
-    from(c in CustomKit, select: count(c.id), where: ^filter_chat_id) |> Repo.one()
   end
 end
