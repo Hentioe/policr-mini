@@ -9,7 +9,6 @@ defmodule PolicrMiniWeb.Admin.API.ChatController do
     Instances,
     Chats,
     ChatBusiness,
-    CustomKitBusiness,
     PermissionBusiness,
     VerificationBusiness
   }
@@ -37,7 +36,7 @@ defmodule PolicrMiniWeb.Admin.API.ChatController do
   def customs(conn, %{"id" => id}) do
     with {:ok, permissions} <- check_permissions(conn, id),
          {:ok, chat} <- Chat.get(id) do
-      custom_kits = CustomKitBusiness.find_list(id)
+      custom_kits = Chats.find_custom_kits(id)
       is_enabled = custom_enabled?(id)
 
       render(conn, "customs.json", %{

@@ -253,4 +253,118 @@ defmodule PolicrMini.ChatsTest do
       assert s2.end_at == today_end_at
     end
   end
+
+  describe "custom_kits" do
+    def build_custom_kit_params(attrs \\ []) do
+      chat_id =
+        if chat_id = attrs[:chat_id] do
+          chat_id
+        else
+          {:ok, chat} = Instances.create_chat(Factory.build(:chat) |> Map.from_struct())
+          chat.id
+        end
+
+      custom_kit = Factory.build(:custom_kit, chat_id: chat_id)
+      custom_kit |> struct(attrs) |> Map.from_struct()
+    end
+
+    test "create_custom_kit/1" do
+      custom_kit_params = build_custom_kit_params()
+      {:ok, custom_kit} = create_custom_kit(custom_kit_params)
+
+      assert custom_kit.chat_id == custom_kit_params.chat_id
+      assert custom_kit.title == custom_kit_params.title
+      assert custom_kit.answers == custom_kit_params.answers
+    end
+
+    test "update_custom_kit/2" do
+      custom_kit = build_custom_kit_params()
+      {:ok, custom_kit1} = create_custom_kit(custom_kit)
+
+      updated_title = "老虎吃人吗？"
+      updated_answers = ["+吃", "-不吃"]
+
+      {:ok, custom_kit2} =
+        update_custom_kit(custom_kit1, %{
+          title: updated_title,
+          answers: updated_answers
+        })
+
+      assert custom_kit2.id == custom_kit1.id
+      assert custom_kit2.title == updated_title
+      assert custom_kit2.answers == updated_answers
+    end
+
+    test "find_custom_kits/1" do
+      custom_kit_params = build_custom_kit_params()
+      {:ok, _} = create_custom_kit(custom_kit_params)
+      {:ok, _} = create_custom_kit(custom_kit_params)
+
+      custom_kits = find_custom_kits(custom_kit_params.chat_id)
+      assert length(custom_kits) == 2
+
+      {:ok, chat2} =
+        Instances.create_chat(Factory.build(:chat, id: 1_098_765_432) |> Map.from_struct())
+
+      {:ok, _} = create_custom_kit(custom_kit_params |> Map.put(:chat_id, chat2.id))
+
+      custom_kits = find_custom_kits(custom_kit_params.chat_id)
+      assert length(custom_kits) == 2
+
+      custom_kits = find_custom_kits(chat2.id)
+      assert length(custom_kits) == 1
+    end
+
+    test "delete_custom_kit/1" do
+      custom_kit_params = build_custom_kit_params()
+      {:ok, custom_kit} = create_custom_kit(custom_kit_params)
+
+      custom_kits = find_custom_kits(custom_kit_params.chat_id)
+      assert length(custom_kits) == 1
+
+      {:ok, _} = delete_custom_kit(custom_kit)
+
+      custom_kits = find_custom_kits(custom_kit_params.chat_id)
+      assert Enum.empty?(custom_kits)
+    end
+
+    test "random_custom_kit/1" do
+      custom_kit_params = build_custom_kit_params()
+      {:ok, custom_kit1} = create_custom_kit(custom_kit_params)
+      {:ok, custom_kit2} = create_custom_kit(custom_kit_params |> Map.put(:title, "我是其它问题1"))
+      {:ok, custom_kit3} = create_custom_kit(custom_kit_params |> Map.put(:title, "我是其它问题2"))
+
+      custom_kits = [custom_kit1, custom_kit2, custom_kit3]
+
+      assert Enum.member?(custom_kits, random_custom_kit(custom_kit_params.chat_id))
+      assert Enum.member?(custom_kits, random_custom_kit(custom_kit_params.chat_id))
+      assert Enum.member?(custom_kits, random_custom_kit(custom_kit_params.chat_id))
+    end
+
+    test "create_custom_kit/1 and invalid answers field" do
+      incorrect_format_answers = ["无效的答案", "-错误答案"]
+      missing_corrent_answers = ["-错误答案1", "-错误答案2"]
+
+      custom_kit_params = build_custom_kit_params(answers: incorrect_format_answers)
+      {:error, changeset} = create_custom_kit(custom_kit_params)
+
+      assert changeset.errors == [{:answers, {"incorrect format", []}}]
+
+      custom_kit_params = %{custom_kit_params | answers: missing_corrent_answers}
+      {:error, changeset} = create_custom_kit(custom_kit_params)
+
+      assert changeset.errors == [{:answers, {"missing correct answer", []}}]
+
+      custom_kit_params = %{custom_kit_params | answers: ["+正确答案", "-错误答案"]}
+      {:ok, custom_kit} = create_custom_kit(custom_kit_params)
+
+      {:error, changeset} = update_custom_kit(custom_kit, %{answers: incorrect_format_answers})
+
+      assert changeset.errors == [{:answers, {"incorrect format", []}}]
+
+      {:error, changeset} = update_custom_kit(custom_kit, %{answers: missing_corrent_answers})
+
+      assert changeset.errors == [{:answers, {"missing correct answer", []}}]
+    end
+  end
 end
