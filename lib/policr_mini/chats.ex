@@ -99,8 +99,9 @@ defmodule PolicrMini.Chats do
   def upsert_scheme(chat_id, params) do
     set = Enum.into(params, [])
 
-    Repo.insert(
-      %Scheme{chat_id: chat_id},
+    %Scheme{chat_id: chat_id}
+    |> Scheme.changeset(set)
+    |> Repo.insert(
       on_conflict: [set: set],
       conflict_target: :chat_id
     )
