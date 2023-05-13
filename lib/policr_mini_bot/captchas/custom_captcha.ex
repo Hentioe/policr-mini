@@ -7,11 +7,11 @@ defmodule PolicrMiniBot.CustomCaptcha do
 
   use PolicrMiniBot.Captcha
 
-  alias PolicrMini.CustomKitBusiness
+  alias PolicrMini.Chats
 
   @impl true
   def make!(chat_id, _scheme) do
-    custom_kit = CustomKitBusiness.random_one(chat_id)
+    custom_kit = Chats.random_custom_kit(chat_id)
 
     # 随机混乱答案列表
     answers = Enum.shuffle(custom_kit.answers)

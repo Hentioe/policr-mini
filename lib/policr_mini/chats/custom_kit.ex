@@ -1,4 +1,4 @@
-defmodule PolicrMini.Schema.CustomKit do
+defmodule PolicrMini.Chats.CustomKit do
   @moduledoc """
   自定义套件模型。
   """
@@ -35,11 +35,11 @@ defmodule PolicrMini.Schema.CustomKit do
     - `answers`: 至少存在一个正确答案，即 `+` 开头的内容。
 
   ## 例子
-      iex> PolicrMini.Schema.CustomKit.validator(:answers, ["+正确答案", "-错误答案"])
+      iex> PolicrMini.Chats.CustomKit.validator(:answers, ["+正确答案", "-错误答案"])
       []
-      iex> PolicrMini.Schema.CustomKit.validator(:answers, ["无效的答案", "-错误答案"])
+      iex> PolicrMini.Chats.CustomKit.validator(:answers, ["无效的答案", "-错误答案"])
       [answers: "incorrect format"]
-      iex> PolicrMini.Schema.CustomKit.validator(:answers, ["-错误答案1", "-错误答案2"])
+      iex> PolicrMini.Chats.CustomKit.validator(:answers, ["-错误答案1", "-错误答案2"])
       [answers: "missing correct answer"]
   """
   @spec validator(atom, any) :: [{atom(), String.t()}]

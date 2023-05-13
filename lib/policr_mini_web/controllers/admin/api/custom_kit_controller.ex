@@ -5,7 +5,8 @@ defmodule PolicrMiniWeb.Admin.API.CustomKitController do
 
   use PolicrMiniWeb, :controller
 
-  alias PolicrMini.{Chats, CustomKitBusiness}
+  alias PolicrMini.Chats
+  alias PolicrMini.Chats.CustomKit
 
   import PolicrMiniWeb.Helper
 
@@ -17,7 +18,7 @@ defmodule PolicrMiniWeb.Admin.API.CustomKitController do
     chat_id = params["chat_id"]
 
     with {:ok, _} <- check_permissions(conn, chat_id, [:writable]),
-         {:ok, custom_kit} <- CustomKitBusiness.create(params),
+         {:ok, custom_kit} <- Chats.create_custom_kit(params),
          _ <- switch_to_vcustom(chat_id) do
       render(conn, "custom_kit.json", %{custom_kit: custom_kit})
     end
@@ -27,16 +28,16 @@ defmodule PolicrMiniWeb.Admin.API.CustomKitController do
     chat_id = params["chat_id"]
 
     with {:ok, _} <- check_permissions(conn, chat_id, [:writable]),
-         {:ok, custom_kit} <- CustomKitBusiness.get(id),
-         {:ok, custom_kit} <- CustomKitBusiness.update(custom_kit, params) do
+         {:ok, custom_kit} <- CustomKit.get(id),
+         {:ok, custom_kit} <- Chats.update_custom_kit(custom_kit, params) do
       render(conn, "custom_kit.json", %{custom_kit: custom_kit})
     end
   end
 
   def delete(conn, %{"id" => id} = _params) do
-    with {:ok, custom_kit} <- CustomKitBusiness.get(id),
+    with {:ok, custom_kit} <- CustomKit.get(id),
          {:ok, _} <- check_permissions(conn, custom_kit.chat_id, [:writable]),
-         {:ok, custom_kit} <- CustomKitBusiness.delete(custom_kit),
+         {:ok, custom_kit} <- Chats.delete_custom_kit(custom_kit),
          _ <- check_update_vmethod(custom_kit.chat_id) do
       render(conn, "custom_kit.json", %{custom_kit: custom_kit})
     end
@@ -51,7 +52,7 @@ defmodule PolicrMiniWeb.Admin.API.CustomKitController do
 
       {:error, reason} ->
         Logger.error(
-          "Automatic switching of verification mode failed: #{inspect(reason: reason)}",
+          "Switch to verification mode failed: #{inspect(mode: :custom, reason: reason)}",
           chat_id: chat_id
         )
 
@@ -73,7 +74,7 @@ defmodule PolicrMiniWeb.Admin.API.CustomKitController do
 
       {:error, reason} ->
         Logger.error(
-          "Automatic switching of verification mode failed: #{inspect(reason: reason)}",
+          "Switch to verification mode failed: #{inspect(mode: "delete (nil)", reason: reason)}",
           chat_id: chat_id
         )
 

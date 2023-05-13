@@ -1,9 +1,9 @@
-defmodule PolicrMini.Schema.CustomKitTest do
+defmodule PolicrMini.Chats.CustomKitTest do
   use ExUnit.Case
-  doctest PolicrMini.Schema.CustomKit
+  doctest PolicrMini.Chats.CustomKit
 
   alias PolicrMini.Factory
-  alias PolicrMini.Schema.CustomKit
+  alias PolicrMini.Chats.CustomKit
 
   describe "schema" do
     test "schema metadata" do
@@ -27,7 +27,7 @@ defmodule PolicrMini.Schema.CustomKitTest do
   test "changeset/2" do
     custom_kit = Factory.build(:custom_kit, chat_id: 123_456_789_011)
 
-    updated_title = "1 + 1= ?"
+    updated_title = "1 + 1 = ?"
     updated_answers = ["+2", "-3"]
 
     params = %{
