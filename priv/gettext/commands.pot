@@ -241,3 +241,48 @@ msgstr ""
 #, elixir-autogen, elixir-format
 msgid "这是一种自我纠错的机制，并不影响验证消息的生成，通常也不会再次出现（短时间内高并发验证除外）。"
 msgstr ""
+
+#: lib/policr_mini_bot/plugs/resp_login_cmd_plug.ex:35
+#, elixir-autogen, elixir-format
+msgid "安全小贴士：不可将按钮中的链接或登录令牌分享于他人，除非您想将控制权短暂的共享于他。"
+msgstr ""
+
+#: lib/policr_mini_bot/plugs/resp_login_cmd_plug.ex:27
+#, elixir-autogen, elixir-format
+msgid "已为您创建一枚令牌，点击下方按钮可直接进入后台。亦或复制令牌手动登入。"
+msgstr ""
+
+#: lib/policr_mini_bot/plugs/resp_login_cmd_plug.ex:30
+#, elixir-autogen, elixir-format
+msgid "有效期为 %{duration} %{unit}，过期需重新申请和登入。如怀疑泄漏请立即吊销。"
+msgstr ""
+
+#: lib/policr_mini_bot/plugs/resp_login_cmd_plug.ex:116
+#, elixir-autogen, elixir-format
+msgid "吊销全部令牌"
+msgstr ""
+
+#: lib/policr_mini_bot/plugs/resp_login_cmd_plug.ex:13
+#, elixir-autogen, elixir-format
+msgid "如果您确定自己是群管理员，且群组中的确使用了本机器人。请通知群主或其它管理员在群内使用 `/sync` 命令同步最新数据。"
+msgstr ""
+
+#: lib/policr_mini_bot/plugs/resp_login_cmd_plug.ex:60
+#, elixir-autogen, elixir-format
+msgid "未找到和您相关的权限记录"
+msgstr ""
+
+#: lib/policr_mini_bot/plugs/resp_login_cmd_plug.ex:75
+#, elixir-autogen, elixir-format
+msgid "未找到和您相关的用户记录"
+msgstr ""
+
+#: lib/policr_mini_bot/plugs/resp_login_cmd_plug.ex:93
+#, elixir-autogen, elixir-format
+msgid "请在私聊中使用此命令。"
+msgstr ""
+
+#: lib/policr_mini_bot/plugs/resp_login_cmd_plug.ex:122
+#, elixir-autogen, elixir-format
+msgid "进入后台"
+msgstr ""
