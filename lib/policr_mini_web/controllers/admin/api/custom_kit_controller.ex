@@ -17,7 +17,8 @@ defmodule PolicrMiniWeb.Admin.API.CustomKitController do
     chat_id = params["chat_id"]
 
     with {:ok, _} <- check_permissions(conn, chat_id, [:writable]),
-         {:ok, custom_kit} <- CustomKitBusiness.create(params) do
+         {:ok, custom_kit} <- CustomKitBusiness.create(params),
+         _ <- switch_to_vcustom(chat_id) do
       render(conn, "custom_kit.json", %{custom_kit: custom_kit})
     end
   end
@@ -41,7 +42,24 @@ defmodule PolicrMiniWeb.Admin.API.CustomKitController do
     end
   end
 
-  @spec check_update_vmethod(integer | binary) :: :ok
+  # 切换到自定义验证
+  @spec switch_to_vcustom(integer | binary) :: :ok | :error
+  defp switch_to_vcustom(chat_id) do
+    case Chats.upsert_scheme(chat_id, %{verification_mode: :custom}) do
+      {:ok, _} ->
+        :ok
+
+      {:error, reason} ->
+        Logger.error(
+          "Automatic switching of verification mode failed: #{inspect(reason: reason)}",
+          chat_id: chat_id
+        )
+
+        :error
+    end
+  end
+
+  @spec check_update_vmethod(integer | binary) :: :ok | :error
   defp check_update_vmethod(chat_id) do
     scheme = Chats.find_scheme(chat_id)
     count = Chats.get_custom_kits_count(chat_id)
@@ -55,11 +73,11 @@ defmodule PolicrMiniWeb.Admin.API.CustomKitController do
 
       {:error, reason} ->
         Logger.error(
-          "Automatic switching of verification methods failed: #{inspect(reason: reason)}",
+          "Automatic switching of verification mode failed: #{inspect(reason: reason)}",
           chat_id: chat_id
         )
 
-        :ok
+        :error
     end
   end
 
@@ -67,7 +85,7 @@ defmodule PolicrMiniWeb.Admin.API.CustomKitController do
           :ok | {:ok, map} | {:error, any}
   defp _check_update_vmethod(_chat_id, %{verification_mode: :custom} = scheme, 0 = _count) do
     # 自动更新验证方法为默认值（即空值）
-    Chats.update_scheme(scheme, %{verification_mode: :sdf})
+    Chats.update_scheme(scheme, %{verification_mode: nil})
   end
 
   defp _check_update_vmethod(chat_id, nil = _scheme, 0 = _count) do
