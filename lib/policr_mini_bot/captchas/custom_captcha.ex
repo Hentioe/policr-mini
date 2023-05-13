@@ -27,7 +27,7 @@ defmodule PolicrMiniBot.CustomCaptcha do
 
     ttitle = commands_text("异常提醒")
 
-    tbody = commands_text("由于本群未设置自定义回答，已将验证模式切换为系统默认。")
+    tbody = commands_text("由于本群未设置自定义问答内容，已将验证模式从自定义切换为系统默认。")
 
     tcomment = commands_text("这是一种自我纠错的机制，并不影响验证消息的生成，通常也不会再次出现（短时间内高并发验证除外）。")
 

@@ -32,7 +32,7 @@ msgstr ""
 msgid "- 删除消息（Delete messages）\n- 封禁成员（Ban users）"
 msgstr ""
 
-#: lib/policr_mini_bot/plugs/resp_start_cmd_plug.ex:61
+#: lib/policr_mini_bot/plugs/resp_start_cmd_plug.ex:65
 #, elixir-autogen, elixir-format
 msgid "你好，我是一个专注于新成员验证的机器人。具有稳定的服务，便于操作的网页后台，不断增强与优化的核心功能，并保持长期维护。同时我是开源的，可自由复制部署的。\n\n访问<a href=\"https://github.com/Hentioe/policr-mini\">这里</a>更加了解一下我吧~"
 msgstr ""
@@ -210,4 +210,34 @@ msgstr ""
 #: lib/policr_mini_bot/plugs/resp_sync_cmd_plug.ex:87
 #, elixir-autogen, elixir-format
 msgid "由于本机器人缺失必要管理权限，已取消对新成员验证的接管。"
+msgstr ""
+
+#: lib/policr_mini_bot/captchas/custom_captcha.ex:28
+#, elixir-autogen, elixir-format
+msgid "异常提醒"
+msgstr ""
+
+#: lib/policr_mini_bot/plugs/resp_start_cmd_plug.ex:193
+#, elixir-autogen, elixir-format
+msgid "您还剩 %{sec} 秒，通过可解除限制。"
+msgstr ""
+
+#: lib/policr_mini_bot/plugs/resp_start_cmd_plug.ex:189
+#, elixir-autogen, elixir-format
+msgid "来自『%{chat_title}』的验证，请确认问题并选择您认为正确的答案。"
+msgstr ""
+
+#: lib/policr_mini_bot/captchas/custom_captcha.ex:30
+#, elixir-autogen, elixir-format
+msgid "由于本群未设置自定义问答内容，已将验证模式从自定义切换为系统默认。"
+msgstr ""
+
+#: lib/policr_mini_bot/helper/sender.ex:81
+#, elixir-autogen, elixir-format
+msgid "这是一条错误：消息生成失败，不受支持的附件类型或无效的附件字符串。"
+msgstr ""
+
+#: lib/policr_mini_bot/captchas/custom_captcha.ex:32
+#, elixir-autogen, elixir-format
+msgid "这是一种自我纠错的机制，并不影响验证消息的生成，通常也不会再次出现（短时间内高并发验证除外）。"
 msgstr ""
