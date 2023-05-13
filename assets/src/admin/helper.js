@@ -115,7 +115,7 @@ function isSysLink({ path, page }) {
 
 function errorsToString(errors) {
   if (Object.keys(errors).length == 1 && errors.hasOwnProperty("description")) {
-    return errors.description.join(",") + ".";
+    return errors.description.join(",");
   }
 
   let message = "";
@@ -124,7 +124,7 @@ function errorsToString(errors) {
     message += key + " " + value.join(",");
   });
 
-  return message + ".";
+  return message;
 }
 
 function toastErrors(errors) {
