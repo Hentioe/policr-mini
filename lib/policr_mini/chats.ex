@@ -96,15 +96,19 @@ defmodule PolicrMini.Chats do
   end
 
   # TODO: 添加测试
-  def upsert_scheme(chat_id, params) do
+  def upsert_scheme(chat_id, params) when is_integer(chat_id) do
     set = Enum.into(params, [])
 
     %Scheme{chat_id: chat_id}
-    |> Scheme.changeset(set)
+    |> Scheme.changeset(params)
     |> Repo.insert(
       on_conflict: [set: set],
       conflict_target: :chat_id
     )
+  end
+
+  def upsert_scheme(chat_id, params) when is_binary(chat_id) do
+    upsert_scheme(String.to_integer(chat_id), params)
   end
 
   @spec migrate_scheme(Scheme.t()) :: Scheme.t() | no_return
