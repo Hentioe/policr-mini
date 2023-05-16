@@ -79,7 +79,3 @@ errors:
 units:
   sec: 秒
   min: 分钟
-
-revoke:
-  success: 已成功吊销自 `%{datetime}` 之前的全部令牌。
-  failed: 出于某些原因吊销操作未实际执行，请尝试联系社区群寻求帮助。

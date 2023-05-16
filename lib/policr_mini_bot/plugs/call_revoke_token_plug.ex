@@ -23,13 +23,13 @@ defmodule PolicrMiniBot.CallRevokeTokenPlug do
       utc_now = DateTime.utc_now()
       datetime = utc_now |> DateTime.truncate(:second) |> to_string()
 
-      text = t("revoke.success", %{datetime: datetime})
+      text = commands_text("已成功吊销自 %{datetime} 之前的全部令牌。", %{datetime: "`#{datetime}`"})
 
       edit_message_text(text, chat_id: chat_id, message_id: message_id)
 
       :ok
     else
-      text = t("revoke.failed")
+      text = commands_text("出于某些原因吊销操作未实际执行，请尝试联系社区群寻求帮助。")
 
       send_message(chat_id, text)
 

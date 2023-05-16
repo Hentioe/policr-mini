@@ -11,9 +11,9 @@ defmodule PolicrMiniBot.RespLoginCmdPlug do
   require Logger
 
   @sync_comment_text commands_text(
-                       "如果您确定自己是群管理员，且群组中的确使用了本机器人。请通知群主或其它管理员在群内使用 `/sync` 命令同步最新数据。"
+                       "如果您确定自己是群管理员，且群组中的确使用了本机器人。请通知群主或其它管理员在群内使用 %{command} 命令同步最新数据。",
+                       command: "`/sync`"
                      )
-
   @doc """
   处理登录命令。
 

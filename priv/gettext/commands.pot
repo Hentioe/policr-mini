@@ -262,11 +262,6 @@ msgstr ""
 msgid "吊销全部令牌"
 msgstr ""
 
-#: lib/policr_mini_bot/plugs/resp_login_cmd_plug.ex:13
-#, elixir-autogen, elixir-format
-msgid "如果您确定自己是群管理员，且群组中的确使用了本机器人。请通知群主或其它管理员在群内使用 `/sync` 命令同步最新数据。"
-msgstr ""
-
 #: lib/policr_mini_bot/plugs/resp_login_cmd_plug.ex:60
 #, elixir-autogen, elixir-format
 msgid "未找到和您相关的权限记录"
@@ -285,4 +280,19 @@ msgstr ""
 #: lib/policr_mini_bot/plugs/resp_login_cmd_plug.ex:122
 #, elixir-autogen, elixir-format
 msgid "进入后台"
+msgstr ""
+
+#: lib/policr_mini_bot/plugs/call_revoke_token_plug.ex:32
+#, elixir-autogen, elixir-format
+msgid "出于某些原因吊销操作未实际执行，请尝试联系社区群寻求帮助。"
+msgstr ""
+
+#: lib/policr_mini_bot/plugs/resp_login_cmd_plug.ex:13
+#, elixir-autogen, elixir-format
+msgid "如果您确定自己是群管理员，且群组中的确使用了本机器人。请通知群主或其它管理员在群内使用 %{command} 命令同步最新数据。"
+msgstr ""
+
+#: lib/policr_mini_bot/plugs/call_revoke_token_plug.ex:26
+#, elixir-autogen, elixir-format
+msgid "已成功吊销自 %{datetime} 之前的全部令牌。"
 msgstr ""
