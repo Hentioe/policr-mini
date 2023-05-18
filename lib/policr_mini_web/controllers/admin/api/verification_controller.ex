@@ -8,7 +8,7 @@ defmodule PolicrMiniWeb.Admin.API.VerificationController do
   import PolicrMiniWeb.Helper
 
   alias PolicrMini.{Chats, VerificationBusiness}
-  alias PolicrMini.Schema.Verification
+  alias PolicrMini.Chats.Verification
   alias PolicrMiniBot.Worker
 
   require Logger

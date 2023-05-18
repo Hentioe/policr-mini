@@ -8,8 +8,7 @@ defmodule PolicrMiniBot.HandleUserJoinedCleanupPlug do
   use PolicrMiniBot, plug: :message_handler
 
   alias PolicrMini.Chats
-  alias PolicrMini.Chats.Scheme
-  alias PolicrMini.Schema.Verification
+  alias PolicrMini.Chats.{Scheme, Verification}
   alias PolicrMini.VerificationBusiness
   alias PolicrMiniBot.Worker
 

@@ -3,7 +3,7 @@ defmodule PolicrMini.VerificationBusiness do
   验证的业务功能实现。
   """
 
-  use PolicrMini, business: PolicrMini.Schema.Verification
+  use PolicrMini, business: PolicrMini.Chats.Verification
 
   alias PolicrMini.EctoEnums.VerificationStatusEnum
 

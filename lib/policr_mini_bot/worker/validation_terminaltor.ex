@@ -6,14 +6,12 @@ defmodule PolicrMiniBot.Worker.ValidationTerminator do
   use PolicrMiniBot.Worker
 
   alias PolicrMini.{
-    Chats,
     Repo,
     Chats,
     VerificationBusiness
   }
 
-  alias PolicrMini.Schema.Verification
-  alias PolicrMini.Chats.Scheme
+  alias PolicrMini.Chats.{Scheme, Verification}
   alias PolicrMiniBot.{Cleaner, CallVerificationPlug}
 
   import PolicrMiniBot.Helper

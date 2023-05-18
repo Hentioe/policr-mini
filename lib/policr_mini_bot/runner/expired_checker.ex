@@ -1,7 +1,7 @@
 defmodule PolicrMiniBot.Runner.ExpiredChecker do
   @moduledoc false
 
-  alias PolicrMini.Schema.Verification
+  alias PolicrMini.Chats.Verification
   alias PolicrMini.{Chats, VerificationBusiness}
 
   require Logger

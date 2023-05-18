@@ -1,4 +1,4 @@
-defmodule PolicrMini.Schema.Verification do
+defmodule PolicrMini.Chats.Verification do
   @moduledoc """
   验证模型。
   """

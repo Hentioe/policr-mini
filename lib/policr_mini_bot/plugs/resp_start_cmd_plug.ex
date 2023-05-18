@@ -9,7 +9,7 @@ defmodule PolicrMiniBot.RespStartCmdPlug do
   use PolicrMiniBot, plug: [commander: :start]
 
   alias PolicrMini.{Chats, VerificationBusiness, MessageSnapshotBusiness}
-  alias PolicrMini.Schema.Verification
+  alias PolicrMini.Chats.Verification
   alias PolicrMiniBot.{ArithmeticCaptcha, CustomCaptcha, FallbackCaptcha, ImageCaptcha}
   alias Telegex.Model.{Message, InlineKeyboardMarkup, InlineKeyboardButton}
 
