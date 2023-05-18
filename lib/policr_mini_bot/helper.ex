@@ -540,59 +540,6 @@ defmodule PolicrMiniBot.Helper do
   end
 
   @doc """
-  和发送相关的扩展函数，支持（由于网络或速率限制导致的）自动重试。
-
-  此函数需要返回 `Telegex.send_*` 函数的返回值。
-
-  ## 可选参数
-  - `:retry`: 重试次数，默认值为 0。
-  """
-  def send_extended(options \\ [], do: block) do
-    retry = Keyword.get(options, :retry, 0)
-
-    case block do
-      {:ok, _} = r ->
-        r
-
-      {:error, %Telegex.Model.RequestError{reason: :timeout}} = e ->
-        if retry > 0 do
-          send_extended(Keyword.merge(options, retry: retry - 1), do: block)
-        else
-          e
-        end
-
-      {:error, %Telegex.Model.Error{description: <<"Too Many Requests: retry after">> <> _rest}} =
-          e ->
-        # 随机暂停以减缓发送速率，提高重试成功率。
-        :timer.sleep(trunc(800 * retry * Enum.random(@time_seeds)))
-
-        if retry > 0 do
-          send_extended(Keyword.merge(options, retry: retry - 1), do: block)
-        else
-          e
-        end
-
-      e ->
-        e
-    end
-  end
-
-  defmacro commands_text(msg_id, bindings \\ []) do
-    msg_id =
-      cond do
-        is_binary(msg_id) ->
-          String.trim(msg_id)
-
-        true ->
-          msg_id
-      end
-
-    quote do
-      dgettext("commands", unquote(msg_id), unquote(bindings))
-    end
-  end
-
-  @doc """
   检查接管所需权限。当成员不是管理员时返回 `nonadm`，缺失的管理权限时返回 `{:missing, [permission]}` ，满足接管所需权限时 `:ok`。
   """
   @spec check_takeover_permissions(ChatMember.t()) ::

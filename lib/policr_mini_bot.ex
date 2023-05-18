@@ -7,9 +7,9 @@ defmodule PolicrMiniBot do
 
   defmacro __using__(plug: opts) do
     quote do
-      import PolicrMiniBot.Helper
-      import PolicrMiniBot.State
-      import PolicrMiniWeb.Gettext
+      import PolicrMiniBot.{Helper, State}
+
+      use PolicrMini.I18n
 
       # TODO: 将这些模块别名全部删除
       alias PolicrMiniBot.{State, Cleaner}
