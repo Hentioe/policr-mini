@@ -89,16 +89,9 @@ defmodule PolicrMiniBot.HandleSelfJoinedPlug do
 
   # 退出普通群。
   defp exits("group", chat_id) do
-    text =
-      commands_text("""
-      请在超级群中使用本机器人。如果您不清楚普通群、超级群这些概念，请尝试为本群创建公开链接。
+    {parse_mode, text} = non_super_group_message()
 
-      _提示：创建公开链接后再转私有的群仍然是超级群。_
-
-      在您将本群提升为超级群以后，可再次添加本机器人。如果您正在实施测试，请在测试完成后将本机器人移出群组。
-      """)
-
-    send_message(chat_id, text)
+    send_message(chat_id, text, parse_mode: parse_mode)
 
     Telegex.leave_chat(chat_id)
   end

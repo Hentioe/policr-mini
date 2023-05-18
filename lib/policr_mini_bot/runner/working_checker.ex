@@ -9,9 +9,25 @@ defmodule PolicrMiniBot.Runner.WorkingChecker do
   alias PolicrMini.{Instances, ChatBusiness, PermissionBusiness}
   alias PolicrMini.Instances.Chat
 
-  import PolicrMiniBot.Helper
+  import PolicrMiniBot.Common
+
+  use PolicrMini.I18n
+
+  # TODO: 移除此处的 `only` 选项。
+  import PolicrMiniBot.Helper, only: [send_message: 3, async: 1]
 
   require Logger
+
+  defp no_permission_message() do
+    ttitle = commands_text("由于机器人缺少必要权限，已取消对新成员验证的接管")
+    tdesc = commands_text("如需恢复接管，请将机器人提升为管理员，并确保至少具备「封禁用户」和「删除消息」权限。")
+
+    """
+    #{ttitle}
+
+    #{tdesc}
+    """
+  end
 
   @doc """
   根据权限自动修正工作状态或执行退出。
@@ -33,7 +49,9 @@ defmodule PolicrMiniBot.Runner.WorkingChecker do
 
   # 非超级群，提示并退出。
   defp check_chat(%{id: chat_id, is_take_over: true, type: "group"}) do
-    send_message(chat_id, t("errors.non_super_group"))
+    {parse_mode, text} = non_super_group_message()
+
+    send_message(chat_id, text, parse_mode: parse_mode)
 
     Telegex.leave_chat(chat_id)
   end
@@ -60,20 +78,23 @@ defmodule PolicrMiniBot.Runner.WorkingChecker do
 
           member.status != "administrator" ->
             # 如果不是管理员，取消接管
-            cancel_takeover(chat, reason: :non_admin, send_notification: "errors.no_permission")
+            cancel_takeover(chat,
+              reason: :non_admin,
+              text: no_permission_message()
+            )
 
           member.can_restrict_members == false ->
             # 如果没有限制用户的权限，取消接管
             cancel_takeover(chat,
               reason: :missing_permissions,
-              send_notification: "errors.no_permission"
+              text: no_permission_message()
             )
 
           member.can_delete_messages == false ->
             # 如果没有删除消息的权限，取消接管
             cancel_takeover(chat,
               reason: :missing_permissions,
-              send_notification: "errors.no_permission"
+              text: no_permission_message()
             )
 
           true ->
@@ -146,21 +167,16 @@ defmodule PolicrMiniBot.Runner.WorkingChecker do
           | :upgraded
           | :not_found
 
-  @type text_key :: String.t()
-  @type cancel_takeover_opts :: [reason: cancel_reason, send_notification: text_key]
+  @type cancel_takeover_opts :: [reason: cancel_reason, text: String.t()]
 
   # 取消接管
   @spec cancel_takeover(Chat.t(), cancel_takeover_opts) :: :ok
   defp cancel_takeover(%{id: chat_id} = chat, opts) do
     Instances.cancel_chat_takeover(chat)
 
-    if text_key = Keyword.get(opts, :send_notification) do
+    if text = Keyword.get(opts, :text) do
       async do
-        send_message(
-          chat.id,
-          t(text_key, %{bot_username: PolicrMiniBot.username()}),
-          parse_mode: nil
-        )
+        send_message(chat.id, text, parse_mode: nil)
       end
     end
 

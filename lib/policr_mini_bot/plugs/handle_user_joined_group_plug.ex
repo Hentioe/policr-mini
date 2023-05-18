@@ -65,18 +65,10 @@ defmodule PolicrMiniBot.HandleUserJoinedGroupPlug do
       "A new member has joined the group: #{inspect(chat_id: chat_id, user_id: new_user.id)}"
     )
 
-    case Chats.fetch_scheme(chat_id) do
-      {:ok, scheme} ->
-        HandleUserJoinedCleanupPlug.handle_one(chat_id, new_user, date, scheme, state)
+    {:ok, scheme} = Chats.fetch_scheme(chat_id)
 
-      {:error, reason} ->
-        Logger.error(
-          "Verification scheme getting failed: #{inspect(chat_id: chat_id, reason: reason)}"
-        )
+    HandleUserJoinedCleanupPlug.handle_one(chat_id, new_user, date, scheme, state)
 
-        send_message(chat_id, t("errors.scheme_fetch_failed"))
-
-        {:error, state}
-    end
+    {:ok, state}
   end
 end

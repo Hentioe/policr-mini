@@ -9,6 +9,7 @@ defmodule PolicrMiniBot do
     quote do
       import PolicrMiniBot.Helper
       import PolicrMiniBot.State
+      import PolicrMiniBot.Common
       import PolicrMiniWeb.Gettext
 
       # TODO: 将这些模块别名全部删除

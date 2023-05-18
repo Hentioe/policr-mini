@@ -141,7 +141,7 @@ defmodule PolicrMiniBot.RespStartCmdPlug do
             chat_id: target_chat_id
           )
 
-          send_message(from_user_id, t("errors.unknown"))
+          send_message(from_user_id, commands_text("发生了一些未预料的情况，请向开发者反馈。"))
 
           e
       end
@@ -154,7 +154,7 @@ defmodule PolicrMiniBot.RespStartCmdPlug do
   def handle_args(_, message) do
     %{chat: %{id: chat_id}} = message
 
-    send_message(chat_id, t("errors.dont_understand"))
+    send_message(chat_id, commands_text("很抱歉，我未能理解您的意图。"))
   end
 
   @type tgerror_returns :: {:error, Telegex.Model.errors()}
