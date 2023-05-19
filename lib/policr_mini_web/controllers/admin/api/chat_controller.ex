@@ -9,8 +9,7 @@ defmodule PolicrMiniWeb.Admin.API.ChatController do
     Instances,
     Chats,
     ChatBusiness,
-    PermissionBusiness,
-    VerificationBusiness
+    PermissionBusiness
   }
 
   alias PolicrMini.Instances.Chat
@@ -147,18 +146,11 @@ defmodule PolicrMiniWeb.Admin.API.ChatController do
     offset = params["offset"]
     _time_range = params["timeRange"]
 
-    status =
-      try do
-        String.to_existing_atom(params["status"])
-      rescue
-        _ -> :all
-      end
-
-    cont = [chat_id: chat_id, offset: offset, status: status]
+    cont = [chat_id: chat_id, offset: offset, status: {:not_in, []}]
 
     with {:ok, perms} <- check_permissions(conn, chat_id),
          {:ok, chat} <- Chat.get(chat_id) do
-      verifications = VerificationBusiness.find_list(cont)
+      verifications = Chats.find_verifications(cont)
 
       render(conn, "verifications.json", %{
         chat: chat,
@@ -172,7 +164,7 @@ defmodule PolicrMiniWeb.Admin.API.ChatController do
     offset = params["offset"]
     _time_range = params["timeRange"]
 
-    conts = [
+    cont = [
       chat_id: chat_id,
       offset: offset,
       preload: [:verification]
@@ -180,7 +172,7 @@ defmodule PolicrMiniWeb.Admin.API.ChatController do
 
     with {:ok, perms} <- check_permissions(conn, chat_id),
          {:ok, chat} <- Chat.get(chat_id) do
-      operations = Chats.find_operations(conts)
+      operations = Chats.find_operations(cont)
 
       render(conn, "operations.json", %{
         chat: chat,

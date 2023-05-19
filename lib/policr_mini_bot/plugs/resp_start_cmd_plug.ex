@@ -8,7 +8,7 @@ defmodule PolicrMiniBot.RespStartCmdPlug do
 
   use PolicrMiniBot, plug: [commander: :start]
 
-  alias PolicrMini.{Chats, VerificationBusiness, MessageSnapshotBusiness}
+  alias PolicrMini.{Chats, MessageSnapshotBusiness}
   alias PolicrMini.Chats.Verification
   alias PolicrMiniBot.{ArithmeticCaptcha, CustomCaptcha, FallbackCaptcha, ImageCaptcha}
   alias Telegex.Model.{Message, InlineKeyboardMarkup, InlineKeyboardButton}
@@ -99,7 +99,7 @@ defmodule PolicrMiniBot.RespStartCmdPlug do
   def handle_args(["verification", "v1", target_chat_id], %{chat: %{id: from_user_id}} = message) do
     target_chat_id = target_chat_id |> String.to_integer()
 
-    if verification = VerificationBusiness.find_waiting_verification(target_chat_id, from_user_id) do
+    if verification = Chats.find_pending_verification(target_chat_id, from_user_id) do
       # 读取验证方案（当前的实现没有实际根据方案数据动态决定什么）
       with {:ok, scheme} <- Chats.fetch_scheme(target_chat_id),
            # 发送验证消息
@@ -121,7 +121,7 @@ defmodule PolicrMiniBot.RespStartCmdPlug do
              }),
            # 更新验证记录：关联消息快照、存储正确答案
            {:ok, _} <-
-             VerificationBusiness.update(verification, %{
+             Chats.update_verification(verification, %{
                message_snapshot_id: message_snapshot.id,
                indices: captcha_data.correct_indices
              }) do

@@ -6,13 +6,14 @@ defmodule PolicrMini.Chats do
   import Ecto.Query, only: [from: 2, dynamic: 2]
 
   alias PolicrMini.Repo
-  alias PolicrMini.Chats.{Scheme, Operation, Statistic, CustomKit}
+  alias PolicrMini.Chats.{Scheme, Operation, Statistic, CustomKit, Verification}
   alias PolicrMini.Chats.CustomKit
 
   @type scheme_written_returns :: {:ok, Scheme.t()} | {:error, Ecto.Changeset.t()}
   @type operation_written_result :: {:ok, Operation.t()} | {:error, Ecto.Changeset.t()}
   @type statistic_written_result :: {:ok, Statistic.t()} | {:error, Ecto.Changeset.t()}
   @type custom_kit_change_result :: {:ok, CustomKit.t()} | {:error, Ecto.Changeset.t()}
+  @type verification_change_result :: {:ok, Verification.t()} | {:error, Ecto.Changeset.t()}
 
   @type stat_status :: :passed | :timeout | :wronged | :other
 
@@ -143,7 +144,7 @@ defmodule PolicrMini.Chats do
     %Operation{} |> Operation.changeset(params) |> Repo.insert()
   end
 
-  @type find_operations_conts :: [
+  @type find_operations_cont :: [
           {:chat_id, integer},
           {:actions, [:kick | :ban]},
           {:roles, [:system | :admin]},
@@ -171,27 +172,27 @@ defmodule PolicrMini.Chats do
   - `order_by`: 排序方式。默认值为 `[desc: :inserted_at]`。
   - `preload`: 预加载的引用数据。
   """
-  @spec find_operations(find_operations_conts) :: [Operation.t()]
-  def find_operations(conts \\ []) do
+  @spec find_operations(find_operations_cont) :: [Operation.t()]
+  def find_operations(cont \\ []) do
     filter_chat_id =
-      if chat_id = Keyword.get(conts, :chat_id) do
+      if chat_id = Keyword.get(cont, :chat_id) do
         dynamic([o], o.chat_id == ^chat_id)
       end
 
-    actions = Keyword.get(conts, :actions, [:kick, :ban])
-    roles = Keyword.get(conts, :roles, [:system, :admin])
+    actions = Keyword.get(cont, :actions, [:kick, :ban])
+    roles = Keyword.get(cont, :roles, [:system, :admin])
 
-    offset = Keyword.get(conts, :offset, 0)
+    offset = Keyword.get(cont, :offset, 0)
 
     limit =
-      if limit = Keyword.get(conts, :limit) do
+      if limit = Keyword.get(cont, :limit) do
         if limit > @max_find_operations_count, do: @default_find_operations_count, else: limit
       else
         @default_find_operations_count
       end
 
-    order_by = Keyword.get(conts, :order_by, desc: :inserted_at)
-    preload = Keyword.get(conts, :preload, [])
+    order_by = Keyword.get(cont, :order_by, desc: :inserted_at)
+    preload = Keyword.get(cont, :preload, [])
 
     from(o in Operation,
       where: ^filter_chat_id,
@@ -331,5 +332,188 @@ defmodule PolicrMini.Chats do
   def random_custom_kit(chat_id) do
     from(c in CustomKit, where: c.chat_id == ^chat_id, order_by: fragment("RANDOM()"), limit: 1)
     |> Repo.one()
+  end
+
+  @doc """
+  创建验证记录。
+  """
+  @spec create_verification(map) :: verification_change_result
+  def create_verification(params) when is_map(params) do
+    %Verification{} |> Verification.changeset(params) |> Repo.insert()
+  end
+
+  @doc """
+  获取或创建指定群聊和用户的等待完成验证。
+  """
+  @spec get_or_create_pending_verification(integer, integer, map) ::
+          verification_change_result
+  def get_or_create_pending_verification(chat_id, target_user_id, params \\ %{}) do
+    case find_pending_verification(chat_id, target_user_id) do
+      nil ->
+        params =
+          params
+          |> Map.put(:chat_id, chat_id)
+          |> Map.put(:target_user_id, target_user_id)
+          |> Map.put(:status, :waiting)
+
+        create_verification(params)
+
+      r ->
+        {:ok, r}
+    end
+  end
+
+  @spec find_pending_verification(integer, integer) :: Verification.t() | nil
+  def find_pending_verification(chat_id, target_user_id)
+      when chat_id < 0 and target_user_id > 0 do
+    from(p in Verification,
+      where: p.chat_id == ^chat_id,
+      where: p.target_user_id == ^target_user_id,
+      where: p.status == :waiting,
+      order_by: [asc: p.inserted_at],
+      limit: 1
+    )
+    |> Repo.one()
+    |> Repo.preload([:chat])
+  end
+
+  @doc """
+  更新验证记录。
+  """
+  @spec update_verification(Verification.t(), map) :: verification_change_result
+  def update_verification(%Verification{} = verification, params) do
+    verification |> Verification.changeset(params) |> Repo.update()
+  end
+
+  @doc """
+  查找指定群聊的最后一个等待完成的验证。
+  """
+  @spec find_last_pending_verification(integer) :: Verification.t() | nil
+  def find_last_pending_verification(chat_id) do
+    from(p in Verification,
+      where: p.chat_id == ^chat_id,
+      where: p.status == :waiting,
+      order_by: [desc: p.message_id],
+      limit: 1
+    )
+    |> Repo.one()
+  end
+
+  @doc """
+  获取指定群聊的等待完成的验证个数。
+  """
+  @spec get_pending_verification_count(integer) :: integer
+  def get_pending_verification_count(chat_id) do
+    from(p in Verification,
+      select: count(p.id),
+      where: p.chat_id == ^chat_id,
+      where: p.status == :waiting
+    )
+    |> Repo.one()
+  end
+
+  @doc """
+  获取指定群聊的最后一个验证的消息编号。
+  """
+  @spec find_last_verification_message_id(integer) :: integer | nil
+  def find_last_verification_message_id(chat_id) do
+    from(p in Verification,
+      select: p.message_id,
+      where: p.chat_id == ^chat_id,
+      where: not is_nil(p.message_id),
+      order_by: [desc: p.message_id],
+      limit: 1
+    )
+    |> Repo.one()
+  end
+
+  @doc """
+  查找所有等待完成的验证。
+  """
+  @spec find_all_pending_verifications :: [Verification.t()]
+  def find_all_pending_verifications do
+    from(p in Verification,
+      where: p.status == :waiting,
+      order_by: [asc: p.inserted_at]
+    )
+    |> Repo.all()
+  end
+
+  @type find_verifications_total_cont_status :: :passed | :timeout
+  @type find_verifications_total_cont :: [{:status, find_verifications_total_cont_status}]
+
+  @doc """
+  查找指定条件的验证总个数。
+  """
+  @spec find_verifications_total(find_verifications_total_cont) :: integer
+  def find_verifications_total(cont \\ []) do
+    filter_status =
+      if status = Keyword.get(cont, :status) do
+        dynamic([v], v.status == ^status)
+      else
+        true
+      end
+
+    from(v in Verification, select: count(v.id), where: ^filter_status)
+    |> Repo.one()
+  end
+
+  @default_verification_list_limit 25
+  @max_verification_list_limit @default_verification_list_limit
+
+  @type find_verifications_cont :: [
+          {:chat_id, integer | binary},
+          {:status, {:in, [atom]} | {:not_in, [atom]}},
+          {:limit, integer},
+          {:offset, integer},
+          {:order_by, [{:desc | :asc, atom | [atom]}]}
+        ]
+
+  @doc """
+  查找验证记录列表。
+
+  可选参数表示查询条件，部分条件存在默认和最大值限制。
+
+  ## 查询条件
+  - `chat_id`: 群组的 ID。
+  - `status`: 状态条件，值为 `{:in, [status, ...]}` 或 `{:not_in, [status, ...]}`。
+  - `limit`: 数量限制。默认值为 `25`，最大值为 `25`。如果条件中的值大于最大值将会被最大值重写。
+  - `offset`: 偏移量。默认值为 `0`。
+  - `order_by`: 排序方式，默认值为 `[desc: :inserted_at]`。
+  """
+  @spec find_verifications(find_verifications_cont) :: [Verification.t()]
+  def find_verifications(cont \\ []) do
+    filter_chat_id =
+      if chat_id = Keyword.get(cont, :chat_id) do
+        dynamic([v], v.chat_id == ^chat_id)
+      else
+        true
+      end
+
+    filter_status =
+      case Keyword.get(cont, :status) do
+        {:in, status} -> dynamic([v], v.status in ^status)
+        {:not_in, status} -> dynamic([v], v.status not in ^status)
+        _ -> true
+      end
+
+    limit =
+      if limit = Keyword.get(cont, :limit) do
+        if limit > @max_verification_list_limit, do: @max_verification_list_limit, else: limit
+      else
+        @default_verification_list_limit
+      end
+
+    offset = Keyword.get(cont, :offset, 0)
+    order_by = Keyword.get(cont, :order_by, desc: :inserted_at)
+
+    from(v in Verification,
+      where: ^filter_chat_id,
+      where: ^filter_status,
+      limit: ^limit,
+      offset: ^offset,
+      order_by: ^order_by
+    )
+    |> Repo.all()
   end
 end

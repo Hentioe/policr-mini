@@ -1,8 +1,8 @@
 defmodule PolicrMiniBot.Runner.ExpiredChecker do
   @moduledoc false
 
+  alias PolicrMini.Chats
   alias PolicrMini.Chats.Verification
-  alias PolicrMini.{Chats, VerificationBusiness}
 
   require Logger
   require PolicrMiniBot.Helper
@@ -16,7 +16,7 @@ defmodule PolicrMiniBot.Runner.ExpiredChecker do
   """
   def run do
     # 获取所有处于等待状态的验证
-    verifications = VerificationBusiness.find_all_waiting_verifications()
+    verifications = Chats.find_all_pending_verifications()
     # 计算已经过期的验证
     verifications =
       Enum.filter(verifications, fn v ->
@@ -36,7 +36,7 @@ defmodule PolicrMiniBot.Runner.ExpiredChecker do
         )
       end
 
-      VerificationBusiness.update(verification, %{status: :expired})
+      Chats.update_verification(verification, %{status: :expired})
     end)
 
     log_auto_corrected(verifications)

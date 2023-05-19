@@ -9,7 +9,6 @@ defmodule PolicrMiniBot.HandleUserJoinedCleanupPlug do
 
   alias PolicrMini.Chats
   alias PolicrMini.Chats.{Scheme, Verification}
-  alias PolicrMini.VerificationBusiness
   alias PolicrMiniBot.Worker
 
   require Logger
@@ -73,26 +72,30 @@ defmodule PolicrMiniBot.HandleUserJoinedCleanupPlug do
       # 异步限制新用户
       async_run(fn -> restrict_chat_member(chat_id, new_chat_member.id) end)
 
+      # 处理验证
       handle_it(mode, seconds, chat_id, new_chat_member, state)
     end
   end
 
   @doc """
   处理过期验证。
+
   当前仅限制用户，并不发送验证消息。
   """
   @spec handle_expired(integer, map, State.t()) :: {:error, State.t()} | {:ok, State.t()}
   def handle_expired(chat_id, new_chat_member, state) do
+    # 创建过期验证
     verification_params = %{
       chat_id: chat_id,
       target_user_id: new_chat_member.id,
       target_user_name: fullname(new_chat_member),
       target_user_language_code: new_chat_member.language_code,
       seconds: 0,
-      status: :expired
+      status: :expired,
+      source: :joined
     }
 
-    case VerificationBusiness.fetch(verification_params) do
+    case Chats.create_verification(verification_params) do
       {:ok, _} ->
         # 计数器自增（验证总数）
         PolicrMini.Counter.increment(:verification_total)
@@ -115,15 +118,18 @@ defmodule PolicrMiniBot.HandleUserJoinedCleanupPlug do
   """
   def handle_it(_, seconds, chat_id, new_chat_member, state) do
     verification_params = %{
-      chat_id: chat_id,
-      target_user_id: new_chat_member.id,
       target_user_name: fullname(new_chat_member),
       target_user_language_code: new_chat_member.language_code,
       seconds: seconds,
-      status: :waiting
+      source: :joined
     }
 
-    with {:ok, verification} <- VerificationBusiness.fetch(verification_params),
+    with {:ok, verification} <-
+           Chats.get_or_create_pending_verification(
+             chat_id,
+             new_chat_member.id,
+             verification_params
+           ),
          {:ok, scheme} <- Chats.fetch_scheme(chat_id),
          {text, markup} <- make_verify_content(verification, scheme, seconds),
          {:ok, reminder_message} <-
@@ -132,7 +138,7 @@ defmodule PolicrMiniBot.HandleUserJoinedCleanupPlug do
              parse_mode: "MarkdownV2ToHTML"
            ),
          {:ok, _} <-
-           VerificationBusiness.update(verification, %{message_id: reminder_message.message_id}) do
+           Chats.update_verification(verification, %{message_id: reminder_message.message_id}) do
       # 计数器自增（验证总数）
       PolicrMini.Counter.increment(:verification_total)
 
@@ -172,7 +178,7 @@ defmodule PolicrMiniBot.HandleUserJoinedCleanupPlug do
     new_chat_member = %{id: target_user_id, fullname: target_user_name}
 
     # 读取等待验证的人数并根据人数分别响应不同的文本内容
-    waiting_count = VerificationBusiness.get_waiting_count(chat_id)
+    waiting_count = Chats.get_pending_verification_count(chat_id)
 
     make_message_content(chat_id, new_chat_member, waiting_count, scheme, seconds)
   end

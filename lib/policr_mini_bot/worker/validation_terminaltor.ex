@@ -5,11 +5,7 @@ defmodule PolicrMiniBot.Worker.ValidationTerminator do
 
   use PolicrMiniBot.Worker
 
-  alias PolicrMini.{
-    Repo,
-    Chats,
-    VerificationBusiness
-  }
+  alias PolicrMini.{Repo, Chats}
 
   alias PolicrMini.Chats.{Scheme, Verification}
   alias PolicrMiniBot.{Cleaner, CallVerificationPlug}
@@ -69,12 +65,12 @@ defmodule PolicrMiniBot.Worker.ValidationTerminator do
       # 计数器自增（超时总数）
       PolicrMini.Counter.increment(:verification_timeout_total)
       # 更新状态为超时
-      VerificationBusiness.update(last_veri, %{status: :timeout})
+      Chats.update_verification(last_veri, %{status: :timeout})
       # 击杀用户（原因为超时）
       CallVerificationPlug.kill(chat_id, user, :timeout, killing_method, delay_unban_secs)
 
       # 如果还存在多条验证，更新入口消息
-      waiting_count = VerificationBusiness.get_waiting_count(chat_id)
+      waiting_count = Chats.get_pending_verification_count(chat_id)
 
       if waiting_count == 0 do
         # 已经没有剩余验证，直接删除上一个入口消息
@@ -141,12 +137,12 @@ defmodule PolicrMiniBot.Worker.ValidationTerminator do
       )
 
       # 更新状态为超时
-      VerificationBusiness.update(veri, %{status: status})
+      Chats.update_verification(veri, %{status: status})
       # 击杀用户（原因即状态）
       CallVerificationPlug.kill(chat_id, user, status, kmeth, delay_unban_secs)
 
       # 如果还存在多条验证，更新入口消息
-      waiting_count = VerificationBusiness.get_waiting_count(chat_id)
+      waiting_count = Chats.get_pending_verification_count(chat_id)
 
       if waiting_count == 0 do
         # 已经没有剩余验证，直接删除上一个入口消息

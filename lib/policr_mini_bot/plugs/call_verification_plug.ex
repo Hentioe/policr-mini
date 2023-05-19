@@ -5,7 +5,7 @@ defmodule PolicrMiniBot.CallVerificationPlug do
 
   use PolicrMiniBot, plug: [caller: [prefix: "verification:"]]
 
-  alias PolicrMini.{Chats, VerificationBusiness}
+  alias PolicrMini.Chats
   alias PolicrMini.Chats.{Scheme, Verification}
   alias PolicrMiniBot.{HandleUserJoinedCleanupPlug, Disposable, Worker}
 
@@ -103,8 +103,8 @@ defmodule PolicrMiniBot.CallVerificationPlug do
          {:ok, verification} <- handle_answer.(verification, scheme),
          # 更新验证记录中的选择索引
 
-         {:ok, _} <- VerificationBusiness.update(verification, %{chosen: chosen}) do
-      count = VerificationBusiness.get_waiting_count(verification.chat_id)
+         {:ok, _} <- Chats.update_verification(verification, %{chosen: chosen}) do
+      count = Chats.get_pending_verification_count(verification.chat_id)
 
       # 如果没有等待验证了，立即删除入口消息
       if count == 0 do
@@ -186,7 +186,7 @@ defmodule PolicrMiniBot.CallVerificationPlug do
       end
     end
 
-    case VerificationBusiness.update(verification, %{status: :passed}) do
+    case Chats.update_verification(verification, %{status: :passed}) do
       {:ok, verification} ->
         # 解除限制
         async do
@@ -277,7 +277,7 @@ defmodule PolicrMiniBot.CallVerificationPlug do
       end
     end
 
-    case VerificationBusiness.update(verification, %{status: :wronged}) do
+    case Chats.update_verification(verification, %{status: :wronged}) do
       {:ok, verification} ->
         # 添加操作记录（系统）。
         operation_create_fun.(verification)
@@ -314,7 +314,7 @@ defmodule PolicrMiniBot.CallVerificationPlug do
   def update_unity_message(chat_id, count, scheme, max_seconds) do
     # 提及当前最新的等待验证记录中的用户
 
-    if verification = VerificationBusiness.find_last_waiting_verification(chat_id) do
+    if verification = Chats.find_last_pending_verification(chat_id) do
       user = %{id: verification.target_user_id, fullname: verification.target_user_name}
 
       {text, markup} =
@@ -327,7 +327,7 @@ defmodule PolicrMiniBot.CallVerificationPlug do
         )
 
       # 获取最新的验证入口消息编号
-      message_id = VerificationBusiness.find_last_verification_message_id(chat_id)
+      message_id = Chats.find_last_verification_message_id(chat_id)
 
       edit_message_text(text,
         chat_id: chat_id,

@@ -6,7 +6,7 @@ defmodule PolicrMini.Chats.Operation do
   use PolicrMini.Schema
 
   alias PolicrMini.EctoEnums.{OperationActionEnum, OperationRoleEnum}
-  alias PolicrMini.Schema.{Verification}
+  alias PolicrMini.Chats.Verification
   alias PolicrMini.Instances.Chat
 
   @required_fields ~w(chat_id verification_id action role)a

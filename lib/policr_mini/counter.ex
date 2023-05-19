@@ -5,7 +5,7 @@ defmodule PolicrMini.Counter do
 
   use GenServer
 
-  alias PolicrMini.VerificationBusiness
+  alias PolicrMini.Chats
 
   defmodule State do
     @moduledoc false
@@ -47,9 +47,9 @@ defmodule PolicrMini.Counter do
 
   def start_link(_opts) do
     state = %State{
-      verification_total: VerificationBusiness.find_total(),
-      verification_passed_total: VerificationBusiness.find_total(status: :passed),
-      verification_timeout_total: VerificationBusiness.find_total(status: :timeout)
+      verification_total: Chats.find_verifications_total(),
+      verification_passed_total: Chats.find_verifications_total(status: :passed),
+      verification_timeout_total: Chats.find_verifications_total(status: :timeout)
     }
 
     GenServer.start_link(__MODULE__, %{init: state}, name: __MODULE__)
