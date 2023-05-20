@@ -12,12 +12,10 @@ defmodule PolicrMini.I18n do
 
   defmacro commands_text(msg_id, bindings \\ []) do
     msg_id =
-      cond do
-        is_binary(msg_id) ->
-          String.trim(msg_id)
-
-        true ->
-          msg_id
+      if is_binary(msg_id) do
+        String.trim(msg_id)
+      else
+        msg_id
       end
 
     quote do

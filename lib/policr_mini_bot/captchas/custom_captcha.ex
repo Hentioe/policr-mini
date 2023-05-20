@@ -10,7 +10,7 @@ defmodule PolicrMiniBot.CustomCaptcha do
 
   alias PolicrMini.Chats
   alias PolicrMini.Chats.{Scheme, CustomKit}
-  alias PolicrMiniBot.CaptchaMakeFailed
+  alias PolicrMiniBot.CaptchaGenerationError
 
   @impl true
   def make!(chat_id, scheme) do
@@ -41,7 +41,7 @@ defmodule PolicrMiniBot.CustomCaptcha do
 
     Telegex.send_message(chat_id, text, parse_mode: "HTML")
 
-    raise CaptchaMakeFailed, message: "No custom kit found"
+    raise CaptchaGenerationError, message: "No custom kit found"
   end
 
   def _make!(_chat_id, _scheme, custom_kit) do
