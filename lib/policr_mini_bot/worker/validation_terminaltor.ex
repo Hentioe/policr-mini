@@ -193,9 +193,9 @@ defmodule PolicrMiniBot.Worker.ValidationTerminator do
   end
 
   @spec async_terminate(Verification.t(), Scheme.t(), integer) :: Honeydew.Job.t()
-  def async_terminate(veri = v, scheme, waiting_secs) do
-    %{chat_id: chat_id, target_user_id: user_id} = veri
-    job_key = job_key(:terminate, veri)
+  def async_terminate(v, scheme, waiting_secs) do
+    %{chat_id: chat_id, target_user_id: user_id} = v
+    job_key = job_key(:terminate, v)
 
     if job = JobCacher.get_job(job_key) do
       # 已存在
@@ -206,7 +206,7 @@ defmodule PolicrMiniBot.Worker.ValidationTerminator do
 
       job
     else
-      fun = {:terminate, [veri, scheme, waiting_secs]}
+      fun = {:terminate, [v, scheme, waiting_secs]}
       job = Honeydew.async(fun, @queue_name, delay_secs: waiting_secs)
 
       JobCacher.add_job(job_key, job)
