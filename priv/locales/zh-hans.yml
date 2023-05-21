@@ -38,17 +38,6 @@ sync:
   unable_to_takeover: 没有接管新成员验证的能力。
 
 verification:
-  unity:
-    single_waiting: |
-      新成员 %{mentioned_user} 你好！
-
-      您当前需要完成验证才能解除限制，验证有效时间不超过 __%{seconds}__ 秒。
-      过期会被踢出或封禁，请尽快。
-    multiple_waiting: |
-      刚来的 %{mentioned_user} 和另外 %{remaining_count} 个还未验证的新成员，你们好！
-
-      请主动完成验证以解除限制，验证有效时间不超过 __%{seconds}__ 秒。
-      过期会被踢出或封禁，请尽快。
   passed:
     private: |
       恭喜您通过了『*%{chat_title}*』的加群验证，权限已恢复。
@@ -84,19 +73,11 @@ verification:
       public: |
         刚刚 %{mentioned_user} 被手动封禁，针对 TA 个人的验证已取消。
 
-buttons:
-  verification:
-    click_here: 点此验证
-
 errors:
   dont_understand: 很抱歉，我未能理解您的意图。
   unknown: 发生了一些未预料的情况，请向开发者反馈。
   sync_failed: 出现了一些问题，同步失败。请联系开发者。
   scheme_fetch_failed: 发生了一些错误，没有读取到本群的验证方案。如果重复出现此问题，请取消机器人的接管状态并通知开发者。
-  verification_created_failed: |
-    发生了一些错误，针对 %{mentioned_user} 的验证创建失败。建议管理员自行鉴别再决定取消限制或手动封禁。
-
-    如果反复出现此问题，请取消接管状态并通知开发者。
   check_answer_failed: 出现了一些未意料的错误，校验验证时失败。请管理员并通知开发者。
   verification_not_found: 没有找到和这条验证有关的记录哦～
   verification_target_incorrect: 此条验证并不针对你～

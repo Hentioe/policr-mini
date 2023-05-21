@@ -8,15 +8,12 @@ defmodule PolicrMiniBot.HandleUserJoinedCleanupPlug do
   use PolicrMiniBot, plug: :message_handler
 
   alias PolicrMini.Chats
-  alias PolicrMini.Chats.{Scheme, Verification}
+  alias PolicrMini.Chats.Scheme
   alias PolicrMiniBot.Worker
 
   require Logger
 
   @type user :: PolicrMiniBot.Helper.mention_user()
-
-  # 过期时间：15 分钟
-  @expired_seconds 60 * 15
 
   @doc """
   检查消息中包含的新加入用户是否有效。
@@ -54,135 +51,6 @@ defmodule PolicrMiniBot.HandleUserJoinedCleanupPlug do
     {:ok, %{state | done: true, deleted: true}}
   end
 
-  # 处理单个新成员的加入。
-  def handle_one(chat_id, new_chat_member, date, scheme, state) do
-    joined_datetime =
-      case date |> DateTime.from_unix() do
-        {:ok, datetime} -> datetime
-        _ -> DateTime.utc_now()
-      end
-
-    mode = scheme.verification_mode || default!(:vmode)
-    seconds = scheme.seconds || default!(:vseconds)
-
-    if DateTime.diff(DateTime.utc_now(), joined_datetime) >= @expired_seconds do
-      # 处理过期验证
-      handle_expired(chat_id, new_chat_member, state)
-    else
-      # 异步限制新用户
-      async_run(fn -> restrict_chat_member(chat_id, new_chat_member.id) end)
-
-      # 处理验证
-      handle_it(mode, seconds, chat_id, new_chat_member, state)
-    end
-  end
-
-  @doc """
-  处理过期验证。
-
-  当前仅限制用户，并不发送验证消息。
-  """
-  @spec handle_expired(integer, map, State.t()) :: {:error, State.t()} | {:ok, State.t()}
-  def handle_expired(chat_id, new_chat_member, state) do
-    # 创建过期验证
-    verification_params = %{
-      chat_id: chat_id,
-      target_user_id: new_chat_member.id,
-      target_user_name: fullname(new_chat_member),
-      target_user_language_code: new_chat_member.language_code,
-      seconds: 0,
-      status: :expired,
-      source: :joined
-    }
-
-    case Chats.create_verification(verification_params) do
-      {:ok, _} ->
-        # 计数器自增（验证总数）
-        PolicrMini.Counter.increment(:verification_total)
-        # 异步限制新用户
-        async_run(fn -> restrict_chat_member(chat_id, new_chat_member.id) end)
-
-        {:ok, state}
-
-      {:error, reason} ->
-        Logger.error(
-          "Verification getting failed: #{inspect(chat_id: chat_id, user_id: new_chat_member.id, reason: reason)}"
-        )
-
-        {:error, state}
-    end
-  end
-
-  @doc """
-  统一入口 + 私聊方案的细节实现。
-  """
-  def handle_it(_, seconds, chat_id, new_chat_member, state) do
-    verification_params = %{
-      target_user_name: fullname(new_chat_member),
-      target_user_language_code: new_chat_member.language_code,
-      seconds: seconds,
-      source: :joined
-    }
-
-    with {:ok, verification} <-
-           Chats.get_or_create_pending_verification(
-             chat_id,
-             new_chat_member.id,
-             verification_params
-           ),
-         {:ok, scheme} <- Chats.fetch_scheme(chat_id),
-         {text, markup} <- make_verify_content(verification, scheme, seconds),
-         {:ok, reminder_message} <-
-           Cleaner.send_verification_message(chat_id, text,
-             reply_markup: markup,
-             parse_mode: "MarkdownV2ToHTML"
-           ),
-         {:ok, _} <-
-           Chats.update_verification(verification, %{message_id: reminder_message.message_id}) do
-      # 计数器自增（验证总数）
-      PolicrMini.Counter.increment(:verification_total)
-
-      # 异步延迟处理超时
-      Worker.async_terminate_validation(verification, scheme, seconds)
-
-      {:ok, %{state | done: true, deleted: true}}
-    else
-      {:error, reason} ->
-        Logger.error(
-          "Create verification failed: #{inspect(reason: reason)}",
-          chat_id: chat_id
-        )
-
-        text =
-          t("errors.verification_created_failed", %{mentioned_user: mention(new_chat_member)})
-
-        send_message(chat_id, text)
-
-        {:error, state}
-    end
-  end
-
-  @doc """
-  生成验证消息。
-
-  注意：此函数需要在验证记录创建以后调用，否则会出现不正确的等待验证人数。
-  因为当前默认统一验证入口的关系，此函数生成的是入口消息而不是验证消息。
-  """
-  @spec make_verify_content(Verification.t(), Scheme.t(), integer) ::
-          {String.t(), InlineKeyboardMarkup.t()}
-  def make_verify_content(verification, scheme, seconds)
-      when is_struct(verification, Verification) and is_struct(scheme, Scheme) do
-    %{chat_id: chat_id, target_user_id: target_user_id, target_user_name: target_user_name} =
-      verification
-
-    new_chat_member = %{id: target_user_id, fullname: target_user_name}
-
-    # 读取等待验证的人数并根据人数分别响应不同的文本内容
-    waiting_count = Chats.get_pending_verification_count(chat_id)
-
-    make_message_content(chat_id, new_chat_member, waiting_count, scheme, seconds)
-  end
-
   @doc """
   生成验证入口消息内容。
   """
@@ -195,6 +63,7 @@ defmodule PolicrMiniBot.HandleUserJoinedCleanupPlug do
         ) ::
           {String.t(), InlineKeyboardMarkup.t()}
 
+  @deprecated "Use `PolicrMiniBot.VerificationHelper.send_entrance_message/2` instead."
   def make_message_content(chat_id, user, waiting_count, scheme, seconds)
       when is_struct(scheme, Scheme) do
     # 读取等待验证的人数并根据人数分别响应不同的文本内容

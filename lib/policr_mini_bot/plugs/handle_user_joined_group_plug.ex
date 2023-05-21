@@ -9,8 +9,7 @@ defmodule PolicrMiniBot.HandleUserJoinedGroupPlug do
 
   use PolicrMiniBot, plug: :preheater
 
-  alias PolicrMiniBot.HandleUserJoinedCleanupPlug
-  alias PolicrMini.Chats
+  import PolicrMiniBot.VerificationHelper
 
   require Logger
 
@@ -62,20 +61,15 @@ defmodule PolicrMiniBot.HandleUserJoinedGroupPlug do
     %{chat: %{id: chat_id}, new_chat_member: %{user: new_user}, date: date} = chat_member
 
     Logger.debug(
-      "A new member has joined the group: #{inspect(chat_id: chat_id, user_id: new_user.id)}"
+      "A new member has joined group: #{inspect(user_id: new_user.id)}",
+      chat_id: chat_id
     )
 
-    case Chats.fetch_scheme(chat_id) do
-      {:ok, scheme} ->
-        HandleUserJoinedCleanupPlug.handle_one(chat_id, new_user, date, scheme, state)
+    case embarrass_user(:joined, chat_id, new_user, date) do
+      {:ok, _} ->
+        {:ok, state}
 
-      {:error, reason} ->
-        Logger.error(
-          "Verification scheme getting failed: #{inspect(chat_id: chat_id, reason: reason)}"
-        )
-
-        send_message(chat_id, t("errors.scheme_fetch_failed"))
-
+      {:error, _} ->
         {:error, state}
     end
   end
