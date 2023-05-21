@@ -66,8 +66,6 @@ defmodule PolicrMiniBot.VerificationHelper do
 
           e
       end
-
-      {:error, 1}
     else
       # 载入方案
       # TODO: 当方案为空时，返回一个默认的方案
