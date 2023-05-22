@@ -8,7 +8,6 @@ defmodule PolicrMiniBot.HandleUserJoinedCleanupPlug do
   use PolicrMiniBot, plug: :message_handler
 
   alias PolicrMini.Chats
-  alias PolicrMini.Chats.Scheme
   alias PolicrMiniBot.Worker
 
   require Logger
@@ -49,51 +48,5 @@ defmodule PolicrMiniBot.HandleUserJoinedCleanupPlug do
     end
 
     {:ok, %{state | done: true, deleted: true}}
-  end
-
-  @doc """
-  生成验证入口消息内容。
-  """
-  @spec make_message_content(
-          integer | binary,
-          user,
-          integer,
-          Scheme.t(),
-          integer
-        ) ::
-          {String.t(), InlineKeyboardMarkup.t()}
-
-  @deprecated "Use `PolicrMiniBot.VerificationHelper.send_entrance_message/2` instead."
-  def make_message_content(chat_id, user, waiting_count, scheme, seconds)
-      when is_struct(scheme, Scheme) do
-    # 读取等待验证的人数并根据人数分别响应不同的文本内容
-    mention_scheme = scheme.mention_text || default!(:mention_scheme)
-
-    text =
-      if waiting_count == 1,
-        do:
-          t("verification.unity.single_waiting", %{
-            mentioned_user: build_mention(user, mention_scheme),
-            seconds: seconds
-          }),
-        else:
-          t("verification.unity.multiple_waiting", %{
-            mentioned_user: build_mention(user, mention_scheme),
-            remaining_count: waiting_count - 1,
-            seconds: seconds
-          })
-
-    markup = %InlineKeyboardMarkup{
-      inline_keyboard: [
-        [
-          %InlineKeyboardButton{
-            text: t("buttons.verification.click_here"),
-            url: "https://t.me/#{bot_username()}?start=verification_v1_#{chat_id}"
-          }
-        ]
-      ]
-    }
-
-    {text, markup}
   end
 end

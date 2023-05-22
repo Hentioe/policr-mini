@@ -8,7 +8,7 @@ defmodule PolicrMiniBot.Worker.ValidationTerminator do
   alias PolicrMini.{Repo, Chats}
 
   alias PolicrMini.Chats.{Scheme, Verification}
-  alias PolicrMiniBot.{Cleaner, CallVerificationPlug}
+  alias PolicrMiniBot.{EntryMaintainer, CallVerificationPlug}
 
   import PolicrMiniBot.Helper
 
@@ -40,7 +40,7 @@ defmodule PolicrMiniBot.Worker.ValidationTerminator do
   终止超时验证。
   """
   @spec terminate(Verification.t(), Scheme.t(), integer) :: :ok
-  def terminate(veri = v, scheme, waiting_secs)
+  def terminate(veri = v, scheme, _waiting_secs)
       when is_struct(veri, Verification) and is_struct(scheme, Scheme) do
     %{chat_id: chat_id, target_user_id: user_id, target_user_name: user_name} = veri
     user = %{id: user_id, fullname: user_name}
@@ -74,14 +74,13 @@ defmodule PolicrMiniBot.Worker.ValidationTerminator do
 
       if waiting_count == 0 do
         # 已经没有剩余验证，直接删除上一个入口消息
-        Cleaner.delete_latest_verification_message(chat_id)
+        EntryMaintainer.delete_entry_message(chat_id)
       else
         # 如果还存在多条验证，更新入口消息
         CallVerificationPlug.update_unity_message(
           chat_id,
           waiting_count,
-          scheme,
-          waiting_secs
+          scheme
         )
       end
     else
@@ -146,14 +145,13 @@ defmodule PolicrMiniBot.Worker.ValidationTerminator do
 
       if waiting_count == 0 do
         # 已经没有剩余验证，直接删除上一个入口消息
-        Cleaner.delete_latest_verification_message(chat_id)
+        EntryMaintainer.delete_entry_message(chat_id)
       else
         # 如果还存在多条验证，更新入口消息
         CallVerificationPlug.update_unity_message(
           chat_id,
           waiting_count,
-          scheme,
-          scheme.seconds
+          scheme
         )
       end
 

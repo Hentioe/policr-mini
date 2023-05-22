@@ -74,8 +74,8 @@ defmodule PolicrMiniBot.Supervisor do
       PolicrMiniBot.Worker.JobCacher,
       # 图片提供服务
       PolicrMiniBot.ImageProvider,
-      # 消息清理服务
-      PolicrMiniBot.Cleaner,
+      # 验证入口维护器
+      PolicrMiniBot.EntryMaintainer,
       # 一次性处理保证
       PolicrMiniBot.Disposable,
       # 速度限制。

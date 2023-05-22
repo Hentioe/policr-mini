@@ -7,7 +7,9 @@ defmodule PolicrMiniBot.CallVerificationPlug do
 
   alias PolicrMini.Chats
   alias PolicrMini.Chats.{Scheme, Verification}
-  alias PolicrMiniBot.{HandleUserJoinedCleanupPlug, Disposable, Worker}
+  alias PolicrMiniBot.{EntryMaintainer, Disposable, Worker}
+
+  import PolicrMiniBot.VerificationHelper
 
   require Logger
 
@@ -97,7 +99,7 @@ defmodule PolicrMiniBot.CallVerificationPlug do
       end
     end
 
-    with {:ok, verification} <- validity_check(user_id, verification_id),
+    with {:ok, verification = v} <- validity_check(user_id, verification_id),
          {:ok, scheme} <- Chats.fetch_scheme(verification.chat_id),
          # 处理回答。
          {:ok, verification} <- handle_answer.(verification, scheme),
@@ -109,11 +111,9 @@ defmodule PolicrMiniBot.CallVerificationPlug do
       # 如果没有等待验证了，立即删除入口消息
       if count == 0 do
         # 获取最新的验证入口消息编号
-        Cleaner.delete_latest_verification_message(verification.chat_id)
+        EntryMaintainer.delete_entry_message(v.chat_id)
       else
-        # 如果还存在多条验证，更新入口消息
-        max_seconds = scheme.seconds || default!(:vseconds)
-        update_unity_message(verification.chat_id, count, scheme, max_seconds)
+        update_unity_message(verification.chat_id, count, scheme)
       end
 
       :ok
@@ -309,31 +309,19 @@ defmodule PolicrMiniBot.CallVerificationPlug do
   @doc """
   更新统一验证入口消息
   """
-  @spec update_unity_message(integer, integer, Scheme.t(), integer) ::
-          :not_found | {:error, Telegex.Model.errors()} | {:ok, Message.t()}
-  def update_unity_message(chat_id, count, scheme, max_seconds) do
+  @spec update_unity_message(integer, integer, Scheme.t()) ::
+          :not_found
+          | {:error, Telegex.Model.errors()}
+          | {:ok, Message.t()}
+  def update_unity_message(chat_id, count, scheme) do
     # 提及当前最新的等待验证记录中的用户
 
-    if verification = Chats.find_last_pending_verification(chat_id) do
-      user = %{id: verification.target_user_id, fullname: verification.target_user_name}
-
-      {text, markup} =
-        HandleUserJoinedCleanupPlug.make_message_content(
-          chat_id,
-          user,
-          count,
-          scheme,
-          max_seconds
-        )
-
+    if v = Chats.find_last_pending_verification(chat_id) do
       # 获取最新的验证入口消息编号
       message_id = Chats.find_last_verification_message_id(chat_id)
 
-      edit_message_text(text,
-        chat_id: chat_id,
-        message_id: message_id,
-        reply_markup: markup
-      )
+      # 更新入口消息
+      put_entry_message(v, scheme, edit: true, pending_count: count, message_id: message_id)
     else
       :not_found
     end

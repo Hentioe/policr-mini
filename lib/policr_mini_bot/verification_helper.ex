@@ -3,7 +3,7 @@ defmodule PolicrMiniBot.VerificationHelper do
 
   alias PolicrMini.{Counter, Chats}
   alias PolicrMini.Chats.{Verification, Scheme}
-  alias PolicrMiniBot.Worker
+  alias PolicrMiniBot.{Worker, EntryMaintainer}
   alias Telegex.Model.User, as: TgUser
   alias Telegex.Model.{InlineKeyboardMarkup, InlineKeyboardButton}
 
@@ -83,7 +83,7 @@ defmodule PolicrMiniBot.VerificationHelper do
 
       # 主要流程：创建（或获取进行中的）验证数据，验证入口消息，并更新验证数据中的消息 ID
       with {:ok, v} <- Chats.get_or_create_pending_verification(chat_id, user.id, params),
-           {:ok, %{message_id: message_id}} <- send_entrance_message(v, scheme),
+           {:ok, %{message_id: message_id}} <- put_entry_message(v, scheme),
            {:ok, v} = ok_r <- Chats.update_verification(v, %{message_id: message_id}) do
         # 验证创建成功
 
@@ -126,20 +126,21 @@ defmodule PolicrMiniBot.VerificationHelper do
     DateTime.diff(DateTime.utc_now(), DateTime.from_unix!(date)) >= @expire_secs
   end
 
-  @spec send_entrance_message(Verification.t(), Scheme.t()) :: {:ok, tgmsg} | {:error, tgerr}
-  def send_entrance_message(v, scheme) do
+  @spec put_entry_message(Verification.t(), Scheme.t(), keyword) :: {:ok, tgmsg} | {:error, tgerr}
+  def put_entry_message(v, scheme, opts \\ []) do
     %{chat_id: chat_id, target_user_id: target_user_id, target_user_name: target_user_name} = v
 
     new_chat_user = %{id: target_user_id, fullname: target_user_name}
 
     # 读取等待验证的人数并根据人数分别响应不同的文本内容
-    waiting_count = Chats.get_pending_verification_count(chat_id)
+    pending_count =
+      Keyword.get(opts, :pending_count) || Chats.get_pending_verification_count(chat_id)
 
     # 读取等待验证的人数并根据人数分别响应不同的文本内容
     mention_scheme = scheme.mention_text || default!(:mention_scheme)
 
     text =
-      if waiting_count == 1 do
+      if pending_count == 1 do
         thello =
           commands_text("新成员 %{mention} 你好！",
             mention: build_mention(new_chat_user, mention_scheme)
@@ -159,7 +160,7 @@ defmodule PolicrMiniBot.VerificationHelper do
         thello =
           commands_text("刚来的 %{mention} 和另外 %{remaining_count} 个还未验证的新成员，你们好！",
             mention: build_mention(new_chat_user, mention_scheme),
-            remaining_count: waiting_count - 1
+            remaining_count: pending_count - 1
           )
 
         tdesc = commands_text("请主动完成验证以解除限制，验证有效时间不超过 __%{seconds}__ 秒。", seconds: v.seconds)
@@ -173,7 +174,12 @@ defmodule PolicrMiniBot.VerificationHelper do
         """
       end
 
-    sender = make_text_sender(text)
+    caller =
+      if Keyword.get(opts, :edit, false) do
+        make_text_editor(text, Keyword.get(opts, :message_id))
+      else
+        make_text_sender(text)
+      end
 
     markup = %InlineKeyboardMarkup{
       inline_keyboard: [
@@ -186,8 +192,14 @@ defmodule PolicrMiniBot.VerificationHelper do
       ]
     }
 
-    # TODO: 实现类似 `PolicrMiniBot.Cleaner` 模块的旧消息自动删除机制
-    call_opts = [reply_markup: markup, disable_notification: true, parse_mode: "MarkdownV2"]
-    call(sender, chat_id, call_opts)
+    call_opts = [
+      reply_markup: markup,
+      disable_notification: true,
+      disable_web_page_preview: false,
+      parse_mode: "MarkdownV2"
+    ]
+
+    # 更新到群聊的入口消息中
+    EntryMaintainer.put_entry_message(caller, chat_id, call_opts)
   end
 end

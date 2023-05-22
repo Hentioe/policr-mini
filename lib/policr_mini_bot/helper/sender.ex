@@ -5,12 +5,16 @@ defmodule PolicrMiniBot.Helper.Sender do
 
   @type tgerr :: Telegex.Model.errors()
   @type tgmsg :: Telegex.Model.Message.t()
-  @type sender :: (integer | binary, keyword -> {:ok, any} | {:error, tgerr})
+  @type call_result :: {:ok, tgmsg} | {:error, tgerr}
+  @type sender :: (integer | binary, keyword -> call_result)
+  @type editor :: (integer | binary, integer | binary, keyword -> call_result)
+  @type caller :: sender | editor
   @type call_opts :: [
           caption: String.t(),
           parse_mode: String.t(),
-          disable_notification: boolean(),
-          reply_to_message_id: integer(),
+          disable_notification: boolean,
+          disable_web_page_preview: boolean,
+          reply_to_message_id: integer,
           reply_markup: Telegex.Model.InlineKeyboardMarkup.t(),
           logging: boolean
         ]
@@ -19,14 +23,21 @@ defmodule PolicrMiniBot.Helper.Sender do
 
   require Logger
 
-  @spec call(sender, integer | binary, call_opts) :: {:ok, tgmsg} | {:error, tgerr}
-  def call(sender, chat_id, opts \\ []) do
+  defmacro __using__(_) do
+    quote do
+      alias unquote(__MODULE__)
+      import unquote(__MODULE__), except: [call: 3]
+    end
+  end
+
+  @spec call(caller, integer | binary, call_opts) :: call_result
+  def call(caller, chat_id, opts \\ []) when is_function(caller) do
     {logging, opts} = Keyword.pop(opts, :logging, false)
 
-    r = sender.(chat_id, opts)
+    r = caller.(chat_id, opts)
 
     if logging && match?({:error, _}, r) do
-      Logger.error("Send attachment failed: #{inspect(reason: elem(r, 1))}", chat_id: chat_id)
+      Logger.error("Send or edit message failed: #{inspect(reason: elem(r, 1))}", chat_id: chat_id)
     end
 
     r
@@ -49,6 +60,17 @@ defmodule PolicrMiniBot.Helper.Sender do
   def make_text_sender(text) do
     fn chat_id, optional ->
       Telegex.send_message(chat_id, text, optional)
+    end
+  end
+
+  def make_text_editor(text, message_id) do
+    fn chat_id, optional ->
+      optional =
+        optional
+        |> Keyword.put(:chat_id, chat_id)
+        |> Keyword.put(:message_id, message_id)
+
+      Telegex.edit_message_text(text, optional)
     end
   end
 
