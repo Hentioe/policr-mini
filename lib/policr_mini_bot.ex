@@ -10,9 +10,7 @@ defmodule PolicrMiniBot do
       import PolicrMiniBot.{Helper, State}
 
       use PolicrMini.I18n
-
-      # TODO: 将这些模块别名全部删除
-      alias PolicrMiniBot.{State, Cleaner}
+      use PolicrMiniBot.MessageCaller
 
       alias Telegex.Model.{
         Update,

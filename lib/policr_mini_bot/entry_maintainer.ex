@@ -2,15 +2,15 @@ defmodule PolicrMiniBot.EntryMaintainer do
   @moduledoc false
 
   use GenServer
-  use PolicrMiniBot.Helper.Sender
+  use PolicrMiniBot.MessageCaller
 
   alias PolicrMiniBot.Worker
 
   require Logger
 
   @type state :: %{integer => integer}
-  @type caller :: Sender.caller()
-  @type put_opts :: Sender.call_opts()
+  @type caller :: MessageCaller.caller()
+  @type put_opts :: MessageCaller.call_opts()
 
   def start_link(_) do
     GenServer.start_link(__MODULE__, %{}, name: __MODULE__)
@@ -26,9 +26,9 @@ defmodule PolicrMiniBot.EntryMaintainer do
 
   此函数会自动维护每个群聊入口消息的单一性，缓存最新的入口消息并删除过期入口消息。
   """
-  @spec put_entry_message(caller, integer, put_opts) :: Sender.call_result()
+  @spec put_entry_message(caller, integer, put_opts) :: MessageCaller.call_result()
   def put_entry_message(caller, chat_id, optional) do
-    case Sender.call(caller, chat_id, optional) do
+    case MessageCaller.call(caller, chat_id, optional) do
       {:ok, %{message_id: message_id}} = ok_r ->
         # 清理过期的入口消息
         clear_expired_entry_message(chat_id, message_id)

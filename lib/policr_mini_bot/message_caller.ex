@@ -1,14 +1,10 @@
-defmodule PolicrMiniBot.Helper.Sender do
+defmodule PolicrMiniBot.MessageCaller do
   @moduledoc false
 
   # TODO: 增加超时重试机制
 
   @type tgerr :: Telegex.Model.errors()
   @type tgmsg :: Telegex.Model.Message.t()
-  @type call_result :: {:ok, tgmsg} | {:error, tgerr}
-  @type sender :: (integer | binary, keyword -> call_result)
-  @type editor :: (integer | binary, integer | binary, keyword -> call_result)
-  @type caller :: sender | editor
   @type call_opts :: [
           caption: String.t(),
           parse_mode: String.t(),
@@ -18,6 +14,10 @@ defmodule PolicrMiniBot.Helper.Sender do
           reply_markup: Telegex.Model.InlineKeyboardMarkup.t(),
           logging: boolean
         ]
+  @type call_result :: {:ok, tgmsg} | {:error, tgerr}
+  @type sender :: (integer | binary, call_opts -> call_result)
+  @type editor :: (integer | binary, integer | binary, call_opts -> call_result)
+  @type caller :: sender | editor
 
   use PolicrMini.I18n
 

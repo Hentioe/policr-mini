@@ -8,7 +8,7 @@ defmodule PolicrMiniBot.VerificationHelper do
   alias Telegex.Model.{InlineKeyboardMarkup, InlineKeyboardButton}
 
   import PolicrMiniBot.Helper
-  import PolicrMiniBot.Helper.Sender
+  import PolicrMiniBot.MessageCaller
 
   use PolicrMini.I18n
 

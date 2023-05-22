@@ -6,8 +6,7 @@ defmodule PolicrMiniBot.Helper do
   """
 
   alias __MODULE__.{
-    CheckRequiredPermissions,
-    Sender
+    CheckRequiredPermissions
   }
 
   alias Telegex.Model.ChatMember
@@ -548,7 +547,4 @@ defmodule PolicrMiniBot.Helper do
           | :ok
 
   defdelegate check_takeover_permissions(member), to: CheckRequiredPermissions
-
-  defdelegate send_attachment(chat_id, attachment, opts \\ []), to: Sender
-  defdelegate send_text(chat_id, text, opts \\ []), to: Sender
 end
