@@ -3,7 +3,7 @@ defmodule PolicrMiniBot.VerificationHelper do
 
   alias PolicrMini.{Counter, Chats}
   alias PolicrMini.Chats.{Verification, Scheme}
-  alias PolicrMiniBot.{Worker, EntryMaintainer}
+  alias PolicrMiniBot.{Worker, EntryMaintainer, Captcha}
   alias Telegex.Model.User, as: TgUser
   alias Telegex.Model.{InlineKeyboardMarkup, InlineKeyboardButton}
 
@@ -16,6 +16,7 @@ defmodule PolicrMiniBot.VerificationHelper do
 
   @type tgerr :: Telegex.Model.errors()
   @type tgmsg :: Telegex.Model.Message.t()
+  @type captcha_data :: Captcha.Data.t()
   @type source :: :joined | :join_request
 
   # 过期时间：15 分钟
@@ -201,5 +202,82 @@ defmodule PolicrMiniBot.VerificationHelper do
 
     # 更新到群聊的入口消息中
     EntryMaintainer.put_entry_message(caller, chat_id, call_opts)
+  end
+
+  @spec send_verification(Verification.t(), Scheme.t()) ::
+          {:ok, {tgmsg, captcha_data}} | {:error, tgerr}
+  def send_verification(v, scheme) do
+    mode = scheme.verification_mode || default!(:vmode)
+    data = Captcha.make(mode, v.chat_id, scheme)
+
+    ttitle =
+      commands_text("来自『%{chat_title}』的验证，请确认问题并选择您认为正确的答案。",
+        chat_title: "*#{escape_markdown(v.chat.title)}*"
+      )
+
+    tfooter = commands_text("您还剩 %{sec} 秒，通过可解除限制。", sec: "__#{time_left_text(v)}__")
+
+    text = """
+    #{ttitle}
+
+    *#{escape_markdown(data.question)}*
+
+    #{tfooter}
+    """
+
+    markup = Captcha.build_markup(data.candidates, v.id)
+
+    case send_verification_message(v, data, text, markup) do
+      {:ok, msg} -> {:ok, {msg, data}}
+      e -> e
+    end
+  end
+
+  @doc """
+  发送验证消息。
+  """
+  @spec send_verification_message(
+          Verification.t(),
+          captcha_data,
+          String.t(),
+          InlineKeyboardMarkup.t()
+        ) :: {:ok, tgmsg} | {:error, tgerr}
+  # 发送图片验证消息
+  def send_verification_message(v, %{photo: photo} = _captcha_data, text, markup)
+      when photo != nil do
+    send_attachment(v.target_user_id, "photo/#{photo}",
+      caption: text,
+      reply_markup: markup,
+      parse_mode: "MarkdownV2",
+      logging: true
+    )
+  end
+
+  # 发送附件验证消息
+  def send_verification_message(v, %{attachment: attachment} = _captcha_data, text, markup)
+      when attachment != nil do
+    send_attachment(v.target_user_id, attachment,
+      caption: text,
+      reply_markup: markup,
+      parse_mode: "MarkdownV2",
+      logging: true
+    )
+  end
+
+  # 发送文本验证消息
+  def send_verification_message(v, _captcha_data, text, markup) do
+    send_text(v.target_user_id, text,
+      reply_markup: markup,
+      parse_mode: "MarkdownV2",
+      logging: true
+    )
+  end
+
+  @doc """
+  根据验证记录计算剩余时间。
+  """
+  @spec time_left_text(Verification.t()) :: integer()
+  def time_left_text(%Verification{seconds: seconds, inserted_at: inserted_at}) do
+    seconds - DateTime.diff(DateTime.utc_now(), inserted_at)
   end
 end
