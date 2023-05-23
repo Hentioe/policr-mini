@@ -133,9 +133,8 @@ defmodule PolicrMiniBot.Runner.WorkingChecker do
   end
 
   # 未知错误
-  defp handle_check_error(error, chat)
-       when is_struct(error, Telegex.Model.Error) or is_struct(error, Telegex.Model.RequestError) do
-    Logger.error("Self-permissions check failed", chat_id: chat.id, error: error)
+  defp handle_check_error(error, chat) do
+    Logger.error("Self-permissions check failed: #{inspect(error: error)}", chat_id: chat.id)
   end
 
   @type cancel_reason ::
