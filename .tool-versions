@@ -1,4 +1,4 @@
-erlang 25.3.2
-elixir 1.14.4-otp-25
+erlang 26.0
+elixir 1.14.5-otp-26
 nodejs lts-hydrogen
 pnpm 8.3.1
