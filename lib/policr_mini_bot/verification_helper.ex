@@ -7,16 +7,17 @@ defmodule PolicrMiniBot.VerificationHelper do
   alias Telegex.Model.User, as: TgUser
   alias Telegex.Model.{InlineKeyboardMarkup, InlineKeyboardButton}
 
-  import PolicrMiniBot.Helper
-  import PolicrMiniBot.MessageCaller
-
+  use PolicrMiniBot.MessageCaller
   use PolicrMini.I18n
+
+  import PolicrMiniBot.Helper
 
   require Logger
 
   @type tgerr :: Telegex.Model.errors()
   @type tgmsg :: Telegex.Model.Message.t()
   @type captcha_data :: Captcha.Data.t()
+  @type send_opts :: MessageCaller.call_opts()
   @type source :: :joined | :join_request
 
   # 过期时间：15 分钟
@@ -227,7 +228,14 @@ defmodule PolicrMiniBot.VerificationHelper do
 
     markup = Captcha.build_markup(data.candidates, v.id)
 
-    case send_verification_message(v, data, text, markup) do
+    send_opts = [
+      reply_markup: markup,
+      parse_mode: "MarkdownV2",
+      disable_web_page_preview: true,
+      logging: true
+    ]
+
+    case send_verification_message(v, data, text, send_opts) do
       {:ok, msg} -> {:ok, {msg, data}}
       e -> e
     end
@@ -236,41 +244,27 @@ defmodule PolicrMiniBot.VerificationHelper do
   @doc """
   发送验证消息。
   """
-  @spec send_verification_message(
-          Verification.t(),
-          captcha_data,
-          String.t(),
-          InlineKeyboardMarkup.t()
-        ) :: {:ok, tgmsg} | {:error, tgerr}
+  @spec send_verification_message(Verification.t(), captcha_data, String.t(), send_opts) ::
+          {:ok, tgmsg} | {:error, tgerr}
   # 发送图片验证消息
-  def send_verification_message(v, %{photo: photo} = _captcha_data, text, markup)
+  def send_verification_message(v, %{photo: photo} = _captcha_data, text, opts)
       when photo != nil do
-    send_attachment(v.target_user_id, "photo/#{photo}",
-      caption: text,
-      reply_markup: markup,
-      parse_mode: "MarkdownV2",
-      logging: true
-    )
+    opts = Keyword.merge(opts, caption: text)
+
+    send_attachment(v.target_user_id, "photo/#{photo}", opts)
   end
 
   # 发送附件验证消息
-  def send_verification_message(v, %{attachment: attachment} = _captcha_data, text, markup)
+  def send_verification_message(v, %{attachment: attachment} = _captcha_data, text, opts)
       when attachment != nil do
-    send_attachment(v.target_user_id, attachment,
-      caption: text,
-      reply_markup: markup,
-      parse_mode: "MarkdownV2",
-      logging: true
-    )
+    opts = Keyword.merge(opts, caption: text)
+
+    send_attachment(v.target_user_id, attachment, opts)
   end
 
   # 发送文本验证消息
-  def send_verification_message(v, _captcha_data, text, markup) do
-    send_text(v.target_user_id, text,
-      reply_markup: markup,
-      parse_mode: "MarkdownV2",
-      logging: true
-    )
+  def send_verification_message(v, _captcha_data, text, opts) do
+    send_text(v.target_user_id, text, opts)
   end
 
   @doc """
