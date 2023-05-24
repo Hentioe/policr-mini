@@ -37,7 +37,7 @@ defmodule PolicrMiniBot.HandleUserJoinedCleanupPlug do
     %{chat: %{id: chat_id}} = message
 
     # TOD0: 将 scheme 的获取放在一个独立的 plug 中，通过状态传递。
-    case Chats.fetch_scheme(chat_id) do
+    case Chats.find_or_init_scheme(chat_id) do
       {:ok, scheme} ->
         service_message_cleanup = scheme.service_message_cleanup || default!(:smc) || []
 

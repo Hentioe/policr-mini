@@ -107,7 +107,7 @@ defmodule PolicrMiniBot.HandleSelfJoinedPlug do
     # 注意，创建群组后需要继续创建方案。
     with {:ok, chat} <- RespSyncCmdPlug.synchronize_chat(chat_id, true),
          {:ok, chat} <- Syncing.sync_for_chat_permissions(chat),
-         {:ok, _} <- Chats.fetch_scheme(chat_id),
+         {:ok, _} <- Chats.find_or_init_scheme(chat_id),
          :ok <- response(chat_id) do
       if Enum.empty?(chat.permissions) do
         # 如果找不到任何管理员，发送相应提示。

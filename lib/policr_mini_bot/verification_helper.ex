@@ -70,8 +70,7 @@ defmodule PolicrMiniBot.VerificationHelper do
       end
     else
       # 载入方案
-      # TODO: 当方案为空时，返回一个默认的方案
-      scheme = Chats.find_scheme(chat_id)
+      scheme = Chats.find_or_init_scheme!(chat_id)
       # 异步限制成员权限
       async_run(fn -> restrict_chat_member(chat_id, user.id) end)
 

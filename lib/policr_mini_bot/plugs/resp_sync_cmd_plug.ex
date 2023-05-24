@@ -46,7 +46,7 @@ defmodule PolicrMiniBot.RespSyncCmdPlug do
         # 注意，同步完成后需进一步确保方案存在。
         with {:ok, chat} <- synchronize_chat(chat_id),
              {:ok, chat} <- Syncing.sync_for_chat_permissions(chat),
-             {:ok, _scheme} <- Chats.fetch_scheme(chat_id),
+             {:ok, _scheme} <- Chats.find_or_init_scheme(chat_id),
              {:ok, member} <- Telegex.get_chat_member(chat_id, PolicrMiniBot.id()) do
           # 检查是否具备接管权限，如果具备则自动接管验证
           has_takeover_permissions = check_takeover_permissions(member) == :ok

@@ -69,23 +69,23 @@ defmodule PolicrMini.ChatsTest do
       assert find_scheme(-1) == nil
     end
 
-    test "fetch_scheme/1" do
+    test "find_or_init_scheme/1" do
       scheme_params = build_params()
       {:ok, scheme1} = create_scheme(scheme_params)
 
-      {:ok, scheme2} = fetch_scheme(scheme_params.chat_id)
+      {:ok, scheme2} = find_or_init_scheme(scheme_params.chat_id)
       assert scheme2 == scheme1
 
       {:ok, chat2} =
         Instances.create_chat(Factory.build(:chat, id: 1_087_654_321) |> Map.from_struct())
 
-      {:ok, scheme3} = fetch_scheme(chat2.id)
+      {:ok, scheme3} = find_or_init_scheme(chat2.id)
 
       assert scheme3.chat_id == chat2.id
     end
 
-    test "fetch_default_scheme/0" do
-      {:ok, default} = fetch_default_scheme()
+    test "default_scheme/0" do
+      {:ok, default} = default_scheme()
 
       assert default.chat_id == 0
       assert default.verification_mode == :image

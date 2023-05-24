@@ -91,7 +91,7 @@ defmodule PolicrMiniBot.RespStartCmdPlug do
 
     if verification = Chats.find_pending_verification(target_chat_id, from_user_id) do
       # 读取验证方案（当前的实现没有实际根据方案数据动态决定什么）
-      with {:ok, scheme} <- Chats.fetch_scheme(target_chat_id),
+      with {:ok, scheme} <- Chats.find_or_init_scheme(target_chat_id),
            # 发送验证
            {:ok, {_, captcha_data}} <- send_verification(verification, scheme),
            # 更新验证记录：存储正确答案

@@ -100,7 +100,7 @@ defmodule PolicrMiniBot.CallVerificationPlug do
     end
 
     with {:ok, verification = v} <- validity_check(user_id, verification_id),
-         {:ok, scheme} <- Chats.fetch_scheme(verification.chat_id),
+         {:ok, scheme} <- Chats.find_or_init_scheme(verification.chat_id),
          # 处理回答。
          {:ok, verification} <- handle_answer.(verification, scheme),
          # 更新验证记录中的选择索引

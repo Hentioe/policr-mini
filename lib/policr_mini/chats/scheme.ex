@@ -70,4 +70,22 @@ defmodule PolicrMini.Chats.Scheme do
     |> validate_number(:image_answers_count, @users_image_answers_count_validate)
     |> validate_number(:delay_unban_secs, @users_delay_unban_secs_validate)
   end
+
+  def default_params do
+    %{
+      verification_mode: :image,
+      seconds: 300,
+      timeout_killing_method: :kick,
+      wrong_killing_method: :kick,
+      is_highlighted: true,
+      mention_text: :mosaic_full_name,
+      image_answers_count: 4,
+      service_message_cleanup: [:joined],
+      delay_unban_secs: 300
+    }
+  end
+
+  def default_param(field_name) do
+    default_params()[field_name]
+  end
 end

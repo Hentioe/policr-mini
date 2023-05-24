@@ -81,7 +81,7 @@ defmodule PolicrMiniBot.HandleUserLeftGroupPlug do
       # 检测并删除服务消息
       # 注意：此处的代码不确定是否有效，同样的功能在 `PolicrMiniBot.HandleGroupMemberLeftMessagePlug` 模块中已实现。
       # 但尚不明确此处的服务消息删除代码是否还有必要，因为 TG 疑似已将退出服务消息在作为独立消息发送。此代码仍然保留。
-      case Chats.fetch_scheme(chat_id) do
+      case Chats.find_or_init_scheme(chat_id) do
         {:ok, scheme} ->
           service_message_cleanup = scheme.service_message_cleanup || default!(:smc) || []
 

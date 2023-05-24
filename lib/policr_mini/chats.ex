@@ -9,7 +9,7 @@ defmodule PolicrMini.Chats do
   alias PolicrMini.Chats.{Scheme, Operation, Statistic, CustomKit, Verification}
   alias PolicrMini.Chats.CustomKit
 
-  @type scheme_written_returns :: {:ok, Scheme.t()} | {:error, Ecto.Changeset.t()}
+  @type scheme_change_result :: {:ok, Scheme.t()} | {:error, Ecto.Changeset.t()}
   @type operation_written_result :: {:ok, Operation.t()} | {:error, Ecto.Changeset.t()}
   @type statistic_written_result :: {:ok, Statistic.t()} | {:error, Ecto.Changeset.t()}
   @type custom_kit_change_result :: {:ok, CustomKit.t()} | {:error, Ecto.Changeset.t()}
@@ -22,8 +22,10 @@ defmodule PolicrMini.Chats do
   end
 
   @default_scheme_chat_id 0
-  def create_default_scheme(params) do
-    %Scheme{chat_id: @default_scheme_chat_id} |> Scheme.changeset(params) |> Repo.insert()
+  def create_default_scheme do
+    %Scheme{chat_id: @default_scheme_chat_id}
+    |> Scheme.changeset(Scheme.default_params())
+    |> Repo.insert()
   end
 
   def delete_scheme(scheme) when is_struct(scheme, Scheme) do
@@ -39,19 +41,8 @@ defmodule PolicrMini.Chats do
     from(s in Scheme, where: s.chat_id == ^chat_id, limit: 1) |> Repo.one()
   end
 
-  @type find_scheme_opts :: [{:chat_id, integer()}]
-
-  # TODO: 添加测试。
-  @spec find_scheme(find_scheme_opts) :: Scheme.t() | nil
-  def find_scheme(options) when is_list(options) do
-    filter_chat_id =
-      if chat_id = options[:chat_id], do: dynamic([s], s.chat_id == ^chat_id), else: true
-
-    from(s in Scheme, where: ^filter_chat_id) |> Repo.one()
-  end
-
-  @spec fetch_scheme(integer | binary) :: scheme_written_returns
-  def fetch_scheme(chat_id) when is_integer(chat_id) or is_binary(chat_id) do
+  @spec find_or_init_scheme(integer | binary) :: scheme_change_result
+  def find_or_init_scheme(chat_id) do
     case find_scheme(chat_id) do
       nil ->
         create_scheme(%{
@@ -63,35 +54,32 @@ defmodule PolicrMini.Chats do
     end
   end
 
-  @default_scheme %{
-    verification_mode: :image,
-    seconds: 300,
-    timeout_killing_method: :kick,
-    wrong_killing_method: :kick,
-    is_highlighted: true,
-    mention_text: :mosaic_full_name,
-    image_answers_count: 4,
-    service_message_cleanup: [:joined],
-    delay_unban_secs: 300
-  }
+  # TODO: `find_or_init_scheme!/1` 需要测试。
+  @spec find_or_init_scheme!(integer | binary) :: Scheme.t()
+  def find_or_init_scheme!(chat_id) do
+    case find_or_init_scheme(chat_id) do
+      {:ok, scheme} -> scheme
+      {:error, e} -> raise e
+    end
+  end
 
   @doc """
   获取默认方案，如果不存在将自动创建。
   """
-  @spec fetch_default_scheme :: scheme_written_returns
-  def fetch_default_scheme do
+  @spec default_scheme :: scheme_change_result
+  def default_scheme do
     Repo.transaction(fn ->
-      case find_scheme(@default_scheme_chat_id) || create_default_scheme(@default_scheme) do
+      case find_scheme(@default_scheme_chat_id) || create_default_scheme() do
         {:ok, scheme} ->
-          # 创建了一个新的方案。
+          # 创建了一个新的默认方案
           scheme
 
         {:error, e} ->
-          # 创建方案发生错误。
+          # 创建方案发生错误，回滚事务
           Repo.rollback(e)
 
         scheme ->
-          # 方案已存在
+          # 方案已存在，迁移到最新的方案中
           migrate_scheme(scheme)
       end
     end)
@@ -113,9 +101,13 @@ defmodule PolicrMini.Chats do
     upsert_scheme(String.to_integer(chat_id), params)
   end
 
+  @doc """
+  迁移方案到具有默认值的最新数据中。将旧方案迁移到新的具有默认值的版本，避免已存在方案的新字段出现 `nil` 值。
+
+  目前迁移仅用于全局的默认方案，对于群聊自己的方案不应该执行此操作。
+  """
   @spec migrate_scheme(Scheme.t()) :: Scheme.t() | no_return
-  defp migrate_scheme(scheme) do
-    # 此处填充后续在方案中添加的新字段，避免方案已存在时这些字段出现 `nil` 值。
+  def migrate_scheme(scheme) do
     attrs =
       %{}
       |> put_default_attr(scheme, :mention_text)
@@ -130,9 +122,11 @@ defmodule PolicrMini.Chats do
   end
 
   defp put_default_attr(attrs, scheme, field_name) do
-    if Map.get(scheme, field_name) != nil,
-      do: attrs,
-      else: Map.put(attrs, field_name, @default_scheme[field_name])
+    if scheme |> Map.get(field_name) |> is_nil() do
+      Map.put(attrs, field_name, Scheme.default_param(field_name))
+    else
+      attrs
+    end
   end
 
   # TODO：添加测试。

@@ -116,7 +116,7 @@ defmodule PolicrMiniBot.Worker.ValidationTerminator do
       # 终止超时处理任务
       :ok = PolicrMiniBot.Worker.cancel_terminate_validation_job(chat_id, user_id)
 
-      {:ok, scheme} = Chats.fetch_scheme(chat_id)
+      scheme = Chats.find_or_init_scheme!(chat_id)
 
       Logger.debug(
         "[#{v.id}] Verification manually terminated by the administrator: #{inspect(chat_id: chat_id, user_id: user_id)}"

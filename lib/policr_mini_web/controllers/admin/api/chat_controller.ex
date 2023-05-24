@@ -49,7 +49,7 @@ defmodule PolicrMiniWeb.Admin.API.ChatController do
 
   @spec custom_enabled?(integer() | String.t()) :: boolean()
   defp custom_enabled?(chat_id) do
-    scheme = Chats.find_scheme(chat_id: chat_id)
+    scheme = Chats.find_scheme(chat_id)
 
     if scheme && scheme.verification_mode == :custom, do: true, else: false
   end
@@ -57,7 +57,7 @@ defmodule PolicrMiniWeb.Admin.API.ChatController do
   def scheme(conn, %{"id" => id}) do
     with {:ok, permissions} <- check_permissions(conn, id),
          {:ok, chat} <- Chat.get(id) do
-      scheme = Chats.find_scheme(chat_id: id)
+      scheme = Chats.find_scheme(id)
 
       render(conn, "scheme.json", %{
         chat: chat,
@@ -71,7 +71,7 @@ defmodule PolicrMiniWeb.Admin.API.ChatController do
     with {:ok, _} <- check_permissions(conn, chat_id, [:writable]),
          {:ok, chat} <- Chat.get(chat_id),
          :ok <- check_vmethod(params),
-         {:ok, scheme} <- Chats.fetch_scheme(chat_id),
+         {:ok, scheme} <- Chats.find_or_init_scheme(chat_id),
          {:ok, scheme} <- Chats.update_scheme(scheme, params) do
       render(conn, "scheme.json", %{chat: chat, scheme: scheme, writable: true})
     end
