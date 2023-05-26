@@ -136,7 +136,7 @@ defmodule PolicrMiniBot.VerificationHelper do
       EntryMaintainer.delete_entry_message(v.source, v.chat_id)
     else
       # 获取最新的验证入口消息编号
-      message_id = Chats.find_last_verification_message_id(v.chat_id)
+      message_id = Chats.find_last_verification_message_id(v.chat_id, v.source)
 
       # 更新入口消息
       put_entry_message(v, scheme, edit: true, pending_count: count, message_id: message_id)

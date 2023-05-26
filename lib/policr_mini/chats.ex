@@ -412,11 +412,12 @@ defmodule PolicrMini.Chats do
   @doc """
   获取指定群聊的最后一个验证的消息编号。
   """
-  @spec find_last_verification_message_id(integer) :: integer | nil
-  def find_last_verification_message_id(chat_id) do
+  @spec find_last_verification_message_id(integer, vsource) :: integer | nil
+  def find_last_verification_message_id(chat_id, source) do
     from(p in Verification,
       select: p.message_id,
       where: p.chat_id == ^chat_id,
+      where: p.source == ^source,
       where: not is_nil(p.message_id),
       order_by: [desc: p.message_id],
       limit: 1
