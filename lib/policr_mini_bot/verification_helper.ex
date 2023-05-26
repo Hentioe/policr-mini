@@ -133,7 +133,7 @@ defmodule PolicrMiniBot.VerificationHelper do
 
     if count == 0 do
       # 如果没有等待验证了，立即删除入口消息
-      EntryMaintainer.delete_entry_message(v.chat_id)
+      EntryMaintainer.delete_entry_message(v.source, v.chat_id)
     else
       # 获取最新的验证入口消息编号
       message_id = Chats.find_last_verification_message_id(v.chat_id)
@@ -145,7 +145,6 @@ defmodule PolicrMiniBot.VerificationHelper do
     :ok
   end
 
-  # TODO: 入口消息的生成应根据来源分离，`PolicrMiniBot.EntryMaintainer` 模块需支持对两种来源消息的维护。
   @spec put_entry_message(Verification.t(), Scheme.t(), keyword) :: {:ok, tgmsg} | {:error, tgerr}
   def put_entry_message(%{source: :joined} = v, scheme, opts \\ []) do
     %{chat_id: chat_id, target_user_id: target_user_id, target_user_name: target_user_name} = v
@@ -220,8 +219,7 @@ defmodule PolicrMiniBot.VerificationHelper do
     ]
 
     # 更新到群聊的入口消息中
-    # TODO: 入口维护器需要同时支持两种来源的入口消息。
-    EntryMaintainer.put_entry_message(caller, chat_id, call_opts)
+    EntryMaintainer.put_entry_message(v.source, caller, chat_id, call_opts)
   end
 
   @spec send_verification(Verification.t(), Scheme.t()) ::
