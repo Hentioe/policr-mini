@@ -7,8 +7,8 @@ defmodule PolicrMiniBot.VerificationHelper do
   alias Telegex.Model.User, as: TgUser
   alias Telegex.Model.{InlineKeyboardMarkup, InlineKeyboardButton}
 
-  use PolicrMiniBot.MessageCaller
   use PolicrMini.I18n
+  use PolicrMiniBot.MessageCaller
 
   import PolicrMiniBot.Helper
 
@@ -127,15 +127,34 @@ defmodule PolicrMiniBot.VerificationHelper do
     DateTime.diff(DateTime.utc_now(), DateTime.from_unix!(date)) >= @expire_secs
   end
 
+  @spec put_or_delete_entry_message(Verification.t(), Scheme.t()) :: :ok | {:error, any}
+  def put_or_delete_entry_message(v, scheme) do
+    count = Chats.get_pending_verification_count(v.chat_id, v.source)
+
+    if count == 0 do
+      # 如果没有等待验证了，立即删除入口消息
+      EntryMaintainer.delete_entry_message(v.chat_id)
+    else
+      # 获取最新的验证入口消息编号
+      message_id = Chats.find_last_verification_message_id(v.chat_id)
+
+      # 更新入口消息
+      put_entry_message(v, scheme, edit: true, pending_count: count, message_id: message_id)
+    end
+
+    :ok
+  end
+
+  # TODO: 入口消息的生成应根据来源分离，`PolicrMiniBot.EntryMaintainer` 模块需支持对两种来源消息的维护。
   @spec put_entry_message(Verification.t(), Scheme.t(), keyword) :: {:ok, tgmsg} | {:error, tgerr}
-  def put_entry_message(v, scheme, opts \\ []) do
+  def put_entry_message(%{source: :joined} = v, scheme, opts \\ []) do
     %{chat_id: chat_id, target_user_id: target_user_id, target_user_name: target_user_name} = v
 
     new_chat_user = %{id: target_user_id, fullname: target_user_name}
 
     # 读取等待验证的人数并根据人数分别响应不同的文本内容
     pending_count =
-      Keyword.get(opts, :pending_count) || Chats.get_pending_verification_count(chat_id)
+      Keyword.get(opts, :pending_count) || Chats.get_pending_verification_count(chat_id, :joined)
 
     # 读取等待验证的人数并根据人数分别响应不同的文本内容
     mention_scheme = scheme.mention_text || default!(:mention_scheme)
@@ -201,6 +220,7 @@ defmodule PolicrMiniBot.VerificationHelper do
     ]
 
     # 更新到群聊的入口消息中
+    # TODO: 入口维护器需要同时支持两种来源的入口消息。
     EntryMaintainer.put_entry_message(caller, chat_id, call_opts)
   end
 

@@ -459,15 +459,15 @@ defmodule PolicrMini.ChatsTest do
       assert last == verification2
     end
 
-    test "get_pending_verification_count/1" do
+    test "get_pending_verification_count/2" do
       verification_params = build_verification_params()
 
       {:ok, _} = create_verification(verification_params)
       {:ok, _} = create_verification(verification_params)
       {:ok, _} = create_verification(verification_params)
-      {:ok, _} = create_verification(verification_params |> Map.put(:status, 1))
+      {:ok, _} = create_verification(Map.put(verification_params, :status, 1))
 
-      assert get_pending_verification_count(verification_params.chat_id) == 3
+      assert get_pending_verification_count(verification_params.chat_id, :joined) == 3
     end
 
     test "find_verifications_total/0" do

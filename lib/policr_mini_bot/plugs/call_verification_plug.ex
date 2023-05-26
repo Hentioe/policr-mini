@@ -6,8 +6,8 @@ defmodule PolicrMiniBot.CallVerificationPlug do
   use PolicrMiniBot, plug: [caller: [prefix: "verification:"]]
 
   alias PolicrMini.Chats
-  alias PolicrMini.Chats.{Scheme, Verification}
-  alias PolicrMiniBot.{EntryMaintainer, Disposable, Worker}
+  alias PolicrMini.Chats.Verification
+  alias PolicrMiniBot.{Disposable, Worker}
 
   import PolicrMiniBot.VerificationHelper
 
@@ -106,15 +106,8 @@ defmodule PolicrMiniBot.CallVerificationPlug do
          # 更新验证记录中的选择索引
 
          {:ok, _} <- Chats.update_verification(verification, %{chosen: chosen}) do
-      count = Chats.get_pending_verification_count(verification.chat_id)
-
-      # 如果没有等待验证了，立即删除入口消息
-      if count == 0 do
-        # 获取最新的验证入口消息编号
-        EntryMaintainer.delete_entry_message(v.chat_id)
-      else
-        update_unity_message(verification.chat_id, count, scheme)
-      end
+      # 更新或删除入口消息
+      put_or_delete_entry_message(v, scheme)
 
       :ok
     else
@@ -303,27 +296,6 @@ defmodule PolicrMiniBot.CallVerificationPlug do
 
       e ->
         e
-    end
-  end
-
-  @doc """
-  更新统一验证入口消息
-  """
-  @spec update_unity_message(integer, integer, Scheme.t()) ::
-          :not_found
-          | {:error, Telegex.Model.errors()}
-          | {:ok, Message.t()}
-  def update_unity_message(chat_id, count, scheme) do
-    # 提及当前最新的等待验证记录中的用户
-
-    if v = Chats.find_last_pending_verification(chat_id) do
-      # 获取最新的验证入口消息编号
-      message_id = Chats.find_last_verification_message_id(chat_id)
-
-      # 更新入口消息
-      put_entry_message(v, scheme, edit: true, pending_count: count, message_id: message_id)
-    else
-      :not_found
     end
   end
 

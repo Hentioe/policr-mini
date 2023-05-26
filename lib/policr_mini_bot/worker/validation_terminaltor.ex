@@ -8,9 +8,9 @@ defmodule PolicrMiniBot.Worker.ValidationTerminator do
   alias PolicrMini.{Repo, Chats}
 
   alias PolicrMini.Chats.{Scheme, Verification}
-  alias PolicrMiniBot.{EntryMaintainer, CallVerificationPlug}
+  alias PolicrMiniBot.CallVerificationPlug
 
-  import PolicrMiniBot.Helper
+  import PolicrMiniBot.{Helper, VerificationHelper}
 
   require Logger
 
@@ -68,21 +68,8 @@ defmodule PolicrMiniBot.Worker.ValidationTerminator do
       Chats.update_verification(last_veri, %{status: :timeout})
       # 击杀用户（原因为超时）
       CallVerificationPlug.kill(chat_id, user, :timeout, killing_method, delay_unban_secs)
-
-      # 如果还存在多条验证，更新入口消息
-      waiting_count = Chats.get_pending_verification_count(chat_id)
-
-      if waiting_count == 0 do
-        # 已经没有剩余验证，直接删除上一个入口消息
-        EntryMaintainer.delete_entry_message(chat_id)
-      else
-        # 如果还存在多条验证，更新入口消息
-        CallVerificationPlug.update_unity_message(
-          chat_id,
-          waiting_count,
-          scheme
-        )
-      end
+      # 更新或删除入口消息
+      put_or_delete_entry_message(v, scheme)
     else
       Logger.debug("[#{v.id}] Verification has ended, ignoring timeout processing")
     end
@@ -139,21 +126,8 @@ defmodule PolicrMiniBot.Worker.ValidationTerminator do
       Chats.update_verification(veri, %{status: status})
       # 击杀用户（原因即状态）
       CallVerificationPlug.kill(chat_id, user, status, kmeth, delay_unban_secs)
-
-      # 如果还存在多条验证，更新入口消息
-      waiting_count = Chats.get_pending_verification_count(chat_id)
-
-      if waiting_count == 0 do
-        # 已经没有剩余验证，直接删除上一个入口消息
-        EntryMaintainer.delete_entry_message(chat_id)
-      else
-        # 如果还存在多条验证，更新入口消息
-        CallVerificationPlug.update_unity_message(
-          chat_id,
-          waiting_count,
-          scheme
-        )
-      end
+      # 更新或删除入口消息
+      put_or_delete_entry_message(v, scheme)
 
       Logger.debug(
         "[#{v.id}] Manual verification termination completed: #{inspect(chat_id: chat_id, user_id: user_id)}"

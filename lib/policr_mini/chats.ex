@@ -9,6 +9,8 @@ defmodule PolicrMini.Chats do
   alias PolicrMini.Chats.{Scheme, Operation, Statistic, CustomKit, Verification}
   alias PolicrMini.Chats.CustomKit
 
+  @type vsource :: :joined | :join_request
+
   @type scheme_change_result :: {:ok, Scheme.t()} | {:error, Ecto.Changeset.t()}
   @type operation_written_result :: {:ok, Operation.t()} | {:error, Ecto.Changeset.t()}
   @type statistic_written_result :: {:ok, Statistic.t()} | {:error, Ecto.Changeset.t()}
@@ -396,12 +398,13 @@ defmodule PolicrMini.Chats do
   @doc """
   获取指定群聊的等待完成的验证个数。
   """
-  @spec get_pending_verification_count(integer) :: integer
-  def get_pending_verification_count(chat_id) do
+  @spec get_pending_verification_count(integer, vsource) :: integer
+  def get_pending_verification_count(chat_id, source) do
     from(p in Verification,
       select: count(p.id),
       where: p.chat_id == ^chat_id,
-      where: p.status == :waiting
+      where: p.status == :waiting,
+      where: p.source == ^source
     )
     |> Repo.one()
   end
