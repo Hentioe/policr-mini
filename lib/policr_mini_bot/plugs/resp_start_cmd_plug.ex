@@ -90,15 +90,12 @@ defmodule PolicrMiniBot.RespStartCmdPlug do
     target_chat_id = target_chat_id |> String.to_integer()
 
     if verification = Chats.find_pending_verification(target_chat_id, from_user_id) do
-      # 读取验证方案（当前的实现没有实际根据方案数据动态决定什么）
-      with {:ok, scheme} <- Chats.find_or_init_scheme(target_chat_id),
-           # 发送验证
-           {:ok, {_, captcha_data}} <- send_verification(verification, scheme),
-           # 更新验证记录：存储正确答案
-           {:ok, _} <-
-             Chats.update_verification(verification, %{indices: captcha_data.correct_indices}) do
-        :ok
-      else
+      scheme = Chats.find_or_init_scheme!(target_chat_id)
+
+      case send_verification(verification, scheme) do
+        {:ok, _} ->
+          :ok
+
         {:error, %{error_code: 403}} = e ->
           Logger.warning(
             "Verification creation failed due to user blocking: #{inspect(user_id: from_user_id)}",

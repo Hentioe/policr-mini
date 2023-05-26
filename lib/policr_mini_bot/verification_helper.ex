@@ -222,8 +222,13 @@ defmodule PolicrMiniBot.VerificationHelper do
     EntryMaintainer.put_entry_message(v.source, caller, chat_id, call_opts)
   end
 
+  @doc """
+  发送并更新验证。
+
+  如果验证发送成功，验证记录将被更新（包含正确答案），并返回更新后的验证记录。
+  """
   @spec send_verification(Verification.t(), Scheme.t()) ::
-          {:ok, {tgmsg, captcha_data}} | {:error, tgerr}
+          {:ok, Verification.t()} | {:error, any}
   def send_verification(v, scheme) do
     mode = scheme.verification_mode || default!(:vmode)
     data = Captcha.make(mode, v.chat_id, scheme)
@@ -252,8 +257,10 @@ defmodule PolicrMiniBot.VerificationHelper do
       logging: true
     ]
 
-    case send_verification_message(v, data, text, send_opts) do
-      {:ok, msg} -> {:ok, {msg, data}}
+    with {:ok, _} <- send_verification_message(v, data, text, send_opts),
+         {:ok, v} <- Chats.update_verification(v, %{indices: data.correct_indices}) do
+      {:ok, v}
+    else
       e -> e
     end
   end
