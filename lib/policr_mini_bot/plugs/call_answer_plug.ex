@@ -1,9 +1,9 @@
-defmodule PolicrMiniBot.CallVerificationPlug do
+defmodule PolicrMiniBot.CallAnswerPlug do
   @moduledoc """
   验证回调处理模块。
   """
 
-  use PolicrMiniBot, plug: [caller: [prefix: "verification:"]]
+  use PolicrMiniBot, plug: [caller: [prefix: "ans:"]]
 
   alias PolicrMini.Chats
   alias PolicrMini.Chats.Verification
@@ -13,11 +13,6 @@ defmodule PolicrMiniBot.CallVerificationPlug do
 
   require Logger
 
-  @doc """
-  回调处理函数。
-
-  此函数仅仅解析参数并分发到 `handle_data/2` 子句中。
-  """
   @impl true
   def handle(%{data: data} = callback_query, _state) do
     %{
@@ -40,7 +35,7 @@ defmodule PolicrMiniBot.CallVerificationPlug do
 
       {:repeat, :processing} ->
         Telegex.answer_callback_query(callback_query_id,
-          text: "有请求正在处理中……",
+          text: commands_text("有请求正在处理中…"),
           show_alert: true
         )
 
@@ -48,7 +43,7 @@ defmodule PolicrMiniBot.CallVerificationPlug do
 
       {:repeat, :done} ->
         Telegex.answer_callback_query(callback_query_id,
-          text: "此任务已被处理过了～",
+          text: commands_text("此任务已被处理过了～"),
           show_alert: true
         )
 

@@ -81,7 +81,7 @@ defmodule PolicrMiniBot.Captcha do
 
         %InlineKeyboardButton{
           text: to_string(text),
-          callback_data: "verification:#{@data_vsn}:#{index}:#{verification_id}"
+          callback_data: "ans:#{@data_vsn}:#{index}:#{verification_id}"
         }
       end)
     end

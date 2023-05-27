@@ -8,7 +8,7 @@ defmodule PolicrMiniBot.Worker.ValidationTerminator do
   alias PolicrMini.{Repo, Chats}
 
   alias PolicrMini.Chats.{Scheme, Verification}
-  alias PolicrMiniBot.CallVerificationPlug
+  alias PolicrMiniBot.CallAnswerPlug
 
   import PolicrMiniBot.{Helper, VerificationHelper}
 
@@ -67,7 +67,7 @@ defmodule PolicrMiniBot.Worker.ValidationTerminator do
       # 更新状态为超时
       Chats.update_verification(last_veri, %{status: :timeout})
       # 击杀用户（原因为超时）
-      CallVerificationPlug.kill(chat_id, user, :timeout, killing_method, delay_unban_secs)
+      CallAnswerPlug.kill(chat_id, user, :timeout, killing_method, delay_unban_secs)
       # 更新或删除入口消息
       put_or_delete_entry_message(v, scheme)
     else
@@ -125,7 +125,7 @@ defmodule PolicrMiniBot.Worker.ValidationTerminator do
       # 更新状态为超时
       Chats.update_verification(veri, %{status: status})
       # 击杀用户（原因即状态）
-      CallVerificationPlug.kill(chat_id, user, status, kmeth, delay_unban_secs)
+      CallAnswerPlug.kill(chat_id, user, status, kmeth, delay_unban_secs)
       # 更新或删除入口消息
       put_or_delete_entry_message(v, scheme)
 

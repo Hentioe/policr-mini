@@ -22,7 +22,7 @@ defmodule PolicrMiniBot.Supervisor do
     HandleNewChatTitlePlug,
     HandleNewChatPhotoPlug,
     HandlePrivateAttachmentPlug,
-    CallVerificationPlug,
+    CallAnswerPlug,
     CallRevokeTokenPlug,
     CallEnablePlug,
     CallLeavePlug
@@ -62,7 +62,7 @@ defmodule PolicrMiniBot.Supervisor do
       HandleNewChatPhotoPlug,
       HandleMemberRemovedPlug,
       HandlePrivateAttachmentPlug,
-      CallVerificationPlug,
+      CallAnswerPlug,
       CallRevokeTokenPlug,
       CallEnablePlug,
       CallLeavePlug
