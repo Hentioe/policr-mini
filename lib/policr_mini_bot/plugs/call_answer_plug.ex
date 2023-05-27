@@ -5,9 +5,10 @@ defmodule PolicrMiniBot.CallAnswerPlug do
 
   use PolicrMiniBot, plug: [caller: [prefix: "ans:"]]
 
-  alias PolicrMini.Chats
-  alias PolicrMini.Chats.Verification
+  alias PolicrMini.{Chats, Counter}
+  alias PolicrMini.Chats.{Verification, Scheme, Operation}
   alias PolicrMiniBot.{Disposable, Worker}
+  alias Telegex.Model.User, as: TgUser
 
   import PolicrMiniBot.VerificationHelper
 
@@ -59,49 +60,24 @@ defmodule PolicrMiniBot.CallAnswerPlug do
   """
   @spec handle_data({String.t(), [String.t(), ...]}, CallbackQuery.t()) ::
           :error | :ok
-  def handle_data({"v1", [chosen, verification_id]}, callback_query) do
+  def handle_data({"v1", [chosen, vid]}, callback_query) do
     %{
       id: callback_query_id,
-      from: %{id: user_id} = from,
-      message: %{message_id: message_id}
+      from: %{id: user_id}
     } = callback_query
 
     chosen = String.to_integer(chosen)
-    verification_id = String.to_integer(verification_id)
+    vid = String.to_integer(vid)
 
-    handle_answer = fn verification, scheme ->
-      wrong_killing_method = scheme.wrong_killing_method || default!(:wkmethod)
-      delay_unban_secs = scheme.delay_unban_secs || default!(:delay_unban_secs)
-
-      # 取消超时任务
-      Worker.cancel_terminate_validation_job(
-        verification.chat_id,
-        verification.target_user_id
-      )
-
-      if Enum.member?(verification.indices, chosen) do
-        # 处理回答正确
-        handle_correct(verification, message_id, from)
-      else
-        # 处理回答错误
-        handle_wrong(
-          verification,
-          wrong_killing_method,
-          delay_unban_secs,
-          message_id,
-          from
-        )
-      end
-    end
-
-    with {:ok, verification = v} <- validity_check(user_id, verification_id),
-         {:ok, scheme} <- Chats.find_or_init_scheme(verification.chat_id),
-         # 处理回答。
-         {:ok, verification} <- handle_answer.(verification, scheme),
-         # 更新验证记录中的选择索引
-
-         {:ok, _} <- Chats.update_verification(verification, %{chosen: chosen}) do
-      # 更新或删除入口消息
+    # 1. 检查验证有效性
+    # 2. 更新选择数据
+    # 3. 获取群组方案
+    # 4. 处理回答
+    with {:ok, v} <- validity_check(user_id, vid),
+         {:ok, v} <- Chats.update_verification(v, %{chosen: chosen}),
+         {:ok, scheme} <- Chats.find_or_init_scheme(v.chat_id),
+         {:ok, v} <- handle_answer(v, scheme, callback_query) do
+      # 验证处理结束，更新或删除入口消息
       put_or_delete_entry_message(v, scheme)
 
       :ok
@@ -134,178 +110,186 @@ defmodule PolicrMiniBot.CallAnswerPlug do
   end
 
   @doc """
+  处理答案。
+  """
+  @spec handle_answer(Verification.t(), Scheme.t(), CallbackQuery.t()) ::
+          {:ok, Verification.t()} | {:error, any}
+  def handle_answer(v, scheme, callback_query) do
+    %{
+      from: from,
+      message: %{message_id: message_id}
+    } = callback_query
+
+    # 取消超时任务
+    Worker.cancel_terminate_validation_job(
+      v.chat_id,
+      v.target_user_id
+    )
+
+    if Enum.member?(v.indices, v.chosen) do
+      # 处理回答正确
+      handle_correct_answer(v, message_id, from)
+    else
+      # 处理回答错误
+      handle_wrong_answer(v, scheme, message_id, from)
+    end
+  end
+
+  @doc """
   处理回答正确。
   """
-  @spec handle_correct(Verification.t(), integer(), Telegex.Model.User.t()) ::
+  @spec handle_correct_answer(Verification.t(), integer, TgUser.t()) ::
           {:ok, Verification.t()} | {:error, any()}
-  def handle_correct(verification, message_id, from_user) do
-    # 自增统计数据（通过）。
-    async do
-      Chats.increment_statistic(
-        verification.chat_id,
-        verification.target_user_language_code,
-        :passed
-      )
-    end
+  def handle_correct_answer(%{source: :joined} = v, message_id, from_user) do
+    # 自增统计数据（通过）
+    async_run(fn -> Chats.increment_statistic(v.chat_id, v.target_user_language_code, :passed) end)
 
-    # 计数器自增（通过总数）
-    PolicrMini.Counter.increment(:verification_passed_total)
-    # 发送通知消息并延迟删除
-    notice_fun = fn ->
-      marked_enabled = Application.get_env(:policr_mini, :marked_enabled)
-      seconds = DateTime.diff(DateTime.utc_now(), verification.inserted_at)
+    # 计数器自增（通过的总数）
+    Counter.increment(:verification_passed_total)
 
-      text =
-        t("verification.passed.notice", %{
-          mentioned_user: mention(from_user, anonymization: !marked_enabled),
-          seconds: seconds
-        })
+    case Chats.update_verification(v, %{status: :passed}) do
+      {:ok, v} = ok_r ->
+        # 异步解除限制
+        async_run(fn -> derestrict_chat_member(v.chat_id, v.target_user_id) end)
 
-      case send_message(verification.chat_id, text, parse_mode: "MarkdownV2ToHTML") do
-        {:ok, sended_message} ->
-          Worker.async_delete_message(
-            verification.chat_id,
-            sended_message.message_id,
-            delay_secs: 8
-          )
+        # 更新验证消息为验证结果
+        async_update_result(v, message_id)
 
-        {:error, reason} ->
-          Logger.error("Sending verification notification failed: #{inspect(reason: reason)}")
-      end
-    end
+        # 发送验证成功通知
+        async_success_notify(v, from_user)
 
-    case Chats.update_verification(verification, %{status: :passed}) do
-      {:ok, verification} ->
-        # 解除限制
-        async do
-          derestrict_chat_member(
-            verification.chat_id,
-            verification.target_user_id
-          )
-        end
-
-        # 更新验证结果
-        async do
-          # 注意：此处默认以 `Telegex.Marked` 库转换文字，需要用 `escape_markdown/1` 函数转义文本中的动态内容。
-          text =
-            t("verification.passed.private", %{
-              chat_title: escape_markdown(verification.chat.title)
-            })
-
-          Worker.async_delete_message(verification.target_user_id, message_id)
-
-          send_message(verification.target_user_id, text, parse_mode: "MarkdownV2ToHTML")
-        end
-
-        async(fn -> verification.chat_id |> typing() end)
-
-        # 发送通知
-        async_run(notice_fun)
-
-        {:ok, verification}
+        ok_r
 
       e ->
         e
     end
   end
 
+  @spec async_update_result(Verification.t(), integer) :: :ok
+  defp async_update_result(v, message_id) do
+    async do
+      # 注意：此处默认以 `Telegex.Marked` 库转换文字，需要用 `escape_markdown/1` 函数转义文本中的动态内容。
+      text =
+        t("verification.passed.private", %{
+          chat_title: escape_markdown(v.chat.title)
+        })
+
+      Worker.async_delete_message(v.target_user_id, message_id)
+
+      send_message(v.target_user_id, text, parse_mode: "MarkdownV2ToHTML")
+    end
+
+    :ok
+  end
+
+  @spec async_success_notify(Verification.t(), TgUser.t()) :: :ok
+  defp async_success_notify(v, user) do
+    async do
+      marked_enabled = Application.get_env(:policr_mini, :marked_enabled)
+      seconds = DateTime.diff(DateTime.utc_now(), v.inserted_at)
+
+      text =
+        t("verification.passed.notice", %{
+          mentioned_user: mention(user, anonymization: !marked_enabled),
+          seconds: seconds
+        })
+
+      case send_message(v.chat_id, text, parse_mode: "MarkdownV2ToHTML") do
+        {:ok, %{message_id: message_id}} ->
+          # 延迟 8 秒删除通知消息
+          Worker.async_delete_message(v.chat_id, message_id, delay_secs: 8)
+
+        {:error, reason} ->
+          Logger.error("Send notification failed: #{inspect(reason: reason)}",
+            chat_id: v.chat_id
+          )
+      end
+    end
+
+    :ok
+  end
+
   @doc """
   处理错误回答。
-
-  将根据验证方案中的配置选择击杀方式对应的处理逻辑。
   """
-  @spec handle_wrong(
-          Verification.t(),
-          atom,
-          integer,
-          integer,
-          Telegex.Model.User.t()
-        ) ::
+  @spec handle_wrong_answer(Verification.t(), Scheme.t(), integer, TgUser.t()) ::
           {:ok, Verification.t()} | {:error, any}
-  def handle_wrong(
-        verification,
-        wrong_killing_method,
-        delay_unban_secs,
-        message_id,
-        from_user
-      ) do
-    # 自增统计数据（错误）。
-    async do
-      Chats.increment_statistic(
-        verification.chat_id,
-        verification.target_user_language_code,
-        :wronged
-      )
-    end
+  def handle_wrong_answer(v, scheme, message_id, user) do
+    # 获取方案中的配置项
+    wkmethod = scheme.wrong_killing_method || default!(:wkmethod)
+    delay_unban_secs = scheme.delay_unban_secs || default!(:delay_unban_secs)
+    # 自增统计数据（错误）
+    async_run(fn ->
+      Chats.increment_statistic(v.chat_id, v.target_user_language_code, :wronged)
+    end)
 
-    cleaner_fun = fn notice_text ->
-      async do
-        Worker.async_delete_message(verification.target_user_id, message_id)
-
-        send_message(verification.target_user_id, notice_text, parse_mode: "MarkdownV2ToHTML")
-      end
-    end
-
-    operation_create_fun = fn verification ->
-      operation_action = if wrong_killing_method == :ban, do: :ban, else: :kick
-
-      case Chats.create_operation(%{
-             chat_id: verification.chat_id,
-             verification_id: verification.id,
-             action: operation_action,
-             role: :system
-           }) do
-        {:ok, _} = r ->
-          r
-
-        {:error, reason} = e ->
-          Logger.error("Operation creation failed: #{inspect(reason: reason)}")
-
-          e
-      end
-    end
-
-    case Chats.update_verification(verification, %{status: :wronged}) do
-      {:ok, verification} ->
-        # 添加操作记录（系统）。
-        operation_create_fun.(verification)
-
-        # 注意：此处默认以 `Telegex.Marked` 库转换文字，需要用 `escape_markdown/1` 函数转义文本中的动态内容。
-        text =
-          t("verification.wronged.#{wrong_killing_method || :kick}.private", %{
-            chat_title: escape_markdown(verification.chat.title)
-          })
+    case Chats.update_verification(v, %{status: :wronged}) do
+      {:ok, v} ->
+        # 添加操作记录
+        add_operation(wkmethod, v)
 
         # 清理消息并私聊验证结果。
-        cleaner_fun.(text)
+        async_clean_with_notify(message_id, v, wkmethod)
 
-        kill(
-          verification.chat_id,
-          from_user,
-          :wronged,
-          wrong_killing_method,
-          delay_unban_secs
-        )
+        # 击杀用户
+        kill(v.chat_id, user, :wronged, wkmethod, delay_unban_secs)
 
-        {:ok, verification}
+        {:ok, v}
 
       e ->
         e
+    end
+  end
+
+  @spec add_operation(atom, Verification.t()) :: {:ok, Operation.t()} | {:error, any}
+  defp add_operation(kmethod, v) do
+    action = if kmethod == :ban, do: :ban, else: :kick
+
+    params = %{
+      chat_id: v.chat_id,
+      verification_id: v.id,
+      action: action,
+      role: :system
+    }
+
+    case Chats.create_operation(params) do
+      {:ok, _} = ok_r ->
+        ok_r
+
+      {:error, reason} = e ->
+        Logger.error("Create operation failed: #{inspect(reason: reason)}")
+
+        e
+    end
+  end
+
+  @spec async_clean_with_notify(integer, Verification.t(), atom) :: no_return
+  defp async_clean_with_notify(message_id, v, kmethod) do
+    async do
+      # 注意：此处默认以 `Telegex.Marked` 库转换文字，需要用 `escape_markdown/1` 函数转义文本中的动态内容。
+      text =
+        t("verification.wronged.#{kmethod || :kick}.private", %{
+          chat_title: escape_markdown(v.chat.title)
+        })
+
+      Worker.async_delete_message(v.target_user_id, message_id)
+
+      send_message(v.target_user_id, text, parse_mode: "MarkdownV2ToHTML")
     end
   end
 
   @doc """
   检查验证数据是否有效。
   """
-  @spec validity_check(integer(), integer()) ::
-          {:ok, Verification.t()} | {:error, String.t()}
+  @spec validity_check(integer(), integer()) :: {:ok, Verification.t()} | {:error, String.t()}
   def validity_check(user_id, verification_id) do
-    with {:ok, verification} <-
-           Verification.get(verification_id, preload: [:chat]),
-         {:check_user, true} <-
-           {:check_user, verification.target_user_id == user_id},
-         {:check_status, true} <-
-           {:check_status, verification.status == :waiting} do
+    # 1. 验证是否存在
+    # 2. 验证是否是目标用户
+    # 3. 验证是否未完成
+    with {:ok, verification} <- Verification.get(verification_id, preload: [:chat]),
+         {:check_user, true} <- {:check_user, verification.target_user_id == user_id},
+         {:check_status, true} <- {:check_status, verification.status == :waiting} do
+      # 返回验证记录
       {:ok, verification}
     else
       {:error, :not_found, _} ->
@@ -319,8 +303,7 @@ defmodule PolicrMiniBot.CallAnswerPlug do
     end
   end
 
-  @type killing_reason ::
-          :wronged | :timeout | :kick | :ban | :manual_ban | :manual_kick
+  @type killing_reason :: :wronged | :timeout | :kick | :ban | :manual_ban | :manual_kick
   @type killing_method :: :ban | :kick
 
   @doc """
