@@ -7,7 +7,6 @@ defmodule PolicrMiniBot.Supervisor do
     InitTakeoveredPlug,
     InitFromPlug,
     InitUserJoinedActionPlug,
-    HandleUserJoinedGroupPlug,
     HandleSelfJoinedPlug,
     HandleSelfLeftedPlug,
     HandleAdminPermissionsChangePlug,
@@ -42,20 +41,21 @@ defmodule PolicrMiniBot.Supervisor do
       InitTakeoveredPlug,
       InitFromPlug,
       InitUserJoinedActionPlug,
+      PolicrMiniBot.InitChatJoinRequestActionPlug,
       RespStartCmdPlug,
       RespPingCmdPlug,
       RespSyncCmdPlug,
       RespLoginCmdPlug,
       RespSponsorshipCmdPlug,
-      # ↓此模块↓ 需保证安装在 `InitUserJoinedActionPlug` 模块的后面。
-      HandleUserJoinedGroupPlug,
+      PolicrMiniBot.HandleJoinRequestPlug,
+      PolicrMiniBot.HandleGroupUserJoinedPlug,
       PolicrMiniBot.HandleUserLeftGroupPlug,
       PolicrMiniBot.HandleGroupMemberLeftMessagePlug,
       HandleSelfJoinedPlug,
       HandleSelfLeftedPlug,
       # ↓此模块↓ 需保证安装在 `HandleUserLeftGroupPlug` 模块的后面。
       HandleAdminPermissionsChangePlug,
-      # ↓此模块↓ 需保证安装在 `InitUserJoinedActionPlug` 和 `HandleSelfLeftedPlug` 模块的后面。
+      # ↓此模块↓ 需保证安装在 `HandleSelfLeftedPlug` 模块的后面。
       HandleSelfPermissionsChangePlug,
       HandleUserJoinedCleanupPlug,
       HandleNewChatTitlePlug,
@@ -82,6 +82,8 @@ defmodule PolicrMiniBot.Supervisor do
       PolicrMiniBot.SpeedLimiter,
       # 任务调度服务
       PolicrMiniBot.Scheduler,
+      # 加群请求托管。
+      PolicrMiniBot.JoinReuquestHosting,
       # 拉取更新消息
       PolicrMiniBot.UpdatesPoller,
       # 消费消息的动态主管

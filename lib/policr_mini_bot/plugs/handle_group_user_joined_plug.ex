@@ -1,4 +1,4 @@
-defmodule PolicrMiniBot.HandleUserJoinedGroupPlug do
+defmodule PolicrMiniBot.HandleGroupUserJoinedPlug do
   @moduledoc """
   用户加入群组的处理器。
   """
@@ -8,6 +8,8 @@ defmodule PolicrMiniBot.HandleUserJoinedGroupPlug do
   # !注意! 此模块功能依赖对 `chat_member` 更新的接收。
 
   use PolicrMiniBot, plug: :preheater
+
+  alias PolicrMiniBot.JoinReuquestHosting
 
   import PolicrMiniBot.VerificationHelper
 
@@ -58,19 +60,24 @@ defmodule PolicrMiniBot.HandleUserJoinedGroupPlug do
 
   @impl true
   def call(%{chat_member: chat_member} = _update, state) do
-    %{chat: %{id: chat_id}, new_chat_member: %{user: new_user}, date: date} = chat_member
+    %{chat: chat, new_chat_member: %{user: user}, date: date} = chat_member
 
     Logger.debug(
-      "A new member has joined group: #{inspect(user_id: new_user.id)}",
-      chat_id: chat_id
+      "A new member has joined group: #{inspect(user_id: user.id)}",
+      chat_id: chat.id
     )
 
-    case embarrass_user(:joined, chat_id, new_user, date) do
-      {:ok, _} ->
-        {:ok, state}
+    request = JoinReuquestHosting.get(chat.id, user.id)
 
-      {:error, _} ->
-        {:error, state}
+    if request && request.status == :approved do
+      # 当加入请求存在托管且状态为 `:approved` 时，删除托管内容，忽略验证用户
+      :ok = JoinReuquestHosting.delete(chat.id, user.id)
+
+      {:ignored, state}
+    else
+      embarrass_user(:joined, chat.id, user, date)
+
+      {:ok, state}
     end
   end
 end

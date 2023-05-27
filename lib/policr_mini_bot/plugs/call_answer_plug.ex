@@ -7,7 +7,7 @@ defmodule PolicrMiniBot.CallAnswerPlug do
 
   alias PolicrMini.{Chats, Counter}
   alias PolicrMini.Chats.{Verification, Scheme, Operation}
-  alias PolicrMiniBot.{Disposable, Worker}
+  alias PolicrMiniBot.{Disposable, Worker, JoinReuquestHosting}
   alias Telegex.Model.User, as: TgUser
 
   import PolicrMiniBot.VerificationHelper
@@ -131,7 +131,7 @@ defmodule PolicrMiniBot.CallAnswerPlug do
       handle_correct_answer(v, message_id, from)
     else
       # 处理回答错误
-      handle_wrong_answer(v, scheme, message_id, from)
+      handle_wrong_answer(v, scheme, message_id)
     end
   end
 
@@ -140,7 +140,7 @@ defmodule PolicrMiniBot.CallAnswerPlug do
   """
   @spec handle_correct_answer(Verification.t(), integer, TgUser.t()) ::
           {:ok, Verification.t()} | {:error, any()}
-  def handle_correct_answer(%{source: :joined} = v, message_id, from_user) do
+  def handle_correct_answer(v, message_id, from_user) do
     # 自增统计数据（通过）
     async_run(fn -> Chats.increment_statistic(v.chat_id, v.target_user_language_code, :passed) end)
 
@@ -149,8 +149,8 @@ defmodule PolicrMiniBot.CallAnswerPlug do
 
     case Chats.update_verification(v, %{status: :passed}) do
       {:ok, v} = ok_r ->
-        # 异步解除限制
-        async_run(fn -> derestrict_chat_member(v.chat_id, v.target_user_id) end)
+        # 通过用户
+        pass_user(v)
 
         # 更新验证消息为验证结果
         async_update_result(v, message_id)
@@ -163,6 +163,23 @@ defmodule PolicrMiniBot.CallAnswerPlug do
       e ->
         e
     end
+  end
+
+  # 根据不同来源，通过验证用户
+  @spec pass_user(Verification.t()) :: :ok
+  defp pass_user(%{source: :joined} = v) do
+    async_run(fn -> derestrict_chat_member(v.chat_id, v.target_user_id) end)
+
+    :ok
+  end
+
+  defp pass_user(%{source: :join_request} = v) do
+    # 更新托管的请求中的状态
+    :ok = JoinReuquestHosting.update_status(v.chat_id, v.target_user_id, :approved)
+
+    async_run(fn -> Telegex.approve_chat_join_request(v.chat_id, v.target_user_id) end)
+
+    :ok
   end
 
   @spec async_update_result(Verification.t(), integer) :: :ok
@@ -212,12 +229,11 @@ defmodule PolicrMiniBot.CallAnswerPlug do
   @doc """
   处理错误回答。
   """
-  @spec handle_wrong_answer(Verification.t(), Scheme.t(), integer, TgUser.t()) ::
+  @spec handle_wrong_answer(Verification.t(), Scheme.t(), integer) ::
           {:ok, Verification.t()} | {:error, any}
-  def handle_wrong_answer(v, scheme, message_id, user) do
+  def handle_wrong_answer(v, scheme, message_id) do
     # 获取方案中的配置项
     wkmethod = scheme.wrong_killing_method || default!(:wkmethod)
-    delay_unban_secs = scheme.delay_unban_secs || default!(:delay_unban_secs)
     # 自增统计数据（错误）
     async_run(fn ->
       Chats.increment_statistic(v.chat_id, v.target_user_language_code, :wronged)
@@ -232,7 +248,7 @@ defmodule PolicrMiniBot.CallAnswerPlug do
         async_clean_with_notify(message_id, v, wkmethod)
 
         # 击杀用户
-        kill(v.chat_id, user, :wronged, wkmethod, delay_unban_secs)
+        kill(v, scheme, :wronged)
 
         {:ok, v}
 
@@ -264,17 +280,63 @@ defmodule PolicrMiniBot.CallAnswerPlug do
   end
 
   @spec async_clean_with_notify(integer, Verification.t(), atom) :: no_return
-  defp async_clean_with_notify(message_id, v, kmethod) do
-    async do
-      # 注意：此处默认以 `Telegex.Marked` 库转换文字，需要用 `escape_markdown/1` 函数转义文本中的动态内容。
-      text =
-        t("verification.wronged.#{kmethod || :kick}.private", %{
-          chat_title: escape_markdown(v.chat.title)
-        })
+  defp async_clean_with_notify(message_id, %{source: :joined} = v, kmethod) do
+    text =
+      case kmethod do
+        :ban ->
+          commands_text("抱歉，您未通过『%{chat_title}』的加群验证。已被封禁。",
+            chat_title: "*#{escape_markdown(v.chat.title)}*"
+          )
 
+        _ ->
+          theader =
+            commands_text("抱歉，您未通过『%{chat_title}』的加群验证。已被移出该群。",
+              chat_title: "*#{escape_markdown(v.chat.title)}*"
+            )
+
+          tfooter = commands_text("提示：可稍后重新尝试，但无法立刻再次加入。")
+
+          """
+          #{theader}
+
+          _#{tfooter}_
+          """
+      end
+
+    async do
       Worker.async_delete_message(v.target_user_id, message_id)
 
-      send_message(v.target_user_id, text, parse_mode: "MarkdownV2ToHTML")
+      send_message(v.target_user_id, text, parse_mode: "MarkdownV2")
+    end
+  end
+
+  defp async_clean_with_notify(message_id, %{source: :join_request} = v, kmethod) do
+    text =
+      case kmethod do
+        :ban ->
+          commands_text("抱歉，您未通过『%{chat_title}』的加群验证。已拒绝加入请求并被禁止再次申请加入。",
+            chat_title: "*#{escape_markdown(v.chat.title)}*"
+          )
+
+        _ ->
+          theader =
+            commands_text("抱歉，您未通过『%{chat_title}』的加群验证。已拒绝加入请求。",
+              chat_title: "*#{escape_markdown(v.chat.title)}*"
+            )
+
+          tfooter = commands_text("提示：可稍后重新尝试，但无法立刻再次申请加入。")
+
+          """
+          #{theader}
+
+          _#{tfooter}_
+          """
+      end
+
+    async do
+      Worker.async_delete_message(v.target_user_id, message_id)
+
+      send_message(v.target_user_id, text, parse_mode: "MarkdownV2")
     end
   end
 
@@ -301,100 +363,5 @@ defmodule PolicrMiniBot.CallAnswerPlug do
       {:check_status, false} ->
         {:error, :known, t("errors.verification_expired")}
     end
-  end
-
-  @type killing_reason :: :wronged | :timeout | :kick | :ban | :manual_ban | :manual_kick
-  @type killing_method :: :ban | :kick
-
-  @doc """
-  击杀用户。
-
-  此函数会根据击杀方法做出指定动作，并结合击杀原因发送通知消息。若 `method` 参数的值为 `nil`，则默认表示击杀方法为 `:kick`。
-  """
-  @spec kill(integer | binary, map, killing_reason, killing_method, integer) ::
-          :ok | {:error, map}
-  def kill(chat_id, user, reason, method, delay_unban_secs) do
-    method = method || :kick
-
-    case method do
-      :kick ->
-        kick_chat_member(chat_id, user.id, delay_unban_secs)
-
-      :ban ->
-        Telegex.ban_chat_member(chat_id, user.id)
-    end
-
-    time_text = "#{delay_unban_secs} #{t("units.sec")}"
-    mentioned_user = mention(user, anonymization: false, mosaic: true)
-
-    text = build_kick_text(reason, method, mentioned_user, time_text)
-
-    case send_message(chat_id, text, parse_mode: "MarkdownV2ToHTML") do
-      {:ok, sended_message} ->
-        Worker.async_delete_message(chat_id, sended_message.message_id, delay_secs: 8)
-
-        :ok
-
-      {:error, reason} = e ->
-        Logger.warning(
-          "Send kill user notification failed: #{inspect(chat_id: chat_id, user_id: user.id, reason: reason)}"
-        )
-
-        e
-    end
-  end
-
-  # 构造击杀文字（公聊通知）
-  @spec build_kick_text(killing_reason, killing_method, String.t(), String.t()) ::
-          String.t()
-  defp build_kick_text(:timeout, method, mentioned_user, time_text) do
-    t("verification.timeout.#{method}.public", %{
-      mentioned_user: mentioned_user,
-      time_text: time_text
-    })
-  end
-
-  defp build_kick_text(:wronged, method, mentioned_user, time_text) do
-    t("verification.wronged.#{method}.public", %{
-      mentioned_user: mentioned_user,
-      time_text: time_text
-    })
-  end
-
-  defp build_kick_text(:manual_ban, method, mentioned_user, _time_text) do
-    t("verification.manual.#{method}.public", %{mentioned_user: mentioned_user})
-  end
-
-  defp build_kick_text(:manual_kick, method, mentioned_user, _time_text) do
-    t("verification.manual.#{method}.public", %{mentioned_user: mentioned_user})
-  end
-
-  @spec kick_chat_member(integer, integer, integer) ::
-          {:ok, boolean} | Telegex.Model.errors()
-  defp kick_chat_member(chat_id, user_id, delay_unban_secs) do
-    case PolicrMiniBot.config(:unban_method) do
-      :api_call ->
-        r = Telegex.ban_chat_member(chat_id, user_id)
-
-        # 调用 API 解除限制以允许再次加入。
-        async_run(fn -> Telegex.unban_chat_member(chat_id, user_id) end,
-          delay_secs: delay_unban_secs
-        )
-
-        r
-
-      :until_date ->
-        Telegex.ban_chat_member(chat_id, user_id, until_date: until_date(delay_unban_secs))
-    end
-  end
-
-  @spec until_date(integer) :: integer
-  defp until_date(delay_unban_secs) do
-    dt_now = DateTime.utc_now()
-    unix_now = DateTime.to_unix(dt_now)
-
-    # 当前时间加允许重现加入的秒数，确保能正常解除封禁。
-    # +1 是为了抵消网络延迟
-    unix_now + delay_unban_secs + 1
   end
 end

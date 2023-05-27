@@ -6,9 +6,7 @@ defmodule PolicrMiniBot.Worker.ValidationTerminator do
   use PolicrMiniBot.Worker
 
   alias PolicrMini.{Repo, Chats}
-
   alias PolicrMini.Chats.{Scheme, Verification}
-  alias PolicrMiniBot.CallAnswerPlug
 
   import PolicrMiniBot.{Helper, VerificationHelper}
 
@@ -42,8 +40,7 @@ defmodule PolicrMiniBot.Worker.ValidationTerminator do
   @spec terminate(Verification.t(), Scheme.t(), integer) :: :ok
   def terminate(veri = v, scheme, _waiting_secs)
       when is_struct(veri, Verification) and is_struct(scheme, Scheme) do
-    %{chat_id: chat_id, target_user_id: user_id, target_user_name: user_name} = veri
-    user = %{id: user_id, fullname: user_name}
+    %{chat_id: chat_id, target_user_id: user_id} = veri
 
     Logger.debug(
       "[#{v.id}] Verification timeout processing has started: #{inspect(chat_id: chat_id, user_id: user_id)}"
@@ -57,7 +54,6 @@ defmodule PolicrMiniBot.Worker.ValidationTerminator do
       Chats.increment_statistic(v.chat_id, v.target_user_language_code, :timeout)
 
       killing_method = scheme.timeout_killing_method || default!(:tkmethod)
-      delay_unban_secs = scheme.delay_unban_secs || default!(:delay_unban_secs)
 
       # 添加操作记录
       create_operation(last_veri, killing_method, :system)
@@ -67,7 +63,7 @@ defmodule PolicrMiniBot.Worker.ValidationTerminator do
       # 更新状态为超时
       Chats.update_verification(last_veri, %{status: :timeout})
       # 击杀用户（原因为超时）
-      CallAnswerPlug.kill(chat_id, user, :timeout, killing_method, delay_unban_secs)
+      kill(last_veri, scheme, :timeout)
       # 更新或删除入口消息
       put_or_delete_entry_message(v, scheme)
     else
@@ -91,8 +87,7 @@ defmodule PolicrMiniBot.Worker.ValidationTerminator do
   """
   @spec manual_terminate(Verification.t(), operation_status) :: :ok
   def manual_terminate(veri = v, status) when status in [:manual_ban, :manual_kick] do
-    %{chat_id: chat_id, target_user_id: user_id, target_user_name: user_name} = veri
-    user = %{id: user_id, fullname: user_name}
+    %{chat_id: chat_id, target_user_id: user_id} = veri
 
     Logger.debug(
       "[#{v.id}] Manual verification termination started: #{inspect(chat_id: chat_id, user_id: user_id)}"
@@ -110,7 +105,6 @@ defmodule PolicrMiniBot.Worker.ValidationTerminator do
       )
 
       kmeth = if status == :manual_ban, do: :ban, else: :kick
-      delay_unban_secs = scheme.delay_unban_secs || default!(:delay_unban_secs)
 
       # 添加操作记录
       create_operation(veri, kmeth, :admin)
@@ -125,7 +119,7 @@ defmodule PolicrMiniBot.Worker.ValidationTerminator do
       # 更新状态为超时
       Chats.update_verification(veri, %{status: status})
       # 击杀用户（原因即状态）
-      CallAnswerPlug.kill(chat_id, user, status, kmeth, delay_unban_secs)
+      kill(veri, scheme, status)
       # 更新或删除入口消息
       put_or_delete_entry_message(v, scheme)
 

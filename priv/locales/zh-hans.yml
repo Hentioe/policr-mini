@@ -44,34 +44,6 @@ verification:
 
       _提示：如果限制仍未解除请主动联系群管理。_
     notice: 刚刚 %{mentioned_user} 通过了验证，用时 %{seconds} 秒。
-  wronged:
-    kick:
-      private: |
-        抱歉，您未通过『*%{chat_title}*』的加群验证。已被移出该群。
-
-        _提示：可稍后重新尝试，但无法立刻再次加入。_
-      public: |
-        刚刚 %{mentioned_user} 验证错误，已经移出本群。
-
-        过 %{time_text}后可再次尝试加入。
-    ban:
-      private: 抱歉，您未通过『*%{chat_title}*』的加群验证。已被封禁。
-      public: 刚刚 %{mentioned_user} 验证错误，已被封禁。
-  timeout:
-    kick:
-      public: |
-        刚刚 %{mentioned_user} 超时未验证，已经移出本群。
-
-        过 %{time_text}后可再次尝试加入。
-    ban:
-      public: 刚刚 %{mentioned_user} 超时未验证，已被封禁。
-  manual:
-    kick:
-      public: |
-        刚刚 %{mentioned_user} 被手动踢出，针对 TA 个人的验证已取消。
-    ban:
-      public: |
-        刚刚 %{mentioned_user} 被手动封禁，针对 TA 个人的验证已取消。
 
 errors:
   dont_understand: 很抱歉，我未能理解您的意图。
