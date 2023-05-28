@@ -137,9 +137,6 @@ defmodule PolicrMiniBot.VerificationHelper do
           {:ok, Verification.t()} | {:error, any}
   def embarrass_request_user(chat_id, user, date) do
     if date > 0 && expired?(date) do
-      # 拒绝加群请求
-      Telegex.decline_chat_join_request(chat_id, user.id)
-
       # 创建过期的验证
       params = %{
         chat_id: chat_id,
