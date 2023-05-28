@@ -183,7 +183,7 @@ defmodule PolicrMiniBot.CallAnswerPlug do
   end
 
   @spec async_update_result(Verification.t(), integer) :: :ok
-  defp async_update_result(v, message_id) do
+  defp async_update_result(%{source: :joined} = v, message_id) do
     theader =
       commands_text("恭喜您通过了『%{chat_title}』的加群验证，权限已恢复。",
         chat_title: "*#{escape_markdown(v.chat.title)}*"
@@ -200,7 +200,30 @@ defmodule PolicrMiniBot.CallAnswerPlug do
     async do
       Worker.async_delete_message(v.target_user_id, message_id)
 
-      send_message(v.target_user_id, text, parse_mode: "MarkdownV2")
+      send_text(v.target_user_id, text, parse_mode: "MarkdownV2")
+    end
+
+    :ok
+  end
+
+  defp async_update_result(%{source: :join_request} = v, message_id) do
+    theader =
+      commands_text("恭喜您通过了『%{chat_title}』的加群验证，已批准加入请求。",
+        chat_title: "*#{escape_markdown(v.chat.title)}*"
+      )
+
+    tfooter = commands_text("提示：如果仍未加入群聊请主动联系群管理。")
+
+    text = """
+    #{theader}
+
+    _#{tfooter}_
+    """
+
+    async do
+      Worker.async_delete_message(v.target_user_id, message_id)
+
+      send_text(v.target_user_id, text, parse_mode: "MarkdownV2")
     end
 
     :ok
@@ -217,7 +240,7 @@ defmodule PolicrMiniBot.CallAnswerPlug do
       )
 
     async do
-      case send_message(v.chat_id, text, parse_mode: "MarkdownV2") do
+      case send_text(v.chat_id, text, parse_mode: "MarkdownV2") do
         {:ok, %{message_id: message_id}} ->
           # 延迟 8 秒删除通知消息
           Worker.async_delete_message(v.chat_id, message_id, delay_secs: 8)
@@ -312,7 +335,7 @@ defmodule PolicrMiniBot.CallAnswerPlug do
     async do
       Worker.async_delete_message(v.target_user_id, message_id)
 
-      send_message(v.target_user_id, text, parse_mode: "MarkdownV2")
+      send_text(v.target_user_id, text, parse_mode: "MarkdownV2")
     end
   end
 
@@ -342,7 +365,7 @@ defmodule PolicrMiniBot.CallAnswerPlug do
     async do
       Worker.async_delete_message(v.target_user_id, message_id)
 
-      send_message(v.target_user_id, text, parse_mode: "MarkdownV2")
+      send_text(v.target_user_id, text, parse_mode: "MarkdownV2")
     end
   end
 
