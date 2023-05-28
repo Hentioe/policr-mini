@@ -15,9 +15,9 @@ defmodule PolicrMiniBot.RespPingCmdPlug do
 
     Worker.async_delete_message(chat_id, message_id)
 
-    case send_message(chat_id, "🏓") do
-      {:ok, sended_message} ->
-        Worker.async_delete_message(chat_id, sended_message.message_id, delay_secs: 8)
+    case send_text(chat_id, "🏓", logging: true) do
+      {:ok, %{message_id: message_id}} ->
+        Worker.async_delete_message(chat_id, message_id, delay_secs: 8)
 
       {:error, reason} ->
         Logger.error("Command response failed: #{inspect(command: "/ping", reason: reason)}")

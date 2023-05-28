@@ -12,9 +12,10 @@ defmodule PolicrMiniBot.Runner.WorkingChecker do
   import PolicrMiniBot.Common
 
   use PolicrMini.I18n
+  use PolicrMiniBot.MessageCaller
 
   # TODO: 移除此处的 `only` 选项。
-  import PolicrMiniBot.Helper, only: [send_message: 3, async: 1]
+  import PolicrMiniBot.Helper, only: [async: 1]
 
   require Logger
 
@@ -51,7 +52,7 @@ defmodule PolicrMiniBot.Runner.WorkingChecker do
   defp check_chat(%{id: chat_id, is_take_over: true, type: "group"}) do
     {parse_mode, text} = non_super_group_message()
 
-    send_message(chat_id, text, parse_mode: parse_mode)
+    send_text(chat_id, text, parse_mode: parse_mode, logging: true)
 
     Telegex.leave_chat(chat_id)
   end
@@ -175,7 +176,7 @@ defmodule PolicrMiniBot.Runner.WorkingChecker do
 
     if text = Keyword.get(opts, :text) do
       async do
-        send_message(chat.id, text, parse_mode: nil)
+        send_text(chat.id, text, logging: true)
       end
     end
 

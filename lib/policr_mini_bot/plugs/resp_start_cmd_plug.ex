@@ -78,7 +78,7 @@ defmodule PolicrMiniBot.RespStartCmdPlug do
         ]
       }
 
-      send_message(chat_id, text, reply_markup: markup, parse_mode: "HTML")
+      send_text(chat_id, text, reply_markup: markup, parse_mode: "HTML", logging: true)
     end
 
     {:ok, state}
@@ -117,12 +117,12 @@ defmodule PolicrMiniBot.RespStartCmdPlug do
             chat_id: target_chat_id
           )
 
-          send_message(from_user_id, commands_text("发生了一些未预料的情况，请向开发者反馈。"))
+          send_text(from_user_id, commands_text("发生了一些未预料的情况，请向开发者反馈。"), logging: true)
 
           e
       end
     else
-      send_message(from_user_id, commands_text("您没有该目标群组的待验证记录。"))
+      send_text(from_user_id, commands_text("您没有该目标群组的待验证记录。"), logging: true)
     end
   end
 
@@ -130,6 +130,6 @@ defmodule PolicrMiniBot.RespStartCmdPlug do
   def handle_args(_, message) do
     %{chat: %{id: chat_id}} = message
 
-    send_message(chat_id, commands_text("很抱歉，我未能理解您的意图。"))
+    send_text(chat_id, commands_text("很抱歉，我未能理解您的意图。"), logging: true)
   end
 end

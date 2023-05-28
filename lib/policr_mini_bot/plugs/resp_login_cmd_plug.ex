@@ -27,9 +27,8 @@ defmodule PolicrMiniBot.RespLoginCmdPlug do
       theader = commands_text("已为您创建一枚令牌，点击下方按钮可直接进入后台。亦或复制令牌手动登入。")
 
       tfooter =
-        commands_text("有效期为 %{duration} %{unit}，过期需重新申请和登入。如怀疑泄漏请立即吊销。",
-          duration: "1",
-          unit: gettext("天")
+        commands_text("有效期为 %{day_count} 天，过期需重新申请和登入。如怀疑泄漏请立即吊销。",
+          day_count: 1
         )
 
       tcomment = commands_text("安全小贴士：不可将按钮中的链接或登录令牌分享于他人，除非您想将控制权短暂的共享于他。")
@@ -46,7 +45,7 @@ defmodule PolicrMiniBot.RespLoginCmdPlug do
 
       reply_markup = make_markup(user_id, token)
 
-      case send_message(chat_id, text, reply_markup: reply_markup, parse_mode: "HTML") do
+      case send_text(chat_id, text, reply_markup: reply_markup, parse_mode: "HTML") do
         {:ok, _} ->
           {:ok, state}
 
@@ -67,7 +66,8 @@ defmodule PolicrMiniBot.RespLoginCmdPlug do
         <i>#{tcomment}</i>
         """
 
-        send_message(chat_id, text, parse_mode: "HTML")
+        # 由于依赖 `@sync_comment_text` 此处只能以 HTML 发送
+        send_text(chat_id, text, parse_mode: "HTML", logging: true)
 
         {:ok, state}
 
@@ -82,7 +82,8 @@ defmodule PolicrMiniBot.RespLoginCmdPlug do
         <i>#{tcomment}</i>
         """
 
-        send_message(chat_id, text, parse_mode: "HTML")
+        # 由于依赖 `@sync_comment_text` 此处只能以 HTML 发送
+        send_text(chat_id, text, parse_mode: "HTML", logging: true)
 
         {:ok, state}
     end
@@ -92,9 +93,9 @@ defmodule PolicrMiniBot.RespLoginCmdPlug do
     %{chat: %{id: chat_id}, message_id: message_id} = message
     text = commands_text("请在私聊中使用此命令。")
 
-    case reply_message(chat_id, message_id, text) do
-      {:ok, sended_message} ->
-        Worker.async_delete_message(chat_id, sended_message.message_id, delay_secs: 8)
+    case send_text(chat_id, text, reply_to_message_id: message_id) do
+      {:ok, %{message_id: message_id}} ->
+        Worker.async_delete_message(chat_id, message_id, delay_secs: 8)
 
       {:error, reason} ->
         Logger.error("Command response failed: #{inspect(command: "/login", reason: reason)}")

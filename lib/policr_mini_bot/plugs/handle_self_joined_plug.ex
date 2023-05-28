@@ -91,7 +91,7 @@ defmodule PolicrMiniBot.HandleSelfJoinedPlug do
   defp exits("group", chat_id) do
     {parse_mode, text} = non_super_group_message()
 
-    send_message(chat_id, text, parse_mode: parse_mode)
+    send_text(chat_id, text, parse_mode: parse_mode, logging: true)
 
     Telegex.leave_chat(chat_id)
   end
@@ -113,6 +113,7 @@ defmodule PolicrMiniBot.HandleSelfJoinedPlug do
          :ok <- response(chat_id) do
       if Enum.empty?(chat.permissions) do
         # 如果找不到任何管理员，发送相应提示。
+        # TODO: 此处的文字需要国际化
         text = """
         *出现了一些异常*
 
@@ -126,7 +127,7 @@ defmodule PolicrMiniBot.HandleSelfJoinedPlug do
         _注意：此设计只是为了避免在所有管理员匿名的情况下无法启用本机器人功能，并非解决管理员匿名所致的权限问题的最终方案。_
         """
 
-        Telegex.send_message(chat_id, text, parse_mode: "MarkdownV2")
+        send_text(chat_id, text, parse_mode: "MarkdownV2", logging: true)
       end
     else
       # 无发消息权限，直接退出
@@ -136,7 +137,7 @@ defmodule PolicrMiniBot.HandleSelfJoinedPlug do
       {:error, reason} ->
         Logger.error("Invitation handling failed: #{inspect(reason: reason)}", chat_id: chat_id)
 
-        send_message(chat_id, commands_text("出现了一些问题，群组登记失败。请联系开发者。"))
+        send_text(chat_id, commands_text("出现了一些问题，群组登记失败。请联系开发者。"), logging: true)
     end
   end
 
@@ -216,7 +217,7 @@ defmodule PolicrMiniBot.HandleSelfJoinedPlug do
       ]
     }
 
-    case send_message(chat_id, text, reply_markup: markup, parse_mode: "HTML") do
+    case send_text(chat_id, text, reply_markup: markup, parse_mode: "HTML") do
       {:ok, _} -> :ok
       e -> e
     end

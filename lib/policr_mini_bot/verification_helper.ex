@@ -126,7 +126,7 @@ defmodule PolicrMiniBot.VerificationHelper do
           #{tcomment}
           """
 
-          send_message(chat_id, text)
+          send_text(chat_id, text, logging: true)
 
           e
       end
@@ -222,7 +222,7 @@ defmodule PolicrMiniBot.VerificationHelper do
           #{tcomment}
           """
 
-          send_message(chat_id, text)
+          send_text(chat_id, text, logging: true)
 
           e
       end
@@ -360,7 +360,6 @@ defmodule PolicrMiniBot.VerificationHelper do
 
     call_opts = [
       reply_markup: markup,
-      disable_notification: true,
       disable_web_page_preview: false,
       parse_mode: "MarkdownV2"
     ]
@@ -424,7 +423,6 @@ defmodule PolicrMiniBot.VerificationHelper do
       end
 
     call_opts = [
-      disable_notification: true,
       disable_web_page_preview: false,
       parse_mode: "MarkdownV2"
     ]
@@ -462,9 +460,10 @@ defmodule PolicrMiniBot.VerificationHelper do
     markup = Captcha.build_markup(data.candidates, v.id)
 
     send_opts = [
+      # 启用通知，此处可能是唯一启用通知的地方
+      disable_notification: false,
       reply_markup: markup,
       parse_mode: "MarkdownV2",
-      disable_web_page_preview: true,
       logging: true
     ]
 
@@ -530,9 +529,9 @@ defmodule PolicrMiniBot.VerificationHelper do
 
     text = knotifition_text(v.source, reason, kmethod, mention, time_text)
 
-    case send_message(v.chat_id, text, parse_mode: "MarkdownV2ToHTML") do
-      {:ok, sended_message} ->
-        Worker.async_delete_message(v.chat_id, sended_message.message_id, delay_secs: 8)
+    case send_text(v.chat_id, text, parse_mode: "MarkdownV2") do
+      {:ok, %{message_id: message_id}} ->
+        Worker.async_delete_message(v.chat_id, message_id, delay_secs: 8)
 
         :ok
 

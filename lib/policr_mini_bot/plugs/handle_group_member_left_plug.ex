@@ -67,13 +67,13 @@ defmodule PolicrMiniBot.HandleGroupMemberLeftPlug do
 
   @impl true
   def call(%{chat_member: chat_member} = update, state) do
-    %{chat: %{id: chat_id}, new_chat_member: %{user: %{id: lefted_user_id} = user}} = chat_member
+    %{chat: %{id: chat_id}, new_chat_member: %{user: %{id: left_user_id} = user}} = chat_member
 
-    Logger.debug("A group member has left: #{inspect(chat_id: chat_id, user_id: lefted_user_id)}")
+    Logger.debug("A group member has left: #{inspect(chat_id: chat_id, user_id: left_user_id)}")
 
     state = action(state, :user_lefted)
 
-    if lefted_user_id == bot_id() do
+    if left_user_id == bot_id() do
       # 跳过机器人自身
       {:ignored, state}
     else
@@ -96,17 +96,25 @@ defmodule PolicrMiniBot.HandleGroupMemberLeftPlug do
       end
 
       # 如果是管理员（非群主）则删除权限记录
-      if perm = PermissionBusiness.find(chat_id, lefted_user_id) do
+      if perm = PermissionBusiness.find(chat_id, left_user_id) do
         unless perm.tg_is_owner do
-          PermissionBusiness.delete(chat_id, lefted_user_id)
+          PermissionBusiness.delete(chat_id, left_user_id)
+
+          theader =
+            commands_text("已将曾经的管理员 %{mention} 的后台权限移除。",
+              mention: mention(user, anonymization: false)
+            )
+
+          tfooter =
+            commands_text("提示：由于此特性的加入，在管理员已离开群组的场景下将不再需要手动调用 %{command} 命令。", command: "`/sync`")
 
           text = """
-          已将曾经的管理员 #{mention(user, anonymization: false, parse_mode: "HTML")} 的后台权限移除。
+          #{theader}
 
-          <i>提示：由于此特性的加入，在管理员已离开群组的场景下将不再需要手动调用 <code>/sync</code> 命令。</i>
+          _#{tfooter}_
           """
 
-          send_message(chat_id, text, parse_mode: "HTML")
+          send_text(chat_id, text, parse_mode: "MarkdownV2", logging: true)
         end
       end
 

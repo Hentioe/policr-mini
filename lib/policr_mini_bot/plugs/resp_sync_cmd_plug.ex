@@ -28,11 +28,12 @@ defmodule PolicrMiniBot.RespSyncCmdPlug do
 
     cond do
       waiting_sec > 0 ->
-        send_message(
+        send_text(
           chat_id,
-          commands_text("同步过于频繁，请在 %{waiting_sec} 秒后重试。",
-            waiting_sec: waiting_sec
-          )
+          commands_text("同步过于频繁，请在 %{sec_count} 秒后重试。",
+            sec_count: waiting_sec
+          ),
+          logging: true
         )
 
       no_permissions?(message) ->
@@ -93,19 +94,19 @@ defmodule PolicrMiniBot.RespSyncCmdPlug do
             end
 
           text = """
-          <b>#{ttitle}</b>
+          *#{ttitle}*
 
           #{tupdate_chat}
           #{tupdate_admins}
           #{ttakeover}
           """
 
-          async_run(fn -> send_message(chat_id, text, parse_mode: "HTML") end)
+          async_run(fn -> send_text(chat_id, text, parse_mode: "MarkdownV2", logging: true) end)
         else
           {:error, reason} ->
             Logger.error("Sync of permissions failed: #{inspect(reason: reason)}")
 
-            send_message(chat_id, commands_text("出现了一些问题，同步失败。请联系开发者。"))
+            send_text(chat_id, commands_text("出现了一些问题，同步失败。请联系开发者。"), logging: true)
         end
     end
 

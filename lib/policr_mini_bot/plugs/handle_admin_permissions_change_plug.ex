@@ -115,13 +115,24 @@ defmodule PolicrMiniBot.HandleAdminPermissionsChangePlug do
 
     with {:ok, chat} <- Chat.get(chat_id),
          {:ok, _} <- Syncing.sync_for_chat_permissions(chat) do
-      text = """
-      检测到用户 #{mention(user, anonymization: false, parse_mode: "HTML")} 的管理权限变化，已自动同步至后台权限中。
+      theader =
+        commands_text("检测到群成员 %{mention} 的管理权限变化，已自动同步至后台权限中。",
+          mention: mention(user, anonymization: false, parse_mode: "HTML")
+        )
 
-      <i>提示：由于此特性的加入，在管理员权限变化的场景下将不再需要手动调用 <code>/sync</code> 命令。</i>
+      tfooter =
+        commands_text("提示：由于此特性的加入，在管理员权限变化的场景下将不再需要手动调用 %{command} 命令。",
+          command: "<code>/sync</code>"
+        )
+
+      text = """
+      #{theader}
+
+
+      #{tfooter}
       """
 
-      case send_message(chat_id, text, parse_mode: "HTML") do
+      case send_text(chat_id, text, parse_mode: "HTML") do
         {:ok, msg} ->
           Worker.async_delete_message(chat_id, msg.message_id, delay_secs: 4)
 
@@ -132,9 +143,12 @@ defmodule PolicrMiniBot.HandleAdminPermissionsChangePlug do
       end
     else
       {:error, reason} ->
-        send_message(
+        send_text(
           chat_id,
-          "检测到用户 #{mention(user, anonymization: false)} 的管理权限变化，但由于某些原因同步到后台权限失败了。"
+          commands_text("检测到用户 %{mention} 的管理权限变化，但由于某些原因同步到后台权限失败了。",
+            mention: mention(user, anonymization: false)
+          ),
+          logging: true
         )
 
         Logger.error(
@@ -144,7 +158,7 @@ defmodule PolicrMiniBot.HandleAdminPermissionsChangePlug do
       {:error, :not_found, _} ->
         # TODO: 保存群聊数据，并执行同步
 
-        Logger.error("Chat not found: #{inspect(chat_id: chat_id)}")
+        Logger.error("Chat not found", chat_id: chat_id)
     end
 
     {:ok, state}

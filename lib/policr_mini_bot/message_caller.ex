@@ -54,6 +54,21 @@ defmodule PolicrMiniBot.MessageCaller do
   def send_text(chat_id, text, opts \\ []) do
     sender = make_text_sender(text)
 
+    opts =
+      opts
+      |> Keyword.put_new(:disable_notification, true)
+      |> Keyword.put_new(:disable_web_page_preview, true)
+
+    call(sender, chat_id, opts)
+  end
+
+  @spec edit_text(integer | binary, integer | binary, String.t(), call_opts) ::
+          {:ok, tgmsg} | {:error, tgerr}
+  def edit_text(chat_id, message_id, text, opts \\ []) do
+    sender = make_text_editor(text, message_id)
+
+    opts = Keyword.put_new(opts, :disable_web_page_preview, true)
+
     call(sender, chat_id, opts)
   end
 
