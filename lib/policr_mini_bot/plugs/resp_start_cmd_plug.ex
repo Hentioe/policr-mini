@@ -8,26 +8,16 @@ defmodule PolicrMiniBot.RespStartCmdPlug do
 
   use PolicrMiniBot, plug: [commander: :start]
 
-  alias PolicrMini.{Chats, VerificationBusiness, MessageSnapshotBusiness}
-  alias PolicrMini.Schema.Verification
-  alias PolicrMiniBot.{ArithmeticCaptcha, CustomCaptcha, FallbackCaptcha, ImageCaptcha}
+  alias PolicrMini.Chats
   alias Telegex.Model.{Message, InlineKeyboardMarkup, InlineKeyboardButton}
+
+  import PolicrMiniBot.VerificationHelper
 
   require Logger
 
   @type captcha_data :: PolicrMiniBot.Captcha.Data.t()
   @type tgerr :: Telegex.Model.errors()
   @type tgmsg :: Telegex.Model.Message.t()
-
-  @fallback_captcha_module FallbackCaptcha
-
-  @captchas_mapping [
-    image: ImageCaptcha,
-    custom: CustomCaptcha,
-    arithmetic: ArithmeticCaptcha,
-    # 当前的备用验证就是主动验证
-    initiative: FallbackCaptcha
-  ]
 
   @doc """
   重写匹配规则，以 `/start` 开始即匹配。
@@ -96,37 +86,16 @@ defmodule PolicrMiniBot.RespStartCmdPlug do
   @spec handle_args([binary, ...], Message.t()) :: :ok | {:error, Telegex.Model.errors()}
 
   # 处理 v1 版本的验证参数。
-  def handle_args(["verification", "v1", target_chat_id], %{chat: %{id: from_user_id}} = message) do
+  def handle_args(["verification", "v1", target_chat_id], %{chat: %{id: from_user_id}} = _message) do
     target_chat_id = target_chat_id |> String.to_integer()
 
-    if verification = VerificationBusiness.find_waiting_verification(target_chat_id, from_user_id) do
-      # 读取验证方案（当前的实现没有实际根据方案数据动态决定什么）
-      with {:ok, scheme} <- Chats.fetch_scheme(target_chat_id),
-           # 发送验证消息
-           {:ok, {verification_message, markup, captcha_data}} <-
-             send_verify_message(verification, scheme, target_chat_id, from_user_id),
-           # 创建消息快照
-           {:ok, message_snapshot} <-
-             MessageSnapshotBusiness.create(%{
-               chat_id: target_chat_id,
-               message_id: verification_message.message_id,
-               from_user_id: from_user_id,
-               from_user_name: fullname(message.from),
-               date: verification_message.date,
-               text: verification_message.text,
-               markup_body: Jason.encode!(markup, pretty: false),
-               caption: verification_message.caption,
-               photo_id: get_photo_id(verification_message),
-               attachment: captcha_data.attachment
-             }),
-           # 更新验证记录：关联消息快照、存储正确答案
-           {:ok, _} <-
-             VerificationBusiness.update(verification, %{
-               message_snapshot_id: message_snapshot.id,
-               indices: captcha_data.correct_indices
-             }) do
-        :ok
-      else
+    if verification = Chats.find_pending_verification(target_chat_id, from_user_id) do
+      scheme = Chats.find_or_init_scheme!(target_chat_id)
+
+      case send_verification(verification, scheme) do
+        {:ok, _} ->
+          :ok
+
         {:error, %{error_code: 403}} = e ->
           Logger.warning(
             "Verification creation failed due to user blocking: #{inspect(user_id: from_user_id)}",
@@ -137,7 +106,7 @@ defmodule PolicrMiniBot.RespStartCmdPlug do
 
         {:error, reason} = e ->
           Logger.error(
-            "Create verification failed: #{inspect(user_id: from_user_id, reason: reason)}",
+            "Send verification failed: #{inspect(user_id: from_user_id, reason: reason)}",
             chat_id: target_chat_id
           )
 
@@ -156,107 +125,4 @@ defmodule PolicrMiniBot.RespStartCmdPlug do
 
     send_message(chat_id, commands_text("很抱歉，我未能理解您的意图。"))
   end
-
-  @type tgerror_returns :: {:error, Telegex.Model.errors()}
-
-  @doc """
-  发送验证消息。
-  """
-  @spec send_verify_message(Verification.t(), PolicrMini.Chats.Scheme.t(), integer, integer) ::
-          tgerror_returns
-          | {:ok, {Message.t(), InlineKeyboardMarkup.t(), PolicrMiniBot.Captcha.Data.t()}}
-  def send_verify_message(verification, scheme, chat_id, user_id) do
-    mode = scheme.verification_mode || default!(:vmode)
-
-    captcha_module = @captchas_mapping[mode] || @fallback_captcha_module
-
-    data =
-      try do
-        captcha_module.make!(chat_id, scheme)
-      rescue
-        e ->
-          Logger.warning(
-            "Verification data generation failed: #{inspect(exception: e)}",
-            chat_id: chat_id
-          )
-
-          @fallback_captcha_module.make!(chat_id, scheme)
-      end
-
-    markup = PolicrMiniBot.Captcha.build_markup(data.candidates, verification.id)
-
-    ttitle =
-      commands_text("来自『%{chat_title}』的验证，请确认问题并选择您认为正确的答案。",
-        chat_title: "*#{escape_markdown(verification.chat.title)}*"
-      )
-
-    tfooter = commands_text("您还剩 %{sec} 秒，通过可解除限制。", sec: "__#{time_left_text(verification)}__")
-
-    text = """
-    #{ttitle}
-
-    *#{escape_markdown(data.question)}*
-
-    #{tfooter}
-    """
-
-    # 发送验证消息
-    case send_verification(user_id, text, data, markup, "MarkdownV2") do
-      {:ok, sended_message} ->
-        {:ok, {sended_message, markup, data}}
-
-      e ->
-        e
-    end
-  end
-
-  @spec send_verification(integer, String.t(), captcha_data, InlineKeyboardMarkup.t(), binary) ::
-          {:ok, tgmsg} | {:error, tgerr}
-
-  # 发送图片验证消息
-  def send_verification(chat_id, text, %{photo: photo} = _data, markup, parse_mode)
-      when photo != nil do
-    send_attachment(chat_id, "photo/#{photo}",
-      caption: text,
-      reply_markup: markup,
-      parse_mode: parse_mode,
-      logging: true
-    )
-  end
-
-  # 发送附件验证消息
-  def send_verification(chat_id, text, %{attachment: attachment} = _data, markup, parse_mode)
-      when attachment != nil do
-    send_attachment(chat_id, attachment,
-      caption: text,
-      reply_markup: markup,
-      parse_mode: parse_mode,
-      logging: true
-    )
-  end
-
-  # 发送文本验证消息
-  def send_verification(chat_id, text, _data, markup, parse_mode) do
-    send_text(chat_id, text,
-      reply_markup: markup,
-      parse_mode: parse_mode
-    )
-  end
-
-  @type captchas :: ImageCaptcha | CustomCaptcha | ArithmeticCaptcha | FallbackCaptcha
-  @type send_returns :: {:ok, Message.t()} | {:error, Telegex.Model.errors()}
-
-  @doc """
-  根据验证记录计算剩余时间
-  """
-  @spec time_left_text(Verification.t()) :: integer()
-  def time_left_text(%Verification{seconds: seconds, inserted_at: inserted_at}) do
-    seconds - DateTime.diff(DateTime.utc_now(), inserted_at)
-  end
-
-  def get_photo_id(%Telegex.Model.Message{photo: [%Telegex.Model.PhotoSize{file_id: file_id} | _]}),
-      do: file_id
-
-  def get_photo_id(%Telegex.Model.Message{photo: []}), do: nil
-  def get_photo_id(%Telegex.Model.Message{photo: nil}), do: nil
 end

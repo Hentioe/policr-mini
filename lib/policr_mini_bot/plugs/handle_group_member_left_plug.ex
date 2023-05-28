@@ -1,4 +1,4 @@
-defmodule PolicrMiniBot.HandleUserLeftGroupPlug do
+defmodule PolicrMiniBot.HandleGroupMemberLeftPlug do
   @moduledoc """
   群成员离开的处理器。
   """
@@ -81,18 +81,18 @@ defmodule PolicrMiniBot.HandleUserLeftGroupPlug do
       # 检测并删除服务消息
       # 注意：此处的代码不确定是否有效，同样的功能在 `PolicrMiniBot.HandleGroupMemberLeftMessagePlug` 模块中已实现。
       # 但尚不明确此处的服务消息删除代码是否还有必要，因为 TG 疑似已将退出服务消息在作为独立消息发送。此代码仍然保留。
-      case Chats.fetch_scheme(chat_id) do
-        {:ok, scheme} ->
-          service_message_cleanup = scheme.service_message_cleanup || default!(:smc) || []
+      if update.message do
+        scheme = Chats.find_or_init_scheme!(chat_id)
+        enabled_cleanup = scheme.service_message_cleanup || default!(:smc) || []
 
-          if Enum.member?(service_message_cleanup, :lefted) && update.message do
-            Logger.debug(
-              "Deleting member left message: #{inspect(chat_id: chat_id, message_id: update.message.message_id)}"
-            )
+        if Enum.member?(enabled_cleanup, :lefted) do
+          Logger.debug(
+            "Deleting member left message: #{inspect(chat_id: chat_id, message_id: update.message.message_id)}"
+          )
 
-            # 删除服务消息。
-            Worker.async_delete_message(chat_id, update.message.message_id)
-          end
+          # 删除服务消息。
+          Worker.async_delete_message(chat_id, update.message.message_id)
+        end
       end
 
       # 如果是管理员（非群主）则删除权限记录

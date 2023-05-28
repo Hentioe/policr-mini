@@ -7,13 +7,10 @@ defmodule PolicrMiniBot do
 
   defmacro __using__(plug: opts) do
     quote do
-      import PolicrMiniBot.Helper
-      import PolicrMiniBot.State
-      import PolicrMiniBot.Common
-      import PolicrMiniWeb.Gettext
+      import PolicrMiniBot.{Common, Helper, State}
 
-      # TODO: 将这些模块别名全部删除
-      alias PolicrMiniBot.{State, Cleaner}
+      use PolicrMini.I18n
+      use PolicrMiniBot.MessageCaller
 
       alias Telegex.Model.{
         Update,

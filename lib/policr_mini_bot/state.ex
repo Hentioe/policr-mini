@@ -24,6 +24,6 @@ defmodule PolicrMiniBot.State do
   end
 
   def action(state, action) do
-    raise "Repeat set action field\n  Details: #{inspect(action: action, state: state)}"
+    raise "Duplicated action field setting: #{inspect(action: action, state: state)}"
   end
 end

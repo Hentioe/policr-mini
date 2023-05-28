@@ -65,13 +65,14 @@ defmodule PolicrMini.Factory do
   end
 
   def build(:verification) do
-    %PolicrMini.Schema.Verification{
+    %PolicrMini.Chats.Verification{
       target_user_id: 491_837_624,
       target_user_name: "小明",
       message_id: 1234,
       indices: [1, 3],
       seconds: 60,
-      status: 0
+      status: 0,
+      source: :joined
     }
   end
 

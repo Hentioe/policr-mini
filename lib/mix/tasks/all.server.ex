@@ -1,4 +1,6 @@
 defmodule Mix.Tasks.All.Server do
+  @moduledoc false
+
   use Mix.Task
 
   @require_opts [runtime_migrate: true, tg_serve: true]

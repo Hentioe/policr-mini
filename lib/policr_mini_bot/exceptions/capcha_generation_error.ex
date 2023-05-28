@@ -1,4 +1,4 @@
-defmodule PolicrMiniBot.CaptchaMakeFailed do
+defmodule PolicrMiniBot.CaptchaGenerationError do
   @moduledoc false
 
   defexception [:message]

@@ -1,8 +1,8 @@
-defmodule PolicrMini.Schema.VerificationTest do
+defmodule PolicrMini.Chats.VerificationTest do
   use ExUnit.Case
 
   alias PolicrMini.Factory
-  alias PolicrMini.Schema.Verification
+  alias PolicrMini.Chats.Verification
 
   describe "schema" do
     test "schema metadata" do
@@ -21,6 +21,7 @@ defmodule PolicrMini.Schema.VerificationTest do
                  :seconds,
                  :status,
                  :chosen,
+                 :source,
                  :inserted_at,
                  :updated_at
                ]
@@ -64,7 +65,8 @@ defmodule PolicrMini.Schema.VerificationTest do
              :chat_id,
              :target_user_id,
              :seconds,
-             :status
+             :status,
+             :source
            ]
 
     assert changeset.valid?

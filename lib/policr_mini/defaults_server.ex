@@ -10,7 +10,7 @@ defmodule PolicrMini.DefaultsServer do
   require Logger
 
   def start_link(_) do
-    {:ok, scheme} = Chats.fetch_default_scheme()
+    {:ok, scheme} = Chats.default_scheme()
 
     GenServer.start_link(__MODULE__, %{scheme: scheme}, name: __MODULE__)
   end

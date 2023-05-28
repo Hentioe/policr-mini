@@ -28,14 +28,8 @@ defmodule PolicrMiniBot.HandleGroupMemberLeftMessagePlug do
 
     # TOD0: 将 scheme 的获取放在一个独立的 plug 中，通过状态传递。
     # 检测并删除服务消息。
-    enabled_cleanup =
-      case Chats.fetch_scheme(chat.id) do
-        {:ok, scheme} ->
-          scheme.service_message_cleanup || default!(:smc) || []
-
-        _ ->
-          default!(:smc) || []
-      end
+    scheme = Chats.find_or_init_scheme!(chat.id)
+    enabled_cleanup = scheme.service_message_cleanup || default!(:smc) || []
 
     if Enum.member?(enabled_cleanup, :lefted) do
       Logger.debug(
