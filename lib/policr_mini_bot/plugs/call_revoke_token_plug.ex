@@ -25,7 +25,7 @@ defmodule PolicrMiniBot.CallRevokeTokenPlug do
 
       text = commands_text("已成功吊销自 %{datetime} 之前的全部令牌。", %{datetime: "`#{datetime}`"})
 
-      edit_text(chat_id, message_id, text, parse_mode: "Markdownv2", logging: true)
+      edit_text(chat_id, message_id, text, parse_mode: "MarkdownV2", logging: true)
 
       :ok
     else
