@@ -2,7 +2,6 @@ defmodule PolicrMiniBot.VerificationHelper do
   @moduledoc false
 
   # TODO: 疑似存在验证入口消息的更新顺序问题。假设 B 用户覆盖了 A 用户的入口，B 结束时应该重新显示 A。错误在于继续显示了 B 用户的入口消息文本。
-  # TODO: 支持验证来源转换。当存在 `:joined` 来源的验证从 `:join_request` 重新申请加入时，或者反过来。需要进行一些 API 动作和验证数据更新。
 
   alias PolicrMini.{Repo, Counter, Chats}
   alias PolicrMini.Chats.{Verification, Scheme}
@@ -91,8 +90,13 @@ defmodule PolicrMiniBot.VerificationHelper do
         source: :joined
       }
 
-      # 主要流程：创建（或获取进行中的）验证数据，验证入口消息，并更新验证数据中的消息 ID
+      # 主要流程：
+      # 1. 创建（或获取进行中的）验证数据
+      # 2. 尝试转换可能不匹配的数据来源
+      # 3. 写入到入口消息
+      # 4. 更新验证数据中的消息 ID
       with {:ok, v} <- Chats.get_or_create_pending_verification(chat_id, user.id, params),
+           {:ok, v} <- try_convert_souce(:joined, v, scheme),
            {:ok, %{message_id: message_id}} <- put_entry_message(v, scheme, []),
            {:ok, v} = ok_r <- Chats.update_verification(v, %{message_id: message_id}) do
         # 验证创建成功
@@ -178,8 +182,14 @@ defmodule PolicrMiniBot.VerificationHelper do
         source: :join_request
       }
 
-      # 主要流程：创建（或获取进行中的）验证数据，发送验证
+      # 主要流程：
+      # 1. 创建（或获取进行中的）验证数据
+      # 2. 尝试转换可能不匹配的数据来源
+      # 3. 写入到入口消息
+      # 4. 更新验证数据中的消息 ID
+      # 5. 发送验证
       with {:ok, v} <- Chats.get_or_create_pending_verification(chat_id, user.id, params),
+           {:ok, v} <- try_convert_souce(:join_request, v, scheme),
            {:ok, %{message_id: message_id}} <- put_entry_message(v, scheme, []),
            {:ok, v} <- Chats.update_verification(v, %{message_id: message_id}),
            {:ok, v} = ok_r <- send_verification(Repo.preload(v, [:chat]), scheme) do
@@ -228,6 +238,44 @@ defmodule PolicrMiniBot.VerificationHelper do
   def expired?(date) do
     DateTime.diff(DateTime.utc_now(), DateTime.from_unix!(date)) >= @expire_secs
   end
+
+  @doc """
+  比对目标来源和验证数据，当不对应时进行转换。
+  """
+  @spec try_convert_souce(source, Verification.t(), Scheme.t()) ::
+          {:ok, Verification.t()} | {:error, any}
+  # 将 `:joined` 转换为 `:join_request` 验证
+  def try_convert_souce(:join_request, %{source: :joined} = v, scheme) do
+    # 更新来源数据并更新入口消息
+    with {:ok, _} = ok_r <- Chats.update_verification(v, %{source: :join_request}),
+         # 由于更新的是旧入口消息，所以此处不使用更新来源后的验证数据
+         :ok <- put_or_delete_entry_message(v, scheme) do
+      # 解除之前的权限限制
+      async_run(fn -> derestrict_chat_member(v.chat_id, v.target_user_id) end)
+
+      ok_r
+    else
+      e -> e
+    end
+  end
+
+  # 将 `:join_request` 转换为 `:joined` 验证
+  def try_convert_souce(:joined, %{source: :join_request} = v, scheme) do
+    # 更新来源数据并更新入口消息
+    with {:ok, _} = ok_r <- Chats.update_verification(v, %{source: :joined}),
+         # 由于更新的是旧入口消息，所以此处不使用更新来源后的验证数据
+         :ok <- put_or_delete_entry_message(v, scheme) do
+      # 拒绝之前的加群请求
+      async_run(fn -> Telegex.decline_chat_join_request(v.chat_id, v.target_user_id) end)
+
+      ok_r
+    else
+      e -> e
+    end
+  end
+
+  # 目标来源和验证数据相匹配，直接返回验证数据
+  def try_convert_souce(_, v, _scheme), do: {:ok, v}
 
   @spec put_or_delete_entry_message(Verification.t(), Scheme.t()) :: :ok | {:error, any}
   def put_or_delete_entry_message(v, scheme) do
@@ -357,7 +405,7 @@ defmodule PolicrMiniBot.VerificationHelper do
         """
       else
         theader =
-          commands_text("最近申请加入的 %{mention} 和另外 %{remaining_count} 个用户正在验证！",
+          commands_text("刚刚申请加入的 %{mention} 和另外 %{remaining_count} 个用户正在验证！",
             mention: build_mention(new_chat_user, mention_scheme),
             remaining_count: pending_count - 1
           )

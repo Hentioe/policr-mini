@@ -38,32 +38,29 @@ defmodule PolicrMiniBot.Worker.ValidationTerminator do
   终止超时验证。
   """
   @spec terminate(Verification.t(), Scheme.t(), integer) :: :ok
-  def terminate(veri = v, scheme, _waiting_secs)
-      when is_struct(veri, Verification) and is_struct(scheme, Scheme) do
-    %{chat_id: chat_id, target_user_id: user_id} = veri
+  def terminate(v, scheme, _waiting_secs)
+      when is_struct(v, Verification) and is_struct(scheme, Scheme) do
+    %{chat_id: chat_id, target_user_id: user_id} = v
 
     Logger.debug(
       "[#{v.id}] Verification timeout processing has started: #{inspect(chat_id: chat_id, user_id: user_id)}"
     )
 
     # 读取最新的验证数据，因为用户参与验证可能会同时发生
-    last_veri = Repo.reload(veri)
+    v = Repo.reload(v)
     # 为等待状态才实施操作
-    if last_veri.status == :waiting do
+    if v.status == :waiting do
       # 自增统计数据（超时）
       Chats.increment_statistic(v.chat_id, v.target_user_language_code, :timeout)
-
-      killing_method = scheme.timeout_killing_method || default!(:tkmethod)
-
       # 添加操作记录
-      create_operation(last_veri, killing_method, :system)
-
+      kmethod = scheme.timeout_killing_method || default!(:tkmethod)
+      create_operation(v, kmethod, :system)
       # 计数器自增（超时总数）
       PolicrMini.Counter.increment(:verification_timeout_total)
       # 更新状态为超时
-      Chats.update_verification(last_veri, %{status: :timeout})
+      Chats.update_verification(v, %{status: :timeout})
       # 击杀用户（原因为超时）
-      kill(last_veri, scheme, :timeout)
+      kill(v, scheme, :timeout)
       # 更新或删除入口消息
       put_or_delete_entry_message(v, scheme)
     else
@@ -75,7 +72,7 @@ defmodule PolicrMiniBot.Worker.ValidationTerminator do
     )
 
     # 从缓存中删除任务
-    JobCacher.delete_job(job_key(:terminate, veri))
+    JobCacher.delete_job(job_key(:terminate, v))
 
     :ok
   end
