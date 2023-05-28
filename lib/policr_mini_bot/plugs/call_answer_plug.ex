@@ -78,7 +78,7 @@ defmodule PolicrMiniBot.CallAnswerPlug do
          {:ok, scheme} <- Chats.find_or_init_scheme(v.chat_id),
          {:ok, v} <- handle_answer(v, scheme, callback_query) do
       # 验证处理结束，更新或删除入口消息
-      put_or_delete_entry_message(v, scheme)
+      put_or_delete_entry_message(v.chat_id, scheme)
 
       :ok
     else

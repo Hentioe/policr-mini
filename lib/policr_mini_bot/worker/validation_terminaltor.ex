@@ -62,7 +62,7 @@ defmodule PolicrMiniBot.Worker.ValidationTerminator do
       # 击杀用户（原因为超时）
       kill(v, scheme, :timeout)
       # 更新或删除入口消息
-      put_or_delete_entry_message(v, scheme)
+      put_or_delete_entry_message(v.chat_id, scheme)
     else
       Logger.debug("[#{v.id}] Verification has ended, ignoring timeout processing")
     end
@@ -118,7 +118,7 @@ defmodule PolicrMiniBot.Worker.ValidationTerminator do
       # 击杀用户（原因即状态）
       kill(veri, scheme, status)
       # 更新或删除入口消息
-      put_or_delete_entry_message(v, scheme)
+      put_or_delete_entry_message(v.chat_id, scheme)
 
       Logger.debug(
         "[#{v.id}] Manual verification termination completed: #{inspect(chat_id: chat_id, user_id: user_id)}"

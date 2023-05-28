@@ -1,8 +1,6 @@
 defmodule PolicrMiniBot.VerificationHelper do
   @moduledoc false
 
-  # TODO: 疑似存在验证入口消息的更新顺序问题。假设 B 用户覆盖了 A 用户的入口，B 结束时应该重新显示 A。错误在于继续显示了 B 用户的入口消息文本。
-
   alias PolicrMini.{Repo, Counter, Chats}
   alias PolicrMini.Chats.{Verification, Scheme}
   alias PolicrMiniBot.{Worker, EntryMaintainer, Captcha, JoinReuquestHosting}
@@ -249,7 +247,7 @@ defmodule PolicrMiniBot.VerificationHelper do
     # 更新来源数据并更新入口消息
     with {:ok, _} = ok_r <- Chats.update_verification(v, %{source: :join_request}),
          # 由于更新的是旧入口消息，所以此处不使用更新来源后的验证数据
-         :ok <- put_or_delete_entry_message(v, scheme) do
+         :ok <- put_or_delete_entry_message(v.chat_id, scheme) do
       # 解除之前的权限限制
       async_run(fn -> derestrict_chat_member(v.chat_id, v.target_user_id) end)
 
@@ -264,7 +262,7 @@ defmodule PolicrMiniBot.VerificationHelper do
     # 更新来源数据并更新入口消息
     with {:ok, _} = ok_r <- Chats.update_verification(v, %{source: :joined}),
          # 由于更新的是旧入口消息，所以此处不使用更新来源后的验证数据
-         :ok <- put_or_delete_entry_message(v, scheme) do
+         :ok <- put_or_delete_entry_message(v.chat_id, scheme) do
       # 拒绝之前的加群请求
       async_run(fn -> Telegex.decline_chat_join_request(v.chat_id, v.target_user_id) end)
 
@@ -277,19 +275,19 @@ defmodule PolicrMiniBot.VerificationHelper do
   # 目标来源和验证数据相匹配，直接返回验证数据
   def try_convert_souce(_, v, _scheme), do: {:ok, v}
 
-  @spec put_or_delete_entry_message(Verification.t(), Scheme.t()) :: :ok | {:error, any}
-  def put_or_delete_entry_message(v, scheme) do
-    count = Chats.get_pending_verification_count(v.chat_id, v.source)
-
-    if count == 0 do
-      # 如果没有等待验证了，立即删除入口消息
-      EntryMaintainer.delete_entry_message(v.source, v.chat_id)
-    else
+  @spec put_or_delete_entry_message(integer, Scheme.t()) :: :ok | {:error, any}
+  def put_or_delete_entry_message(chat_id, scheme) do
+    if v = Chats.find_last_pending_verification(chat_id) do
+      # 获取等待验证数量
+      count = Chats.get_pending_verification_count(v.chat_id, v.source)
       # 获取最新的验证入口消息编号
       message_id = Chats.find_last_verification_message_id(v.chat_id, v.source)
-
       # 更新入口消息
       put_entry_message(v, scheme, pending_count: count, message_id: message_id)
+    else
+      # 如果没有等待验证了，立即删除入口消息
+      EntryMaintainer.delete_entry_message(:joined, chat_id)
+      EntryMaintainer.delete_entry_message(:join_request, chat_id)
     end
 
     :ok
