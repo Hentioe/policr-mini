@@ -49,11 +49,11 @@ defmodule PolicrMiniBot.Supervisor do
       RespSponsorshipCmdPlug,
       PolicrMiniBot.HandleJoinRequestPlug,
       PolicrMiniBot.HandleGroupUserJoinedPlug,
-      PolicrMiniBot.HandleUserLeftGroupPlug,
+      PolicrMiniBot.HandleGroupMemberLeftPlug,
       PolicrMiniBot.HandleGroupMemberLeftMessagePlug,
       HandleSelfJoinedPlug,
       HandleSelfLeftedPlug,
-      # ↓此模块↓ 需保证安装在 `HandleUserLeftGroupPlug` 模块的后面。
+      # ↓此模块↓ 需保证安装在 `HandleGroupMemberLeftPlug` 模块的后面。
       HandleAdminPermissionsChangePlug,
       # ↓此模块↓ 需保证安装在 `HandleSelfLeftedPlug` 模块的后面。
       HandleSelfPermissionsChangePlug,

@@ -26,7 +26,7 @@ defmodule PolicrMiniBot.HandleAdminPermissionsChangePlug do
   """
 
   # !注意! 由于依赖状态中的 `action` 字段，此模块需要位于管道中的涉及填充状态相关字段、相关值的插件后面。
-  # 当前此模块需要保证位于 `PolicrMiniBot.InitUserJoinedActionPlug` 和 `PolicrMiniBot.HandleUserLeftGroupPlug` 两个模块的后面。
+  # 当前此模块需要保证位于 `PolicrMiniBot.HandleGroupMemberLeftPlug` 两个模块的后面。
   @impl true
   def call(%{chat_member: nil} = _update, state) do
     {:ignored, state}
