@@ -200,7 +200,7 @@ defmodule PolicrMiniBot.CallAnswerPlug do
     async do
       Worker.async_delete_message(v.target_user_id, message_id)
 
-      send_text(v.target_user_id, text, parse_mode: "MarkdownV2")
+      send_text(v.target_user_id, text, parse_mode: "MarkdownV2", logging: true)
     end
 
     :ok
@@ -223,7 +223,7 @@ defmodule PolicrMiniBot.CallAnswerPlug do
     async do
       Worker.async_delete_message(v.target_user_id, message_id)
 
-      send_text(v.target_user_id, text, parse_mode: "MarkdownV2")
+      send_text(v.target_user_id, text, parse_mode: "MarkdownV2", logging: true)
     end
 
     :ok
@@ -335,7 +335,7 @@ defmodule PolicrMiniBot.CallAnswerPlug do
     async do
       Worker.async_delete_message(v.target_user_id, message_id)
 
-      send_text(v.target_user_id, text, parse_mode: "MarkdownV2")
+      send_text(v.target_user_id, text, parse_mode: "MarkdownV2", logging: true)
     end
   end
 
@@ -365,7 +365,7 @@ defmodule PolicrMiniBot.CallAnswerPlug do
     async do
       Worker.async_delete_message(v.target_user_id, message_id)
 
-      send_text(v.target_user_id, text, parse_mode: "MarkdownV2")
+      send_text(v.target_user_id, text, parse_mode: "MarkdownV2", logging: true)
     end
   end
 
