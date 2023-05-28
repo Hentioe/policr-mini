@@ -72,8 +72,7 @@ defmodule PolicrMini.MixProject do
       {:not_qwerty123, "~> 2.3"},
       {:yaml_elixir, "~> 2.7"},
       {:unzip, "~> 0.8"},
-      {:mime, "~> 2.0"},
-      {:exi18n, github: "Hentioe/exi18n"}
+      {:mime, "~> 2.0"}
     ]
   end
 

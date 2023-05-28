@@ -478,33 +478,6 @@ defmodule PolicrMiniBot.Helper do
     PolicrMini.DefaultsServer.get_scheme_value(field)
   end
 
-  @spec t(String.t(), map()) :: String.t()
-  @doc """
-  使用默认 `locale` 搜索国际化翻译。
-  """
-  def t(key, values \\ %{}) do
-    t(ExI18n.locale(), key, values)
-  end
-
-  @doc """
-  搜索国际化翻译。
-
-  参数 `locale` 为 `priv/locals` 中 `yml` 文件的名称。
-  参数 `values` 用于给翻译字符串中的变量赋值。
-  """
-  @spec t(String.t(), String.t(), map()) :: String.t()
-  def t(locale, key, values)
-      when is_binary(locale) and is_binary(key) and is_map(values) do
-    try do
-      ExI18n.t(locale, key, values)
-    rescue
-      e ->
-        Logger.error("Translation search failed: #{inspect(key: key, error: e)}")
-
-        String.replace("#{locale}:#{key}", "_", "\\_")
-    end
-  end
-
   @spec async_run(function, delay_secs: integer) :: Honeydew.Job.t() | no_return
   defdelegate async_run(fun, opts \\ []), to: PolicrMini.Worker.GeneralRun, as: :async_run
 

@@ -51,30 +51,37 @@ defmodule PolicrMiniBot.RespStartCmdPlug do
     if length(args) == 2 do
       args |> List.last() |> dispatch(message)
     else
-      ttext =
-        commands_text("""
-        你好，我是一个专注于新成员验证的机器人。具有稳定的服务，便于操作的网页后台，不断增强与优化的核心功能，并保持长期维护。同时我是开源的，可自由复制部署的。
+      theader = commands_text("您好，我是一个专注于新成员验证的机器人。")
+      tdesc = commands_text("我具有稳定的服务，便于操作的网页后台。并不断增强与优化的核心功能，保持长期维护。同时我是开源的，可自由复制部署的。")
 
-        访问<a href="https://github.com/Hentioe/policr-mini">这里</a>更加了解一下我吧~
-        """)
+      tfooter =
+        commands_text("访问 %{here_link} 更加了解一下我吧～",
+          here_link: ~s|<a href="https://github.com/Hentioe/policr-mini">这里</a>|
+        )
 
-      send_message(chat_id, ttext, reply_markup: default_markup(), parse_mode: "HTML")
+      text = """
+      #{theader}
+
+      #{tdesc}
+
+      #{tfooter}
+      """
+
+      markup = %InlineKeyboardMarkup{
+        inline_keyboard: [
+          [
+            %InlineKeyboardButton{
+              text: "添加到群聊",
+              url: "https://t.me/#{PolicrMiniBot.username()}?startgroup=added"
+            }
+          ]
+        ]
+      }
+
+      send_message(chat_id, text, reply_markup: markup, parse_mode: "HTML")
     end
 
     {:ok, state}
-  end
-
-  defp default_markup do
-    %InlineKeyboardMarkup{
-      inline_keyboard: [
-        [
-          %InlineKeyboardButton{
-            text: "添加到群聊",
-            url: "https://t.me/#{PolicrMiniBot.username()}?startgroup=added"
-          }
-        ]
-      ]
-    }
   end
 
   @doc """
@@ -115,7 +122,7 @@ defmodule PolicrMiniBot.RespStartCmdPlug do
           e
       end
     else
-      send_message(from_user_id, t("errors.verification_no_wating"))
+      send_message(from_user_id, commands_text("您没有该目标群组的待验证记录。"))
     end
   end
 

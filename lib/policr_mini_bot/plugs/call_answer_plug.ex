@@ -86,7 +86,7 @@ defmodule PolicrMiniBot.CallAnswerPlug do
         Logger.error("Processing of verification answer failed: #{inspect(reason: changeset)}")
 
         answer_callback_query(callback_query_id,
-          text: t("errors.check_answer_failed"),
+          text: commands_text("答案校验失败，请管理员并通知开发者。"),
           show_alert: true
         )
 
@@ -99,7 +99,7 @@ defmodule PolicrMiniBot.CallAnswerPlug do
 
       {:error, reason} ->
         answer_callback_query(callback_query_id,
-          text: t("errors.unknown"),
+          text: commands_text("发生了一些未预料的情况，请向开发者反馈。"),
           show_alert: true
         )
 
@@ -184,16 +184,23 @@ defmodule PolicrMiniBot.CallAnswerPlug do
 
   @spec async_update_result(Verification.t(), integer) :: :ok
   defp async_update_result(v, message_id) do
-    async do
-      # 注意：此处默认以 `Telegex.Marked` 库转换文字，需要用 `escape_markdown/1` 函数转义文本中的动态内容。
-      text =
-        t("verification.passed.private", %{
-          chat_title: escape_markdown(v.chat.title)
-        })
+    theader =
+      commands_text("恭喜您通过了『%{chat_title}』的加群验证，权限已恢复。",
+        chat_title: "*#{escape_markdown(v.chat.title)}*"
+      )
 
+    tfooter = commands_text("提示：如果限制仍未解除请主动联系群管理。")
+
+    text = """
+    #{theader}
+
+    _#{tfooter}_
+    """
+
+    async do
       Worker.async_delete_message(v.target_user_id, message_id)
 
-      send_message(v.target_user_id, text, parse_mode: "MarkdownV2ToHTML")
+      send_message(v.target_user_id, text, parse_mode: "MarkdownV2")
     end
 
     :ok
@@ -201,17 +208,16 @@ defmodule PolicrMiniBot.CallAnswerPlug do
 
   @spec async_success_notify(Verification.t(), TgUser.t()) :: :ok
   defp async_success_notify(v, user) do
+    seconds = DateTime.diff(DateTime.utc_now(), v.inserted_at)
+
+    text =
+      commands_text("刚刚 %{mention} 通过了验证，用时 %{seconds} 秒。",
+        mention: mention(user, anonymization: false),
+        seconds: seconds
+      )
+
     async do
-      marked_enabled = Application.get_env(:policr_mini, :marked_enabled)
-      seconds = DateTime.diff(DateTime.utc_now(), v.inserted_at)
-
-      text =
-        t("verification.passed.notice", %{
-          mentioned_user: mention(user, anonymization: !marked_enabled),
-          seconds: seconds
-        })
-
-      case send_message(v.chat_id, text, parse_mode: "MarkdownV2ToHTML") do
+      case send_message(v.chat_id, text, parse_mode: "MarkdownV2") do
         {:ok, %{message_id: message_id}} ->
           # 延迟 8 秒删除通知消息
           Worker.async_delete_message(v.chat_id, message_id, delay_secs: 8)
@@ -355,13 +361,13 @@ defmodule PolicrMiniBot.CallAnswerPlug do
       {:ok, verification}
     else
       {:error, :not_found, _} ->
-        {:error, :known, t("errors.verification_not_found")}
+        {:error, :known, commands_text("没有找到和这条验证有关的记录～")}
 
       {:check_user, false} ->
-        {:error, :known, t("errors.verification_target_incorrect")}
+        {:error, :known, commands_text("此条验证并不针对你～")}
 
       {:check_status, false} ->
-        {:error, :known, t("errors.verification_expired")}
+        {:error, :known, commands_text("这条验证可能已经失效了～")}
     end
   end
 end

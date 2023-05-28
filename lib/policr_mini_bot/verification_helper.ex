@@ -526,7 +526,7 @@ defmodule PolicrMiniBot.VerificationHelper do
     # 击杀用户
     kill_user(v, kmethod, delay_unban_secs)
 
-    time_text = "#{delay_unban_secs} #{t("units.sec")}"
+    time_text = commands_text("%{count} 秒", count: delay_unban_secs)
 
     user_map = %{id: v.target_user_id, fullname: v.target_user_name}
     mention = mention(user_map, anonymization: false, mosaic: true)
