@@ -560,13 +560,15 @@ defmodule PolicrMiniBot.VerificationHelper do
     end
   end
 
-  defp kill_user(%{source: :join_request} = v, kmethod, _delay_unban_secs) do
+  defp kill_user(%{source: :join_request} = v, kmethod, delay_unban_secs) do
     # 删除托管的加群请求数据
     :ok = JoinReuquestHosting.delete(v.chat_id, v.target_user_id)
 
     case kmethod do
       :kick ->
+        # 拒绝加群请求并临时封禁
         Telegex.decline_chat_join_request(v.chat_id, v.target_user_id)
+        kick_chat_member(v.chat_id, v.target_user_id, delay_unban_secs)
 
       :ban ->
         # 拒绝加群请求并封禁
