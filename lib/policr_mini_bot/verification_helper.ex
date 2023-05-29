@@ -113,7 +113,7 @@ defmodule PolicrMiniBot.VerificationHelper do
 
           tdesc =
             commands_text("发生了一些错误，针对 %{mention} 的验证创建失败。建议管理员自行鉴别再决定取消限制或手动封禁。",
-              mention: mention(user)
+              mention: mention(user, anonymization: false)
             )
 
           tcomment = commands_text("如果反复出现此问题，请取消接管状态并通知开发者。")
@@ -209,7 +209,7 @@ defmodule PolicrMiniBot.VerificationHelper do
 
           tdesc =
             commands_text("发生了一些错误，针对 %{mention} 的验证创建失败。建议管理员自行鉴别并决定通过或拒绝加群请求。",
-              mention: mention(user)
+              mention: mention(user, anonymization: false)
             )
 
           tcomment = commands_text("如果反复出现此问题，请取消接管状态并通知开发者。")
