@@ -8,6 +8,7 @@ defmodule PolicrMini.Chats do
   alias PolicrMini.Repo
   alias PolicrMini.Chats.{Scheme, Operation, Statistic, CustomKit, Verification}
   alias PolicrMini.Chats.CustomKit
+  alias PolicrMini.Schema.Permission
 
   @type vsource :: :joined | :join_request
 
@@ -513,5 +514,42 @@ defmodule PolicrMini.Chats do
       order_by: ^order_by
     )
     |> Repo.all()
+  end
+
+  @doc """
+  查找指定群聊中指定用户的权限。
+  """
+  @spec find_user_permission(integer, integer) :: Permission.t() | nil
+  def find_user_permission(chat_id, user_id) do
+    from(p in Permission, where: p.chat_id == ^chat_id, where: p.user_id == ^user_id)
+    |> Repo.one()
+  end
+
+  @type pmode :: :writable | :readable | :owner
+
+  # TODO: 添加测试。
+  @doc """
+  获取指定群聊下用户的权限模型列表。
+
+  **注意：此函数对机器人已离开的群聊永远返回空列表**
+  """
+  @spec get_pmodes(integer | binary, integer) :: [pmode]
+  def get_pmodes(chat_id, user_id) do
+    if permission = find_user_permission(chat_id, user_id) do
+      chat = Repo.preload(permission, [:chat]).chat
+
+      # 检查群组是否已离开
+      if chat.left == true do
+        []
+      else
+        pmodes = if permission.writable, do: [:writable], else: []
+        pmodes = if permission.readable, do: pmodes ++ [:readable], else: pmodes
+        pmodes = if permission.tg_is_owner, do: pmodes ++ [:owner], else: pmodes
+
+        pmodes
+      end
+    else
+      []
+    end
   end
 end

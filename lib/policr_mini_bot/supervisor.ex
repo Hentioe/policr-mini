@@ -47,6 +47,8 @@ defmodule PolicrMiniBot.Supervisor do
       RespSyncCmdPlug,
       RespLoginCmdPlug,
       RespSponsorshipCmdPlug,
+      # `/embarrass_member` 命令。
+      PolicrMiniBot.RespEmbarrassMemberCmdPlug,
       PolicrMiniBot.HandleJoinRequestPlug,
       PolicrMiniBot.HandleGroupUserJoinedPlug,
       PolicrMiniBot.HandleGroupMemberLeftPlug,

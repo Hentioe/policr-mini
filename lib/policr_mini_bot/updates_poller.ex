@@ -147,6 +147,10 @@ defmodule PolicrMiniBot.UpdatesPoller do
         description: "存活测试"
       },
       %BotCommand{
+        command: "embarrass_member",
+        description: "验证此成员（实验性）"
+      },
+      %BotCommand{
         command: "sync",
         description: "同步群数据"
       },

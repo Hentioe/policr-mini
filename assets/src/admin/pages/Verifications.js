@@ -332,7 +332,7 @@ export default () => {
                     <Tr>
                       <Th tw="w-2/12">用户名称</Th>
                       <Th tw="w-2/12">语言代码</Th>
-                      <Th tw="w-3/12">加入时间</Th>
+                      <Th tw="w-3/12">开始于</Th>
                       <Th tw="w-1/12 text-center">用时</Th>
                       <Th tw="w-2/12 text-center">状态</Th>
                       <Th tw="w-2/12 text-right">操作</Th>

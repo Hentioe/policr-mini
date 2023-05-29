@@ -27,8 +27,6 @@ defmodule PolicrMiniBot.VerificationHelper do
 
   @doc """
   向用户发送验证消息或在群聊中发送验证入口消息（取决于用户来源）。无论来源如何，都会生成并返回验证记录。函数名 `embarrass_user` 表达了为难加群用户（或群成员）的含义，因为机器人将要出题考他们。
-
-  理论上此函数可以验证已存在的群成员，但存在一些未知数，并且未经测试。
   """
   @spec embarrass_user(source, integer, TgUser.t(), integer) ::
           {:ok, Verification.t()} | {:error, any}
@@ -324,7 +322,7 @@ defmodule PolicrMiniBot.VerificationHelper do
         """
       else
         thello =
-          commands_text("刚来的 %{mention} 和另外 %{remaining_count} 个还未验证的新成员，你们好！",
+          commands_text("最近加入的 %{mention} 和另外 %{remaining_count} 个还未验证的新成员，你们好！",
             mention: build_mention(new_chat_user, mention_scheme),
             remaining_count: pending_count - 1
           )
@@ -399,7 +397,7 @@ defmodule PolicrMiniBot.VerificationHelper do
         """
       else
         theader =
-          commands_text("刚刚申请加入的 %{mention} 和另外 %{remaining_count} 个用户正在验证！",
+          commands_text("最近申请加入的 %{mention} 和另外 %{remaining_count} 个用户正在验证！",
             mention: build_mention(new_chat_user, mention_scheme),
             remaining_count: pending_count - 1
           )
