@@ -16,6 +16,7 @@ defmodule PolicrMiniBot.InitTakeoveredPlug do
   @impl true
   def call(update, state) do
     if chat_id = find_chat_id(update) do
+      # TODO: 在 state 中单独初始化 `chat` 数据
       takeovered =
         case Chat.get(chat_id) do
           {:ok, chat} -> chat.is_take_over
