@@ -64,8 +64,6 @@ config :policr_mini, PolicrMiniBot,
   name: System.get_env("POLICR_MINI_BOT_NAME"),
   # 解封方法
   unban_method: unban_method,
-  # 是否启用 Marked 库，注意：此配置可能已过时
-  marked_enabled: (System.get_env("POLICR_MINI_BOT_ISSUE_33") || "false") == "true",
   opts: opts
 
 # 配置根链接

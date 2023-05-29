@@ -47,10 +47,6 @@ config :policr_mini, PolicrMiniBot.Scheduler,
     ]
   ]
 
-# 配置 Marked
-config :policr_mini,
-  marked_enabled: true
-
 # 配置 Telegex
 config :telegex,
   timeout: 1000 * 30,

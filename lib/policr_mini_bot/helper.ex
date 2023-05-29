@@ -56,15 +56,6 @@ defmodule PolicrMiniBot.Helper do
     )
   end
 
-  @spec escape_marked(binary) :: binary
-  def escape_marked(text) do
-    text
-    |> String.replace(".", "\\.")
-    |> String.replace("+", "\\+")
-    |> String.replace("-", "\\-")
-    |> String.replace("=", "\\=")
-  end
-
   @default_restrict_permissions %Telegex.Model.ChatPermissions{
     can_send_messages: false,
     can_send_media_messages: false,
