@@ -22,6 +22,10 @@ defmodule PolicrMiniBot.VerificationHelper do
   @type kreason :: :wronged | :timeout | :kick | :ban | :manual_ban | :manual_kick
   @type kmethod :: :ban | :kick
 
+  @cant_initiate_conversation "Forbidden: bot can't initiate conversation with a user"
+  @blocked_by_user "Forbidden: bot was blocked by the user"
+  @admin_approve_prompt commands_text("请管理员自行鉴别后决定批准或拒绝此用户的加群请求。")
+
   # 过期时间：15 分钟
   @expire_secs 60 * 15
 
@@ -112,7 +116,7 @@ defmodule PolicrMiniBot.VerificationHelper do
           )
 
           tdesc =
-            commands_text("发生了一些错误，针对 %{mention} 的验证创建失败。建议管理员自行鉴别再决定取消限制或手动封禁。",
+            commands_text("发生了一些错误，针对 %{mention} 的验证创建失败。请管理员自行鉴别并决定取消限制或手动封禁。",
               mention: mention(user, anonymization: false)
             )
 
@@ -199,7 +203,30 @@ defmodule PolicrMiniBot.VerificationHelper do
 
         ok_r
       else
-        # TODO: 单独处理用户拉黑等不能主动与之沟通的错误。
+        {:error, %{description: description, error_code: 403}} = e
+        when description in [@cant_initiate_conversation, @blocked_by_user] ->
+          # 不能主动与用户对话或被用户拉黑
+
+          Logger.warning("#{description}: #{inspect(user_id: user.id)}",
+            chat_id: chat_id
+          )
+
+          tdesc =
+            commands_text("无法主动与 %{mention} 对话，针对 TA 的验证消息没有送达。",
+              mention: mention(user, anonymization: false, mosaic: true)
+            )
+
+          tcomment = commands_text("如果没有手动处理此用户的加群申请，待验证过期后会自动拒绝。")
+
+          text = """
+          #{tdesc}__#{@admin_approve_prompt}__
+
+          _#{tcomment}_
+          """
+
+          send_text(chat_id, text, parse_mode: "MarkdownV2", logging: true)
+
+          e
 
         {:error, reason} = e ->
           Logger.error(
@@ -208,16 +235,16 @@ defmodule PolicrMiniBot.VerificationHelper do
           )
 
           tdesc =
-            commands_text("发生了一些错误，针对 %{mention} 的验证创建失败。建议管理员自行鉴别并决定通过或拒绝加群请求。",
-              mention: mention(user, anonymization: false)
+            commands_text("发生了一些错误，针对 %{mention} 的验证创建失败。",
+              mention: mention(user, anonymization: false, mosaic: true)
             )
 
           tcomment = commands_text("如果反复出现此问题，请取消接管状态并通知开发者。")
 
           text = """
-          #{tdesc}
+          #{tdesc}__#{@admin_approve_prompt}__
 
-          #{tcomment}
+          _#{tcomment}_
           """
 
           send_text(chat_id, text, parse_mode: "MarkdownV2", logging: true)
