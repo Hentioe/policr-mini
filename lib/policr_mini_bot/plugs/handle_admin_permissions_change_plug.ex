@@ -148,6 +148,7 @@ defmodule PolicrMiniBot.HandleAdminPermissionsChangePlug do
           commands_text("检测到用户 %{mention} 的管理权限变化，但由于某些原因同步到后台权限失败了。",
             mention: mention(user, anonymization: false)
           ),
+          parse_mode: "MarkdownV2",
           logging: true
         )
 

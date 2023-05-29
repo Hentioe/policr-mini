@@ -126,7 +126,7 @@ defmodule PolicrMiniBot.VerificationHelper do
           #{tcomment}
           """
 
-          send_text(chat_id, text, logging: true)
+          send_text(chat_id, text, parse_mode: "MarkdownV2", logging: true)
 
           e
       end
@@ -222,7 +222,7 @@ defmodule PolicrMiniBot.VerificationHelper do
           #{tcomment}
           """
 
-          send_text(chat_id, text, logging: true)
+          send_text(chat_id, text, parse_mode: "MarkdownV2", logging: true)
 
           e
       end
