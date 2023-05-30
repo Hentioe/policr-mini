@@ -9,8 +9,7 @@ defmodule PolicrMiniBot.HandleGroupMemberLeftPlug do
 
   use PolicrMiniBot, plug: :preheater
 
-  alias PolicrMini.{Chats, PermissionBusiness}
-  alias PolicrMiniBot.Worker
+  alias PolicrMini.PermissionBusiness
 
   require Logger
 
@@ -71,54 +70,45 @@ defmodule PolicrMiniBot.HandleGroupMemberLeftPlug do
 
     Logger.debug("A group member has left: #{inspect(chat_id: chat_id, user_id: left_user_id)}")
 
-    state = action(state, :user_lefted)
-
     if left_user_id == bot_id() do
       # 跳过机器人自身
       {:ignored, state}
     else
-      # TOD0: 将 scheme 的获取放在一个独立的 plug 中，通过状态传递。
-      # 检测并删除服务消息
-      # 注意：此处的代码不确定是否有效，同样的功能在 `PolicrMiniBot.HandleGroupMemberLeftMessagePlug` 模块中已实现。
-      # 但尚不明确此处的服务消息删除代码是否还有必要，因为 TG 疑似已将退出服务消息在作为独立消息发送。此代码仍然保留。
-      if update.message do
-        scheme = Chats.find_or_init_scheme!(chat_id)
-        enabled_cleanup = scheme.service_message_cleanup || default!(:smc) || []
+      # 删除离开消息（此调用委托给 `PolicrMiniBot.HandleGroupMemberLeftMessagePlug` 处理）
+      {_, state} = delete_left_message(update.message, state)
+      state = action(state, :user_lefted)
 
-        if Enum.member?(enabled_cleanup, :lefted) do
-          Logger.debug(
-            "Deleting member left message: #{inspect(chat_id: chat_id, message_id: update.message.message_id)}"
+      # 判断是否为管理员退出
+      perm = PermissionBusiness.find(chat_id, left_user_id)
+      # 此处的管理员不包括群主
+      is_admin = perm && !perm.tg_is_owner
+
+      if is_admin do
+        # 如果是管理员则删除权限记录
+        PermissionBusiness.delete(chat_id, left_user_id)
+
+        theader =
+          commands_text("已将曾经的管理员 %{mention} 的后台权限移除。",
+            mention: mention(user, anonymization: false)
           )
 
-          # 删除服务消息。
-          Worker.async_delete_message(chat_id, update.message.message_id)
-        end
-      end
+        tfooter =
+          commands_text("提示：由于此特性的加入，在管理员已离开群组的场景下将不再需要手动调用 %{command} 命令。", command: "`/sync`")
 
-      # 如果是管理员（非群主）则删除权限记录
-      if perm = PermissionBusiness.find(chat_id, left_user_id) do
-        unless perm.tg_is_owner do
-          PermissionBusiness.delete(chat_id, left_user_id)
+        text = """
+        #{theader}
 
-          theader =
-            commands_text("已将曾经的管理员 %{mention} 的后台权限移除。",
-              mention: mention(user, anonymization: false)
-            )
+        _#{tfooter}_
+        """
 
-          tfooter =
-            commands_text("提示：由于此特性的加入，在管理员已离开群组的场景下将不再需要手动调用 %{command} 命令。", command: "`/sync`")
-
-          text = """
-          #{theader}
-
-          _#{tfooter}_
-          """
-
-          send_text(chat_id, text, parse_mode: "MarkdownV2", logging: true)
-        end
+        send_text(chat_id, text, parse_mode: "MarkdownV2", logging: true)
       end
 
       {:ok, %{state | done: true}}
     end
   end
+
+  defdelegate delete_left_message(message, state),
+    to: PolicrMiniBot.HandleGroupMemberLeftMessagePlug,
+    as: :handle
 end
