@@ -7,11 +7,11 @@ defmodule PolicrMiniBot.State do
 
   typedstruct do
     field :action, atom
-    field :takeovered, boolean()
-    field :from_self, boolean()
-    field :from_admin, boolean()
-    field :deleted, boolean(), default: false
-    field :done, boolean(), default: false
+    field :takeovered, boolean
+    field :from_self, boolean
+    field :from_admin, boolean
+    field :deleted, boolean, default: false
+    field :done, boolean, default: false
   end
 
   @doc """
@@ -25,5 +25,9 @@ defmodule PolicrMiniBot.State do
 
   def action(state, action) do
     raise "Duplicated action field setting: #{inspect(action: action, state: state)}"
+  end
+
+  def done(state) do
+    %{state | done: true}
   end
 end

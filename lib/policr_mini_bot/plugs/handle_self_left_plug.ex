@@ -64,15 +64,22 @@ defmodule PolicrMiniBot.HandleSelfLeftedPlug do
   def call(%{my_chat_member: my_chat_member} = _update, state) do
     %{chat: %{id: chat_id}} = my_chat_member
 
-    Logger.info("I have left group: #{inspect(chat_id: chat_id)}")
+    Logger.info("I have left group", chat_id: chat_id)
 
     state = action(state, :self_lefted)
 
-    # 更新群组
     case Chat.get(chat_id) do
-      {:ok, chat} -> Instances.chat_left_and_takeover_cancel(chat)
-    end
+      {:ok, chat} ->
+        # 更新群组
+        Instances.chat_left_and_takeover_cancel(chat)
 
-    {:ok, %{state | done: true}}
+        {:ok, done(state)}
+
+      {:error, :not_found, _} ->
+        # 群组是有可能不存在的，因为普通群没有被保存，直接忽略处理
+        Logger.info("Left in chat not found", chat_id: chat_id)
+
+        {:ok, state}
+    end
   end
 end
