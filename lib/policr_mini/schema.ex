@@ -36,6 +36,15 @@ defmodule PolicrMini.Schema do
           r -> {:ok, r}
         end
       end
+
+      @spec get!(any, get_otps) :: Ecto.Schema.t()
+      def get!(id, options \\ []) do
+        preload = Keyword.get(options, :preload, [])
+
+        @schema_module
+        |> Repo.get!(id)
+        |> Repo.preload(preload)
+      end
     end
   end
 end

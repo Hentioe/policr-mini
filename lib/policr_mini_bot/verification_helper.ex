@@ -1,7 +1,8 @@
 defmodule PolicrMiniBot.VerificationHelper do
   @moduledoc false
 
-  alias PolicrMini.{Repo, Counter, Chats}
+  alias PolicrMini.{Repo, Counter, Chats, Instances}
+  alias PolicrMini.Instances.Chat
   alias PolicrMini.Chats.{Verification, Scheme}
   alias PolicrMiniBot.{Worker, EntryMaintainer, Captcha, JoinReuquestHosting}
   alias Telegex.Model.User, as: TgUser
@@ -24,6 +25,8 @@ defmodule PolicrMiniBot.VerificationHelper do
 
   @cant_initiate_conversation "Forbidden: bot can't initiate conversation with a user"
   @blocked_by_user "Forbidden: bot was blocked by the user"
+  @chat_restricted "Bad Request: CHAT_RESTRICTED"
+
   @admin_approve_prompt commands_text("请管理员自行鉴别后决定批准或拒绝此用户的加群请求。")
 
   # 过期时间：15 分钟
@@ -109,6 +112,10 @@ defmodule PolicrMiniBot.VerificationHelper do
 
         ok_r
       else
+        {:error, %{description: @chat_restricted, error_code: 400}} ->
+          # 群组被限制取消接管
+          Instances.cancel_chat_takeover(Chat.get!(chat_id))
+
         {:error, reason} = e ->
           Logger.error(
             "Embarrass joined user failed: #{inspect(reason: reason)}",
