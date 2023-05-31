@@ -143,12 +143,12 @@ defmodule PolicrMiniBot.UpdatesPoller do
 
     commands = [
       %BotCommand{
-        command: "ping",
-        description: "存活测试"
-      },
-      %BotCommand{
         command: "embarrass_member",
         description: "验证此成员（实验性）"
+      },
+      %BotCommand{
+        command: "ping",
+        description: "存活测试"
       },
       %BotCommand{
         command: "sync",
