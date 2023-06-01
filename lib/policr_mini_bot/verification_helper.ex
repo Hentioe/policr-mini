@@ -374,9 +374,9 @@ defmodule PolicrMiniBot.VerificationHelper do
 
     caller =
       if message_id = Keyword.get(opts, :message_id) do
-        make_text_editor(text, message_id)
+        text_editor(text, message_id)
       else
-        make_text_sender(text)
+        text_sender(text)
       end
 
     markup = %InlineKeyboardMarkup{
@@ -391,8 +391,10 @@ defmodule PolicrMiniBot.VerificationHelper do
     }
 
     call_opts = [
+      # 此处的选项不可省略，因为没有默认值
       reply_markup: markup,
-      disable_web_page_preview: false,
+      disable_notification: true,
+      disable_web_page_preview: true,
       parse_mode: "MarkdownV2"
     ]
 
@@ -449,13 +451,15 @@ defmodule PolicrMiniBot.VerificationHelper do
 
     caller =
       if message_id = Keyword.get(opts, :message_id) do
-        make_text_editor(text, message_id)
+        text_editor(text, message_id)
       else
-        make_text_sender(text)
+        text_sender(text)
       end
 
     call_opts = [
-      disable_web_page_preview: false,
+      # 此处的选项不可省略，因为没有默认值
+      disable_notification: true,
+      disable_web_page_preview: true,
       parse_mode: "MarkdownV2"
     ]
 
