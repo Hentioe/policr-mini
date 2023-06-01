@@ -130,6 +130,11 @@ defmodule PolicrMiniBot.MessageCaller do
   def send_attachment(chat_id, attachment, opts \\ []) do
     sender = attachment_sender(attachment)
 
+    opts =
+      opts
+      |> Keyword.put_new(:disable_notification, true)
+      |> Keyword.put_new(:disable_web_page_preview, true)
+
     call(sender, chat_id, opts)
   end
 
