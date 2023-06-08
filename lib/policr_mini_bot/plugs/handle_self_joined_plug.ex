@@ -131,7 +131,7 @@ defmodule PolicrMiniBot.HandleSelfJoinedPlug do
       end
     else
       # 无发消息权限，直接退出
-      {:error, %Telegex.Model.Error{description: "Bad Request: have no rights to send a message"}} ->
+      {:error, %Telegex.Error{description: "Bad Request: have no rights to send a message"}} ->
         Telegex.leave_chat(chat_id)
 
       {:error, reason} ->
@@ -141,7 +141,7 @@ defmodule PolicrMiniBot.HandleSelfJoinedPlug do
     end
   end
 
-  @spec response(integer()) :: :ok | {:error, Telegex.Model.errors()}
+  @spec response(integer()) :: :ok | {:error, Telegex.Type.error()}
   @doc """
   发送响应消息。
   """

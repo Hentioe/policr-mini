@@ -29,7 +29,7 @@ defmodule PolicrMiniBot.InitFromPlug do
     end
   end
 
-  @spec find_infomation(Telegex.Model.Update.t()) :: {integer(), integer()} | nil
+  @spec find_infomation(Telegex.Type.Update.t()) :: {integer(), integer()} | nil
   defp find_infomation(update) do
     cond do
       update.message != nil ->

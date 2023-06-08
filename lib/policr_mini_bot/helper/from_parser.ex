@@ -1,7 +1,7 @@
 defmodule PolicrMiniBot.Helper.FromParser do
   @moduledoc false
 
-  alias Telegex.Model.Update
+  alias Telegex.Type.Update
 
   @type chat_id :: binary | integer
   @type user_id :: binary | integer

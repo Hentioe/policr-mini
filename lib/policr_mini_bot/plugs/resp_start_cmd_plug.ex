@@ -9,15 +9,15 @@ defmodule PolicrMiniBot.RespStartCmdPlug do
   use PolicrMiniBot, plug: [commander: :start]
 
   alias PolicrMini.Chats
-  alias Telegex.Model.{Message, InlineKeyboardMarkup, InlineKeyboardButton}
+  alias Telegex.Type.{Message, InlineKeyboardMarkup, InlineKeyboardButton}
 
   import PolicrMiniBot.VerificationHelper
 
   require Logger
 
   @type captcha_data :: PolicrMiniBot.Captcha.Data.t()
-  @type tgerr :: Telegex.Model.errors()
-  @type tgmsg :: Telegex.Model.Message.t()
+  @type tgerr :: Telegex.Type.error()
+  @type tgmsg :: Telegex.Type.Message.t()
 
   @doc """
   重写匹配规则，以 `/start` 开始即匹配。
@@ -90,7 +90,7 @@ defmodule PolicrMiniBot.RespStartCmdPlug do
   """
   def dispatch(arg, message), do: arg |> String.split("_") |> handle_args(message)
 
-  @spec handle_args([binary, ...], Message.t()) :: :ok | {:error, Telegex.Model.errors()}
+  @spec handle_args([binary, ...], Message.t()) :: :ok | {:error, Telegex.Type.error()}
 
   # 处理 v1 版本的验证参数。
   def handle_args(["verification", "v1", target_chat_id], %{chat: %{id: from_user_id}} = _message) do

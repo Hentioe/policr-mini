@@ -103,7 +103,7 @@ defmodule PolicrMiniBot.Runner.WorkingChecker do
             :ok
         end
 
-      {:error, %Telegex.Model.RequestError{reason: :timeout}} ->
+      {:error, %Telegex.RequestError{reason: :timeout}} ->
         # 处理超时，自动重试
         Logger.warning(
           "Checking own permission timeout, waiting for retry: #{inspect(chat_id: chat.id)}"
@@ -130,24 +130,24 @@ defmodule PolicrMiniBot.Runner.WorkingChecker do
   @err_desc_was_upgraded_supergroup "Bad Request: group chat was upgraded to a supergroup chat"
 
   # 机器人被封禁，取消接管。
-  defp handle_check_error(%Telegex.Model.Error{description: description}, chat)
+  defp handle_check_error(%Telegex.Error{description: description}, chat)
        when description == @err_desc_bot_was_kicked,
        do: cancel_takeover(chat, reason: :kicked)
 
   # 机器人已不在群中，取消接管。
-  defp handle_check_error(%Telegex.Model.Error{description: description}, chat)
+  defp handle_check_error(%Telegex.Error{description: description}, chat)
        when description in @err_desc_bot_is_not_member,
        do: cancel_takeover(chat, reason: :left)
 
   # 已被升级为超级群，取消接管。
   # 一些未经证实的猜测：
   # 此错误提示表示旧群 ID 仍然被 TG 识别，但是 ID 的作用已被废弃。理论上这类群组需要清理，否则会出现资料重复的群组。
-  defp handle_check_error(%Telegex.Model.Error{description: description}, chat)
+  defp handle_check_error(%Telegex.Error{description: description}, chat)
        when description == @err_desc_was_upgraded_supergroup,
        do: cancel_takeover(chat, reason: :upgraded)
 
   # 群组已不存在。取消接管，并删除与之相关的用户权限。
-  defp handle_check_error(%Telegex.Model.Error{description: description}, chat)
+  defp handle_check_error(%Telegex.Error{description: description}, chat)
        when description == @err_desc_chat_not_found do
     cancel_takeover(chat, reason: :not_found)
 

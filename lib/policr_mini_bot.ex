@@ -12,7 +12,7 @@ defmodule PolicrMiniBot do
       use PolicrMini.I18n
       use PolicrMiniBot.MessageCaller
 
-      alias Telegex.Model.{
+      alias Telegex.Type.{
         Update,
         Message,
         CallbackQuery,

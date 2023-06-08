@@ -8,15 +8,15 @@ defmodule PolicrMiniBot.MessageCaller do
 
   require Logger
 
-  @type tgerr :: Telegex.Model.errors()
-  @type tgmsg :: Telegex.Model.Message.t()
+  @type tgerr :: Telegex.Type.error()
+  @type tgmsg :: Telegex.Type.Message.t()
   @type call_opts :: [
           caption: String.t(),
           parse_mode: String.t(),
           disable_notification: boolean,
           disable_web_page_preview: boolean,
           reply_to_message_id: integer,
-          reply_markup: Telegex.Model.InlineKeyboardMarkup.t(),
+          reply_markup: Telegex.Type.InlineKeyboardMarkup.t(),
           logging: boolean
         ]
   @type call_result :: {:ok, tgmsg} | {:error, tgerr}

@@ -143,7 +143,6 @@ defmodule PolicrMiniBot.RespSyncCmdPlug do
           tg_can_change_info: chat_permissions.can_change_info,
           tg_can_invite_users: chat_permissions.can_invite_users,
           tg_can_pin_messages: chat_permissions.can_pin_messages,
-          tg_can_send_media_messages: chat_permissions.can_send_media_messages,
           tg_can_send_messages: chat_permissions.can_send_messages,
           tg_can_send_other_messages: chat_permissions.can_send_other_messages,
           tg_can_send_polls: chat_permissions.can_send_polls

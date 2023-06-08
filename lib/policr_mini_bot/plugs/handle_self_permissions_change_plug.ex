@@ -8,7 +8,7 @@ defmodule PolicrMiniBot.HandleSelfPermissionsChangePlug do
   alias PolicrMini.Instances
   alias PolicrMini.Instances.Chat
   alias PolicrMiniBot.Helper.Syncing
-  alias Telegex.Model.{InlineKeyboardMarkup, InlineKeyboardButton}
+  alias Telegex.Type.{InlineKeyboardMarkup, InlineKeyboardButton}
 
   import PolicrMiniBot.Helper.CheckRequiredPermissions,
     only: [has_takeover_permissions: 1]
@@ -322,13 +322,13 @@ defmodule PolicrMiniBot.HandleSelfPermissionsChangePlug do
   end
 
   @typep fix_chat_empty_admins_arg ::
-           Telegex.Model.ChatMemberUpdated.t() | Chat.t()
+           Telegex.Type.ChatMemberUpdated.t() | Chat.t()
   @typep fix_chat_empty_admins_returns :: :fixed | :no_empty | :error
 
   @spec fix_chat_empty_admins(fix_chat_empty_admins_arg) ::
           fix_chat_empty_admins_returns
   defp fix_chat_empty_admins(my_chat_member)
-       when is_struct(my_chat_member, Telegex.Model.ChatMemberUpdated) do
+       when is_struct(my_chat_member, Telegex.Type.ChatMemberUpdated) do
     %{chat: %{id: chat_id} = chat} = my_chat_member
 
     chat_params = %{
@@ -357,7 +357,7 @@ defmodule PolicrMiniBot.HandleSelfPermissionsChangePlug do
     end
   end
 
-  @spec handle_self_promoted(Telegex.Model.ChatMemberUpdated.t()) :: no_return()
+  @spec handle_self_promoted(Telegex.Type.ChatMemberUpdated.t()) :: no_return()
   defp handle_self_promoted(my_chat_member) do
     %{chat: %{id: chat_id}, new_chat_member: new_chat_member} = my_chat_member
 

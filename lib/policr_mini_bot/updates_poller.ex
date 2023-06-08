@@ -105,7 +105,7 @@ defmodule PolicrMiniBot.UpdatesPoller do
             List.last(updates).update_id + 1
           end
 
-        {:error, %Telegex.Model.Error{description: "Bad Gateway"}} ->
+        {:error, %Telegex.Error{description: "Bad Gateway"}} ->
           # Telegram 服务器故障，大幅度降低请求频率
           :timer.sleep(500)
 
@@ -139,7 +139,7 @@ defmodule PolicrMiniBot.UpdatesPoller do
   end
 
   defp gen_commands(username) do
-    alias Telegex.Model.BotCommand
+    alias Telegex.Type.BotCommand
 
     commands = [
       %BotCommand{
@@ -193,7 +193,7 @@ defmodule PolicrMiniBot.UpdatesPoller do
   @spec get_bot_info() :: BotInfo.t()
   def get_bot_info do
     case Telegex.get_me() do
-      {:ok, %Telegex.Model.User{id: id, username: username, first_name: first_name}} ->
+      {:ok, %Telegex.Type.User{id: id, username: username, first_name: first_name}} ->
         %BotInfo{
           id: id,
           username: username,

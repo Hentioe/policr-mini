@@ -5,8 +5,8 @@ defmodule PolicrMiniBot.VerificationHelper do
   alias PolicrMini.Instances.Chat
   alias PolicrMini.Chats.{Verification, Scheme}
   alias PolicrMiniBot.{Worker, EntryMaintainer, Captcha, JoinReuquestHosting}
-  alias Telegex.Model.User, as: TgUser
-  alias Telegex.Model.{InlineKeyboardMarkup, InlineKeyboardButton}
+  alias Telegex.Type.User, as: TgUser
+  alias Telegex.Type.{InlineKeyboardMarkup, InlineKeyboardButton}
 
   use PolicrMini.I18n
   use PolicrMiniBot.MessageCaller
@@ -15,8 +15,8 @@ defmodule PolicrMiniBot.VerificationHelper do
 
   require Logger
 
-  @type tgerr :: Telegex.Model.errors()
-  @type tgmsg :: Telegex.Model.Message.t()
+  @type tgerr :: Telegex.Type.error()
+  @type tgmsg :: Telegex.Type.Message.t()
   @type captcha_data :: Captcha.Data.t()
   @type send_opts :: MessageCaller.call_opts()
   @type source :: :joined | :join_request
@@ -692,7 +692,7 @@ defmodule PolicrMiniBot.VerificationHelper do
   end
 
   @spec kick_chat_member(integer, integer, integer) ::
-          {:ok, boolean} | Telegex.Model.errors()
+          {:ok, boolean} | Telegex.Type.error()
   defp kick_chat_member(chat_id, user_id, delay_unban_secs) do
     case PolicrMiniBot.config(:unban_method) do
       :api_call ->

@@ -8,7 +8,7 @@ defmodule PolicrMiniBot.CallAnswerPlug do
   alias PolicrMini.{Chats, Counter}
   alias PolicrMini.Chats.{Verification, Scheme, Operation}
   alias PolicrMiniBot.{Disposable, Worker, JoinReuquestHosting}
-  alias Telegex.Model.User, as: TgUser
+  alias Telegex.Type.User, as: TgUser
 
   import PolicrMiniBot.VerificationHelper
 

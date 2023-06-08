@@ -48,9 +48,9 @@ config :policr_mini, PolicrMiniBot.Scheduler,
   ]
 
 # 配置 Telegex
-config :telegex,
-  timeout: 1000 * 30,
-  recv_timeout: 1000 * 45
+config :telegex, Telegex.Caller,
+  adapter: Telegex.Caller.FinchAdapter,
+  options: [receive_timeout: 30 * 1000]
 
 # Configures Elixir's Logger
 config :logger, :console,

@@ -121,7 +121,7 @@ defmodule PolicrMiniWeb.Admin.API.ChatController do
             {:ok, []}
         end
 
-      {:error, %Telegex.Model.Error{description: description}} ->
+      {:error, %Telegex.Error{description: description}} ->
         {:error, %{description: description}}
 
       _ ->

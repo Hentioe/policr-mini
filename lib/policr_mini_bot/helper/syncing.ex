@@ -7,7 +7,7 @@ defmodule PolicrMiniBot.Helper.Syncing do
   alias PolicrMini.Instances.Chat
   alias PolicrMini.Schema.{User, Permission}
   alias PolicrMini.UserBusiness
-  alias Telegex.Model.ChatMember
+  alias Telegex.Type.{ChatMember, ChatMemberAdministrator}
 
   require Logger
 
@@ -20,7 +20,13 @@ defmodule PolicrMiniBot.Helper.Syncing do
   def sync_for_chat_permissions(chat) do
     case Telegex.get_chat_administrators(chat.id) do
       {:ok, administrators} ->
-        # 过滤管理员中的机器人。
+        # TODO: [Telegex] 待实现联合类型转换后，删除此处手动转换的代码。
+        administrators =
+          Telegex.Helper.typedmap(administrators, %Telegex.TypeDefiner.ArrayType{
+            elem_type: Telegex.Type.ChatMemberAdministrator
+          })
+
+        # 过滤管理员中的机器人
         administrators = Enum.filter(administrators, fn member -> !member.user.is_bot end)
 
         # 更新用户列表。
@@ -64,7 +70,9 @@ defmodule PolicrMiniBot.Helper.Syncing do
   end
 
   @spec sync_for_user(ChatMember.t()) :: {:ok, User.t()} | {:error, any}
-  def sync_for_user(chat_member) when is_struct(chat_member, ChatMember) do
+
+  # 注意：此处的 ChatMember 是联合类型，不能进行 is_struct 判断。
+  def sync_for_user(chat_member) when is_struct(chat_member, ChatMemberAdministrator) do
     user = chat_member.user
 
     user_params = %{

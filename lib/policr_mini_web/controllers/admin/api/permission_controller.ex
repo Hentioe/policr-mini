@@ -91,7 +91,7 @@ defmodule PolicrMiniWeb.Admin.API.PermissionController do
       {:ok, true} ->
         {:ok, true}
 
-      {:error, %Telegex.Model.Error{description: <<"Bad Request: " <> reason>>}} ->
+      {:error, %Telegex.Error{description: <<"Bad Request: " <> reason>>}} ->
         description =
           case reason do
             "not enough rights" -> "bot cannot add new admins"
@@ -101,10 +101,10 @@ defmodule PolicrMiniWeb.Admin.API.PermissionController do
 
         {:error, %{description: description}}
 
-      {:error, %Telegex.Model.Error{description: description}} ->
+      {:error, %Telegex.Error{description: description}} ->
         {:error, %{description: description}}
 
-      {:error, %Telegex.Model.RequestError{reason: _reason}} ->
+      {:error, %Telegex.RequestError{reason: _reason}} ->
         {:error, %{description: "please try again"}}
     end
   end

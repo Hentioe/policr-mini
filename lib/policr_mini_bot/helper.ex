@@ -9,12 +9,12 @@ defmodule PolicrMiniBot.Helper do
     CheckRequiredPermissions
   }
 
-  alias Telegex.Model.ChatMember
+  alias Telegex.Type.ChatMember
 
   require Logger
 
-  @type tgerr :: {:error, Telegex.Model.errors()}
-  @type tgmsg :: Telegex.Model.Message.t()
+  @type tgerr :: {:error, Telegex.Type.error()}
+  @type tgmsg :: Telegex.Type.Message.t()
 
   @doc """
   获取机器人自身的 `id` 字段。详情参照 `PolicrMiniBot.id/0` 函数。
@@ -56,15 +56,17 @@ defmodule PolicrMiniBot.Helper do
     )
   end
 
-  @default_restrict_permissions %Telegex.Model.ChatPermissions{
+  @default_restrict_permissions %Telegex.Type.ChatPermissions{
     can_send_messages: false,
-    can_send_media_messages: false,
+    can_send_audios: false,
+    can_send_documents: false,
+    can_send_photos: false,
+    can_send_videos: false,
+    can_send_video_notes: false,
+    can_send_voice_notes: false,
     can_send_polls: false,
     can_send_other_messages: false,
-    can_add_web_page_previews: false,
-    can_change_info: false,
-    can_invite_users: false,
-    can_pin_messages: false
+    can_add_web_page_previews: false
   }
 
   @doc """
@@ -93,14 +95,16 @@ defmodule PolicrMiniBot.Helper do
   限制聊天成员。
 
   目前来讲，它会限制以下权限：
-  - `can_send_messages`: `false`
-  - `can_send_media_messages`: `false`
-  - `can_send_polls`: `false`
-  - `can_send_other_messages`: `false`
-  - `can_add_web_page_previews`: `false`
-  - `can_change_info`: `false`
-  - `can_invite_users`: `false`
-  - `can_pin_messages`: `false`
+    - `can_send_messages`: false,
+    - `can_send_audios`: false,
+    - `can_send_documents`: false,
+    - `can_send_photos`: false,
+    - `can_send_videos`: false,
+    - `can_send_video_notes`: false,
+    - `can_send_voice_notes`: false,
+    - `can_send_polls`: false,
+    - `can_send_other_messages`: false,
+    - `can_add_web_page_previews`: false
   """
   def restrict_chat_member(chat_id, user_id) do
     Telegex.restrict_chat_member(chat_id, user_id, @default_restrict_permissions)
@@ -112,15 +116,17 @@ defmodule PolicrMiniBot.Helper do
   此调用会解除成员所有限制。根据 https://github.com/Hentioe/policr-mini/issues/126 中的测试，开放所有权限是安全的。
   """
   def derestrict_chat_member(chat_id, user_id) do
-    Telegex.restrict_chat_member(chat_id, user_id, %Telegex.Model.ChatPermissions{
+    Telegex.restrict_chat_member(chat_id, user_id, %Telegex.Type.ChatPermissions{
       can_send_messages: true,
-      can_send_media_messages: true,
+      can_send_audios: true,
+      can_send_documents: true,
+      can_send_photos: true,
+      can_send_videos: true,
+      can_send_video_notes: true,
+      can_send_voice_notes: true,
       can_send_polls: true,
       can_send_other_messages: true,
-      can_add_web_page_previews: true,
-      can_change_info: true,
-      can_invite_users: true,
-      can_pin_messages: true
+      can_add_web_page_previews: true
     })
   end
 
@@ -334,7 +340,7 @@ defmodule PolicrMiniBot.Helper do
   @doc """
   响应回调查询。
   """
-  @spec answer_callback_query(String.t(), keyword()) :: :ok | {:error, Telegex.Model.errors()}
+  @spec answer_callback_query(String.t(), keyword()) :: :ok | {:error, Telegex.Type.error()}
   def answer_callback_query(callback_query_id, options \\ []) do
     Telegex.answer_callback_query(callback_query_id, options)
   end
