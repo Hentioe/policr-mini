@@ -9,8 +9,3 @@
 ## effect: edit them in PO (.po) files instead.
 msgid ""
 msgstr ""
-
-#: lib/policr_mini_bot/plugs/resp_login_cmd_plug.ex:32
-#, elixir-autogen, elixir-format
-msgid "天"
-msgstr ""

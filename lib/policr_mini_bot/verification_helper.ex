@@ -345,7 +345,9 @@ defmodule PolicrMiniBot.VerificationHelper do
             mention: build_mention(new_chat_user, mention_scheme)
           )
 
-        tdesc = commands_text("您当前需要完成验证才能解除限制，验证有效时间不超过 __%{seconds}__ 秒。", seconds: v.seconds)
+        tdesc =
+          commands_text("您当前需要完成验证才能解除限制，验证有效时间不超过 %{seconds} 秒。", seconds: "__#{v.seconds}__")
+
         tfooter = commands_text("过期会被踢出或封禁，请尽快。")
 
         """
@@ -361,7 +363,7 @@ defmodule PolicrMiniBot.VerificationHelper do
             remaining_count: pending_count - 1
           )
 
-        tdesc = commands_text("请主动完成验证以解除限制，验证有效时间不超过 __%{seconds}__ 秒。", seconds: v.seconds)
+        tdesc = commands_text("请主动完成验证以解除限制，验证有效时间不超过 %{seconds} 秒。", seconds: "__#{v.seconds}__")
         tfooter = commands_text("过期会被踢出或封禁，请尽快。")
 
         """
@@ -423,7 +425,7 @@ defmodule PolicrMiniBot.VerificationHelper do
           )
 
         tdesc = commands_text("加群请求会根据验证结果自动处理，并按照方案决定是否进一步封禁。")
-        tfooter = commands_text("验证有效时间不超过 __%{seconds}__ 秒。", seconds: v.seconds)
+        tfooter = commands_text("验证有效时间不超过 %{seconds} 秒。", seconds: "__#{v.seconds}__")
 
         """
         #{theader}
@@ -439,7 +441,7 @@ defmodule PolicrMiniBot.VerificationHelper do
           )
 
         tdesc = commands_text("加群请求会根据验证结果自动处理，并按照方案决定是否进一步封禁。")
-        tfooter = commands_text("验证有效时间不超过 __%{seconds}__ 秒。", seconds: v.seconds)
+        tfooter = commands_text("验证有效时间不超过 %{seconds} 秒。", seconds: "__#{v.seconds}__")
 
         """
         #{theader}
