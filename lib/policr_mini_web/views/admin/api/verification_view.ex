@@ -16,6 +16,6 @@ defmodule PolicrMiniWeb.Admin.API.VerificationView do
   end
 
   def render("verification.json", %{verification: verification}) do
-    verification |> Map.drop([:__meta__, :chat, :message_snapshot]) |> Map.from_struct()
+    verification |> Map.drop([:__meta__, :chat]) |> Map.from_struct()
   end
 end

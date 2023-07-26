@@ -53,17 +53,6 @@ defmodule PolicrMini.Factory do
     }
   end
 
-  def build(:message_snapshot) do
-    %PolicrMini.Schema.MessageSnapshot{
-      message_id: 1234,
-      from_user_id: 123_456_789,
-      from_user_name: "小新",
-      date: 1_591_654_677,
-      text: "请回答问题「1 + 1 = ?」。您有 20 秒的时间通过此验证，超时将从群组【Elixir 中文交流】中封禁。",
-      markup_body: "[3](101:1) [2](101:2)"
-    }
-  end
-
   def build(:verification) do
     %PolicrMini.Chats.Verification{
       target_user_id: 491_837_624,

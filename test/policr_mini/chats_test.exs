@@ -369,8 +369,6 @@ defmodule PolicrMini.ChatsTest do
   end
 
   describe "verifications" do
-    alias PolicrMini.MessageSnapshotBusiness
-
     def build_verification_params(attrs \\ []) do
       chat_id =
         if chat_id = attrs[:chat_id] do
@@ -381,22 +379,7 @@ defmodule PolicrMini.ChatsTest do
           chat.id
         end
 
-      message_snapshot_id =
-        if message_snapshot_id = attrs[:message_snapshot_id] do
-          message_snapshot_id
-        else
-          {:ok, message_snapshot} =
-            MessageSnapshotBusiness.create(
-              :message_snapshot
-              |> Factory.build(chat_id: chat_id)
-              |> Map.from_struct()
-            )
-
-          message_snapshot.id
-        end
-
-      verification =
-        Factory.build(:verification, chat_id: chat_id, message_snapshot_id: message_snapshot_id)
+      verification = Factory.build(:verification, chat_id: chat_id)
 
       verification |> struct(attrs) |> Map.from_struct()
     end
@@ -407,7 +390,6 @@ defmodule PolicrMini.ChatsTest do
       {:ok, verification} = create_verification(verification_params)
 
       assert verification.chat_id == verification_params.chat_id
-      assert verification.message_snapshot_id == verification_params.message_snapshot_id
       assert verification.message_id == verification_params.message_id
       assert verification.indices == verification_params.indices
       assert verification.seconds == verification_params.seconds
