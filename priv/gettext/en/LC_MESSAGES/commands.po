@@ -14,538 +14,538 @@ msgstr ""
 #: lib/policr_mini_bot/plugs/handle_self_permissions_change_plug.ex:386
 #, elixir-autogen, elixir-format
 msgid "我已经具备必要管理权限了，是否立即接管新成员验证？"
-msgstr ""
+msgstr "I already have the necessary management permissions. Do you want to take over the verification of new members immediately?"
 
 #: lib/policr_mini_bot/plugs/handle_self_permissions_change_plug.ex:216
 #, elixir-autogen, elixir-format
 msgid "我已经具备必要管理权限了，是否重新接管新成员验证？"
-msgstr ""
+msgstr "I already have the necessary management permissions. Do you want to take over the verification of new members again?"
 
 #: lib/policr_mini_bot/plugs/handle_self_permissions_change_plug.ex:217
 #: lib/policr_mini_bot/plugs/handle_self_permissions_change_plug.ex:387
 #, elixir-autogen, elixir-format
 msgid "提示：群管理可直接通过按钮启用，亦可随时进入后台页面操作。"
-msgstr ""
+msgstr "Note: Group management can be enabled directly through buttons or accessed anytime through the backend page."
 
 #: lib/policr_mini_bot/plugs/handle_self_permissions_change_plug.ex:234
 #: lib/policr_mini_bot/plugs/handle_self_permissions_change_plug.ex:373
 #, elixir-autogen, elixir-format
 msgid "- 删除消息（Delete messages）\n- 封禁成员（Ban users）"
-msgstr ""
+msgstr "- Delete messages \n- Ban users"
 
 #: lib/policr_mini_bot/plugs/call_answer_plug.ex:102
 #: lib/policr_mini_bot/plugs/resp_start_cmd_plug.ex:120
 #, elixir-autogen, elixir-format
 msgid "发生了一些未预料的情况，请向开发者反馈。"
-msgstr ""
+msgstr "Something unexpected happened. Please provide feedback to the developers."
 
 #: lib/policr_mini_bot/plugs/handle_self_joined_plug.ex:183
 #, elixir-autogen, elixir-format
 msgid "为了避免误解，附加一些有关用户自行测试的说明：当退群重进的用户身份是群主时是不会产生验证的，请使用小号或拜托其他人测试。"
-msgstr ""
+msgstr "To avoid misunderstandings, here are some additional instructions for user self-testing: When a user re-joins the group after leaving, there won't be any verification if they are the group owner. Please use an alternate account or ask someone else to test."
 
 #: lib/policr_mini_bot/plugs/handle_self_joined_plug.ex:140
 #, elixir-autogen, elixir-format
 msgid "出现了一些问题，群组登记失败。请联系开发者。"
-msgstr ""
+msgstr "There was an issue, and group registration failed. Please contact the developers."
 
 #: lib/policr_mini_bot/plugs/handle_self_joined_plug.ex:160
 #, elixir-autogen, elixir-format
 msgid "功能关闭方法（标准流程）：\n- 进入后台操作。\n\n功能自动关闭（非标准流程）：\n- 将机器人的管理员身份撤销。\n- 将机器人的任一必要管理权限关闭。\n\n以下非正常操作会导致机器人自动退出：\n- 关闭机器人的发消息权限。"
-msgstr ""
+msgstr "Method to disable the function (standard procedure):\n- Access the backend.\n\nFunction automatically disabled (non-standard procedure): \n- Revoke the bot's administrator status. \n- Disable any necessary management permissions for the bot. \n\nThe following abnormal operations will cause the bot to automatically exit: \n- Disabling the bot's message-sending permission."
 
 #: lib/policr_mini_bot/plugs/handle_self_joined_plug.ex:153
 #, elixir-autogen, elixir-format
 msgid "功能启用流程：\n1. 将本机器人提升为管理员。\n2. 操作一完成后将自动提供的功能启用按钮，或进入后台操作。"
-msgstr ""
+msgstr "Procedure to enable the function: \n1. Promote this bot to administrator. \n2. After the operation is completed, an automatic function enable button will be provided or access the backend for further action."
 
 #: lib/policr_mini_bot/plugs/handle_self_joined_plug.ex:150
 #, elixir-autogen, elixir-format
 msgid "已成功登记本群信息，所有管理员皆可登入后台。"
-msgstr ""
+msgstr "Group information has been successfully registered, and all administrators can log in to the backend."
 
 #: lib/policr_mini_bot/plugs/handle_self_joined_plug.ex:149
 #, elixir-autogen, elixir-format
 msgid "欢迎使用"
-msgstr ""
+msgstr "Welcome to use"
 
 #: lib/policr_mini_bot/plugs/handle_self_joined_plug.ex:181
 #, elixir-autogen, elixir-format
 msgid "注意：当前后台网页仅支持桌面浏览器访问，手机尚未兼容。"
-msgstr ""
+msgstr "Note: The current backend webpage only supports desktop browser access and is not yet compatible with mobile devices."
 
 #: lib/policr_mini_bot/plugs/handle_self_joined_plug.ex:207
 #, elixir-autogen, elixir-format
 msgid "订阅更新"
-msgstr ""
+msgstr "Subscribe for updates"
 
 #: lib/policr_mini_bot/plugs/handle_self_joined_plug.ex:213
 #, elixir-autogen, elixir-format
 msgid "设置为管理员"
-msgstr ""
+msgstr "Set as administrator"
 
 #: lib/policr_mini_bot/plugs/handle_self_joined_plug.ex:173
 #, elixir-autogen, elixir-format
 msgid "进入后台方法：\n- 私聊发送 %{command} 命令"
-msgstr ""
+msgstr "Method to access the backend: \n- Send %{command} command via private chat"
 
 #: lib/policr_mini_bot/plugs/handle_self_joined_plug.ex:182
 #, elixir-autogen, elixir-format
 msgid "撤销机器人的管理员或必要管理权限并不会导致机器人退群，也是被认可的取消接管方式。但将机器人禁言是毫无意义的，机器人只能选择退出。"
-msgstr ""
+msgstr "Revoking the bot's administrator or necessary management permissions will not cause the bot to leave the group. It is an accepted way to cancel the takeover. However, muting the bot is pointless as it can only choose to leave."
 
 #: lib/policr_mini_bot/plugs/resp_sync_cmd_plug.ex:109
 #, elixir-autogen, elixir-format
 msgid "出现了一些问题，同步失败。请联系开发者。"
-msgstr ""
+msgstr "There was an issue, and synchronization failed. Please contact the developers."
 
 #: lib/policr_mini_bot/plugs/resp_sync_cmd_plug.ex:71
 #, elixir-autogen, elixir-format
 msgid "同步成功"
-msgstr ""
+msgstr "Synchronization successful"
 
 #: lib/policr_mini_bot/plugs/resp_sync_cmd_plug.ex:81
 #, elixir-autogen, elixir-format
 msgid "因为本机器人具备权限，已接管新成员验证。"
-msgstr ""
+msgstr "The new member verification has been taken over because this bot has the required permissions."
 
 #: lib/policr_mini_bot/plugs/resp_sync_cmd_plug.ex:90
 #, elixir-autogen, elixir-format
 msgid "因为本机器人缺失必要管理权限，所以无法接管新成员验证。"
-msgstr ""
+msgstr "The new member verification cannot be taken over because this bot lacks the necessary management permissions."
 
 #: lib/policr_mini_bot/plugs/resp_sync_cmd_plug.ex:73
 #, elixir-autogen, elixir-format
 msgid "已更新管理员权限。"
-msgstr ""
+msgstr "Administrator permissions have been updated."
 
 #: lib/policr_mini_bot/plugs/resp_sync_cmd_plug.ex:72
 #, elixir-autogen, elixir-format
 msgid "已更新群组资料。"
-msgstr ""
+msgstr "Group information has been updated."
 
 #: lib/policr_mini_bot/plugs/resp_sync_cmd_plug.ex:79
 #, elixir-autogen, elixir-format
 msgid "新成员验证已处于接管状态。"
-msgstr ""
+msgstr "The new member verification is already in takeover mode."
 
 #: lib/policr_mini_bot/plugs/resp_sync_cmd_plug.ex:88
 #, elixir-autogen, elixir-format
 msgid "由于本机器人缺失必要管理权限，已取消对新成员验证的接管。"
-msgstr ""
+msgstr "The takeover of the new member verification has been canceled because this bot lacks the necessary management permissions."
 
 #: lib/policr_mini_bot/captchas/custom_captcha.ex:28
 #, elixir-autogen, elixir-format
 msgid "异常提醒"
-msgstr ""
+msgstr "Exception reminder"
 
 #: lib/policr_mini_bot/verification_helper.ex:483
 #, elixir-autogen, elixir-format
 msgid "来自『%{chat_title}』的验证，请确认问题并选择您认为正确的答案。"
-msgstr ""
+msgstr "Verification from 『%{chat_title}』: Please confirm the question and select the answer you think is correct."
 
 #: lib/policr_mini_bot/captchas/custom_captcha.ex:30
 #, elixir-autogen, elixir-format
 msgid "由于本群未设置自定义问答内容，已将验证模式从自定义切换为系统默认。"
-msgstr ""
+msgstr "As this group has not set custom Q&A content, the verification mode has been switched from custom to system default."
 
 #: lib/policr_mini_bot/message_caller.ex:66
 #, elixir-autogen, elixir-format
 msgid "这是一条错误：消息生成失败，不受支持的附件类型或无效的附件字符串。"
-msgstr ""
+msgstr "This is an error: Message generation failed due to an unsupported attachment type or an invalid attachment string."
 
 #: lib/policr_mini_bot/captchas/custom_captcha.ex:32
 #, elixir-autogen, elixir-format
 msgid "这是一种自我纠错的机制，并不影响验证消息的生成，通常也不会再次出现（短时间内高并发验证除外）。"
-msgstr ""
+msgstr "This is a self-correcting mechanism that does not affect the generation of verification messages and usually will not appear again (except for high-concurrency verifications in a short period)."
 
 #: lib/policr_mini_bot/plugs/resp_login_cmd_plug.ex:34
 #, elixir-autogen, elixir-format
 msgid "安全小贴士：不可将按钮中的链接或登录令牌分享于他人，除非您想将控制权短暂的共享于他。"
-msgstr ""
+msgstr "Security tip: Do not share links or login tokens in buttons with others unless you want to temporarily share control with them."
 
 #: lib/policr_mini_bot/plugs/resp_login_cmd_plug.ex:27
 #, elixir-autogen, elixir-format
 msgid "已为您创建一枚令牌，点击下方按钮可直接进入后台。亦或复制令牌手动登入。"
-msgstr ""
+msgstr "A token has been created for you. Click the button below to access the backend directly, or copy the token for manual login."
 
 #: lib/policr_mini_bot/plugs/resp_login_cmd_plug.ex:117
 #, elixir-autogen, elixir-format
 msgid "吊销全部令牌"
-msgstr ""
+msgstr "Revoke all tokens"
 
 #: lib/policr_mini_bot/plugs/resp_login_cmd_plug.ex:59
 #, elixir-autogen, elixir-format
 msgid "未找到和您相关的权限记录"
-msgstr ""
+msgstr "No permission records found related to you"
 
 #: lib/policr_mini_bot/plugs/resp_login_cmd_plug.ex:75
 #, elixir-autogen, elixir-format
 msgid "未找到和您相关的用户记录"
-msgstr ""
+msgstr "No user records found related to you"
 
 #: lib/policr_mini_bot/plugs/resp_login_cmd_plug.ex:94
 #, elixir-autogen, elixir-format
 msgid "请在私聊中使用此命令。"
-msgstr ""
+msgstr "Please use this command in private chat."
 
 #: lib/policr_mini_bot/plugs/resp_login_cmd_plug.ex:123
 #, elixir-autogen, elixir-format
 msgid "进入后台"
-msgstr ""
+msgstr "Access the backend"
 
 #: lib/policr_mini_bot/plugs/call_revoke_token_plug.ex:32
 #, elixir-autogen, elixir-format
 msgid "出于某些原因吊销操作未实际执行，请尝试联系社区群寻求帮助。"
-msgstr ""
+msgstr "The revocation operation was not actually executed for some reason. Please try to contact the community group for assistance."
 
 #: lib/policr_mini_bot/plugs/resp_login_cmd_plug.ex:13
 #, elixir-autogen, elixir-format
 msgid "如果您确定自己是群管理员，且群组中的确使用了本机器人。请通知群主或其它管理员在群内使用 %{command} 命令同步最新数据。"
-msgstr ""
+msgstr "If you are sure that you are a group administrator and this bot is indeed used in the group, please inform the group owner or other administrators to use the %{command} command to synchronize the latest data in the group."
 
 #: lib/policr_mini_bot/plugs/call_revoke_token_plug.ex:26
 #, elixir-autogen, elixir-format
 msgid "已成功吊销自 %{datetime} 之前的全部令牌。"
-msgstr ""
+msgstr "All tokens before %{datetime} have been successfully revoked."
 
 #: lib/policr_mini_bot/runner/working_checker.ex:24
 #, elixir-autogen, elixir-format
 msgid "如需恢复接管，请将机器人提升为管理员，并确保至少具备「封禁用户」和「删除消息」权限。"
-msgstr ""
+msgstr "To regain control, promote the bot to an administrator and ensure it has at least "Ban users" and "Delete messages" permissions."
 
 #: lib/policr_mini_bot/common.ex:10
 #, elixir-autogen, elixir-format
 msgid "将本群升级为超级群以后，可再次添加本机器人。如果您正在实施测试，请在测试完成后将本机器人移出群组。"
-msgstr ""
+msgstr "After upgrading this group to a supergroup, you can add this bot again. If you are conducting tests, please remove this bot from the group after the testing is completed."
 
 #: lib/policr_mini_bot/plugs/resp_start_cmd_plug.ex:133
 #, elixir-autogen, elixir-format
 msgid "很抱歉，我未能理解您的意图。"
-msgstr ""
+msgstr "I'm sorry, I didn't understand your intent."
 
 #: lib/policr_mini_bot/common.ex:12
 #, elixir-autogen, elixir-format
 msgid "提示：如果您不清楚普通群、超级群这些概念，请尝试为本群创建公开链接。创建公开链接后再转私有的群仍然是超级群。"
-msgstr ""
+msgstr "Note: If you are not familiar with concepts like normal groups and supergroups, try creating a public link for this group. Even after converting a public link group to private, it will still be a supergroup."
 
 #: lib/policr_mini_bot/common.ex:8
 #, elixir-autogen, elixir-format
 msgid "请在超级群中使用本机器人"
-msgstr ""
+msgstr "Please use this bot in a supergroup"
 
 #: lib/policr_mini_bot/runner/working_checker.ex:23
 #, elixir-autogen, elixir-format
 msgid "由于机器人缺少必要权限，已取消对新成员验证的接管"
-msgstr ""
+msgstr "The takeover of new member verification has been canceled because the bot lacks the necessary permissions."
 
 #: lib/policr_mini_bot/verification_helper.ex:562
 #, elixir-autogen, elixir-format
 msgid "%{count} 秒"
-msgstr ""
+msgstr "%{count} seconds"
 
 #: lib/policr_mini_bot/verification_helper.ex:688
 #, elixir-autogen, elixir-format
 msgid "刚刚 %{mention} 被手动封禁，针对 TA 个人的验证已取消。"
-msgstr ""
+msgstr "Just now, %{mention} was manually banned, and the verification for them has been canceled."
 
 #: lib/policr_mini_bot/verification_helper.ex:692
 #, elixir-autogen, elixir-format
 msgid "刚刚 %{mention} 被手动踢出，针对 TA 个人的验证已取消。"
-msgstr ""
+msgstr "Just now, %{mention} was manually kicked out, and the verification for them has been canceled."
 
 #: lib/policr_mini_bot/verification_helper.ex:657
 #, elixir-autogen, elixir-format
 msgid "刚刚 %{mention} 超时未验证，已拒绝其加入请求。"
-msgstr ""
+msgstr "Just now, %{mention} timed out without verification, and their join request has been rejected."
 
 #: lib/policr_mini_bot/verification_helper.ex:654
 #, elixir-autogen, elixir-format
 msgid "刚刚 %{mention} 超时未验证，已拒绝其加入请求并实施封禁。"
-msgstr ""
+msgstr "Just now, %{mention} timed out without verification, and their join request has been rejected and banned."
 
 #: lib/policr_mini_bot/verification_helper.ex:621
 #, elixir-autogen, elixir-format
 msgid "刚刚 %{mention} 超时未验证，已经移出本群。"
-msgstr ""
+msgstr "Just now, %{mention} timed out without verification, and they have been removed from this group."
 
 #: lib/policr_mini_bot/verification_helper.ex:618
 #, elixir-autogen, elixir-format
 msgid "刚刚 %{mention} 超时未验证，已被封禁。"
-msgstr ""
+msgstr "Just now, %{mention} timed out without verification, and they have been banned."
 
 #: lib/policr_mini_bot/verification_helper.ex:675
 #, elixir-autogen, elixir-format
 msgid "刚刚 %{mention} 验证错误，已拒绝其加入请求。"
-msgstr ""
+msgstr "Just now, %{mention} verification failed, and their join request has been rejected."
 
 #: lib/policr_mini_bot/verification_helper.ex:672
 #, elixir-autogen, elixir-format
 msgid "刚刚 %{mention} 验证错误，已拒绝其加入请求并实施封禁。"
-msgstr ""
+msgstr "Just now, %{mention} verification failed, and their join request has been rejected and banned."
 
 #: lib/policr_mini_bot/verification_helper.ex:639
 #, elixir-autogen, elixir-format
 msgid "刚刚 %{mention} 验证错误，已经移出本群。"
-msgstr ""
+msgstr "Just now, %{mention} verification failed, and they have been removed from this group."
 
 #: lib/policr_mini_bot/verification_helper.ex:636
 #, elixir-autogen, elixir-format
 msgid "刚刚 %{mention} 验证错误，已被封禁。"
-msgstr ""
+msgstr "Just now, %{mention} verification failed, and they have been banned."
 
 #: lib/policr_mini_bot/verification_helper.ex:426
 #: lib/policr_mini_bot/verification_helper.ex:442
 #, elixir-autogen, elixir-format
 msgid "加群请求会根据验证结果自动处理，并按照方案决定是否进一步封禁。"
-msgstr ""
+msgstr "Join requests will be automatically processed based on the verification results, and further bans will be determined according to the plan."
 
 #: lib/policr_mini_bot/verification_helper.ex:245
 #, elixir-autogen, elixir-format
 msgid "发生了一些错误，针对 %{mention} 的验证创建失败。"
-msgstr ""
+msgstr "An error occurred, and verification creation for %{mention} failed."
 
 #: lib/policr_mini_bot/verification_helper.ex:126
 #, elixir-autogen, elixir-format
 msgid "发生了一些错误，针对 %{mention} 的验证创建失败。请管理员自行鉴别并决定取消限制或手动封禁。"
-msgstr ""
+msgstr "An error occurred, and verification creation for %{mention} failed. Administrators need to review and decide whether to cancel the restriction or manually ban the user."
 
 #: lib/policr_mini_bot/verification_helper.ex:130
 #: lib/policr_mini_bot/verification_helper.ex:249
 #, elixir-autogen, elixir-format
 msgid "如果反复出现此问题，请取消接管状态并通知开发者。"
-msgstr ""
+msgstr "If this issue persists, please cancel the takeover status and inform the developers."
 
 #: lib/policr_mini_bot/verification_helper.ex:226
 #, elixir-autogen, elixir-format
 msgid "如果没有手动处理此用户的加群申请，待验证过期后会自动拒绝。"
-msgstr ""
+msgstr "If this user's join request is not handled manually, it will be automatically rejected after the verification expires."
 
 #: lib/policr_mini_bot/plugs/handle_group_member_left_plug.ex:91
 #, elixir-autogen, elixir-format
 msgid "已将曾经的管理员 %{mention} 的后台权限移除。"
-msgstr ""
+msgstr "The backend permissions of former administrator %{mention} have been removed."
 
 #: lib/policr_mini_bot/plugs/call_answer_plug.ex:211
 #, elixir-autogen, elixir-format
 msgid "恭喜您通过了『%{chat_title}』的加群验证，已批准加入请求。"
-msgstr ""
+msgstr "Congratulations, you have passed the verification to join '%{chat_title}', and your request has been approved."
 
 #: lib/policr_mini_bot/plugs/call_answer_plug.ex:188
 #, elixir-autogen, elixir-format
 msgid "恭喜您通过了『%{chat_title}』的加群验证，权限已恢复。"
-msgstr ""
+msgstr "Congratulations, you have passed the verification to join '%{chat_title}', and your permissions have been restored."
 
 #: lib/policr_mini_bot/plugs/resp_start_cmd_plug.ex:54
 #, elixir-autogen, elixir-format
 msgid "您好，我是一个专注于新成员验证的机器人。"
-msgstr ""
+msgstr "Hello, I am a bot specialized in new member verification."
 
 #: lib/policr_mini_bot/plugs/resp_start_cmd_plug.ex:125
 #, elixir-autogen, elixir-format
 msgid "您没有该目标群组的待验证记录。"
-msgstr ""
+msgstr "You have no pending verification records in the target group."
 
 #: lib/policr_mini_bot/plugs/resp_start_cmd_plug.ex:55
 #, elixir-autogen, elixir-format
 msgid "我具有稳定的服务，便于操作的网页后台。并不断增强与优化的核心功能，保持长期维护。同时我是开源的，可自由复制部署的。"
-msgstr ""
+msgstr "I provide stable service, an easy-to-use web backend, constantly enhanced and optimized core functionalities, and long-term maintenance. Additionally, I am open-source and can be freely copied and deployed."
 
 #: lib/policr_mini_bot/plugs/call_answer_plug.ex:352
 #, elixir-autogen, elixir-format
 msgid "抱歉，您未通过『%{chat_title}』的加群验证。已拒绝加入请求。"
-msgstr ""
+msgstr "Sorry, you did not pass the verification to join '%{chat_title}'. Your join request has been rejected."
 
 #: lib/policr_mini_bot/plugs/call_answer_plug.ex:346
 #, elixir-autogen, elixir-format
 msgid "抱歉，您未通过『%{chat_title}』的加群验证。已拒绝加入请求并被禁止再次申请加入。"
-msgstr ""
+msgstr "Sorry, you did not pass the verification to join '%{chat_title}'. Your join request has been rejected, and you are prohibited from applying again."
 
 #: lib/policr_mini_bot/plugs/call_answer_plug.ex:316
 #, elixir-autogen, elixir-format
 msgid "抱歉，您未通过『%{chat_title}』的加群验证。已被封禁。"
-msgstr ""
+msgstr "Sorry, you did not pass the verification to join '%{chat_title}'. You have been banned."
 
 #: lib/policr_mini_bot/plugs/call_answer_plug.ex:322
 #, elixir-autogen, elixir-format
 msgid "抱歉，您未通过『%{chat_title}』的加群验证。已被移出该群。"
-msgstr ""
+msgstr "Sorry, you did not pass the verification to join '%{chat_title}'. You have been removed from the group."
 
 #: lib/policr_mini_bot/plugs/call_answer_plug.ex:326
 #, elixir-autogen, elixir-format
 msgid "提示：可稍后重新尝试，但无法立刻再次加入。"
-msgstr ""
+msgstr "Note: You can try again later, but you cannot rejoin immediately."
 
 #: lib/policr_mini_bot/plugs/call_answer_plug.ex:356
 #, elixir-autogen, elixir-format
 msgid "提示：可稍后重新尝试，但无法立刻再次申请加入。"
-msgstr ""
+msgstr "Note: You can try again later, but you cannot reapply for joining immediately."
 
 #: lib/policr_mini_bot/plugs/call_answer_plug.ex:215
 #, elixir-autogen, elixir-format
 msgid "提示：如果仍未加入群聊请主动联系群管理。"
-msgstr ""
+msgstr "Note: If you are still not added to the group, please contact the group administrators proactively."
 
 #: lib/policr_mini_bot/plugs/call_answer_plug.ex:192
 #, elixir-autogen, elixir-format
 msgid "提示：如果限制仍未解除请主动联系群管理。"
-msgstr ""
+msgstr "Note: If the restriction is not lifted, please contact the group administrators proactively."
 
 #: lib/policr_mini_bot/plugs/handle_group_member_left_plug.ex:96
 #, elixir-autogen, elixir-format
 msgid "提示：由于此特性的加入，在管理员已离开群组的场景下将不再需要手动调用 %{command} 命令。"
-msgstr ""
+msgstr "Note: With the addition of this feature, in the scenario where the administrator has left the group, there is no longer a need to manually call the %{command} command."
 
 #: lib/policr_mini_bot/plugs/handle_admin_permissions_change_plug.ex:124
 #, elixir-autogen, elixir-format
 msgid "提示：由于此特性的加入，在管理员权限变化的场景下将不再需要手动调用 %{command} 命令。"
-msgstr ""
+msgstr "Note: With the addition of this feature, in the scenario of administrator permission changes, there is no longer a need to manually call the %{command} command."
 
 #: lib/policr_mini_bot/verification_helper.ex:344
 #, elixir-autogen, elixir-format
 msgid "新成员 %{mention} 你好！"
-msgstr ""
+msgstr "New member %{mention}, hello!"
 
 #: lib/policr_mini_bot/verification_helper.ex:222
 #, elixir-autogen, elixir-format
 msgid "无法主动与 %{mention} 对话，针对 TA 的验证消息没有送达。"
-msgstr ""
+msgstr "Unable to initiate a conversation with %{mention}, the verification message for them was not delivered."
 
 #: lib/policr_mini_bot/plugs/resp_embarrass_member_cmd_plug.ex:51
 #, elixir-autogen, elixir-format
 msgid "无法对拥有管理权限的人实施验证。"
-msgstr ""
+msgstr "Verification cannot be implemented on someone with management permissions."
 
 #: lib/policr_mini_bot/verification_helper.ex:360
 #, elixir-autogen, elixir-format
 msgid "最近加入的 %{mention} 和另外 %{remaining_count} 个还未验证的新成员，你们好！"
-msgstr ""
+msgstr "Hello to the recently joined %{mention} and %{remaining_count} other new members who are yet to be verified!"
 
 #: lib/policr_mini_bot/verification_helper.ex:437
 #, elixir-autogen, elixir-format
 msgid "最近申请加入的 %{mention} 和另外 %{remaining_count} 个用户正在验证！"
-msgstr ""
+msgstr "Hello to the recently applied %{mention} and %{remaining_count} other users who are currently being verified!"
 
 #: lib/policr_mini_bot/plugs/resp_login_cmd_plug.ex:30
 #, elixir-autogen, elixir-format
 msgid "有效期为 %{day_count} 天，过期需重新申请和登入。如怀疑泄漏请立即吊销。"
-msgstr ""
+msgstr "The validity period is %{day_count} days. If you suspect leakage, revoke it immediately."
 
 #: lib/policr_mini_bot/plugs/call_answer_plug.ex:39
 #, elixir-autogen, elixir-format
 msgid "有请求正在处理中…"
-msgstr ""
+msgstr "There is a request being processed..."
 
 #: lib/policr_mini_bot/plugs/handle_admin_permissions_change_plug.ex:148
 #, elixir-autogen, elixir-format
 msgid "检测到用户 %{mention} 的管理权限变化，但由于某些原因同步到后台权限失败了。"
-msgstr ""
+msgstr "A change in management permissions for %{mention} was detected, but the synchronization to the backend failed due to certain reasons."
 
 #: lib/policr_mini_bot/plugs/handle_admin_permissions_change_plug.ex:119
 #, elixir-autogen, elixir-format
 msgid "检测到群成员 %{mention} 的管理权限变化，已自动同步至后台权限中。"
-msgstr ""
+msgstr "A change in management permissions for group member %{mention} has been detected and automatically synchronized to the backend permissions."
 
 #: lib/policr_mini_bot/plugs/call_answer_plug.ex:47
 #, elixir-autogen, elixir-format
 msgid "此任务已被处理过了～"
-msgstr ""
+msgstr "This task has already been processed～"
 
 #: lib/policr_mini_bot/plugs/call_answer_plug.ex:390
 #, elixir-autogen, elixir-format
 msgid "此条验证并不针对你～"
-msgstr ""
+msgstr "This verification is not for you～"
 
 #: lib/policr_mini_bot/plugs/call_answer_plug.ex:387
 #, elixir-autogen, elixir-format
 msgid "没有找到和这条验证有关的记录～"
-msgstr ""
+msgstr "No records related to this verification were found～"
 
 #: lib/policr_mini_bot/verification_helper.ex:387
 #, elixir-autogen, elixir-format
 msgid "点此验证"
-msgstr ""
+msgstr "Click here to verify"
 
 #: lib/policr_mini_bot/verification_helper.ex:422
 #, elixir-autogen, elixir-format
 msgid "用户 %{mention} 正在验证！"
-msgstr ""
+msgstr "User %{mention} is being verified!"
 
 #: lib/policr_mini_bot/plugs/resp_embarrass_member_cmd_plug.ex:23
 #, elixir-autogen, elixir-format
 msgid "用法错误，请用此命令回复普通群成员的消息。"
-msgstr ""
+msgstr "Incorrect usage, please use this command to reply to messages from regular group members."
 
 #: lib/policr_mini_bot/plugs/call_answer_plug.ex:89
 #, elixir-autogen, elixir-format
 msgid "答案校验失败，请管理员并通知开发者。"
-msgstr ""
+msgstr "Answer validation failed, please inform the administrators and developers."
 
 #: lib/policr_mini_bot/plugs/resp_start_cmd_plug.ex:58
 #, elixir-autogen, elixir-format
 msgid "访问 %{here_link} 更加了解一下我吧～"
-msgstr ""
+msgstr "Visit %{here_link} to learn more about me～"
 
 #: lib/policr_mini_bot/verification_helper.ex:30
 #, elixir-autogen, elixir-format
 msgid "请管理员自行鉴别后决定批准或拒绝此用户的加群请求。"
-msgstr ""
+msgstr "Administrators, please review and decide whether to approve or reject this user's join request."
 
 #: lib/policr_mini_bot/verification_helper.ex:623
 #: lib/policr_mini_bot/verification_helper.ex:641
 #, elixir-autogen, elixir-format
 msgid "过 %{time_text}后可再次尝试加入。"
-msgstr ""
+msgstr "You can try to join again after %{time_text}."
 
 #: lib/policr_mini_bot/verification_helper.ex:659
 #: lib/policr_mini_bot/verification_helper.ex:677
 #, elixir-autogen, elixir-format
 msgid "过 %{time_text}后可再次申请加入。"
-msgstr ""
+msgstr "You can reapply for joining after %{time_text}."
 
 #: lib/policr_mini_bot/verification_helper.ex:350
 #: lib/policr_mini_bot/verification_helper.ex:366
 #, elixir-autogen, elixir-format
 msgid "过期会被踢出或封禁，请尽快。"
-msgstr ""
+msgstr "Expired users will be kicked or banned, so please act quickly."
 
 #: lib/policr_mini_bot/plugs/call_answer_plug.ex:393
 #, elixir-autogen, elixir-format
 msgid "这条验证可能已经失效了～"
-msgstr ""
+msgstr "This verification may have expired～"
 
 #: lib/policr_mini_bot/plugs/resp_embarrass_member_cmd_plug.ex:33
 #, elixir-autogen, elixir-format
 msgid "验证机器人帐号是没有意义的。"
-msgstr ""
+msgstr "Verifying a bot account is meaningless."
 
 #: lib/policr_mini_bot/verification_helper.ex:487
 #, elixir-autogen, elixir-format
 msgid "您还剩 %{count} 秒，通过可解除限制。"
-msgstr ""
+msgstr "You have %{count} seconds left to pass and lift the restriction."
 
 #: lib/policr_mini_bot/verification_helper.ex:348
 #, elixir-autogen, elixir-format
 msgid "您当前需要完成验证才能解除限制，验证有效时间不超过 %{count} 秒。"
-msgstr ""
+msgstr "You currently need to complete the verification to lift the restriction, and the verification is valid for %{count} seconds."
 
 #: lib/policr_mini_bot/verification_helper.ex:365
 #, elixir-autogen, elixir-format
 msgid "请主动完成验证以解除限制，验证有效时间不超过 %{count} 秒。"
-msgstr ""
+msgstr "Please proactively complete the verification to lift the restriction, and the verification is valid for %{count} seconds."
 
 #: lib/policr_mini_bot/plugs/call_answer_plug.ex:237
 #, elixir-autogen, elixir-format
 msgid "刚刚 %{mention} 通过了验证，用时 %{sec_count} 秒。"
-msgstr ""
+msgstr "Just now, %{mention} passed the verification in %{sec_count} seconds."
 
 #: lib/policr_mini_bot/verification_helper.ex:427
 #: lib/policr_mini_bot/verification_helper.ex:443
 #, elixir-autogen, elixir-format
 msgid "验证有效时间不超过 %{count} 秒。"
-msgstr ""
+msgstr "The verification is valid for %{count} seconds."
 
 #: lib/policr_mini_bot/plugs/resp_sync_cmd_plug.ex:33
 #, elixir-autogen, elixir-format
 msgid "同步过于频繁，请在 %{count} 秒后重试。"
-msgstr ""
+msgstr "Synchronization is too frequent, please retry after %{count} seconds."
