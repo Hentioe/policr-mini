@@ -212,7 +212,7 @@ msgstr "All tokens before %{datetime} have been successfully revoked."
 #: lib/policr_mini_bot/runner/working_checker.ex:24
 #, elixir-autogen, elixir-format
 msgid "如需恢复接管，请将机器人提升为管理员，并确保至少具备「封禁用户」和「删除消息」权限。"
-msgstr "To regain control, promote the bot to an administrator and ensure it has at least "Ban users" and "Delete messages" permissions."
+msgstr "To regain control, promote the bot to an administrator and ensure it has at least 「Ban users」 and 「Delete messages」 permissions."
 
 #: lib/policr_mini_bot/common.ex:10
 #, elixir-autogen, elixir-format
