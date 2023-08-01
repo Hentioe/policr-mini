@@ -1,5 +1,9 @@
 lockfileVersion: '6.0'
 
+settings:
+  autoInstallPeers: true
+  excludeLinksFromLockfile: false
+
 dependencies:
   '@reduxjs/toolkit':
     specifier: ^1.6.1
@@ -102,6 +106,9 @@ devDependencies:
   mini-css-extract-plugin:
     specifier: ^1.6.0
     version: 1.6.2(webpack@5.74.0)
+  prettier:
+    specifier: ^3.0.0
+    version: 3.0.0
   sass:
     specifier: ^1.54.9
     version: 1.54.9
@@ -4563,6 +4570,12 @@ packages:
       nanoid: 3.3.4
       picocolors: 1.0.0
       source-map-js: 1.0.2
+    dev: true
+
+  /prettier@3.0.0:
+    resolution: {integrity: sha512-zBf5eHpwHOGPC47h0zrPyNn+eAEIdEzfywMoYn2XPi0P44Zp0tSq64rq0xAREh4auw2cJZHo9QUob+NqCQky4g==}
+    engines: {node: '>=14'}
+    hasBin: true
     dev: true
 
   /promise-inflight@1.0.1:
