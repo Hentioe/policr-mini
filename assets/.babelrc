@@ -1,23 +1,20 @@
 {
-    "presets": [
-        "@babel/preset-env",
-        "react-app"
+  "presets": ["@babel/preset-env", "react-app"],
+  "plugins": [
+    "babel-plugin-twin",
+    "babel-plugin-macros",
+    "babel-plugin-styled-components",
+    [
+      "@babel/plugin-proposal-private-methods",
+      {
+        "loose": true
+      }
     ],
-    "plugins": [
-        "babel-plugin-twin",
-        "babel-plugin-macros",
-        "babel-plugin-styled-components",
-        [
-            "@babel/plugin-proposal-private-methods",
-            {
-                "loose": true
-            }
-        ],
-        [
-            "@babel/plugin-proposal-private-property-in-object",
-            {
-                "loose": true
-            }
-        ]
+    [
+      "@babel/plugin-proposal-private-property-in-object",
+      {
+        "loose": true
+      }
     ]
+  ]
 }
