@@ -93,7 +93,7 @@ defmodule PolicrMini.Factory do
     %PolicrMini.Instances.ThirdParty{
       name: "开发实例",
       bot_username: "policr_mini_dev_bot",
-      homepage: "https://mini-dev.telestd.me",
+      homepage: "https://mini-dev.tcore.app",
       running_days: 1,
       version: "0.0.1-rc.0",
       is_forked: false
