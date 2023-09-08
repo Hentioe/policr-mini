@@ -47,6 +47,9 @@ config :policr_mini, PolicrMiniBot.Scheduler,
     ]
   ]
 
+# 配置默认语言
+config :policr_mini, PolicrMiniWeb.Gettext, default_locale: "zh"
+
 # 配置 Telegex
 config :telegex,
   timeout: 1000 * 30,
