@@ -1,3 +1,5 @@
+# TODO: 将 `Gettext` 移动到 `PolicrMini` 模块中。
+
 defmodule PolicrMiniWeb.Gettext do
   @moduledoc """
   A module providing Internationalization with a gettext-based API.

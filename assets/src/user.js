@@ -3,11 +3,10 @@ import "../styles/user.scss";
 import React, { useEffect } from "react";
 import { createRoot } from "react-dom/client";
 import { HelmetProvider } from "react-helmet-async";
-import { Provider } from "react-redux";
+import { Provider, useSelector } from "react-redux";
 import { configureStore } from "@reduxjs/toolkit";
 import thunkMiddleware from "redux-thunk";
 import reduxLogger from "redux-logger";
-import { useSelector } from "react-redux";
 import "twin.macro";
 import { BrowserRouter as Router, Routes, Route } from "react-router-dom";
 

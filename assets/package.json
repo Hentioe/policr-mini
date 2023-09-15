@@ -51,6 +51,7 @@
     "css-loader": "^5.2.6",
     "css-minimizer-webpack-plugin": "^4.1.0",
     "mini-css-extract-plugin": "^1.6.0",
+    "prettier": "^3.0.0",
     "sass": "^1.54.9",
     "sass-loader": "^12.1.0",
     "styled-components": "^5.1.1",

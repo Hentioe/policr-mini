@@ -177,7 +177,7 @@ const buildPageContentMissingConfirm = ({ title }) => (
       <a
         tw="text-blue-600"
         target="_blank"
-        href="https://mini.telestd.me/community"
+        href="https://mini.tcore.app/community"
       >
         社群
       </a>
@@ -203,7 +203,7 @@ function calculatePassRate({ totals }) {
 const makeThirdPartiesEndpoint = () => {
   if (_GLOBAL.isIndependent) return null;
   else if (_GLOBAL.isThirdParty)
-    return "https://mini.telestd.me/api/third_parties";
+    return "https://mini.tcore.app/api/third_parties";
   else return "/api/third_parties";
 };
 

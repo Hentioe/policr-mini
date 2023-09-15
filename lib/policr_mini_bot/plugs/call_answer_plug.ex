@@ -234,9 +234,9 @@ defmodule PolicrMiniBot.CallAnswerPlug do
     seconds = DateTime.diff(DateTime.utc_now(), v.inserted_at)
 
     text =
-      commands_text("刚刚 %{mention} 通过了验证，用时 %{seconds} 秒。",
+      commands_text("刚刚 %{mention} 通过了验证，用时 %{sec_count} 秒。",
         mention: mention(user, anonymization: false),
-        seconds: seconds
+        sec_count: seconds
       )
 
     async do

@@ -5,7 +5,7 @@ defmodule PolicrMini.MixProject do
     [
       app: :policr_mini,
       version: "0.1.0",
-      elixir: "~> 1.14",
+      elixir: "~> 1.15",
       elixirc_paths: elixirc_paths(Mix.env()),
       compilers: [:phoenix] ++ Mix.compilers(),
       start_permanent: Mix.env() == :prod,
@@ -42,7 +42,7 @@ defmodule PolicrMini.MixProject do
     [
       # {:dep_from_hexpm, "~> 0.3.0"},
       # {:dep_from_git, git: "https://github.com/elixir-lang/my_dep.git", tag: "0.1.0"}
-      {:dialyxir, "~> 1.3", only: [:dev], runtime: false},
+      {:dialyxir, "~> 1.4", only: [:dev], runtime: false},
       {:credo, "~> 1.7", only: [:dev, :test], runtime: false},
       {:telegex, "~> 1.0.0-rc.3"},
       {:telegex_plug, "~> 0.3"},
@@ -73,7 +73,9 @@ defmodule PolicrMini.MixProject do
       {:not_qwerty123, "~> 2.3"},
       {:yaml_elixir, "~> 2.7"},
       {:unzip, "~> 0.8"},
-      {:mime, "~> 2.0"}
+      {:mime, "~> 2.0"},
+      # TODO: 使用 Telegex 1.0+ 以后（HTTP 客户端改为 Finch），此依赖将会移除。
+      {:ssl_verify_fun, "~> 1.1", override: true}
     ]
   end
 

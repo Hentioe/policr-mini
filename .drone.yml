@@ -5,7 +5,7 @@ name: default
 
 steps:
   - name: app-compile
-    image: elixircn/elixir:1.14.5-otp-26-slim
+    image: elixircn/elixir:1.15.5-otp-26-slim
     environment:
       MIX_ENV: prod
     commands:
@@ -18,12 +18,12 @@ steps:
   - name: assets-build
     image: node:lts-hydrogen
     commands:
-      - npm install --location=global pnpm@8.6.7
+      - npm install --location=global pnpm@8.7.5
       - pnpm --prefix assets install
       - pnpm --prefix assets run deploy
 
   - name: app-build
-    image: elixircn/elixir:1.14.5-otp-26-slim
+    image: elixircn/elixir:1.15.5-otp-26-slim
     pull: always
     environment:
       MIX_ENV: prod

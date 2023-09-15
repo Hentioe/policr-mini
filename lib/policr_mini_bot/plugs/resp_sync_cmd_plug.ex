@@ -30,8 +30,8 @@ defmodule PolicrMiniBot.RespSyncCmdPlug do
       waiting_sec > 0 ->
         send_text(
           chat_id,
-          commands_text("同步过于频繁，请在 %{sec_count} 秒后重试。",
-            sec_count: waiting_sec
+          commands_text("同步过于频繁，请在 %{count} 秒后重试。",
+            count: waiting_sec
           ),
           logging: true
         )
