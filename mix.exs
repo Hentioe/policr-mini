@@ -44,7 +44,7 @@ defmodule PolicrMini.MixProject do
       # {:dep_from_git, git: "https://github.com/elixir-lang/my_dep.git", tag: "0.1.0"}
       {:dialyxir, "~> 1.4", only: [:dev], runtime: false},
       {:credo, "~> 1.7", only: [:dev, :test], runtime: false},
-      {:telegex, "~> 1.0.0-rc.3"},
+      {:telegex, "~> 1.1"},
       {:telegex_plug, "~> 0.3"},
       {:phoenix, "~> 1.5"},
       {:phoenix_ecto, "~> 4.2"},
@@ -66,6 +66,7 @@ defmodule PolicrMini.MixProject do
       {:cachex, "~> 3.6"},
       {:finch, "~> 0.16.0"},
       {:multipart, "~> 0.4.0"},
+      # TODO: 使用 Finch 替代所有 HTTPosion 代用代码并删除此依赖
       {:httpoison, "~> 2.1"},
       {:casex, "~> 0.4"},
       {:earmark, "~> 1.4"},
@@ -74,8 +75,6 @@ defmodule PolicrMini.MixProject do
       {:yaml_elixir, "~> 2.7"},
       {:unzip, "~> 0.8"},
       {:mime, "~> 2.0"},
-      # TODO: 使用 Telegex 1.0+ 以后（HTTP 客户端改为 Finch），此依赖将会移除。
-      {:ssl_verify_fun, "~> 1.1", override: true}
     ]
   end
 

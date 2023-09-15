@@ -140,7 +140,7 @@ defmodule PolicrMiniWeb.Helper do
     case Telegex.get_file(file_id) do
       {:ok, %{file_path: file_path}} ->
         file_url =
-          "https://api.telegram.org/file/bot#{Telegex.Caller.Adapter.token()}/#{file_path}"
+          "https://api.telegram.org/file/bot#{Telegex.Instance.token()}/#{file_path}"
 
         {:commit, fetch_assets_file(file_url, fallback_photo)}
 
