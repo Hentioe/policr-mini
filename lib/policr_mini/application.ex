@@ -15,7 +15,9 @@ defmodule PolicrMini.Application do
     tg_serve? = config[:tg_serve] || false
 
     children =
-      []
+      [
+        {Finch, name: PolicrMini.Finch}
+      ]
       # Start the Ecto repository
       |> serve_children(PolicrMini.Repo, true)
       # Start the Cacher

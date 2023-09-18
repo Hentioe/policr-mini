@@ -66,15 +66,13 @@ defmodule PolicrMini.MixProject do
       {:cachex, "~> 3.6"},
       {:finch, "~> 0.16.0"},
       {:multipart, "~> 0.4.0"},
-      # TODO: 使用 Finch 替代所有 HTTPosion 代用代码并删除此依赖
-      {:httpoison, "~> 2.1"},
       {:casex, "~> 0.4"},
       {:earmark, "~> 1.4"},
       {:uuid, "~> 2.0", hex: :uuid_erl},
       {:not_qwerty123, "~> 2.3"},
       {:yaml_elixir, "~> 2.7"},
       {:unzip, "~> 0.8"},
-      {:mime, "~> 2.0"},
+      {:mime, "~> 2.0"}
     ]
   end
 

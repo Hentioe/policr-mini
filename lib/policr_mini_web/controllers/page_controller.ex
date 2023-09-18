@@ -1,7 +1,7 @@
 defmodule PolicrMiniWeb.PageController do
   use PolicrMiniWeb, :controller
 
-  import PolicrMiniWeb.Helper
+  alias PolicrMiniWeb.TgAssetsCacher
 
   def index(conn, _params) do
     bot_name = Application.get_env(:policr_mini, PolicrMiniBot)[:name]
@@ -24,7 +24,8 @@ defmodule PolicrMiniWeb.PageController do
   @fallback_avatar "/images/avatar-100x100.jpg"
 
   def own_photo(conn, _params) do
-    photo_path = get_photo_assets(PolicrMiniBot.photo_file_id(), fallback_photo: @fallback_avatar)
+    photo_path =
+      TgAssetsCacher.get_photo_asset(PolicrMiniBot.photo_file_id(), fallback: @fallback_avatar)
 
     Phoenix.Controller.redirect(conn, to: photo_path)
   end

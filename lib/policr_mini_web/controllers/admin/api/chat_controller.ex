@@ -14,6 +14,7 @@ defmodule PolicrMiniWeb.Admin.API.ChatController do
 
   alias PolicrMini.Instances.Chat
   alias PolicrMiniBot.RespSyncCmdPlug
+  alias PolicrMiniWeb.TgAssetsCacher
 
   import PolicrMiniWeb.Helper
 
@@ -28,7 +29,7 @@ defmodule PolicrMiniWeb.Admin.API.ChatController do
   def photo(conn, %{"id" => id}) do
     with {:ok, _} <- check_permissions(conn, id),
          {:ok, chat} <- Chat.get(id) do
-      Phoenix.Controller.redirect(conn, to: get_photo_assets(chat.small_photo_id))
+      Phoenix.Controller.redirect(conn, to: TgAssetsCacher.get_photo_asset(chat.small_photo_id))
     end
   end
 
