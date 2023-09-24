@@ -3,29 +3,29 @@ defmodule PolicrMiniBot.Supervisor do
 
   use Supervisor
 
-  alias PolicrMiniBot.{
-    InitTakeoveredPlug,
-    InitFromPlug,
-    InitUserJoinedActionPlug,
-    HandleSelfJoinedPlug,
-    HandleSelfLeftedPlug,
-    HandleAdminPermissionsChangePlug,
-    HandleSelfPermissionsChangePlug,
-    RespStartCmdPlug,
-    RespPingCmdPlug,
-    RespSyncCmdPlug,
-    RespLoginCmdPlug,
-    RespSponsorshipCmdPlug,
-    HandleUserJoinedCleanupPlug,
-    HandleMemberRemovedPlug,
-    HandleNewChatTitlePlug,
-    HandleNewChatPhotoPlug,
-    HandlePrivateAttachmentPlug,
-    CallAnswerPlug,
-    CallRevokeTokenPlug,
-    CallEnablePlug,
-    CallLeavePlug
-  }
+  # alias PolicrMiniBot.{
+  #   InitTakeoveredPlug,
+  #   InitFromPlug,
+  #   InitUserJoinedActionPlug,
+  #   HandleSelfJoinedPlug,
+  #   HandleSelfLeftedPlug,
+  #   HandleAdminPermissionsChangePlug,
+  #   HandleSelfPermissionsChangePlug,
+  #   RespStartCmdPlug,
+  #   RespPingCmdPlug,
+  #   RespSyncCmdPlug,
+  #   RespLoginCmdPlug,
+  #   RespSponsorshipCmdPlug,
+  #   HandleUserJoinedCleanupPlug,
+  #   HandleMemberRemovedPlug,
+  #   HandleNewChatTitlePlug,
+  #   HandleNewChatPhotoPlug,
+  #   HandlePrivateAttachmentPlug,
+  #   CallAnswerPlug,
+  #   CallRevokeTokenPlug,
+  #   CallEnablePlug,
+  #   CallLeavePlug
+  # }
 
   def start_link(_opts) do
     Supervisor.start_link(__MODULE__, :ok, name: __MODULE__)
@@ -37,38 +37,39 @@ defmodule PolicrMiniBot.Supervisor do
     PolicrMiniBot.Worker.MessageCleaner.init_queue()
     PolicrMiniBot.Worker.ValidationTerminator.init_queue()
 
-    install_plugs([
-      InitTakeoveredPlug,
-      InitFromPlug,
-      InitUserJoinedActionPlug,
-      PolicrMiniBot.InitChatJoinRequestActionPlug,
-      RespStartCmdPlug,
-      RespPingCmdPlug,
-      RespSyncCmdPlug,
-      RespLoginCmdPlug,
-      RespSponsorshipCmdPlug,
-      # `/embarrass_member` 命令。
-      PolicrMiniBot.RespEmbarrassMemberCmdPlug,
-      PolicrMiniBot.HandleJoinRequestPlug,
-      PolicrMiniBot.HandleGroupUserJoinedPlug,
-      PolicrMiniBot.HandleGroupMemberLeftPlug,
-      PolicrMiniBot.HandleGroupMemberLeftMessagePlug,
-      HandleSelfJoinedPlug,
-      HandleSelfLeftedPlug,
-      # ↓此模块↓ 需保证安装在 `HandleGroupMemberLeftPlug` 模块的后面。
-      HandleAdminPermissionsChangePlug,
-      # ↓此模块↓ 需保证安装在 `HandleSelfLeftedPlug` 模块的后面。
-      HandleSelfPermissionsChangePlug,
-      HandleUserJoinedCleanupPlug,
-      HandleNewChatTitlePlug,
-      HandleNewChatPhotoPlug,
-      HandleMemberRemovedPlug,
-      HandlePrivateAttachmentPlug,
-      CallAnswerPlug,
-      CallRevokeTokenPlug,
-      CallEnablePlug,
-      CallLeavePlug
-    ])
+    # TODO: 此处用于顺序参考，完整的转换为 chains 以后删除这些注释。
+    # install_plugs([
+    #   InitTakeoveredPlug,
+    #   InitFromPlug,
+    #   InitUserJoinedActionPlug,
+    #   PolicrMiniBot.InitChatJoinRequestActionPlug,
+    #   RespStartCmdPlug,
+    #   RespPingCmdPlug,
+    #   RespSyncCmdPlug,
+    #   RespLoginCmdPlug,
+    #   RespSponsorshipCmdPlug,
+    #   # `/embarrass_member` 命令。
+    #   PolicrMiniBot.RespEmbarrassMemberCmdPlug,
+    #   PolicrMiniBot.HandleJoinRequestPlug,
+    #   PolicrMiniBot.HandleGroupUserJoinedPlug,
+    #   PolicrMiniBot.HandleGroupMemberLeftPlug,
+    #   PolicrMiniBot.HandleGroupMemberLeftMessagePlug,
+    #   HandleSelfJoinedPlug,
+    #   HandleSelfLeftedPlug,
+    #   # ↓此模块↓ 需保证安装在 `HandleGroupMemberLeftPlug` 模块的后面。
+    #   HandleAdminPermissionsChangePlug,
+    #   # ↓此模块↓ 需保证安装在 `HandleSelfLeftedPlug` 模块的后面。
+    #   HandleSelfPermissionsChangePlug,
+    #   HandleUserJoinedCleanupPlug,
+    #   HandleNewChatTitlePlug,
+    #   HandleNewChatPhotoPlug,
+    #   HandleMemberRemovedPlug,
+    #   HandlePrivateAttachmentPlug,
+    #   CallAnswerPlug,
+    #   CallRevokeTokenPlug,
+    #   CallEnablePlug,
+    #   CallLeavePlug
+    # ])
 
     # !注意! 因为以上的验证排除条件，此模块需要保证在填充以上条件的模块的处理流程的后面。
     children = [
@@ -86,10 +87,12 @@ defmodule PolicrMiniBot.Supervisor do
       PolicrMiniBot.Scheduler,
       # 加群请求托管。
       PolicrMiniBot.JoinReuquestHosting,
-      # 拉取更新消息
-      PolicrMiniBot.UpdatesPoller,
-      # 消费消息的动态主管
-      PolicrMiniBot.Consumer
+      # 拉取更新消息（TODO: 待删除）
+      # PolicrMiniBot.UpdatesPoller,
+      # 消费消息的动态主管（TODO: 待删除）
+      # PolicrMiniBot.Consumer,
+      # 轮询处理器（接收更新并回调处理函数）
+      PolicrMiniBot.PollingHandler
     ]
 
     # See https://hexdocs.pm/elixir/Supervisor.html
@@ -97,9 +100,5 @@ defmodule PolicrMiniBot.Supervisor do
     opts = [strategy: :one_for_one]
 
     Supervisor.init(children, opts)
-  end
-
-  defp install_plugs(plugs) do
-    Telegex.Plug.Pipeline.install_all(plugs)
   end
 end

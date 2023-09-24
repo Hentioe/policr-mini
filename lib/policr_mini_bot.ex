@@ -5,6 +5,18 @@ defmodule PolicrMiniBot do
 
   alias PolicrMiniBot.UpdatesPoller.BotInfo
 
+  defmodule Chain do
+    @moduledoc false
+
+    defmacro __using__(opts) do
+      quote do
+        use Telegex.Chain, unquote(opts)
+        use PolicrMini.I18n
+        use PolicrMiniBot.MessageCaller
+      end
+    end
+  end
+
   defmacro __using__(plug: opts) do
     quote do
       import PolicrMiniBot.{Common, Helper, State}
