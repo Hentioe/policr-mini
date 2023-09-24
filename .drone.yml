@@ -5,32 +5,30 @@ name: default
 
 steps:
   - name: app-compile
-    image: elixircn/elixir:1.15.5-otp-26-slim
+    image: hentioe/elixir:1.15.6-otp-26-slim
+    pull: always
     environment:
       MIX_ENV: prod
     commands:
       - apt update && apt install git -y
-      - mix local.hex --force
-      - mix local.rebar --force
       - mix deps.get
       - mix compile
 
   - name: assets-build
     image: node:lts-hydrogen
     commands:
-      - npm install --location=global pnpm@8.7.5
+      - npm install --location=global pnpm@8.7.6
       - pnpm --prefix assets install
       - pnpm --prefix assets run deploy
 
   - name: app-build
-    image: elixircn/elixir:1.15.5-otp-26-slim
+    image: hentioe/elixir:1.15.6-otp-26-slim
     pull: always
     environment:
       MIX_ENV: prod
     commands:
       - apt update && apt install git -y
-      - mix local.hex --force
-      - mix local.rebar --force
+      - mix deps.get
       - mix phx.digest
       - mix release
 
