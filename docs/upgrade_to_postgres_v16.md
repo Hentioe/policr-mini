@@ -26,7 +26,7 @@ _但是，如果我们后续会紧跟 PostgreSQL 的版本步伐，`pg_upgrade` 
 1. 备份数据: `docker compose exec db pg_dump -U postgres -F c -Z 5 policr_mini_prod > dumps/policr_mini_prod.dump`。此步骤是向 `db` 容器直接发起命令调用 `pg_dump` 工具备份数据到 `dumps`目录。命令执行时间可能稍长，执行完毕后通过 `ls -lh dumps` 命令查看备份文件的大小，通常不会太过巨大因为有经过压缩。
 1. 停止数据库服务: `docker compose stop db`。此步骤将数据库容器停止，非必要但最好这样做。
 1. 编辑 `docker-compose.yaml` 文件，在 `services` -> `db` -> `image` 后面将 `postgres:12` 修改为 `postgres:16`。然后执行 `docker compose up --no-start` 命令更新镜像但不启动容器（避免无意义的启动）。此步骤先是将数据库版本修改为最新版，然后再拉取该版本镜像并应用到容器中。注意，此时我们还没有正式启动新的镜像。
-1. 备份原始数据目录: `mv _data _data.bak`。此步骤是将上一个版本的数据库的数据目录完整的备份起来，在启动新镜像后会生成新的 `_data` 目录，不会造成对旧数据干扰。
+1. 备份原始数据目录: `mv _data _data.bak`。此步骤是将上一个版本的数据库的数据目录完整的备份起来，在启动新镜像后会生成新的 `_data` 目录，不会造成对旧数据的干扰。
 1. 启动新的数据库: `docker compose start db`。此步骤是将新版本的 `db` 容器启动，它会生成新的 `_data` 目录，但其中空无一物（指机器人数据），为还原做准备。
 1. 还原数据: `docker compose exec db bash -c 'pg_restore -U postgres -d policr_mini_prod < /dumps/policr_mini_prod.dump'`。此步骤是向 `db` 容器直接发起命令调用 `pg_restore` 工具还原此前保存到宿主机 `dumps` 目录中的备份文件。由于此前我们已经添加了新的 `volumes` 配置，所以容器中读取的是 `/dumps` 目录而不是 `./dumps`，在容器中前者映射到后者。注意，此命令可能需要相当长的时间才能执行完毕，最终在 `_data` 目录生成的数据总大小也可能相当巨大（取决于数据量），在执行前请判断服务器磁盘空间是否足够。
 1. 最后，使用 `docker compose up -d` 命令重新部署并启动所有容器。
@@ -39,6 +39,6 @@ _但是，如果我们后续会紧跟 PostgreSQL 的版本步伐，`pg_upgrade` 
 
 _注意，由于升级过程中机器人停止运作了一段时间，此期间产生的请求被忽略或启动后短暂的异常现象是可能发生的。_
 
-### 结束语
+## 结束语
 
 如果你对此有充分的了解，也可以选择自己的效率更高的方式升级数据兼容性和数据库版本，但**切记操作前要备份旧版本数据**。
