@@ -17,6 +17,7 @@ defmodule PolicrMiniBot.InitTakenOverChain do
         _ -> false
       end
 
+    # TODO: [更新前] 批量重命名 `takeovered` 为此处的 `taken_over`。
     {:ok, %{context | taken_over: taken_over}}
   end
 end

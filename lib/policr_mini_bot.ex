@@ -13,6 +13,8 @@ defmodule PolicrMiniBot do
         use Telegex.Chain, unquote(opts)
         use PolicrMini.I18n
         use PolicrMiniBot.MessageCaller
+
+        import PolicrMiniBot.ChainContext
       end
     end
   end
