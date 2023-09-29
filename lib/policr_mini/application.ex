@@ -5,7 +5,12 @@ defmodule PolicrMini.Application do
 
   use Application
 
+  require Logger
+
   def start(_type, _args) do
+    # 输出构建时/运行时信息。
+    print_buildtime_runtime_info()
+
     PolicrMini.Mnesia.init()
     PolicrMini.Worker.GeneralRun.init_queue()
 
@@ -55,5 +60,13 @@ defmodule PolicrMini.Application do
       else
         []
       end
+  end
+
+  defp print_buildtime_runtime_info do
+    alias PolicrMini.BuildtimeRuntime.Tools
+
+    Logger.info(
+      "Buildtime/Runtime: [otp-#{Tools.otp_version()}, elixir-#{Tools.elixir_version()}] / [erts-#{Tools.erts_version()}]"
+    )
   end
 end
