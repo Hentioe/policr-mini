@@ -11,7 +11,6 @@ defmodule PolicrMiniBot.HandleSelfJoinedPlug do
 
   alias PolicrMini.Chats
   alias PolicrMiniBot.Helper.Syncing
-  alias PolicrMiniBot.RespSyncCmdPlug
 
   require Logger
 
@@ -25,6 +24,8 @@ defmodule PolicrMiniBot.HandleSelfJoinedPlug do
   - 成员之前的状态如果是 `member`、`administrator` 二者之一。
   - 成员之前的状态如果是 `restricted`，但 `is_member` 为 `true`。
   """
+
+  defdelegate synchronize_chat(chat_id, init), to: PolicrMiniBot.RespSyncChain
 
   @impl true
   def call(%{my_chat_member: nil} = _update, state) do
@@ -107,7 +108,7 @@ defmodule PolicrMiniBot.HandleSelfJoinedPlug do
   defp handle_it(chat_id) do
     # 同步群组和管理员信息。
     # 注意，创建群组后需要继续创建方案。
-    with {:ok, chat} <- RespSyncCmdPlug.synchronize_chat(chat_id, true),
+    with {:ok, chat} <- synchronize_chat(chat_id, true),
          {:ok, chat} <- Syncing.sync_for_chat_permissions(chat),
          {:ok, _} <- Chats.find_or_init_scheme(chat_id),
          :ok <- response(chat_id) do

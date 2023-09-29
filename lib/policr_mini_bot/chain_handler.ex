@@ -15,6 +15,10 @@ defmodule PolicrMiniBot.ChainHandler do
     # 初始化可能的动作字段值：`chat_join_request`。
     PolicrMiniBot.InitChatJoinRequestActionChain,
     # 响应 `/start` 命令。
-    PolicrMiniBot.RespStartChain
+    PolicrMiniBot.RespStartChain,
+    # 响应 `/ping` 命令。
+    PolicrMiniBot.RespPingChain,
+    # 响应 `/sync` 命令。
+    PolicrMiniBot.RespSyncChain,
   ])
 end

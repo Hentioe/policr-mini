@@ -1,11 +1,11 @@
-defmodule PolicrMiniBot.RespSyncCmdPlug do
+defmodule PolicrMiniBot.RespSyncChain do
   @moduledoc """
-  `/sync` 命令的响应模块。
+  `/sync` 命令。
 
   此命令存在速度限制，15 秒内只能调用一次。
   """
 
-  use PolicrMiniBot, plug: [commander: :sync]
+  use PolicrMiniBot.Chain, {:command, :sync}
 
   alias PolicrMini.{Instances, Chats}
   alias PolicrMini.Instances.Chat
@@ -14,12 +14,9 @@ defmodule PolicrMiniBot.RespSyncCmdPlug do
 
   require Logger
 
-  @doc """
-  同步群组数据：群组信息、管理员列表。
-  """
-
+  # 同步群组数据：群组信息、管理员列表。
   @impl true
-  def handle(message, state) do
+  def handle(message, context) do
     %{chat: %{id: chat_id}, message_id: message_id} = message
 
     speed_limit_key = "sync-#{chat_id}"
@@ -53,7 +50,7 @@ defmodule PolicrMiniBot.RespSyncCmdPlug do
         with {:ok, chat} <- synchronize_chat(chat_id),
              {:ok, chat} <- Syncing.sync_for_chat_permissions(chat),
              {:ok, _scheme} <- Chats.find_or_init_scheme(chat_id),
-             {:ok, member} <- Telegex.get_chat_member(chat_id, PolicrMiniBot.id()) do
+             {:ok, member} <- Telegex.get_chat_member(chat_id, context.bot.id()) do
           # 检查是否具备接管权限，如果具备则自动接管验证
           has_takeover_permissions = check_takeover_permissions(member) == :ok
 
@@ -110,7 +107,7 @@ defmodule PolicrMiniBot.RespSyncCmdPlug do
         end
     end
 
-    {:ok, state}
+    {:ok, context}
   end
 
   @doc """

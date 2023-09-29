@@ -13,12 +13,13 @@ defmodule PolicrMiniWeb.Admin.API.ChatController do
   }
 
   alias PolicrMini.Instances.Chat
-  alias PolicrMiniBot.RespSyncCmdPlug
   alias PolicrMiniWeb.TgAssetsCacher
 
   import PolicrMiniWeb.Helper
 
   action_fallback PolicrMiniWeb.API.FallbackController
+
+  defdelegate synchronize_chat(chat_id), to: PolicrMiniBot.RespSyncChain
 
   def index(%{assigns: %{user: user}} = conn, _prams) do
     chats = Instances.find_user_chats(user.id)
@@ -228,7 +229,7 @@ defmodule PolicrMiniWeb.Admin.API.ChatController do
 
   def sync(conn, %{"id" => chat_id}) do
     with {:ok, _} <- check_sys_permissions(conn),
-         {:ok, chat} <- RespSyncCmdPlug.synchronize_chat(chat_id) do
+         {:ok, chat} <- synchronize_chat(chat_id) do
       render(conn, "sync.json", %{chat: chat})
     end
   end

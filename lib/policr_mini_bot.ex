@@ -15,6 +15,7 @@ defmodule PolicrMiniBot do
         use PolicrMiniBot.MessageCaller
 
         import PolicrMiniBot.ChainContext
+        import PolicrMiniBot.Helper
       end
     end
   end
