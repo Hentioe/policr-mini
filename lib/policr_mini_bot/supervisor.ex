@@ -8,8 +8,6 @@ defmodule PolicrMiniBot.Supervisor do
   #   HandleSelfLeftedPlug,
   #   HandleAdminPermissionsChangePlug,
   #   HandleSelfPermissionsChangePlug,
-  #   RespLoginCmdPlug,
-  #   RespSponsorshipCmdPlug,
   #   HandleUserJoinedCleanupPlug,
   #   HandleMemberRemovedPlug,
   #   HandleNewChatTitlePlug,
@@ -33,10 +31,6 @@ defmodule PolicrMiniBot.Supervisor do
 
     # TODO: 此处用于顺序参考，完整的转换为 chains 以后删除这些注释。
     # install_plugs([
-    #   RespLoginCmdPlug,
-    #   RespSponsorshipCmdPlug,
-    #   # `/embarrass_member` 命令。
-    #   PolicrMiniBot.RespEmbarrassMemberCmdPlug,
     #   PolicrMiniBot.HandleJoinRequestPlug,
     #   PolicrMiniBot.HandleGroupUserJoinedPlug,
     #   PolicrMiniBot.HandleGroupMemberLeftPlug,

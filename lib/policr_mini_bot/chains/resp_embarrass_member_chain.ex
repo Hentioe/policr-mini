@@ -1,9 +1,9 @@
-defmodule PolicrMiniBot.RespEmbarrassMemberCmdPlug do
+defmodule PolicrMiniBot.RespEmbarrassMemberChain do
   @moduledoc """
-  /embarrass_member 命令。
+  `/embarrass_member` 命令。
   """
 
-  use PolicrMiniBot, plug: [commander: :embarrass_member]
+  use PolicrMiniBot.Chain, {:command, :embarrass_member}
 
   alias PolicrMini.Chats
   alias PolicrMiniBot.Worker
@@ -12,34 +12,36 @@ defmodule PolicrMiniBot.RespEmbarrassMemberCmdPlug do
 
   require Logger
 
-  def handle(message, %{from_admin: from_admin} = state) when from_admin != true do
+  @impl true
+  def handle(message, %{from_admin: from_admin} = context) when from_admin != true do
     # 无权限，直接删除命令消息
     Worker.async_delete_message(message.chat.id, message.message_id)
 
-    {:ok, state}
+    {:ok, context}
   end
 
-  def handle(%{reply_to_message: nil} = message, state) do
+  @impl true
+  def handle(%{reply_to_message: nil} = message, context) do
     send_text(message.chat.id, commands_text("用法错误，请用此命令回复普通群成员的消息。"),
       reply_to_message_id: message.message_id,
       logging: true
     )
 
-    {:ok, state}
+    {:ok, context}
   end
 
   @impl true
-  def handle(%{reply_to_message: %{from: %{is_bot: true}}} = message, state) do
+  def handle(%{reply_to_message: %{from: %{is_bot: true}}} = message, context) do
     send_text(message.chat.id, commands_text("验证机器人帐号是没有意义的。"),
       reply_to_message_id: message.message_id,
       logging: true
     )
 
-    {:ok, state}
+    {:ok, context}
   end
 
   @impl true
-  def handle(%{reply_to_message: reply_to_message} = message, state) do
+  def handle(%{reply_to_message: reply_to_message} = message, context) do
     target_user = reply_to_message.from
 
     case Chats.find_user_permission(message.chat.id, target_user.id) do
@@ -54,6 +56,6 @@ defmodule PolicrMiniBot.RespEmbarrassMemberCmdPlug do
         )
     end
 
-    {:ok, state}
+    {:ok, context}
   end
 end

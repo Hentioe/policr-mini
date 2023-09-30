@@ -1,16 +1,16 @@
-defmodule PolicrMiniBot.RespSponsorshipCmdPlug do
+defmodule PolicrMiniBot.RespSponsorshipChain do
   @moduledoc """
-  /sponsorship 命令。
+  `/sponsorship` 命令。
   """
 
-  use PolicrMiniBot, plug: [commander: :sponsorship]
+  use PolicrMiniBot.Chain, {:command, :sponsorship}
 
   alias PolicrMiniBot.SpeedLimiter
 
   @default_ttl 1000 * 60 * 10
 
   @impl true
-  def handle(%{chat: %{type: "private"}} = message, state) do
+  def handle(%{chat: %{type: "private"}} = message, context) do
     %{chat: %{id: chat_id}} = message
 
     speed_limit_key = "sponsorship-cmd-#{chat_id}"
@@ -44,15 +44,18 @@ defmodule PolicrMiniBot.RespSponsorshipCmdPlug do
       {:ok, _} = Telegex.send_message(chat_id, text, parse_mode: "HTML")
     end
 
-    {:ok, state}
+    {:ok, context}
   end
 
   @impl true
-  def handle(_message, state) do
-    {:ignored, state}
+  def handle(_message, context) do
+    # TODO: 加上请私聊使用此命令的提示。
+
+    {:ok, context}
   end
 
   defp gen_and_cache_new_token(chat_id) do
+    # TODO: 使用 `Telegex.Tools.gen_secret_token/1` 函数替代此库。
     token = NotQwerty123.RandomPassword.gen_password(length: 24)
     token = String.upcase(token)
 

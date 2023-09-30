@@ -20,5 +20,11 @@ defmodule PolicrMiniBot.ChainHandler do
     PolicrMiniBot.RespPingChain,
     # 响应 `/sync` 命令。
     PolicrMiniBot.RespSyncChain,
+    # 响应 `/login` 命令。
+    PolicrMiniBot.RespLoginChain,
+    # 响应 `/sponsorship` 命令。
+    PolicrMiniBot.RespSponsorshipChain,
+    # 响应 `/embarrass_member` 命令。
+    PolicrMiniBot.RespEmbarrassMemberChain
   ])
 end

@@ -1,12 +1,13 @@
-defmodule PolicrMiniBot.RespLoginCmdPlug do
+defmodule PolicrMiniBot.RespLoginChain do
   @moduledoc """
-  登录命令。
+  `/login` 命令。
   """
 
-  use PolicrMiniBot, plug: [commander: :login]
+  use PolicrMiniBot.Chain, {:command, :login}
 
   alias PolicrMini.PermissionBusiness
   alias PolicrMiniBot.Worker
+  alias Telegex.Type.{InlineKeyboardButton, InlineKeyboardMarkup}
 
   require Logger
 
@@ -14,12 +15,8 @@ defmodule PolicrMiniBot.RespLoginCmdPlug do
                        "如果您确定自己是群管理员，且群组中的确使用了本机器人。请通知群主或其它管理员在群内使用 %{command} 命令同步最新数据。",
                        command: "`/sync`"
                      )
-  @doc """
-  处理登录命令。
 
-  此命令会提示用户私聊使用，也仅限于私聊使用。
-  """
-  def handle(%{chat: %{type: "private"}} = message, state) do
+  def handle(%{chat: %{type: "private"}} = message, context) do
     %{chat: %{id: chat_id}, from: %{id: user_id}} = message
 
     with {:ok, :isadmin} <- check_user(user_id),
@@ -47,12 +44,12 @@ defmodule PolicrMiniBot.RespLoginCmdPlug do
 
       case send_text(chat_id, text, reply_markup: reply_markup, parse_mode: "HTML") do
         {:ok, _} ->
-          {:ok, state}
+          {:ok, context}
 
         {:error, reason} ->
           Logger.error("Command response failed: #{inspect(command: "/login", reason: reason)}")
 
-          {:error, state}
+          {:stop, context}
       end
     else
       {:error, :nonadmin} ->
@@ -69,7 +66,7 @@ defmodule PolicrMiniBot.RespLoginCmdPlug do
         # 由于依赖 `@sync_comment_text` 此处只能以 HTML 发送
         send_text(chat_id, text, parse_mode: "HTML", logging: true)
 
-        {:ok, state}
+        {:ok, context}
 
       {:error, :notfound} ->
         theader = commands_text("未找到和您相关的用户记录")
@@ -85,11 +82,11 @@ defmodule PolicrMiniBot.RespLoginCmdPlug do
         # 由于依赖 `@sync_comment_text` 此处只能以 HTML 发送
         send_text(chat_id, text, parse_mode: "HTML", logging: true)
 
-        {:ok, state}
+        {:ok, context}
     end
   end
 
-  def handle(message, state) do
+  def handle(message, context) do
     %{chat: %{id: chat_id}, message_id: message_id} = message
     text = commands_text("请在私聊中使用此命令。")
 
@@ -103,7 +100,7 @@ defmodule PolicrMiniBot.RespLoginCmdPlug do
 
     Worker.async_delete_message(chat_id, message_id)
 
-    {:ok, %{state | deleted: true}}
+    {:ok, %{context | deleted: true}}
   end
 
   @spec make_markup(integer, String.t()) :: InlineKeyboardMarkup.t()
