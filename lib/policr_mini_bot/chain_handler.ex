@@ -25,6 +25,10 @@ defmodule PolicrMiniBot.ChainHandler do
     # 响应 `/sponsorship` 命令。
     PolicrMiniBot.RespSponsorshipChain,
     # 响应 `/embarrass_member` 命令。
-    PolicrMiniBot.RespEmbarrassMemberChain
+    PolicrMiniBot.RespEmbarrassMemberChain,
+    # 处理加入请求。
+    PolicrMiniBot.HandleJoinRequestChain,
+    # 处理用户已加入群组。
+    PolicrMiniBot.HandleGroupUserJoinedChain
   ])
 end
