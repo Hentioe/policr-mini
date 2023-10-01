@@ -23,12 +23,12 @@ steps:
 
   - name: app-build
     image: hentioe/elixir:1.15.6-otp-26-slim
-    pull: always
     environment:
       MIX_ENV: prod
     commands:
       - apt update && apt install git -y
-      - mix deps.get
+      - mix local.hex --force
+      - mix local.rebar --force
       - mix phx.digest
       - mix release
 
