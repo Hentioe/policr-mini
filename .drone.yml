@@ -32,6 +32,16 @@ steps:
       - mix phx.digest
       - mix release
 
+  - name: generate-image-tags
+    image: busybox
+    when:
+      branch:
+        - master
+      event:
+        - push
+    commands:
+      - echo -n "$(date +'%Y-%m-%d'),latest" > .tags
+
   - name: image-push-develop
     image: plugins/docker
     settings:
@@ -55,7 +65,6 @@ steps:
       password:
         from_secret: hub_pass_telestd
       dockerfile: Dockerfile
-      tags: latest
     when:
       branch:
         - master
