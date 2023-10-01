@@ -40,7 +40,7 @@ steps:
       event:
         - push
     commands:
-      - echo -n "$(date +'%Y-%m-%d'),latest" > .tags
+      - echo -n "$(date +'%Y%m%d'),latest" > .tags
 
   - name: image-push-develop
     image: plugins/docker
