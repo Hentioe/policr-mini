@@ -29,6 +29,10 @@ defmodule PolicrMiniBot.ChainHandler do
     # 处理加入请求。
     PolicrMiniBot.HandleJoinRequestChain,
     # 处理用户已加入群组。
-    PolicrMiniBot.HandleGroupUserJoinedChain
+    PolicrMiniBot.HandleGroupUserJoinedChain,
+    # 处理群成员离开。
+    PolicrMiniBot.HandleGroupMemberLeftChain,
+    # 处理离开消息。
+    PolicrMiniBot.HandleLeftMessageChain
   ])
 end

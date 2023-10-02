@@ -31,11 +31,9 @@ defmodule PolicrMiniBot.Supervisor do
 
     # TODO: 此处用于顺序参考，完整的转换为 chains 以后删除这些注释。
     # install_plugs([
-    #   PolicrMiniBot.HandleGroupMemberLeftPlug,
-    #   PolicrMiniBot.HandleGroupMemberLeftMessagePlug,
     #   HandleSelfJoinedPlug,
     #   HandleSelfLeftedPlug,
-    #   # ↓此模块↓ 需保证安装在 `HandleGroupMemberLeftPlug` 模块的后面。
+    #   # ↓此模块↓ 需保证安装在 `PolicrMiniBot.HandleGroupMemberLeftChain` 模块的后面。
     #   HandleAdminPermissionsChangePlug,
     #   # ↓此模块↓ 需保证安装在 `HandleSelfLeftedPlug` 模块的后面。
     #   HandleSelfPermissionsChangePlug,
