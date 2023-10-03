@@ -1,9 +1,23 @@
-defmodule PolicrMiniBot.HandleAdminPermissionsChangePlug do
+defmodule PolicrMiniBot.HandleAdminPermissionsChangeChain do
   @moduledoc """
-  同步管理员权限修改的插件。
+  处理管理员权限变更。
+
+  ## 以下情况将不进入流程（按顺序匹配）：
+    - 更新不包含 `chat_member` 数据。
+    - 更新来自频道。
+    - 状态中的 `action` 字段为 `:user_joined` 或 `:user_lefted`。备注：用户加入和管理员权限无关，用户离开有独立的模块处理权限。
+    - 成员的用户类型是机器人。
+    - 成员现在的状态是 `member` 或 `restricted`，并且之前的状态也是 `memeber`、`restricted`。备注：普通权限变化和管理员权限无关。
+    - 成员现在的状态是 `left` 并且之前的状态是 `kicked` 或 `restricted`。备注：从封禁或例外列表中解封用户和管理员权限变化无关。
+    - 成员现在的状态是 `restricted` 并且之前的状态是 `left` 或 `kicked`。备注：将不在群内的用户添加到例外或封禁列表中和管理员权限变化无关。
+    - 成员现在的状态是 `kicked` 并且之前的状态是 `left` 或 `restricted`。备注：将不在群内的用户添加到封禁列表与管理员变化无关。
+
+  ## 注意
+    - 此模块功能依赖对 `chat_member` 更新的接收。
+    - 此模块在管道中需位于 `PolicrMiniBot.HandleGroupMemberLeftChain` 模块的后面。
   """
 
-  use PolicrMiniBot, plug: :preheater
+  use PolicrMiniBot.Chain
 
   alias PolicrMini.Instances.Chat
   alias PolicrMiniBot.Helper.Syncing
@@ -11,100 +25,83 @@ defmodule PolicrMiniBot.HandleAdminPermissionsChangePlug do
 
   require Logger
 
-  @doc """
-  根据更新消息中的 `chat_member` 字段，同步管理员权限变化。
-
-  ## 以下情况将不进入流程（按顺序匹配）：
-  - 更新不包含 `chat_member` 数据。
-  - 更新来自频道。
-  - 状态中的 `action` 字段为 `:user_joined` 或 `:user_lefted`。备注：用户加入和管理员权限无关，用户离开有独立的模块处理权限。
-  - 成员的用户类型是机器人。
-  - 成员现在的状态是 `member` 或 `restricted`，并且之前的状态也是 `memeber`、`restricted`。备注：普通权限变化和管理员权限无关。
-  - 成员现在的状态是 `left` 并且之前的状态是 `kicked` 或 `restricted`。备注：从封禁或例外列表中解封用户和管理员权限变化无关。
-  - 成员现在的状态是 `restricted` 并且之前的状态是 `left` 或 `kicked`。备注：将不在群内的用户添加到例外或封禁列表中和管理员权限变化无关。
-  - 成员现在的状态是 `kicked` 并且之前的状态是 `left` 或 `restricted`。备注：将不在群内的用户添加到封禁列表与管理员变化无关。
-  """
-
-  # !注意! 由于依赖状态中的 `action` 字段，此模块需要位于管道中的涉及填充状态相关字段、相关值的插件后面。
-  # 当前此模块需要保证位于 `PolicrMiniBot.HandleGroupMemberLeftPlug` 两个模块的后面。
   @impl true
-  def call(%{chat_member: nil} = _update, state) do
-    {:ignored, state}
+  def handle(%{chat_member: nil} = _update, context) do
+    {:ok, context}
   end
 
   @impl true
-  def call(%{chat_member: %{chat: %{type: "channel"}}}, state) do
-    {:ignored, state}
+  def handle(%{chat_member: %{chat: %{type: "channel"}}}, context) do
+    {:ok, context}
   end
 
   @impl true
-  def call(_update, %{action: action} = state) when action in [:user_joined, :user_lefted] do
-    {:ignored, state}
+  def handle(_update, %{action: action} = context) when action in [:user_joined, :user_lefted] do
+    {:ok, context}
   end
 
-  def call(%{chat_member: %{new_chat_member: %{user: %{is_bot: is_bot}}}} = _update, state)
-      when is_bot == true do
-    {:ignored, state}
+  def handle(%{chat_member: %{new_chat_member: %{user: %{is_bot: true}}}} = _update, context) do
+    {:ok, context}
   end
 
   @impl true
-  def call(
+  def handle(
         %{
           chat_member: %{
             new_chat_member: %{status: status_new},
             old_chat_member: %{status: status_old}
           }
         },
-        state
+        context
       )
       when status_new in ["member", "restricted"] and status_old in ["member", "restricted"] do
-    {:ignored, state}
+    {:ok, context}
   end
 
   @impl true
-  def call(
+  def handle(
         %{
           chat_member: %{
             new_chat_member: %{status: status_new},
             old_chat_member: %{status: status_old}
           }
         },
-        state
+        context
       )
       when status_new == "left" and status_old in ["kicked", "restricted"] do
-    {:ignored, state}
+    {:ok, context}
   end
 
   @impl true
-  def call(
+  def handle(
         %{
           chat_member: %{
             new_chat_member: %{status: status_new},
             old_chat_member: %{status: status_old}
           }
         },
-        state
+        context
       )
       when status_new == "kicked" and status_old in ["left", "restricted"] do
-    {:ignored, state}
+    {:ok, context}
   end
 
   @impl true
-  def call(
+  def handle(
         %{
           chat_member: %{
             new_chat_member: %{status: status_new},
             old_chat_member: %{status: status_old}
           }
         },
-        state
+        context
       )
       when status_new == "restricted" and status_old in ["left", "kicked"] do
-    {:ignored, state}
+    {:ok, context}
   end
 
   @impl true
-  def call(%{chat_member: chat_member}, state) do
+  def handle(%{chat_member: chat_member}, context) do
     %{chat: %{id: chat_id}, new_chat_member: %{user: %{id: user_id} = user}} = chat_member
 
     Logger.debug(
@@ -162,6 +159,6 @@ defmodule PolicrMiniBot.HandleAdminPermissionsChangePlug do
         Logger.error("Chat not found", chat_id: chat_id)
     end
 
-    {:ok, state}
+    {:ok, context}
   end
 end
