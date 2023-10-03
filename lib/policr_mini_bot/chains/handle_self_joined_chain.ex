@@ -1,91 +1,94 @@
-defmodule PolicrMiniBot.HandleSelfJoinedPlug do
+defmodule PolicrMiniBot.HandleSelfJoinedChain do
   @moduledoc """
-  自身加入新群组的处理器。
+  处理自身加入。
+
+  ## 以下情况将不进入流程（按顺序匹配）：
+    - 更新来自频道或私聊。
+    - 成员现在的状态不是 `restricted` 或 `member` 二者之一。
+    - 成员现在的状态如果是 `restricted`，但 `is_member` 为 `false`。
+    - 成员之前的状态如果是 `member`、`administrator` 二者之一。
+    - 成员之前的状态如果是 `restricted`，但 `is_member` 为 `true`。
+
+  ## 注意
+    - 此模块功能依赖对 `my_chat_member` 更新的接收。
   """
 
-  # TODO: 弃用此模块。由于 TG 上游的变动，加群已放弃对 `message` 的处理。因此 `telegex_plug` 库的预制的抽象模块已无法适应此需求，需改进库设计。
-
-  # !注意! 此模块功能依赖对 `my_chat_member` 更新的接收。
-
-  use PolicrMiniBot, plug: :preheater
+  use PolicrMiniBot.Chain
 
   alias PolicrMini.Chats
   alias PolicrMiniBot.Helper.Syncing
+  alias Telegex.Type.{InlineKeyboardMarkup, InlineKeyboardButton}
+
+  import PolicrMiniBot.Common
 
   require Logger
-
-  @doc """
-  根据更新消息中的 `my_chat_member` 字段，处理自身加入。
-
-  ## 以下情况将不进入流程（按顺序匹配）：
-  - 更新来自频道或私聊。
-  - 成员现在的状态不是 `restricted` 或 `member` 二者之一。
-  - 成员现在的状态如果是 `restricted`，但 `is_member` 为 `false`。
-  - 成员之前的状态如果是 `member`、`administrator` 二者之一。
-  - 成员之前的状态如果是 `restricted`，但 `is_member` 为 `true`。
-  """
 
   defdelegate synchronize_chat(chat_id, init), to: PolicrMiniBot.RespSyncChain
 
   @impl true
-  def call(%{my_chat_member: nil} = _update, state) do
-    {:ignored, state}
+  def handle(%{my_chat_member: nil} = _update, context) do
+    {:ok, context}
   end
 
   @impl true
-  def call(%{my_chat_member: %{chat: %{type: chat_type}}}, state)
+  def handle(%{my_chat_member: %{chat: %{type: chat_type}}}, context)
       when chat_type in ["channel", "private"] do
-    {:ignored, state}
+    {:ok, context}
   end
 
+  # 添加了针对成员新状态是 "administrator" 但是此前状态并非 "left" 或 "kicked" 的匹配，这表示机器人是通过添加群成员进来的，在进入的同时就具备了权限。
+  # TODO：将此项匹配逻辑更新到头部注释中。
   @impl true
-  def call(
+  def handle(
         %{
           my_chat_member: %{
             new_chat_member: %{status: status_new},
             old_chat_member: %{status: status_old}
           }
         } = _update,
-        state
+        context
       )
       when status_new not in ["restricted", "member", "administrator"] or
              (status_new == "administrator" and status_old not in ["left", "kicked"]) do
-    # 添加了针对成员新状态是 "administrator" 但是此前状态并非 "left" 或 "kicked" 的匹配，这表示机器人是通过添加群成员进来的，在进入的同时就具备了权限。
-    # TODO：将此项匹配逻辑更新到头部注释中。
-
-    {:ignored, state}
+    {:ok, context}
   end
 
   @impl true
-  def call(%{my_chat_member: %{new_chat_member: %{is_member: is_member, status: status}}}, state)
+  def handle(
+        %{my_chat_member: %{new_chat_member: %{is_member: is_member, status: status}}},
+        context
+      )
       when status == "restricted" and is_member == false do
-    {:ignored, state}
+    {:ok, context}
   end
 
   @impl true
-  def call(%{my_chat_member: %{old_chat_member: %{status: status}}}, state)
+  def handle(%{my_chat_member: %{old_chat_member: %{status: status}}}, context)
       when status in ["member", "creator", "administrator"] do
-    {:ignored, state}
+    {:ok, context}
   end
 
   @impl true
-  def call(%{my_chat_member: %{old_chat_member: %{is_member: is_member, status: status}}}, state)
+  def handle(
+        %{my_chat_member: %{old_chat_member: %{is_member: is_member, status: status}}},
+        context
+      )
       when status == "restricted" and is_member == true do
-    {:ignored, state}
+    {:ok, context}
   end
 
   @impl true
-  def call(%{my_chat_member: my_chat_member} = _update, state) do
+  def handle(%{my_chat_member: my_chat_member} = _update, context) do
     %{chat: %{id: chat_id, type: chat_type}} = my_chat_member
 
     Logger.debug("I have been invited to a group: #{inspect(chat_id: chat_id)}")
 
-    state = action(state, :self_joined)
+    context = action(context, :self_joined)
 
     # 非超级群直接退出。
     if chat_type != "supergroup", do: exits(chat_type, chat_id), else: handle_it(chat_id)
 
-    {:ok, %{state | done: true}}
+    {:ok, %{context | done: true}}
   end
 
   # 退出普通群。

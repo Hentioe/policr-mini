@@ -33,6 +33,10 @@ defmodule PolicrMiniBot.ChainHandler do
     # 处理群成员离开。
     PolicrMiniBot.HandleGroupMemberLeftChain,
     # 处理离开消息。
-    PolicrMiniBot.HandleLeftMessageChain
+    PolicrMiniBot.HandleLeftMessageChain,
+    # 处理自身加入。
+    PolicrMiniBot.HandleSelfJoinedChain,
+    # 处理自身离开。
+    PolicrMiniBot.HandleSelfLeftChain
   ])
 end
