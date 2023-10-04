@@ -4,8 +4,6 @@ defmodule PolicrMiniBot.Supervisor do
   use Supervisor
 
   # alias PolicrMiniBot.{
-  #   HandleMemberRemovedPlug,
-  #   HandleNewChatPhotoPlug,
   #   HandlePrivateAttachmentPlug,
   #   CallAnswerPlug,
   #   CallRevokeTokenPlug,
@@ -25,8 +23,6 @@ defmodule PolicrMiniBot.Supervisor do
 
     # TODO: 此处用于顺序参考，完整的转换为 chains 以后删除这些注释。
     # install_plugs([
-    #   HandleNewChatPhotoPlug,
-    #   HandleMemberRemovedPlug,
     #   HandlePrivateAttachmentPlug,
     #   CallAnswerPlug,
     #   CallRevokeTokenPlug,

@@ -24,11 +24,15 @@ defmodule PolicrMiniBot.HandleNewChatTitleChain do
   def handle(message, context) do
     %{new_chat_title: new_chat_title, chat: tg_chat} = message
 
+    Logger.debug("New chat title: #{inspect(new_chat_title: new_chat_title)}",
+      chat_id: tg_chat.id
+    )
+
     case Chat.get(tg_chat.id) do
       {:ok, chat} ->
         Instances.update_chat(chat, %{title: new_chat_title})
 
-        {:stop, context}
+        {:ok, context}
 
       {:error, :not_found, _} ->
         Logger.warning(
@@ -36,7 +40,7 @@ defmodule PolicrMiniBot.HandleNewChatTitleChain do
           chat_id: tg_chat.id
         )
 
-        {:stop, context}
+        {:ok, context}
     end
   end
 end

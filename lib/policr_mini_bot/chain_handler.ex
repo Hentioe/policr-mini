@@ -45,6 +45,12 @@ defmodule PolicrMiniBot.ChainHandler do
     # ↓此模块↓ 需保证位于 `PolicrMiniBot.HandleSelfLeftChain` 模块的后面。
     PolicrMiniBot.HandleSelfPermissionsChangeChain,
     # 处理加入消息。
-    PolicrMiniBot.HandleJoinedMessageChain
+    PolicrMiniBot.HandleJoinedMessageChain,
+    # 处理新的群标题。
+    PolicrMiniBot.HandleNewChatTitleChain,
+    # 处理新的群头像。
+    PolicrMiniBot.HandleNewChatPhotoChain,
+    # 处理成员被移除。
+    PolicrMiniBot.HandleMemberRemovedChain
   ])
 end
