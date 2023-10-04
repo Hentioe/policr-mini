@@ -43,6 +43,8 @@ defmodule PolicrMiniBot.ChainHandler do
     PolicrMiniBot.HandleAdminPermissionsChangeChain,
     # 处理自身权限变更。
     # ↓此模块↓ 需保证位于 `PolicrMiniBot.HandleSelfLeftChain` 模块的后面。
-    PolicrMiniBot.HandleSelfPermissionsChangeChain
+    PolicrMiniBot.HandleSelfPermissionsChangeChain,
+    # 处理加入消息。
+    PolicrMiniBot.HandleJoinedMessageChain
   ])
 end
