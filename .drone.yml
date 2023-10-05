@@ -10,7 +10,6 @@ steps:
     environment:
       MIX_ENV: prod
     commands:
-      - apt update && apt install git -y
       - mix deps.get
       - mix compile
 
@@ -26,7 +25,6 @@ steps:
     environment:
       MIX_ENV: prod
     commands:
-      - apt update && apt install git -y
       - mix local.hex --force
       - mix local.rebar --force
       - mix phx.digest
