@@ -50,7 +50,7 @@ opts = String.split(System.get_env("POLICR_MINI_OPTS") || "")
 # 配置机器人。
 config :policr_mini, PolicrMiniBot,
   # 工作模式。
-  work_mode: String.to_existing_atom(System.get_env("POLICR_MINI_BOT_WORK_MODE") || "polling"),
+  work_mode: String.to_atom(System.get_env("POLICR_MINI_BOT_WORK_MODE") || "polling"),
   # 是否自动生成命令。
   auto_gen_commands:
     String.to_existing_atom(System.get_env("POLICR_MINI_BOT_AUTO_GEN_COMMANDS") || "false"),
@@ -69,15 +69,15 @@ config :policr_mini, PolicrMiniBot,
   # 可选项。
   opts: opts
 
-# 配置 WebHook。
+# 配置 Webhook。
 config :policr_mini, PolicrMiniBot.HookHandler,
-  # WebHook URL。
+  # Webhook URL。
   webhook_url:
     System.get_env("POLICR_MINI_BOT_WEBHOOK_URL") ||
       raise("""
       environment variable `POLICR_MINI_BOT_WEBHOOK_URL` is missing.
       """),
-  # WebHook 服务器端口。
+  # Webhook 服务器端口。
   server_port: String.to_integer(System.get_env("POLICR_MINI_BOT_WEBHOOK_SERVER_PORT") || "4001")
 
 # 配置根链接
