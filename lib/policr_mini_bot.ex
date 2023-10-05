@@ -1,6 +1,7 @@
 defmodule PolicrMiniBot do
   @moduledoc false
 
+  alias :ets, as: ETS
   alias __MODULE__.BootHelper
 
   require Logger
@@ -45,8 +46,6 @@ defmodule PolicrMiniBot do
   """
   @spec init :: Info.t()
   def init do
-    alias :ets, as: ETS
-
     if ETS.whereis(Info) == :undefined do
       # 获取机器人必要信息。
       Logger.info("Checking bot information...")
@@ -104,7 +103,7 @@ defmodule PolicrMiniBot do
 
   @spec info :: Info.t() | nil
   def info() do
-    case :ets.lookup(Info, :bot_info) do
+    case ETS.lookup(Info, :bot_info) do
       [{:bot_info, value}] ->
         value
 
