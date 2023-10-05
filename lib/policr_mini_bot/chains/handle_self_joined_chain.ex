@@ -86,7 +86,7 @@ defmodule PolicrMiniBot.HandleSelfJoinedChain do
     context = action(context, :self_joined)
 
     # 非超级群直接退出。
-    if chat_type != "supergroup", do: exits(chat_type, chat_id), else: handle_it(chat_id)
+    if chat_type != "supergroup", do: exits(chat_type, chat_id), else: handle_it(chat_id, context)
 
     {:ok, %{context | done: true}}
   end
@@ -107,14 +107,14 @@ defmodule PolicrMiniBot.HandleSelfJoinedChain do
     Telegex.leave_chat(chat_id)
   end
 
-  @spec handle_it(integer | binary) :: no_return()
-  defp handle_it(chat_id) do
+  @spec handle_it(integer | binary, map) :: no_return()
+  defp handle_it(chat_id, context) do
     # 同步群组和管理员信息。
     # 注意，创建群组后需要继续创建方案。
     with {:ok, chat} <- synchronize_chat(chat_id, true),
          {:ok, chat} <- Syncing.sync_for_chat_permissions(chat),
          {:ok, _} <- Chats.find_or_init_scheme(chat_id),
-         :ok <- response(chat_id) do
+         :ok <- response(chat_id, context) do
       if Enum.empty?(chat.permissions) do
         # 如果找不到任何管理员，发送相应提示。
         # TODO: 此处的文字需要国际化
@@ -145,11 +145,8 @@ defmodule PolicrMiniBot.HandleSelfJoinedChain do
     end
   end
 
-  @spec response(integer()) :: :ok | {:error, Telegex.Type.error()}
-  @doc """
-  发送响应消息。
-  """
-  def response(chat_id) when is_integer(chat_id) do
+  # 发送响应消息。
+  defp response(chat_id, context) when is_integer(chat_id) do
     ttitle = commands_text("欢迎使用")
     tdesc = commands_text("已成功登记本群信息，所有管理员皆可登入后台。")
 
@@ -215,7 +212,7 @@ defmodule PolicrMiniBot.HandleSelfJoinedChain do
         [
           %InlineKeyboardButton{
             text: commands_text("设置为管理员"),
-            url: "https://t.me/#{PolicrMiniBot.username()}?startgroup=added"
+            url: "https://t.me/#{context.bot.username()}?startgroup=added"
           }
         ]
       ]

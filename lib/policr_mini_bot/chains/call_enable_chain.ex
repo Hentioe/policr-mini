@@ -1,39 +1,36 @@
-defmodule PolicrMiniBot.CallEnablePlug do
+defmodule PolicrMiniBot.CallEnableChain do
   @moduledoc """
-  启用验证功能的回调。
+  回调启用验证按钮。
   """
 
-  # TODO: 此模块需要检查必要权限。
+  # TODO: 启用功能前添加必要权限的检查。
 
-  use PolicrMiniBot, plug: [caller: [prefix: "enable:"]]
+  use PolicrMiniBot.Chain, {:callback_query, prefix: "enable:"}
 
   alias PolicrMini.Instances
   alias PolicrMini.Instances.Chat
 
-  @doc """
-  回调处理函数。
-  """
   @impl true
-  def handle(callback_query, %{from_admin: from_admin} = _state)
+  def handle(callback_query, %{from_admin: from_admin} = _context)
       when from_admin == nil or from_admin == false do
-    Telegex.answer_callback_query(callback_query.id, text: "您没有权限~", show_alert: true)
+    Telegex.answer_callback_query(callback_query.id, text: "您没有权限～", show_alert: true)
 
     :ok
   end
 
   @impl true
-  def handle(%{data: data} = callback_query, state) do
-    data |> parse_callback_data() |> handle(callback_query, state)
+  def handle(%{data: data} = callback_query, context) do
+    data |> parse_callback_data() |> _handle(callback_query, context)
   end
 
-  def handle({"v1", [chat_id]}, callback_query, _state) do
+  def _handle({"v1", [chat_id]}, callback_query, context) do
     %{message: %{message_id: message_id}} = callback_query
 
     case Chat.get(chat_id) do
       {:ok, chat} ->
         Instances.update_chat(chat, %{is_take_over: true})
 
-        Telegex.answer_callback_query(callback_query.id, text: "功能已启用~", show_alert: true)
+        Telegex.answer_callback_query(callback_query.id, text: "功能已启用～", show_alert: true)
 
         Telegex.edit_message_text("<b>本机器人已接管新成员验证。</b>",
           chat_id: chat_id,
@@ -48,6 +45,6 @@ defmodule PolicrMiniBot.CallEnablePlug do
         )
     end
 
-    :ok
+    {:stop, context}
   end
 end

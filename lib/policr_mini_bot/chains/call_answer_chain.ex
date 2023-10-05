@@ -1,21 +1,22 @@
-defmodule PolicrMiniBot.CallAnswerPlug do
+defmodule PolicrMiniBot.CallAnswerChain do
   @moduledoc """
-  验证回调处理模块。
+  回调验证答案按钮。
   """
 
-  use PolicrMiniBot, plug: [caller: [prefix: "ans:"]]
+  use PolicrMiniBot.Chain, {:callback_query, prefix: "ans:"}
 
   alias PolicrMini.{Chats, Counter}
   alias PolicrMini.Chats.{Verification, Scheme, Operation}
   alias PolicrMiniBot.{Disposable, Worker, JoinReuquestHosting}
   alias Telegex.Type.User, as: TgUser
+  alias Telegex.Type.CallbackQuery
 
   import PolicrMiniBot.VerificationHelper
 
   require Logger
 
   @impl true
-  def handle(%{data: data} = callback_query, _state) do
+  def handle(%{data: data} = callback_query, context) do
     %{
       id: callback_query_id,
       message: %{message_id: message_id, chat: %{id: chat_id}}
@@ -25,14 +26,13 @@ defmodule PolicrMiniBot.CallAnswerPlug do
 
     case Disposable.processing(processing_key) do
       :ok ->
-        result =
-          data
-          |> parse_callback_data()
-          |> handle_data(callback_query)
+        data
+        |> parse_callback_data()
+        |> handle_data(callback_query, context)
 
         Disposable.done(processing_key)
 
-        result
+        {:stop, context}
 
       {:repeat, :processing} ->
         Telegex.answer_callback_query(callback_query_id,
@@ -40,7 +40,7 @@ defmodule PolicrMiniBot.CallAnswerPlug do
           show_alert: true
         )
 
-        :error
+        {:stop, context}
 
       {:repeat, :done} ->
         Telegex.answer_callback_query(callback_query_id,
@@ -48,7 +48,7 @@ defmodule PolicrMiniBot.CallAnswerPlug do
           show_alert: true
         )
 
-        :error
+        {:stop, context}
     end
   end
 
@@ -58,9 +58,8 @@ defmodule PolicrMiniBot.CallAnswerPlug do
   此版本的数据参数格式为「被选择答案索引:验证编号」。
   TODO: 应该根据验证记录中的入口动态决定的 chat_id（当前因为默认私聊的关系直接使用了 user_id）。
   """
-  @spec handle_data({String.t(), [String.t(), ...]}, CallbackQuery.t()) ::
-          :error | :ok
-  def handle_data({"v1", [chosen, vid]}, callback_query) do
+  @spec handle_data({String.t(), [String.t(), ...]}, CallbackQuery.t(), map) :: {:stop, map}
+  def handle_data({"v1", [chosen, vid]}, callback_query, context) do
     %{
       id: callback_query_id,
       from: %{id: user_id}
@@ -80,7 +79,7 @@ defmodule PolicrMiniBot.CallAnswerPlug do
       # 验证处理结束，更新或删除入口消息
       put_or_delete_entry_message(v.chat_id, scheme)
 
-      :ok
+      {:stop, context}
     else
       {:error, %Ecto.Changeset{} = changeset} ->
         Logger.error("Processing of verification answer failed: #{inspect(reason: changeset)}")
@@ -90,12 +89,12 @@ defmodule PolicrMiniBot.CallAnswerPlug do
           show_alert: true
         )
 
-        :error
+        {:stop, context}
 
       {:error, :known, message} ->
         answer_callback_query(callback_query_id, text: message, show_alert: true)
 
-        :error
+        {:stop, context}
 
       {:error, reason} ->
         answer_callback_query(callback_query_id,
@@ -105,7 +104,7 @@ defmodule PolicrMiniBot.CallAnswerPlug do
 
         Logger.error("Processing of verification answer failed: #{inspect(reason: reason)}")
 
-        :error
+        {:stop, context}
     end
   end
 

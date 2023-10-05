@@ -45,8 +45,6 @@ defmodule PolicrMini.MixProject do
       {:dialyxir, "~> 1.4", only: [:dev], runtime: false},
       {:credo, "~> 1.7", only: [:dev, :test], runtime: false},
       {:telegex, "~> 1.2.1"},
-      # TODO: 适配 Telegex 1.x 后移除。
-      {:telegex_plug, "~> 0.3"},
       {:phoenix, "~> 1.5"},
       {:phoenix_ecto, "~> 4.2"},
       {:postgrex, "~> 0.17"},

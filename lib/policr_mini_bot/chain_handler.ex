@@ -53,6 +53,14 @@ defmodule PolicrMiniBot.ChainHandler do
     # 处理成员被移除。
     PolicrMiniBot.HandleMemberRemovedChain,
     # 处理私聊附件。
-    PolicrMiniBot.HandlePrivateAttachmentChain
+    PolicrMiniBot.HandlePrivateAttachmentChain,
+    # 回调验证答案按钮。
+    PolicrMiniBot.CallAnswerChain,
+    # 回调吊销登录令牌按钮。
+    PolicrMiniBot.CallRevokeTokenChain,
+    # 回调启用验证按钮。
+    PolicrMiniBot.CallEnableChain,
+    # 回调离开群组按钮。
+    PolicrMiniBot.CallLeaveChain
   ])
 end
