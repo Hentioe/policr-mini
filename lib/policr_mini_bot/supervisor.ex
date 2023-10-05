@@ -3,32 +3,16 @@ defmodule PolicrMiniBot.Supervisor do
 
   use Supervisor
 
-  # alias PolicrMiniBot.{
-  #   CallAnswerPlug,
-  #   CallRevokeTokenPlug,
-  #   CallEnablePlug,
-  #   CallLeavePlug
-  # }
-
   def start_link(_opts) do
     Supervisor.start_link(__MODULE__, :ok, name: __MODULE__)
   end
 
   @impl true
   def init(_init_arg) do
-    # 初始化消息清理任务
+    # 初始化 workers。
     PolicrMiniBot.Worker.MessageCleaner.init_queue()
     PolicrMiniBot.Worker.ValidationTerminator.init_queue()
 
-    # TODO: 此处用于顺序参考，完整的转换为 chains 以后删除这些注释。
-    # install_plugs([
-    #   CallAnswerPlug,
-    #   CallRevokeTokenPlug,
-    #   CallEnablePlug,
-    #   CallLeavePlug
-    # ])
-
-    # !注意! 因为以上的验证排除条件，此模块需要保证在填充以上条件的模块的处理流程的后面。
     children = [
       # 任务缓存
       PolicrMiniBot.Worker.JobCacher,
@@ -44,8 +28,6 @@ defmodule PolicrMiniBot.Supervisor do
       PolicrMiniBot.Scheduler,
       # 加群请求托管。
       PolicrMiniBot.JoinReuquestHosting,
-      # 拉取更新消息（TODO: 待删除）
-      # PolicrMiniBot.UpdatesPoller,
       # 消费消息的动态主管（TODO: 待删除）
       # PolicrMiniBot.Consumer,
       # 轮询处理器（接收更新并回调处理函数）
