@@ -7,7 +7,7 @@ import Config
 database_url =
   System.get_env("POLICR_MINI_DATABASE_URL") ||
     raise """
-    environment variable POLICR_MINI_DATABASE_URL is missing.
+    environment variable `POLICR_MINI_DATABASE_URL` is missing.
     For example: ecto://USER:PASS@HOST/DATABASE
     """
 
@@ -19,7 +19,7 @@ config :policr_mini, PolicrMini.Repo,
 secret_key_base =
   System.get_env("POLICR_MINI_SERVER_SECRET_KEY_BASE") ||
     raise """
-    environment variable POLICR_MINI_SERVER_SECRET_KEY_BASE is missing.
+    environment variable `POLICR_MINI_SERVER_SECRET_KEY_BASE` is missing.
     You can generate one by calling: mix phx.gen.secret
     """
 
@@ -47,31 +47,45 @@ unban_method =
 # 使用空白字符（一个或多个空格）间隔的可选项
 opts = String.split(System.get_env("POLICR_MINI_OPTS") || "")
 
-# 配置机器人
+# 配置机器人。
 config :policr_mini, PolicrMiniBot,
-  # 是否自动生成命令
+  # 工作模式。
+  work_mode: String.to_existing_atom(System.get_env("POLICR_MINI_BOT_WORK_MODE") || "polling"),
+  # 是否自动生成命令。
   auto_gen_commands:
     String.to_existing_atom(System.get_env("POLICR_MINI_BOT_AUTO_GEN_COMMANDS") || "false"),
-  # 拥有者 ID
+  # 拥有者 ID。
   owner_id:
     String.to_integer(
       System.get_env("POLICR_MINI_BOT_OWNER_ID") ||
         raise("""
-        environment variable POLICR_MINI_BOT_OWNER_ID is missing.
+        environment variable `POLICR_MINI_BOT_OWNER_ID` is missing.
         """)
     ),
-  # 机器人名称（用于显示）
+  # 机器人名称（用于显示）。
   name: System.get_env("POLICR_MINI_BOT_NAME"),
-  # 解封方法
+  # 解封方法。
   unban_method: unban_method,
+  # 可选项。
   opts: opts
+
+# 配置 WebHook。
+config :policr_mini, PolicrMiniBot.HookHandler,
+  # WebHook URL。
+  webhook_url:
+    System.get_env("POLICR_MINI_BOT_WEBHOOK_URL") ||
+      raise("""
+      environment variable `POLICR_MINI_BOT_WEBHOOK_URL` is missing.
+      """),
+  # WebHook 服务器端口。
+  server_port: String.to_integer(System.get_env("POLICR_MINI_BOT_WEBHOOK_SERVER_PORT") || "4001")
 
 # 配置根链接
 config :policr_mini, PolicrMiniWeb,
   root_url:
     System.get_env("POLICR_MINI_SERVER_ROOT_URL") ||
       raise("""
-      environment variable POLICR_MINI_SERVER_ROOT_URL is missing.
+      environment variable `POLICR_MINI_SERVER_ROOT_URL` is missing.
       """)
 
 # Configures the image provider
@@ -79,7 +93,7 @@ config :policr_mini, PolicrMiniBot.ImageProvider,
   root:
     System.get_env("POLICR_MINI_BOT_ASSETS_PATH") ||
       raise("""
-      environment variable POLICR_MINI_BOT_ASSETS_PATH is missing.
+      environment variable `POLICR_MINI_BOT_ASSETS_PATH` is missing.
       """)
 
 # 配置机器人 token
@@ -87,7 +101,7 @@ config :telegex,
   token:
     System.get_env("POLICR_MINI_BOT_TOKEN") ||
       raise("""
-      environment variable POLICR_MINI_BOT_TOKEN is missing.
+      environment variable `POLICR_MINI_BOT_TOKEN` is missing.
       """)
 
 # ## Using releases (Elixir v1.9+)

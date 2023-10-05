@@ -13,6 +13,14 @@ defmodule PolicrMiniBot.Supervisor do
     PolicrMiniBot.Worker.MessageCleaner.init_queue()
     PolicrMiniBot.Worker.ValidationTerminator.init_queue()
 
+    # 选择更新处理器。
+    updates_handler =
+      if PolicrMiniBot.config_get(:work_mode) == :webhook do
+        PolicrMiniBot.HookHandler
+      else
+        PolicrMiniBot.PollingHandler
+      end
+
     children = [
       # 任务缓存
       PolicrMiniBot.Worker.JobCacher,
@@ -28,10 +36,8 @@ defmodule PolicrMiniBot.Supervisor do
       PolicrMiniBot.Scheduler,
       # 加群请求托管。
       PolicrMiniBot.JoinReuquestHosting,
-      # 消费消息的动态主管（TODO: 待删除）
-      # PolicrMiniBot.Consumer,
-      # 轮询处理器（接收更新并回调处理函数）
-      PolicrMiniBot.PollingHandler
+      # 更新处理器（兼容两个模式）。
+      updates_handler
     ]
 
     # See https://hexdocs.pm/elixir/Supervisor.html

@@ -60,6 +60,7 @@ defmodule PolicrMini.MixProject do
       {:gettext, "~> 0.22"},
       {:jason, "~> 1.4"},
       {:plug_cowboy, "~> 2.6"},
+      {:remote_ip, "~> 1.1"},
       {:quantum, "~> 3.5"},
       {:honeydew, "~> 1.5"},
       {:cachex, "~> 3.6"},

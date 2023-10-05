@@ -117,7 +117,7 @@ defmodule PolicrMiniBot do
 
   def official_bots, do: @official_bots
 
-  @type config_key :: :auto_gen_commands | :owner_id | :name | :unban_method | :opts
+  @type config_key :: :work_mode | :auto_gen_commands | :owner_id | :name | :unban_method | :opts
 
   @spec config_get(config_key, any) :: any
   def config_get(key, default \\ nil) do
