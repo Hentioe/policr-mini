@@ -51,6 +51,8 @@ defmodule PolicrMiniBot.ChainHandler do
     # 处理新的群头像。
     PolicrMiniBot.HandleNewChatPhotoChain,
     # 处理成员被移除。
-    PolicrMiniBot.HandleMemberRemovedChain
+    PolicrMiniBot.HandleMemberRemovedChain,
+    # 处理私聊附件。
+    PolicrMiniBot.HandlePrivateAttachmentChain
   ])
 end

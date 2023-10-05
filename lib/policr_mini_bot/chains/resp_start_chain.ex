@@ -25,7 +25,7 @@ defmodule PolicrMiniBot.RespStartChain do
 
   # 重写匹配规则，消息文本以 `/start` 开始的私聊消息即匹配。
   @impl true
-  def match?(%{text: text, chat: %{type: "private"}}, _context) do
+  def match?(%{text: text, chat: %{type: "private"}}, _context) when text != nil do
     String.starts_with?(text, @command)
   end
 

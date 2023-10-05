@@ -1,27 +1,36 @@
-defmodule PolicrMiniBot.HandlePrivateAttachmentPlug do
-  @moduledoc false
+defmodule PolicrMiniBot.HandlePrivateAttachmentChain do
+  @moduledoc """
+  处理私聊附件。
 
-  use PolicrMiniBot, plug: :message_handler
+  ## 以下情况皆不匹配
+    - 非私聊消息。
+    - 消息不包含图片、文件、视频、音频。
+  """
 
+  use PolicrMiniBot.Chain, :message
+
+  # 忽略非私聊。
   @impl true
-  def match(%{chat: %{type: type}} = _message, state)
-      when type in ["channel", "group", "supergroup"] do
-    {:nomatch, state}
+  def match?(%{chat: %{type: chat_type}} = _message, _context) when chat_type != "private" do
+    false
   end
 
+  # 忽略不包含附件。
+  # 此处的 `photo` 字段可能为 `nil` 或空数组。
   @impl true
-  def match(%{photo: photo, document: document, video: video, audio: audio} = _message, state)
+  def match?(%{photo: photo, document: document, video: video, audio: audio} = _message, _context)
       when (photo == nil or photo == []) and document == nil and video == nil and audio == nil do
-    {:nomatch, state}
+    false
   end
 
+  # 其余皆匹配。
   @impl true
-  def match(_message, state), do: {:match, state}
+  def match?(_message, _context), do: true
 
   @max_size_hint 15 * 1024
 
   @impl true
-  def handle(message, state) do
+  def handle(message, context) do
     %{
       chat: %{id: chat_id},
       message_id: message_id,
@@ -79,19 +88,18 @@ defmodule PolicrMiniBot.HandlePrivateAttachmentPlug do
            """, audio.file_size}
       end
 
-    text =
-      text <>
-        "\n<i>用法提示：请直接将附件字符串复制到后台相对应的编辑框中。</i>"
+    text = text <> "\n<i>用法提示：请直接将附件字符串复制到后台相对应的编辑框中。</i>"
 
+    # TODO: 将此处的 `file_size` 转换为以 KB 为单位的值。
     text =
       if file_size > @max_size_hint do
-        text <> "\n\n<b>注意：附件过大，会拖慢用户验证的速度。请不要使用大文件，图片可采取压缩后再使用。</b>"
+        text <> "\n\n<b>注意：附件过大，会拖慢用户验证的速度。请尽量避免使用大文件，图片可采取压缩后再使用。</b>"
       else
         text
       end
 
     Telegex.send_message(chat_id, text, reply_to_message_id: message_id, parse_mode: "HTML")
 
-    {:ok, state}
+    {:ok, context}
   end
 end
