@@ -3,6 +3,7 @@ defmodule PolicrMiniBot.Common do
 
   use PolicrMini.I18n
 
+  # TODO: 精简此处的函数名。
   @spec non_super_group_message :: {String.t(), String.t()}
   def non_super_group_message do
     ttitle = commands_text("请在超级群中使用本机器人")

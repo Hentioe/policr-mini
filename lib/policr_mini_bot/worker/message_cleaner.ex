@@ -13,7 +13,7 @@ defmodule PolicrMiniBot.Worker.MessageCleaner do
   @failure_mode {Honeydew.FailureMode.Retry, times: 5}
   @max_concurrency 50
 
-  @type tgerr :: Telegex.Model.errors()
+  @type tgerr :: Telegex.Type.error()
 
   @impl true
   def init_queue do
@@ -29,7 +29,7 @@ defmodule PolicrMiniBot.Worker.MessageCleaner do
   @spec delete(integer | binary, integer | binary) :: {:ok, boolean} | {:error, tgerr}
   def delete(chat_id, message_id) do
     case Telegex.delete_message(chat_id, message_id) do
-      {:error, %Telegex.Model.RequestError{reason: reason}} ->
+      {:error, %Telegex.RequestError{reason: reason}} ->
         raise Error,
           message: "Send deletion request failed: #{inspect(reason: reason)}"
 

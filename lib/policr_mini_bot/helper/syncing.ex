@@ -7,7 +7,7 @@ defmodule PolicrMiniBot.Helper.Syncing do
   alias PolicrMini.Instances.Chat
   alias PolicrMini.Schema.{User, Permission}
   alias PolicrMini.UserBusiness
-  alias Telegex.Model.ChatMember
+  alias Telegex.Type.{ChatMember, ChatMemberAdministrator, ChatMemberOwner}
 
   require Logger
 
@@ -20,8 +20,8 @@ defmodule PolicrMiniBot.Helper.Syncing do
   def sync_for_chat_permissions(chat) do
     case Telegex.get_chat_administrators(chat.id) do
       {:ok, administrators} ->
-        # 过滤管理员中的机器人。
-        administrators = Enum.filter(administrators, fn member -> !member.user.is_bot end)
+        # 过滤管理员中的机器人
+        administrators = Enum.reject(administrators, fn member -> member.user.is_bot end)
 
         # 更新用户列表。
         # TODO：处理可能发生的用户同步错误。
@@ -36,9 +36,12 @@ defmodule PolicrMiniBot.Helper.Syncing do
           %Permission{
             user_id: member.user.id,
             tg_is_owner: is_owner,
-            tg_can_restrict_members: member.can_restrict_members,
-            tg_can_promote_members: member.can_promote_members,
+            # 此处必须先判断 `is_owner` 不能直接访问 `can_restrict_members` 字段，因为 `ChatMemberOwner` 缺少此字段。
+            tg_can_restrict_members: is_owner || member.can_restrict_members,
+            # 此处必须先判断 `is_owner` 不能直接访问 `can_promote_members` 字段，因为 `ChatMemberOwner` 缺少此字段。
+            tg_can_promote_members: is_owner || member.can_promote_members,
             readable: true,
+            # 此处必须先判断 `is_owner` 不能直接访问 `can_restrict_members` 字段，因为 `ChatMemberOwner` 缺少此字段。
             writable: is_owner || member.can_restrict_members
           }
         end
@@ -64,7 +67,10 @@ defmodule PolicrMiniBot.Helper.Syncing do
   end
 
   @spec sync_for_user(ChatMember.t()) :: {:ok, User.t()} | {:error, any}
-  def sync_for_user(chat_member) when is_struct(chat_member, ChatMember) do
+
+  def sync_for_user(chat_member)
+      when is_struct(chat_member, ChatMemberAdministrator) or
+             is_struct(chat_member, ChatMemberOwner) do
     user = chat_member.user
 
     user_params = %{

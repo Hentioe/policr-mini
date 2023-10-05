@@ -31,7 +31,7 @@ defmodule PolicrMiniBot.Runner.LeftChecker do
         :memeber
 
       # 超时，无返回，递归调用
-      {:error, %Telegex.Model.RequestError{reason: :timeout}} ->
+      {:error, %Telegex.RequestError{reason: :timeout}} ->
         :timer.sleep(500)
 
         status(chat_id)

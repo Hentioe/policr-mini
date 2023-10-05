@@ -1,0 +1,105 @@
+defmodule PolicrMiniBot.HandlePrivateAttachmentChain do
+  @moduledoc """
+  处理私聊附件。
+
+  ## 以下情况皆不匹配
+    - 非私聊消息。
+    - 消息不包含图片、文件、视频、音频。
+  """
+
+  use PolicrMiniBot.Chain, :message
+
+  # 忽略非私聊。
+  @impl true
+  def match?(%{chat: %{type: chat_type}} = _message, _context) when chat_type != "private" do
+    false
+  end
+
+  # 忽略不包含附件。
+  # 此处的 `photo` 字段可能为 `nil` 或空数组。
+  @impl true
+  def match?(%{photo: photo, document: document, video: video, audio: audio} = _message, _context)
+      when (photo == nil or photo == []) and document == nil and video == nil and audio == nil do
+    false
+  end
+
+  # 其余皆匹配。
+  @impl true
+  def match?(_message, _context), do: true
+
+  @max_size_hint 15 * 1024
+
+  @impl true
+  def handle(message, context) do
+    %{
+      chat: %{id: chat_id},
+      message_id: message_id,
+      photo: photo,
+      document: document,
+      video: video,
+      audio: audio
+    } = message
+
+    {text, file_size} =
+      cond do
+        photo != nil && length(photo) > 0 ->
+          photo_size = List.last(photo)
+
+          {"""
+           附件字符串:
+
+           <code>photo/#{photo_size.file_id}</code>
+
+           高度: <code>#{photo_size.height}</code> px
+           宽度: <code>#{photo_size.width}</code> px
+           大小: <code>#{photo_size.file_size}</code> bytes
+           """, photo_size.file_size}
+
+        document ->
+          {"""
+           附件字符串:
+
+           <code>document/#{document.file_id}</code>
+
+           名称: <code>#{document.file_name}</code>
+           大小: <code>#{document.file_size}</code> bytes
+           """, document.file_size}
+
+        video ->
+          {"""
+           附件字符串:
+
+           <code>video/#{video.file_id}</code>
+
+           格式: <code>#{video.mime_type}</code>
+           高度: <code>#{video.height}</code> px
+           宽度: <code>#{video.width}</code> px
+           大小: <code>#{video.file_size}</code> bytes
+           """, video.file_size}
+
+        audio ->
+          {"""
+           附件字符串:
+
+           <code>audio/#{audio.file_id}</code>
+
+           格式: <code>#{audio.mime_type}</code>
+           大小: <code>#{audio.file_size}</code> bytes
+           """, audio.file_size}
+      end
+
+    text = text <> "\n<i>用法提示：请直接将附件字符串复制到后台相对应的编辑框中。</i>"
+
+    # TODO: 将此处的 `file_size` 转换为以 KB 为单位的值。
+    text =
+      if file_size > @max_size_hint do
+        text <> "\n\n<b>注意：附件过大，会拖慢用户验证的速度。请尽量避免使用大文件，图片可采取压缩后再使用。</b>"
+      else
+        text
+      end
+
+    Telegex.send_message(chat_id, text, reply_to_message_id: message_id, parse_mode: "HTML")
+
+    {:ok, context}
+  end
+end

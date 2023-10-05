@@ -63,16 +63,16 @@ defmodule PolicrMiniWeb.Admin.API.VerificationController do
            if(is_ban, do: {:ok, true}, else: Telegex.unban_chat_member(chat_id, target_user_id)) do
       {:ok, true}
     else
-      {:error, %Telegex.Model.RequestError{}} ->
+      {:error, %Telegex.RequestError{}} ->
         {:error, %{description: "please try again"}}
 
-      {:error, %Telegex.Model.Error{description: <<"Bad Request: " <> reason>>}} ->
+      {:error, %Telegex.Error{description: <<"Bad Request: " <> reason>>}} ->
         {:error, %{description: reason}}
 
-      {:error, %Telegex.Model.Error{description: <<"Forbidden: " <> reason>>}} ->
+      {:error, %Telegex.Error{description: <<"Forbidden: " <> reason>>}} ->
         {:error, %{description: reason}}
 
-      {:error, %Telegex.Model.Error{description: description}} ->
+      {:error, %Telegex.Error{description: description}} ->
         {:error, %{description: description}}
 
       {:ok, false} ->

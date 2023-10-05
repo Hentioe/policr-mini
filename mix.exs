@@ -44,8 +44,7 @@ defmodule PolicrMini.MixProject do
       # {:dep_from_git, git: "https://github.com/elixir-lang/my_dep.git", tag: "0.1.0"}
       {:dialyxir, "~> 1.4", only: [:dev], runtime: false},
       {:credo, "~> 1.7", only: [:dev, :test], runtime: false},
-      {:telegex, git: "https://github.com/Hentioe/telegex.git", branch: "api_5.4-dev"},
-      {:telegex_plug, "~> 0.3"},
+      {:telegex, "~> 1.2.1"},
       {:phoenix, "~> 1.5"},
       {:phoenix_ecto, "~> 4.2"},
       {:postgrex, "~> 0.17"},
@@ -64,16 +63,15 @@ defmodule PolicrMini.MixProject do
       {:quantum, "~> 3.5"},
       {:honeydew, "~> 1.5"},
       {:cachex, "~> 3.6"},
-      {:httpoison, "~> 1.8"},
+      {:finch, "~> 0.16.0"},
+      {:multipart, "~> 0.4.0"},
       {:casex, "~> 0.4"},
       {:earmark, "~> 1.4"},
       {:uuid, "~> 2.0", hex: :uuid_erl},
       {:not_qwerty123, "~> 2.3"},
       {:yaml_elixir, "~> 2.7"},
       {:unzip, "~> 0.8"},
-      {:mime, "~> 2.0"},
-      # TODO: 使用 Telegex 1.0+ 以后（HTTP 客户端改为 Finch），此依赖将会移除。
-      {:ssl_verify_fun, "~> 1.1", override: true}
+      {:mime, "~> 2.0"}
     ]
   end
 

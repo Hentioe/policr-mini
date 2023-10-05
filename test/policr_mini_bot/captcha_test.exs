@@ -3,7 +3,7 @@ defmodule PolicrMiniBot.CaptchaTest do
 
   import PolicrMiniBot.Captcha
 
-  alias Telegex.Model.{InlineKeyboardMarkup, InlineKeyboardButton}
+  alias Telegex.Type.{InlineKeyboardMarkup, InlineKeyboardButton}
 
   test "build_markup/1" do
     markup =
