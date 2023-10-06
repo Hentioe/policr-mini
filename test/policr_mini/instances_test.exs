@@ -433,7 +433,7 @@ defmodule PolicrMini.InstancesTest do
       updated_name = "测试实例"
       updated_bot_username = "policr_mini_beta_bot"
       updated_bot_avatar = "beta.jpg"
-      updated_homepage = "https://mini-beta.tcore.app"
+      updated_homepage = "https://mini-beta.telestd.me"
       updated_description = "这是一个修正开发分支数个 BUG 的测试版本"
       updated_hardware = "1C2GB"
       updated_running_days = 99

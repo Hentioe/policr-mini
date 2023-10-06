@@ -17,8 +17,8 @@ defmodule PolicrMiniWeb.API.ThirdPartyController do
     %PolicrMini.Instances.ThirdParty{
       name: "Policr Mini",
       bot_username: "policr_mini_bot",
-      homepage: "https://mini.tcore.app",
-      description: "由 TCore 孵化、POLICR 社区运营",
+      homepage: "https://mini.telestd.me",
+      description: "由 Telestd 孵化、POLICR 社区运营",
       running_days: Date.diff(Date.utc_today(), @project_start_date),
       is_forked: false
     }
