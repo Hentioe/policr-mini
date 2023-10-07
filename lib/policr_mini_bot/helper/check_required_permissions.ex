@@ -26,6 +26,7 @@ defmodule PolicrMiniBot.Helper.CheckRequiredPermissions do
   end
 
   defguard has_takeover_permissions(chat_member)
-           when chat_member.can_restrict_members == true and
+           when is_struct(chat_member, Telegex.Type.ChatMemberAdministrator) and
+                  chat_member.can_restrict_members == true and
                   chat_member.can_delete_messages == true
 end

@@ -14,8 +14,7 @@ defmodule PolicrMiniBot.Runner.WorkingChecker do
   use PolicrMini.I18n
   use PolicrMiniBot.MessageCaller
 
-  # TODO: 移除此处的 `only` 选项。
-  import PolicrMiniBot.Helper, only: [async: 1]
+  import PolicrMiniBot.Helper
 
   require Logger
 
@@ -69,30 +68,31 @@ defmodule PolicrMiniBot.Runner.WorkingChecker do
         # 检查权限并执行相应修正
 
         cond do
-          member.can_send_messages == false ->
-            # 如果没有发消息权限，直接退出
-            Telegex.leave_chat(chat.id)
-
-            Logger.info(
-              "Missing permission to send message, automatically left the chat: #{inspect(chat_id: chat.id)}"
+          can_send_messages?(member) == false ->
+            # 如果没有发消息权限，直接退出。
+            Logger.warning(
+              "Missing permission to send messages, automatically left",
+              chat_id: chat.id
             )
 
-          member.status != "administrator" ->
-            # 如果不是管理员，取消接管
+            Telegex.leave_chat(chat.id)
+
+          is_administrator?(member) == false ->
+            # 如果不是管理员，取消接管。
             cancel_takeover(chat,
               reason: :non_admin,
               text: no_permission_message()
             )
 
-          member.can_restrict_members == false ->
-            # 如果没有限制用户的权限，取消接管
+          can_restrict_members?(member) == false ->
+            # 如果没有限制用户的权限，取消接管。
             cancel_takeover(chat,
               reason: :missing_permissions,
               text: no_permission_message()
             )
 
-          member.can_delete_messages == false ->
-            # 如果没有删除消息的权限，取消接管
+          can_delete_messages?(member) == false ->
+            # 如果没有删除消息的权限，取消接管。
             cancel_takeover(chat,
               reason: :missing_permissions,
               text: no_permission_message()

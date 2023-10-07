@@ -9,6 +9,8 @@ defmodule PolicrMiniBot.Helper.Syncing do
   alias PolicrMini.UserBusiness
   alias Telegex.Type.{ChatMember, ChatMemberAdministrator, ChatMemberOwner}
 
+  import PolicrMiniBot.Helper
+
   require Logger
 
   @doc """
@@ -32,17 +34,15 @@ defmodule PolicrMiniBot.Helper.Syncing do
 
         memeber_permission_mapping = fn member ->
           is_owner = member.status == "creator"
+          can_restrict_members? = can_restrict_members?(member)
 
           %Permission{
             user_id: member.user.id,
             tg_is_owner: is_owner,
-            # 此处必须先判断 `is_owner` 不能直接访问 `can_restrict_members` 字段，因为 `ChatMemberOwner` 缺少此字段。
-            tg_can_restrict_members: is_owner || member.can_restrict_members,
-            # 此处必须先判断 `is_owner` 不能直接访问 `can_promote_members` 字段，因为 `ChatMemberOwner` 缺少此字段。
-            tg_can_promote_members: is_owner || member.can_promote_members,
+            tg_can_restrict_members: can_restrict_members?,
+            tg_can_promote_members: can_promote_members?(member),
             readable: true,
-            # 此处必须先判断 `is_owner` 不能直接访问 `can_restrict_members` 字段，因为 `ChatMemberOwner` 缺少此字段。
-            writable: is_owner || member.can_restrict_members
+            writable: can_restrict_members?
           }
         end
 

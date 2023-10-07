@@ -144,7 +144,7 @@ defmodule PolicrMiniBot.HandleSelfPermissionsChangeChain do
 
     Logger.debug("I have been demoted to a regular member: #{inspect(chat_id: chat_id)}")
 
-    if new_chat_member.can_send_messages == false do
+    if can_send_messages?(new_chat_member) == false do
       # 如果没有发送消息权限，将直接退群。
       Telegex.leave_chat(chat_id)
     else
@@ -362,9 +362,9 @@ defmodule PolicrMiniBot.HandleSelfPermissionsChangeChain do
     # 尝试修正群管理员个数为零导致的权限问题。
     fix_chat_empty_admins(my_chat_member)
 
-    if new_chat_member.can_restrict_members == false ||
-         new_chat_member.can_delete_messages == false do
-      # 最少权限不完整
+    if can_restrict_members?(new_chat_member) == false ||
+         can_delete_messages?(new_chat_member) == false do
+      # 最小权限不满足。
 
       trequired_permissions = commands_text(@required_permissons_msg)
 

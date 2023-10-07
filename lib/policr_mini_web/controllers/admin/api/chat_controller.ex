@@ -16,6 +16,7 @@ defmodule PolicrMiniWeb.Admin.API.ChatController do
   alias PolicrMiniWeb.TgAssetsCacher
 
   import PolicrMiniWeb.Helper
+  import PolicrMiniBot.Helper
 
   action_fallback PolicrMiniWeb.API.FallbackController
 
@@ -107,16 +108,16 @@ defmodule PolicrMiniWeb.Admin.API.ChatController do
     case Telegex.get_chat_member(chat_id, PolicrMiniBot.id()) do
       {:ok, member} ->
         cond do
-          member.status != "administrator" ->
+          is_administrator?(member) == false ->
             {:error, %{description: "bot is not an administrator"}}
 
-          member.can_restrict_members == false ->
+          can_restrict_members?(member) == false ->
             {:error, %{description: "bot does not have permission to restrict members"}}
 
-          member.can_delete_messages == false ->
+          can_delete_messages?(member) == false ->
             {:error, %{description: "bot does not have permission to delete messages"}}
 
-          member.can_send_messages == false ->
+          can_send_messages?(member) == false ->
             {:error, %{description: "bot does not have permission to send messages"}}
 
           true ->

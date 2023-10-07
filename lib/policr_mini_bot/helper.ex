@@ -9,7 +9,14 @@ defmodule PolicrMiniBot.Helper do
     CheckRequiredPermissions
   }
 
-  alias Telegex.Type.ChatMember
+  alias Telegex.Type.{
+    ChatMember,
+    ChatMemberOwner,
+    ChatMemberAdministrator,
+    ChatMemberRestricted,
+    ChatMemberLeft,
+    ChatMemberBanned
+  }
 
   require Logger
 
@@ -364,4 +371,103 @@ defmodule PolicrMiniBot.Helper do
           | :ok
 
   defdelegate check_takeover_permissions(member), to: CheckRequiredPermissions
+
+  # TODO: 为下列检查 `ChatMember` 的系列函数添加测试。
+  @doc """
+  检查 `ChatMember` 是否具有发言权限。
+  """
+  @spec can_send_messages?(ChatMember.t()) :: boolean
+
+  # 权限受限，检查 `can_send_messages` 字段。
+  def can_send_messages?(chat_member) when is_struct(chat_member, ChatMemberRestricted) do
+    chat_member.can_send_messages
+  end
+
+  # 已离开或被封禁，直接返回 `false`。
+  def can_send_messages?(chat_member)
+      when is_struct(chat_member, ChatMemberLeft) or is_struct(chat_member, ChatMemberBanned) do
+    false
+  end
+
+  # 其余情况，一律返回 `true`。
+  def can_send_messages?(_chat_member) do
+    true
+  end
+
+  @doc """
+  检查 `ChatMember` 是否是管理员（包括所有者）。
+  """
+  @spec is_administrator?(Telegex.Type.ChatMember.t()) :: boolean
+
+  # 是管理员或所有者，直接返回 `true`。
+  def is_administrator?(chat_member)
+      when is_struct(chat_member, ChatMemberAdministrator) or
+             is_struct(chat_member, ChatMemberOwner) do
+    true
+  end
+
+  # 其余情况，一律返回 `false`。
+  def is_administrator?(_chat_member) do
+    false
+  end
+
+  @doc """
+  检查 `ChatMember` 是否能够删除消息。
+  """
+  @spec can_delete_messages?(Telegex.Type.ChatMember.t()) :: boolean
+
+  # 是管理员，检查 `can_delete_messages` 字段。
+  def can_delete_messages?(chat_member) when is_struct(chat_member, ChatMemberAdministrator) do
+    chat_member.can_delete_messages
+  end
+
+  # 是所有者，直接返回 `true`。
+  def can_delete_messages?(chat_member) when is_struct(chat_member, ChatMemberOwner) do
+    true
+  end
+
+  # 其余情况，一律返回 `false`。
+  def can_delete_messages?(_chat_member) do
+    false
+  end
+
+  @doc """
+  检查 `ChatMember` 是否能够限制成员权限。
+  """
+  @spec can_restrict_members?(Telegex.Type.ChatMember.t()) :: boolean
+
+  # 是管理员，检查 `can_restrict_members` 字段。
+  def can_restrict_members?(chat_member) when is_struct(chat_member, ChatMemberAdministrator) do
+    chat_member.can_restrict_members
+  end
+
+  # 是所有者，直接返回 `true`。
+  def can_restrict_members?(chat_member) when is_struct(chat_member, ChatMemberOwner) do
+    true
+  end
+
+  # 其余情况，一律返回 `false`。
+  def can_restrict_members?(_chat_member) do
+    false
+  end
+
+  @doc """
+  检查 `ChatMember` 是否能够提升成员。
+  """
+  @spec can_promote_members?(Telegex.Type.ChatMember.t()) :: boolean
+
+  # 是管理员，检查 `can_promote_members` 字段。
+  def can_promote_members?(chat_member) when is_struct(chat_member, ChatMemberAdministrator) do
+    chat_member.can_promote_members
+  end
+
+  # 是所有者，直接返回 `true`。
+  def can_promote_members?(chat_member) when is_struct(chat_member, ChatMemberOwner) do
+    true
+  end
+
+  # 其余情况，一律返回 `false`。
+  def can_promote_members?(_chat_member) do
+    false
+  end
 end
