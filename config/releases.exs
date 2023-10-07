@@ -96,13 +96,14 @@ config :policr_mini, PolicrMiniBot.ImageProvider,
       environment variable `POLICR_MINI_BOT_ASSETS_PATH` is missing.
       """)
 
-# 配置机器人 token
+# 配置 Telegex 全局选项。
 config :telegex,
   token:
     System.get_env("POLICR_MINI_BOT_TOKEN") ||
       raise("""
       environment variable `POLICR_MINI_BOT_TOKEN` is missing.
-      """)
+      """),
+  api_base_url: System.get_env("POLICR_MINI_BOT_API_BASE_URL") || "https://api.telegram.org/bot"
 
 # ## Using releases (Elixir v1.9+)
 #
