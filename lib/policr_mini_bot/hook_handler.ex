@@ -10,10 +10,10 @@ defmodule PolicrMiniBot.HookHandler do
     # read some parameters from your env config
     env_config = Application.get_env(:policr_mini, __MODULE__)
     # delete the webhook and set it again
-    Telegex.delete_webhook()
+    {:ok, true} = Telegex.delete_webhook()
     # set the webhook (url and secret token)
     secret_token = Telegex.Tools.gen_secret_token()
-    Telegex.set_webhook(env_config[:webhook_url], secret_token: secret_token)
+    {:ok, true} = Telegex.set_webhook(env_config[:webhook_url], secret_token: secret_token)
     # specify port for web server
     # port has a default value of 4000, but it may change with library upgrades
     config = %Telegex.Hook.Config{

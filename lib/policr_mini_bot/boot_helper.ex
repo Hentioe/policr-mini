@@ -21,6 +21,9 @@ defmodule PolicrMiniBot.BootHelper do
 
       {:error, %{reason: :timeout}} ->
         Logger.warning("Checking bot information timeout, retrying...")
+        :timer.sleep(100)
+
+        fetch_bot_info()
 
       {:error, %{reason: :closed}} ->
         Logger.warning("Network error while checking bot information, retrying...")
