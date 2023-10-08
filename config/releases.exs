@@ -54,6 +54,9 @@ config :policr_mini, PolicrMiniBot,
   # 是否自动生成命令。
   auto_gen_commands:
     String.to_existing_atom(System.get_env("POLICR_MINI_BOT_AUTO_GEN_COMMANDS") || "false"),
+  # 马赛克方法。
+  mosaic_method:
+    String.to_existing_atom(System.get_env("POLICR_MINI_BOT_MOSAIC_METHOD") || "spoiler"),
   # 拥有者 ID。
   owner_id:
     String.to_integer(

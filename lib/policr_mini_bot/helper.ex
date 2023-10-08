@@ -18,6 +18,8 @@ defmodule PolicrMiniBot.Helper do
     ChatMemberBanned
   }
 
+  use TypedStruct
+
   require Logger
 
   @type tgerr :: {:error, Telegex.Type.error()}
@@ -145,8 +147,6 @@ defmodule PolicrMiniBot.Helper do
     Telegex.send_chat_action(chat_id, "typing")
   end
 
-  @markdown_parse_mode "MarkdownV2"
-
   @type mention_opts :: [
           {:parse_mode, String.t()},
           {:anonymization, boolean()},
@@ -166,9 +166,11 @@ defmodule PolicrMiniBot.Helper do
   def mention(%{id: id} = user, options \\ []) do
     options =
       options
-      |> Keyword.put_new(:parse_mode, @markdown_parse_mode)
-      |> Keyword.put_new(:anonymization, true)
+      |> Keyword.put_new(:parse_mode, "MarkdownV2")
+      |> Keyword.put_new(:anonymization, false)
       |> Keyword.put_new(:mosaic, false)
+
+    parse_mode = options[:parse_mode]
 
     name =
       if options[:anonymization] do
@@ -177,16 +179,25 @@ defmodule PolicrMiniBot.Helper do
         name = fullname(user)
 
         if options[:mosaic] do
-          mosaic_name(name)
+          # 马赛克函数由于包含必要标签，会自行处理字符转义。
+          mosaic_name(name, parse_mode)
         else
-          name
+          safe_parse_mode(name, parse_mode)
         end
       end
 
-    case options[:parse_mode] do
-      "MarkdownV2" -> "[#{escape_markdown(name)}](tg://user?id=#{id})"
-      "HTML" -> ~s(<a href="tg://user?id=#{id}">#{Telegex.Tools.safe_html(name)}</a>)
+    case parse_mode do
+      "MarkdownV2" -> "[#{name}](tg://user?id=#{id})"
+      "HTML" -> ~s(<a href="tg://user?id=#{id}">#{name}</a>)
     end
+  end
+
+  def safe_parse_mode(text, "MarkdownV2") do
+    Telegex.Tools.safe_markdown(text)
+  end
+
+  def safe_parse_mode(text, "HTML") do
+    Telegex.Tools.safe_html(text)
   end
 
   @type fullname_user :: %{
@@ -211,65 +222,107 @@ defmodule PolicrMiniBot.Helper do
       iex>PolicrMiniBot.Helper.build_mention(%{id: 101, first_name: "Michael", last_name: "Jackson"}, :full_name)
       "[Michael Jackson](tg://user?id=101)"
       iex>PolicrMiniBot.Helper.build_mention(%{id: 101, first_name: "小红在上海鬼混", last_name: nil}, :mosaic_full_name)
-      "[小███混](tg://user?id=101)"
+      "[小||红在上海鬼||混](tg://user?id=101)"
   """
+  @deprecated "Use `mention/2` instead."
   @spec build_mention(mention_user, mention_scheme) :: String.t()
   def build_mention(user, scheme) do
     id = user[:id]
 
-    text =
+    display_text =
       case scheme do
         :user_id -> to_string(id)
-        :full_name -> fullname(user)
-        :mosaic_full_name -> user |> fullname() |> mosaic_name()
+        :full_name -> Telegex.Tools.safe_markdown(fullname(user))
+        :mosaic_full_name -> user |> fullname() |> mosaic_name("MarkdownV2")
       end
 
-    "[#{escape_markdown(text)}](tg://user?id=#{id})"
+    "[#{display_text}](tg://user?id=#{id})"
+  end
+
+  typedstruct module: MosaicConfig do
+    field :len, :integer
+    field :parse_mode, String.t()
+    field :method, :spoiler | :classic
   end
 
   @doc """
-  给名字打马赛克。
-
-  将名字中的部分字符替换成 `░` 符号。如果名字过长（超过五个字符），则只保留前后两个字符，中间使用三个 `█` 填充。
+  构造马赛克名称。
 
   ## 例子
-      iex> PolicrMiniBot.Helper.mosaic_name("小明")
-      "小░"
-      iex> PolicrMiniBot.Helper.mosaic_name("Hello")
-      "H░░░o"
-      iex> PolicrMiniBot.Helper.mosaic_name("Hentioe")
-      "H███e"
+      iex> PolicrMiniBot.Helper.mosaic_name("小明", "MarkdownV2")
+      "小||明||"
+      iex> PolicrMiniBot.Helper.mosaic_name("Hello", "MarkdownV2")
+      "H||ell||o"
+      iex> PolicrMiniBot.Helper.mosaic_name("Hentioe", "MarkdownV2")
+      "H||entio||e"
 
   """
-  @spec mosaic_name(String.t()) :: String.t()
-  def mosaic_name(name), do: mosaic_name_by_len(name, String.length(name))
+  @spec mosaic_name(String.t(), String.t()) :: String.t()
+  def mosaic_name(name, parse_mode) do
+    _mosaic_name(name, %MosaicConfig{
+      len: String.length(name),
+      parse_mode: parse_mode,
+      method: PolicrMiniBot.config_get(:mosaic_method, :spoiler)
+    })
+  end
 
-  @spec mosaic_name_by_len(String.t(), integer) :: String.t()
-  defp mosaic_name_by_len(name, len) when is_integer(len) and len == 1 do
+  @spec _mosaic_name(String.t(), MosaicConfig.t()) :: String.t()
+
+  # 只有一个字符的名称，不打马赛克。
+  defp _mosaic_name(name, %{len: 1} = _config) do
     name
   end
 
-  defp mosaic_name_by_len(name, len) when is_integer(len) and len == 2 do
-    name
-    |> String.graphemes()
-    |> Enum.with_index()
-    |> Enum.map_join(fn {char, index} ->
-      if index == 1, do: "░", else: char
-    end)
+  # 两个字符的名称，遮挡第二个字符（经典）。
+  defp _mosaic_name(name, %{len: 2, method: :classic} = _config) do
+    String.slice(name, 0..0) <> "░"
   end
 
-  defp mosaic_name_by_len(name, len) when is_integer(len) and len >= 3 and len <= 5 do
-    last_index = len - 1
-
-    name
-    |> String.graphemes()
-    |> Enum.with_index()
-    |> Enum.map_join(fn {char, index} ->
-      if index == 0 || index == last_index, do: char, else: "░"
-    end)
+  # 两个字符的名称，遮挡第二个字符（Spoiler）。
+  defp _mosaic_name(name, %{len: 2, method: :spoiler, parse_mode: parse_mode}) do
+    safe_parse_mode(String.slice(name, 0..0), parse_mode) <>
+      wrap_spoiler(String.slice(name, 1..1), parse_mode)
   end
 
-  defp mosaic_name_by_len(name, _len), do: "#{String.at(name, 0)}███#{String.at(name, -1)}"
+  # 3-5 个字符，遮挡除首尾外的中间字符（经典）。
+  defp _mosaic_name(name, %{len: len, method: :classic}) when len >= 3 and len <= 5 do
+    String.slice(name, 0..0) <> String.duplicate("░", len - 2) <> String.slice(name, -1..-1)
+  end
+
+  # 3-5 个字符，遮挡除首尾外的中间字符（Spoiler）。
+  defp _mosaic_name(name, %{len: len, method: :spoiler, parse_mode: parse_mode})
+       when len >= 3 and len <= 5 do
+    last = len - 1
+
+    safe_parse_mode(String.slice(name, 0..0), parse_mode) <>
+      wrap_spoiler(String.slice(name, 1..(last - 1)), parse_mode) <>
+      safe_parse_mode(String.slice(name, last..last), parse_mode)
+  end
+
+  defp _mosaic_name(name, %{method: :classic}) do
+    "#{String.slice(name, 0..0)}███#{String.slice(name, -1..-1)}"
+  end
+
+  defp _mosaic_name(name, %{len: len, method: :spoiler, parse_mode: parse_mode}) do
+    last = len - 1
+
+    safe_parse_mode(String.slice(name, 0..0), parse_mode) <>
+      wrap_spoiler(String.slice(name, 1..(last - 1)), parse_mode) <>
+      safe_parse_mode(String.slice(name, last..last), parse_mode)
+  end
+
+  @doc """
+  根据 `parse_mode` 包装 Spoiler 标签。
+  """
+  @spec wrap_spoiler(String.t(), String.t()) :: String.t()
+
+  def wrap_spoiler(text, "MarkdownV2") do
+    "||#{Telegex.Tools.safe_markdown(text)}||"
+  end
+
+  def wrap_spoiler(text, "HTML") do
+    "<tg-spoiler>#{Telegex.Tools.safe_html(text)}</tg-spoiler>"
+  end
 
   @defaults_key_mapping [
     vmode: :verification_mode,

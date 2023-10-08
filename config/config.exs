@@ -22,13 +22,14 @@ config :policr_mini, PolicrMiniWeb.Endpoint,
 config :policr_mini, PolicrMiniBot.ImageProvider, root: "_assets"
 
 # 配置机器人。
-config :policr_mini, PolicrMiniBot, auto_gen_commands: false, opts: []
+config :policr_mini, PolicrMiniBot,
+  auto_gen_commands: false,
+  mosaic_method: :spoiler,
+  opts: []
 
 # 配置 Telegex 的适配器。
 config :telegex,
-  # HTTP 客户端。
   caller_adapter: {Finch, [receive_timeout: 5 * 1000]},
-  # Webhook 服务端。
   hook_adapter: Cowboy
 
 # 配置根链接。
