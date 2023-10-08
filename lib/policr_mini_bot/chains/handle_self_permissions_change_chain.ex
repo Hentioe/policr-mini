@@ -34,16 +34,84 @@ defmodule PolicrMiniBot.HandleSelfPermissionsChangeChain do
   """
 
   @impl true
-  def handle(%{my_chat_member: nil} = _update, context) do
-    {:ok, context}
+  def match?(%{my_chat_member: nil} = _update, _context) do
+    false
   end
 
   @impl true
-  def handle(%{my_chat_member: %{chat: %{type: chat_type}}}, context)
+  def match?(%{my_chat_member: %{chat: %{type: chat_type}}}, _context)
       when chat_type in ["channel", "private"] do
-    {:ok, context}
+    false
   end
 
+  @impl true
+  def match?(_update, %{action: action} = _context)
+      when action in [:self_joined, :self_lefted] do
+    false
+  end
+
+  @impl true
+  def match?(
+        %{
+          my_chat_member: %{
+            new_chat_member: %{status: status_new},
+            old_chat_member: %{status: status_old}
+          }
+        },
+        _context
+      )
+      when status_new in ["member", "restricted"] and
+             status_old in ["member", "restricted"] do
+    false
+  end
+
+  @impl true
+  def match?(
+        %{
+          my_chat_member: %{
+            new_chat_member: %{status: status_new},
+            old_chat_member: %{status: status_old}
+          }
+        },
+        _context
+      )
+      when status_new == "left" and status_old in ["kicked", "restricted"] do
+    false
+  end
+
+  @impl true
+  def match?(
+        %{
+          my_chat_member: %{
+            new_chat_member: %{status: status_new},
+            old_chat_member: %{status: status_old}
+          }
+        },
+        _context
+      )
+      when status_new == "kicked" and status_old in ["left", "restricted"] do
+    false
+  end
+
+  @impl true
+  def match?(
+        %{
+          my_chat_member: %{
+            new_chat_member: %{status: status_new},
+            old_chat_member: %{status: status_old}
+          }
+        },
+        _context
+      )
+      when status_new == "restricted" and status_old in ["left", "kicked"] do
+    false
+  end
+
+  # 其余皆匹配。
+  @impl true
+  def match?(_update, _context), do: true
+
+  # 机器人通过添加管理员的方式进入群组，这会导致邀请进群和修改权限两个操作同时发生，所以它被放在状态中的动作匹配前面。
   @impl true
   def handle(
         %{
@@ -56,73 +124,10 @@ defmodule PolicrMiniBot.HandleSelfPermissionsChangeChain do
         context
       )
       when status_new == "administrator" and status_old in ["left", "kicked"] do
-    # 机器人通过添加管理员的方式进入群组，这会导致邀请进群和修改权限两个操作同时发生，所以它被放在状态中的动作匹配前面。
     # TODO：将此情况添加到头部注释中。
+    # TODO: [待确认] 此处的代码由于匹配机制，可能不会生效。
     handle_self_promoted(my_chat_member)
 
-    {:ok, context}
-  end
-
-  @impl true
-  def handle(_update, %{action: action} = context)
-      when action in [:self_joined, :self_lefted] do
-    {:ok, context}
-  end
-
-  @impl true
-  def handle(
-        %{
-          my_chat_member: %{
-            new_chat_member: %{status: status_new},
-            old_chat_member: %{status: status_old}
-          }
-        },
-        context
-      )
-      when status_new in ["member", "restricted"] and
-             status_old in ["member", "restricted"] do
-    {:ok, context}
-  end
-
-  @impl true
-  def handle(
-        %{
-          my_chat_member: %{
-            new_chat_member: %{status: status_new},
-            old_chat_member: %{status: status_old}
-          }
-        },
-        context
-      )
-      when status_new == "left" and status_old in ["kicked", "restricted"] do
-    {:ok, context}
-  end
-
-  @impl true
-  def handle(
-        %{
-          my_chat_member: %{
-            new_chat_member: %{status: status_new},
-            old_chat_member: %{status: status_old}
-          }
-        },
-        context
-      )
-      when status_new == "kicked" and status_old in ["left", "restricted"] do
-    {:ok, context}
-  end
-
-  @impl true
-  def handle(
-        %{
-          my_chat_member: %{
-            new_chat_member: %{status: status_new},
-            old_chat_member: %{status: status_old}
-          }
-        },
-        context
-      )
-      when status_new == "restricted" and status_old in ["left", "kicked"] do
     {:ok, context}
   end
 
@@ -138,8 +143,7 @@ defmodule PolicrMiniBot.HandleSelfPermissionsChangeChain do
         } = _update,
         context
       )
-      when status_new in ["restricted", "member"] and
-             status_old == "administrator" do
+      when status_new in ["restricted", "member"] and status_old == "administrator" do
     %{chat: %{id: chat_id}} = my_chat_member
 
     Logger.debug("I have been demoted to a regular member: #{inspect(chat_id: chat_id)}")
@@ -166,7 +170,7 @@ defmodule PolicrMiniBot.HandleSelfPermissionsChangeChain do
       end
     end
 
-    {:ok, context}
+    {:stop, context}
   end
 
   # 从普通成员提升为管理员。
@@ -181,8 +185,8 @@ defmodule PolicrMiniBot.HandleSelfPermissionsChangeChain do
         } = _update,
         context
       )
-      when status_new == "administrator" and
-             status_old in ["restricted", "member"] do
+      when status_new == "administrator" and status_old in ["restricted", "member"] do
+    # 处理自身被提升为管理员。
     handle_self_promoted(my_chat_member)
 
     {:ok, context}

@@ -54,10 +54,15 @@ defmodule PolicrMiniBot.HandleGroupUserJoinedChain do
     false
   end
 
+  # 忽略机器人。
   @impl true
   def match?(%{chat_member: %{new_chat_member: %{user: %{is_bot: true}}}}, _context) do
     false
   end
+
+  # 其余皆匹配。
+  @impl true
+  def match?(_update, _context), do: true
 
   @impl true
   def handle(%{chat_member: chat_member} = _update, context) do

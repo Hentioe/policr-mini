@@ -26,79 +26,83 @@ defmodule PolicrMiniBot.HandleAdminPermissionsChangeChain do
   require Logger
 
   @impl true
-  def handle(%{chat_member: nil} = _update, context) do
-    {:ok, context}
+  def match?(%{chat_member: nil} = _update, _context) do
+    false
   end
 
   @impl true
-  def handle(%{chat_member: %{chat: %{type: "channel"}}}, context) do
-    {:ok, context}
+  def match?(%{chat_member: %{chat: %{type: "channel"}}}, _context) do
+    false
   end
 
   @impl true
-  def handle(_update, %{action: action} = context) when action in [:user_joined, :user_lefted] do
-    {:ok, context}
+  def match?(_update, %{action: action} = _context) when action in [:user_joined, :user_lefted] do
+    false
   end
 
-  def handle(%{chat_member: %{new_chat_member: %{user: %{is_bot: true}}}} = _update, context) do
-    {:ok, context}
+  def match?(%{chat_member: %{new_chat_member: %{user: %{is_bot: true}}}} = _update, _context) do
+    false
   end
 
   @impl true
-  def handle(
+  def match?(
         %{
           chat_member: %{
             new_chat_member: %{status: status_new},
             old_chat_member: %{status: status_old}
           }
         },
-        context
+        _context
       )
       when status_new in ["member", "restricted"] and status_old in ["member", "restricted"] do
-    {:ok, context}
+    false
   end
 
   @impl true
-  def handle(
+  def match?(
         %{
           chat_member: %{
             new_chat_member: %{status: status_new},
             old_chat_member: %{status: status_old}
           }
         },
-        context
+        _context
       )
       when status_new == "left" and status_old in ["kicked", "restricted"] do
-    {:ok, context}
+    false
   end
 
   @impl true
-  def handle(
+  def match?(
         %{
           chat_member: %{
             new_chat_member: %{status: status_new},
             old_chat_member: %{status: status_old}
           }
         },
-        context
+        _context
       )
       when status_new == "kicked" and status_old in ["left", "restricted"] do
-    {:ok, context}
+    false
   end
 
   @impl true
-  def handle(
+  def match?(
         %{
           chat_member: %{
             new_chat_member: %{status: status_new},
             old_chat_member: %{status: status_old}
           }
         },
-        context
+        _context
       )
       when status_new == "restricted" and status_old in ["left", "kicked"] do
-    {:ok, context}
+    false
   end
+
+  # 其余皆匹配。
+  @impl true
+  def match?(_update, _context), do: true
 
   @impl true
   def handle(%{chat_member: chat_member}, context) do

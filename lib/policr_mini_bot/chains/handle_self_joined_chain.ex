@@ -26,89 +26,81 @@ defmodule PolicrMiniBot.HandleSelfJoinedChain do
   defdelegate synchronize_chat(chat_id, init), to: PolicrMiniBot.RespSyncChain
 
   @impl true
-  def handle(%{my_chat_member: nil} = _update, context) do
-    {:ok, context}
+  def match?(%{my_chat_member: nil} = _update, _context) do
+    false
   end
 
   @impl true
-  def handle(%{my_chat_member: %{chat: %{type: chat_type}}}, context)
+  def match?(%{my_chat_member: %{chat: %{type: chat_type}}}, _context)
       when chat_type in ["channel", "private"] do
-    {:ok, context}
+    false
   end
 
   # 添加了针对成员新状态是 "administrator" 但是此前状态并非 "left" 或 "kicked" 的匹配，这表示机器人是通过添加群成员进来的，在进入的同时就具备了权限。
   # TODO：将此项匹配逻辑更新到头部注释中。
   @impl true
-  def handle(
+  def match?(
         %{
           my_chat_member: %{
             new_chat_member: %{status: status_new},
             old_chat_member: %{status: status_old}
           }
         } = _update,
-        context
+        _context
       )
       when status_new not in ["restricted", "member", "administrator"] or
              (status_new == "administrator" and status_old not in ["left", "kicked"]) do
-    {:ok, context}
+    false
   end
 
   @impl true
-  def handle(
+  def match?(
         %{my_chat_member: %{new_chat_member: %{is_member: is_member, status: status}}},
-        context
+        _context
       )
       when status == "restricted" and is_member == false do
-    {:ok, context}
+    false
   end
 
   @impl true
-  def handle(%{my_chat_member: %{old_chat_member: %{status: status}}}, context)
+  def match?(%{my_chat_member: %{old_chat_member: %{status: status}}}, _context)
       when status in ["member", "creator", "administrator"] do
-    {:ok, context}
+    false
   end
 
   @impl true
-  def handle(
+  def match?(
         %{my_chat_member: %{old_chat_member: %{is_member: is_member, status: status}}},
-        context
+        _context
       )
       when status == "restricted" and is_member == true do
-    {:ok, context}
+    false
   end
+
+  # 其余皆匹配。
+  @impl true
+  def match?(_update, _context), do: true
 
   @impl true
   def handle(%{my_chat_member: my_chat_member} = _update, context) do
     %{chat: %{id: chat_id, type: chat_type}} = my_chat_member
 
-    Logger.debug("I have been invited to a group: #{inspect(chat_id: chat_id)}")
+    Logger.debug("Bot (@#{context.bot.username}) invited to a new group", chat_id: chat_id)
 
     context = action(context, :self_joined)
 
-    # 非超级群直接退出。
-    if chat_type != "supergroup", do: exits(chat_type, chat_id), else: handle_it(chat_id, context)
+    if chat_type == "supergroup" do
+      _handle(chat_id, context)
+    else
+      # 非超级群直接退出。
+      exits(chat_type, chat_id)
+    end
 
-    {:ok, %{context | done: true}}
+    {:ok, %{context | stop: true}}
   end
 
-  # 退出普通群。
-  defp exits("group", chat_id) do
-    {parse_mode, text} = non_super_group_message()
-
-    send_text(chat_id, text, parse_mode: parse_mode, logging: true)
-
-    Telegex.leave_chat(chat_id)
-  end
-
-  # 退出频道。附加：目前测试被邀请进频道时并不会产生消息。
-  defp exits("channel", message) do
-    chat_id = message.chat.id
-
-    Telegex.leave_chat(chat_id)
-  end
-
-  @spec handle_it(integer | binary, map) :: no_return()
-  defp handle_it(chat_id, context) do
+  @spec _handle(integer | binary, map) :: no_return()
+  defp _handle(chat_id, context) do
     # 同步群组和管理员信息。
     # 注意，创建群组后需要继续创建方案。
     with {:ok, chat} <- synchronize_chat(chat_id, true),
@@ -143,6 +135,22 @@ defmodule PolicrMiniBot.HandleSelfJoinedChain do
 
         send_text(chat_id, commands_text("出现了一些问题，群组登记失败。请联系开发者。"), logging: true)
     end
+  end
+
+  # 退出普通群。
+  defp exits("group", chat_id) do
+    {parse_mode, text} = non_super_group_message()
+
+    send_text(chat_id, text, parse_mode: parse_mode, logging: true)
+
+    Telegex.leave_chat(chat_id)
+  end
+
+  # 退出频道。附加：目前测试被邀请进频道时并不会产生消息。
+  defp exits("channel", message) do
+    chat_id = message.chat.id
+
+    Telegex.leave_chat(chat_id)
   end
 
   # 发送响应消息。

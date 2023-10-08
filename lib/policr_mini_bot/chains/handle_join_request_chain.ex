@@ -9,17 +9,21 @@ defmodule PolicrMiniBot.HandleJoinRequestChain do
 
   require Logger
 
-  # 忽略未接管
+  # 忽略未接管。
   @impl true
   def match?(_update, %{taken_over: false} = _context) do
     false
   end
 
-  # 忽略加入请求为空
+  # 忽略加入请求为空。
   @impl true
   def match?(%{chat_join_request: nil} = _update, _context) do
     false
   end
+
+  # 其余皆匹配。
+  @impl true
+  def match?(_update, _context), do: true
 
   @impl true
   def handle(update, context) do

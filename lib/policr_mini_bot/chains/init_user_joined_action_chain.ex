@@ -19,43 +19,51 @@ defmodule PolicrMiniBot.InitUserJoinedActionChain do
   use PolicrMiniBot.Chain
 
   @impl true
-  def handle(%{chat_member: nil} = _update, context) do
-    {:ok, context}
+  def match?(%{chat_member: nil} = _update, _context) do
+    false
   end
 
   @impl true
-  def handle(%{chat_member: %{chat: %{type: "channel"}}}, context) do
-    {:ok, context}
+  def match?(%{chat_member: %{chat: %{type: "channel"}}}, _context) do
+    false
   end
 
   @impl true
-  def handle(%{chat_member: %{new_chat_member: %{status: status}}}, context)
+  def match?(%{chat_member: %{new_chat_member: %{status: status}}}, _context)
       when status not in ["restricted", "member"] do
-    {:ok, context}
+    false
   end
 
   @impl true
-  def handle(%{chat_member: %{new_chat_member: %{is_member: is_member, status: status}}}, context)
+  def match?(
+        %{chat_member: %{new_chat_member: %{is_member: is_member, status: status}}},
+        _context
+      )
       when status == "restricted" and is_member == false do
-    {:ok, context}
+    false
   end
 
   @impl true
-  def handle(%{chat_member: %{old_chat_member: %{status: status}}}, context)
+  def match?(%{chat_member: %{old_chat_member: %{status: status}}}, _context)
       when status in ["member", "creator", "administrator"] do
-    {:ok, context}
+    false
   end
 
   @impl true
-  def handle(%{chat_member: %{old_chat_member: %{is_member: is_member, status: status}}}, context)
+  def match?(
+        %{chat_member: %{old_chat_member: %{is_member: is_member, status: status}}},
+        _context
+      )
       when status == "restricted" and is_member == true do
-    {:ok, context}
+    false
   end
+
+  # 其余皆匹配。
+  @impl true
+  def match?(_update, _context), do: true
 
   @impl true
   def handle(_update, context) do
-    context = action(context, :user_joined)
-
-    {:ok, context}
+    {:ok, action(context, :user_joined)}
   end
 end

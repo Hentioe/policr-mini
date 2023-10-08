@@ -21,45 +21,49 @@ defmodule PolicrMiniBot.HandleSelfLeftChain do
   require Logger
 
   @impl true
-  def handle(%{my_chat_member: nil} = _update, context) do
-    {:ok, context}
+  def match?(%{my_chat_member: nil} = _update, _context) do
+    false
   end
 
   @impl true
-  def handle(%{my_chat_member: %{chat: %{type: chat_type}}}, context)
+  def match?(%{my_chat_member: %{chat: %{type: chat_type}}}, _context)
       when chat_type in ["channel", "private"] do
-    {:ok, context}
+    false
   end
 
   @impl true
-  def handle(%{my_chat_member: %{new_chat_member: %{status: status}}}, context)
+  def match?(%{my_chat_member: %{new_chat_member: %{status: status}}}, _context)
       when status not in ["restricted", "left", "kicked"] do
-    {:ok, context}
+    false
   end
 
   @impl true
-  def handle(
+  def match?(
         %{my_chat_member: %{new_chat_member: %{is_member: is_member, status: status}}},
-        context
+        _context
       )
       when status == "restricted" and is_member == true do
-    {:ok, context}
+    false
   end
 
   @impl true
-  def handle(%{my_chat_member: %{old_chat_member: %{status: status}}}, context)
+  def match?(%{my_chat_member: %{old_chat_member: %{status: status}}}, _context)
       when status in ["left", "kicked"] do
-    {:ok, context}
+    false
   end
 
   @impl true
-  def handle(
+  def match?(
         %{my_chat_member: %{old_chat_member: %{is_member: is_member, status: status}}},
-        context
+        _context
       )
       when status == "restricted" and is_member == false do
-    {:ok, context}
+    false
   end
+
+  # 其余皆匹配。
+  @impl true
+  def match?(_update, _context), do: true
 
   @impl true
   def handle(%{my_chat_member: my_chat_member} = _update, context) do

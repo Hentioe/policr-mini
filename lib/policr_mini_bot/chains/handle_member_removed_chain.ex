@@ -41,8 +41,8 @@ defmodule PolicrMiniBot.HandleMemberRemovedChain do
 
   @impl true
   def handle(%{chat: chat} = message, context) do
-    # TODO: 添加被移除用户的 ID 到日志消息中。
-    Logger.debug("Member removed", chat_id: chat.id)
+    # TODO: 添加已离开/被移除用户的 ID 到日志消息中。
+    Logger.debug("Member left/removed", chat_id: chat.id)
 
     Worker.async_delete_message(message.chat.id, message.message_id)
 

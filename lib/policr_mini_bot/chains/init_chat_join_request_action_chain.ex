@@ -9,14 +9,18 @@ defmodule PolicrMiniBot.InitChatJoinRequestActionChain do
   use PolicrMiniBot.Chain
 
   @impl true
-  def handle(%{chat_join_request: nil} = _update, context) do
-    {:ok, context}
+  def match?(%{chat_join_request: nil} = _update, _context) do
+    false
   end
 
   @impl true
-  def handle(%{chat_join_request: %{chat: %{type: "channel"}}}, context) do
-    {:ok, context}
+  def match?(%{chat_join_request: %{chat: %{type: "channel"}}}, _context) do
+    false
   end
+
+  # 其余皆匹配。
+  @impl true
+  def match?(_update, _context), do: true
 
   @impl true
   def handle(_update, context) do
