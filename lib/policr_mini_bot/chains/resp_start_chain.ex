@@ -5,9 +5,8 @@ defmodule PolicrMiniBot.RespStartChain do
   与其它命令不同，`/start` 命令不需要保证完整的匹配，以 `/start` 开头的**私聊文本消息**都能进入处理函数。这是因为 `/start` 是当前设计中唯一一个需要携带参数的命令。
 
 
-  ## 匹配逻辑
-    - 忽略非私聊消息。
-    - 忽略私聊消息文本不以 `/start` 开头的消息。
+  ## 仅匹配一下条件
+    - 私聊且以 `/start` 开头的文本消息。
   """
 
   use PolicrMiniBot.Chain, {:command, :start}
@@ -33,11 +32,15 @@ defmodule PolicrMiniBot.RespStartChain do
   @impl true
   def match?(_message, _context), do: false
 
+  # 处理携带参数。
   @impl true
   def handle(%{text: <<@command <> " " <> args_text::binary>>} = message, context) do
-    args_text |> String.trim() |> String.split("_") |> handle_args(message)
+    args_text
+    |> String.trim()
+    |> String.split("_")
+    |> handle_args(message)
 
-    {:ok, context}
+    {:stop, context}
   end
 
   # 处理空参数。
@@ -70,9 +73,19 @@ defmodule PolicrMiniBot.RespStartChain do
       ]
     }
 
-    send_text(chat.id, text, reply_markup: markup, parse_mode: "HTML", logging: true)
+    context = %{
+      context
+      | payload: %{
+          method: "sendMessage",
+          chat_id: chat.id,
+          text: text,
+          reply_markup: markup,
+          disable_web_page_preview: true,
+          parse_mode: "HTML"
+        }
+    }
 
-    {:ok, context}
+    {:done, context}
   end
 
   # 处理 v1 版本的验证参数。

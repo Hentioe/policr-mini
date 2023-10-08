@@ -11,18 +11,20 @@ defmodule PolicrMiniBot.RespPingChain do
 
   @impl true
   def handle(message, context) do
-    %{message_id: message_id, chat: %{id: chat_id}} = message
+    %{message_id: message_id, chat: chat} = message
 
-    Worker.async_delete_message(chat_id, message_id)
+    Worker.async_delete_message(chat.id, message_id)
 
-    case send_text(chat_id, "🏓") do
+    case send_text(chat.id, "🏓") do
       {:ok, %{message_id: message_id}} ->
-        Worker.async_delete_message(chat_id, message_id, delay_secs: 8)
+        Worker.async_delete_message(chat.id, message_id, delay_secs: 8)
 
       {:error, reason} ->
-        Logger.error("Command response failed: #{inspect(command: "/ping", reason: reason)}")
+        Logger.error("Command response failed: #{inspect(command: "/ping", reason: reason)}",
+          chat_id: chat.id
+        )
     end
 
-    {:ok, %{context | deleted: true}}
+    {:stop, %{context | deleted: true}}
   end
 end
