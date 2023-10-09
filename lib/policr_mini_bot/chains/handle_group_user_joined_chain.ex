@@ -69,7 +69,7 @@ defmodule PolicrMiniBot.HandleGroupUserJoinedChain do
     %{chat: chat, new_chat_member: %{user: user}, date: date} = chat_member
 
     Logger.debug(
-      "A new member has joined group: #{inspect(user_id: user.id)}",
+      "New member joined group: #{inspect(user_id: user.id)}",
       chat_id: chat.id
     )
 
@@ -79,11 +79,11 @@ defmodule PolicrMiniBot.HandleGroupUserJoinedChain do
       # 当加入请求存在托管且状态为 `:approved` 时，删除托管内容，忽略验证用户。
       :ok = JoinReuquestHosting.delete(chat.id, user.id)
 
-      false
+      {:ok, context}
     else
       embarrass_user(:joined, chat.id, user, date)
 
-      {:ok, context}
+      {:stop, context}
     end
   end
 end

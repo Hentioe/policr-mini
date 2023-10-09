@@ -16,6 +16,8 @@ defmodule PolicrMiniBot.InitUserJoinedActionChain do
     - 此模块不会根据当前群组是否接管、新成员的用户类型以及新成员的权限等数据进行过滤，这些交由实现相关模块来做。
   """
 
+  require Logger
+
   use PolicrMiniBot.Chain
 
   @impl true
@@ -64,6 +66,9 @@ defmodule PolicrMiniBot.InitUserJoinedActionChain do
 
   @impl true
   def handle(_update, context) do
+    # 已初始化的动作：user_joined。
+    Logger.debug("Initialized action: `user_joined`.")
+
     {:ok, action(context, :user_joined)}
   end
 end
