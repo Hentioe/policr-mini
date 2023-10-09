@@ -1,6 +1,8 @@
 defmodule PolicrMini.Mnesia do
   @moduledoc false
 
+  # TODO: 此模块中可能存在一些需要清理的残余代码（如日志相关）。
+
   alias :mnesia, as: Mnesia
 
   alias PolicrMini.Counter.State, as: CounterState

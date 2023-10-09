@@ -10,8 +10,9 @@ defmodule PolicrMini.Application do
   def start(_type, _args) do
     # 输出构建时/运行时信息。
     print_buildtime_runtime_info()
-
+    # 初始化 Mnesia 表结构。
     PolicrMini.Mnesia.init()
+    # 初始化 workers。
     PolicrMini.Worker.GeneralRun.init_queue()
 
     config = Application.get_env(:policr_mini, __MODULE__)
@@ -67,8 +68,10 @@ defmodule PolicrMini.Application do
   defp print_buildtime_runtime_info do
     alias PolicrMini.BuildtimeRuntime.Tools
 
-    Logger.info(
-      "Buildtime/Runtime: [otp-#{Tools.otp_version()}, elixir-#{Tools.elixir_version()}] / [erts-#{Tools.erts_version()}]"
-    )
+    if PolicrMini.mix_env() == :prod do
+      Logger.info(
+        "Buildtime/Runtime: [otp-#{Tools.otp_version()}, elixir-#{Tools.elixir_version()}] / [erts-#{Tools.erts_version()}]"
+      )
+    end
   end
 end
