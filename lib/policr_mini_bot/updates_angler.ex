@@ -1,7 +1,7 @@
-defmodule PolicrMiniBot.HookHandler do
+defmodule PolicrMiniBot.UpdatesAngler do
   @moduledoc false
 
-  use Telegex.Hook.GenHandler
+  use Telegex.GenAngler
 
   @impl true
   def on_boot do
@@ -33,5 +33,23 @@ defmodule PolicrMiniBot.HookHandler do
     PolicrMiniBot.ChainHandler.call(update, %PolicrMiniBot.ChainContext{
       bot: Telegex.Instance.bot()
     })
+  end
+
+  # TODO: 让 `on_failure` 回调返回 `__STACKTRACE__`，并以下列方式输出错误日志。
+  # Logger.error(
+  #   "Uncaught Error: #{inspect(exception: e)}\n#{Exception.format(:error, e, __STACKTRACE__)}",
+  #   chat_id: chat_id
+  # )
+
+  @impl true
+  def on_failure(update, e) do
+    import PolicrMiniBot.Helper.FromParser
+
+    chat_id = parse_chat_id(update)
+
+    Logger.error(
+      "Uncaught Error: #{inspect(exception: e)}",
+      chat_id: chat_id
+    )
   end
 end

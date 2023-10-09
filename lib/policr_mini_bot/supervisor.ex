@@ -16,9 +16,9 @@ defmodule PolicrMiniBot.Supervisor do
     # 选择更新处理器。
     updates_handler =
       if PolicrMiniBot.config_get(:work_mode) == :webhook do
-        PolicrMiniBot.HookHandler
+        PolicrMiniBot.UpdatesAngler
       else
-        PolicrMiniBot.PollingHandler
+        PolicrMiniBot.UpdatesPoller
       end
 
     children = [

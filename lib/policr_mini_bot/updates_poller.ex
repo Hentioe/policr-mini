@@ -1,7 +1,7 @@
-defmodule PolicrMiniBot.PollingHandler do
+defmodule PolicrMiniBot.UpdatesPoller do
   @moduledoc false
 
-  use Telegex.Polling.GenHandler
+  use Telegex.GenPoller
 
   # 注意：当前并未依赖对编辑消息、频道消息、内联查询等更新类型的接收才能实现的功能，如有需要需提前更新此列表。
   @allowed_updates [
@@ -26,21 +26,29 @@ defmodule PolicrMiniBot.PollingHandler do
     # You must return the `Telegex.Polling.Config` struct ↑
   end
 
-  # TODO: 按照此代码，捕获所有 chain 中的错误，并输出到日志中与 `chat_id` 关联。
-  # import PolicrMiniBot.Helper.FromParser
-
-  # chat_id = parse_chat_id(update)
-
-  # Logger.error(
-  #   "Uncaught Error: #{inspect(exception: e)}\n#{Exception.format(:error, e, __STACKTRACE__)}",
-  #   chat_id: chat_id
-  # )
-
   @impl true
   def on_update(update) do
     # Consume the update
     PolicrMiniBot.ChainHandler.call(update, %PolicrMiniBot.ChainContext{
       bot: Telegex.Instance.bot()
     })
+  end
+
+  # TODO: 让 `on_failure` 回调返回 `__STACKTRACE__`，并以下列方式输出错误日志。
+  # Logger.error(
+  #   "Uncaught Error: #{inspect(exception: e)}\n#{Exception.format(:error, e, __STACKTRACE__)}",
+  #   chat_id: chat_id
+  # )
+
+  @impl true
+  def on_failure(update, e) do
+    import PolicrMiniBot.Helper.FromParser
+
+    chat_id = parse_chat_id(update)
+
+    Logger.error(
+      "Uncaught Error: #{inspect(exception: e)}",
+      chat_id: chat_id
+    )
   end
 end
