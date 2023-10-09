@@ -8,7 +8,7 @@ defmodule PolicrMiniBot.BootHelper do
   @spec fetch_bot_info :: Info.t()
   def fetch_bot_info do
     # 由于 Instance 缓存的需要，此处须使用 `Telegex.Instance.get_me/0` 不能使用 `Telegex.get_me/0`。
-    case Telegex.Instance.get_me() do
+    case Telegex.Instance.fetch_me() do
       {:ok, %Telegex.Type.User{id: id, username: username, first_name: first_name}} ->
         %Info{
           id: id,

@@ -1,7 +1,7 @@
 defmodule PolicrMiniBot.PollingHandler do
   @moduledoc false
 
-  use Telegex.Polling.Handler
+  use Telegex.Polling.GenHandler
 
   # 注意：当前并未依赖对编辑消息、频道消息、内联查询等更新类型的接收才能实现的功能，如有需要需提前更新此列表。
   @allowed_updates [
@@ -40,7 +40,7 @@ defmodule PolicrMiniBot.PollingHandler do
   def on_update(update) do
     # Consume the update
     PolicrMiniBot.ChainHandler.call(update, %PolicrMiniBot.ChainContext{
-      bot: Telegex.Instance.me()
+      bot: Telegex.Instance.bot()
     })
   end
 end

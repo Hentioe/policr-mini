@@ -1,7 +1,7 @@
 defmodule PolicrMiniBot.HookHandler do
   @moduledoc false
 
-  use Telegex.Hook.Handler
+  use Telegex.Hook.GenHandler
 
   @impl true
   def on_boot do
@@ -31,7 +31,7 @@ defmodule PolicrMiniBot.HookHandler do
   def on_update(update) do
     # Consume the update
     PolicrMiniBot.ChainHandler.call(update, %PolicrMiniBot.ChainContext{
-      bot: Telegex.Instance.me()
+      bot: Telegex.Instance.bot()
     })
   end
 end
