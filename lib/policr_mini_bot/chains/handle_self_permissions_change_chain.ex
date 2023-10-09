@@ -112,6 +112,7 @@ defmodule PolicrMiniBot.HandleSelfPermissionsChangeChain do
   def match?(_update, _context), do: true
 
   # 机器人通过添加管理员的方式进入群组，这会导致邀请进群和修改权限两个操作同时发生，所以它被放在状态中的动作匹配前面。
+  # TODO: [紧急] 由于匹配流程变化，此处已不会生效。具体表现为添加到群组中时，如果已具备权限，将不会提醒是否接管。
   @impl true
   def handle(
         %{
@@ -125,7 +126,6 @@ defmodule PolicrMiniBot.HandleSelfPermissionsChangeChain do
       )
       when status_new == "administrator" and status_old in ["left", "kicked"] do
     # TODO：将此情况添加到头部注释中。
-    # TODO: [待确认] 此处的代码由于匹配机制，可能不会生效。
     handle_self_promoted(my_chat_member)
 
     {:ok, context}
