@@ -240,7 +240,7 @@ defmodule PolicrMiniBot.Helper do
   end
 
   typedstruct module: MosaicConfig do
-    field :len, :integer
+    field :len, non_neg_integer
     field :parse_mode, String.t()
     field :method, :spoiler | :classic
   end
