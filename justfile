@@ -24,9 +24,6 @@ run +args='':
 test:
     mix test
 
-clean:
-    just mix-clean front-clean
-
 mix-clean:
     mix clean
     rm -rf deps _build
@@ -34,3 +31,9 @@ mix-clean:
 front-clean:
     rm -rf assets/node_modules
     rm -rf priv/static
+
+clean:
+    just mix-clean front-clean
+
+destory:
+    just clean dev-env down -v
