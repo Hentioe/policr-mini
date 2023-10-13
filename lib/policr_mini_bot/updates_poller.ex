@@ -34,20 +34,14 @@ defmodule PolicrMiniBot.UpdatesPoller do
     })
   end
 
-  # TODO: 让 `on_failure` 回调返回 `__STACKTRACE__`，并以下列方式输出错误日志。
-  # Logger.error(
-  #   "Uncaught Error: #{inspect(exception: e)}\n#{Exception.format(:error, e, __STACKTRACE__)}",
-  #   chat_id: chat_id
-  # )
-
   @impl true
-  def on_failure(update, e) do
+  def on_failure(update, {e, stacktrace}) do
     import PolicrMiniBot.Helper.FromParser
 
     chat_id = parse_chat_id(update)
 
     Logger.error(
-      "Uncaught Error: #{inspect(exception: e)}",
+      "Uncaught Error: #{inspect(exception: e)}\n#{Exception.format(:error, e, stacktrace)}",
       chat_id: chat_id
     )
   end
