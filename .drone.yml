@@ -5,7 +5,7 @@ name: default
 
 steps:
   - name: app-compile
-    image: hentioe/elixir:1.15.6-otp-26-slim
+    image: hentioe/elixir:1.15.7-otp-26-slim
     pull: always
     environment:
       MIX_ENV: prod
@@ -16,12 +16,12 @@ steps:
   - name: assets-build
     image: node:lts-hydrogen
     commands:
-      - npm install --location=global pnpm@8.8.0
+      - npm install --location=global pnpm@8.9.0
       - pnpm --prefix assets install
       - pnpm --prefix assets run deploy
 
   - name: app-build
-    image: hentioe/elixir:1.15.6-otp-26-slim
+    image: hentioe/elixir:1.15.7-otp-26-slim
     environment:
       MIX_ENV: prod
     commands:
