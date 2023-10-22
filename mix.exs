@@ -44,7 +44,7 @@ defmodule PolicrMini.MixProject do
       # {:dep_from_git, git: "https://github.com/elixir-lang/my_dep.git", tag: "0.1.0"}
       {:dialyxir, "~> 1.4", only: [:dev], runtime: false},
       {:credo, "~> 1.7", only: [:dev, :test], runtime: false},
-      {:telegex, "~> 1.3.1"},
+      {:telegex, "~> 1.3.2"},
       {:phoenix, "~> 1.5"},
       {:phoenix_ecto, "~> 4.2"},
       {:postgrex, "~> 0.17"},
