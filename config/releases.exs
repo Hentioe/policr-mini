@@ -73,7 +73,7 @@ config :policr_mini, PolicrMiniBot,
   opts: opts
 
 # 配置 Webhook。
-config :policr_mini, PolicrMiniBot.HookHandler,
+config :policr_mini, PolicrMiniBot.UpdatesAngler,
   # Webhook URL。
   webhook_url:
     System.get_env("POLICR_MINI_BOT_WEBHOOK_URL") ||
