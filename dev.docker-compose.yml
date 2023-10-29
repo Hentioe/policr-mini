@@ -7,3 +7,13 @@ services:
       - 5432:5432
     environment:
       POSTGRES_PASSWORD: postgres
+
+  local-api:
+    image: aiogram/telegram-bot-api
+    network_mode: host
+    environment:
+      TELEGRAM_API_ID: $TELEGRAM_API_ID
+      TELEGRAM_API_HASH: $TELEGRAM_API_HASH
+      TELEGRAM_LOCAL: 1
+      TELEGRAM_STAT: 1
+    restart: always

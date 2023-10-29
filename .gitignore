@@ -41,3 +41,6 @@ npm-debug.log
 
 # Rersistent assets.
 /_assets/
+
+# Ignore dev-env secret config.
+/dev.env
