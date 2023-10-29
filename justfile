@@ -16,7 +16,7 @@ front-setup:
     pnpm install --prefix assets
 
 dev-env +args:
-    docker compose -f dev.docker-compose.yml {{args}}
+    docker compose -f dev.docker-compose.yml --env-file dev.env {{args}}
 
 run +args='':
     iex -S mix {{args}}
