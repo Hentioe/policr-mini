@@ -5,7 +5,7 @@ name: default
 
 steps:
   - name: app-compile
-    image: hentioe/elixir:1.15.7-otp-26-slim
+    image: hentioe/elixir:1.16.0-rc.0-otp-26-slim
     pull: always
     environment:
       MIX_ENV: prod
@@ -21,7 +21,7 @@ steps:
       - pnpm --prefix assets run deploy
 
   - name: app-build
-    image: hentioe/elixir:1.15.7-otp-26-slim
+    image: hentioe/elixir:1.16.0-rc.0-otp-26-slim
     environment:
       MIX_ENV: prod
     commands:
