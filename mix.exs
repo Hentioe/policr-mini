@@ -72,7 +72,8 @@ defmodule PolicrMini.MixProject do
       {:not_qwerty123, "~> 2.3"},
       {:yaml_elixir, "~> 2.7"},
       {:unzip, "~> 0.8"},
-      {:mime, "~> 2.0"}
+      {:mime, "~> 2.0"},
+      {:img_grider, git: "https://github.com/gramlabs-oss/img_grider.git"}
     ]
   end
 
