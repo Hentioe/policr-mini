@@ -46,7 +46,7 @@ const buildPageContentMissingConfirm = ({ title }) => (
       <a
         tw="text-blue-600"
         target="_blank"
-        href="https://mini.telestd.me/community"
+        href="https://mini.gramlabs.org/community"
       >
         社群
       </a>
@@ -127,7 +127,7 @@ export default () => {
           <RouteMenuLink to="/login">
             <MenuText>后台</MenuText>
           </RouteMenuLink>
-          <MenuLink target="_blank" href="https://mini.telestd.me/community">
+          <MenuLink target="_blank" href="https://mini.gramlabs.org/community">
             <MenuText>社群</MenuText>
           </MenuLink>
           <MenuLink
