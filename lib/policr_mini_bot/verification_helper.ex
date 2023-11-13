@@ -476,7 +476,9 @@ defmodule PolicrMiniBot.VerificationHelper do
   @spec send_verification(Verification.t(), Scheme.t()) ::
           {:ok, Verification.t()} | {:error, any}
   def send_verification(v, scheme) do
-    mode = scheme.verification_mode || default!(:vmode)
+    # mode = scheme.verification_mode || default!(:vmode)
+    # TODO: 此处由于开发需要，固定为网格验证。
+    mode = :grid
     data = Captcha.make(mode, v.chat_id, scheme)
 
     ttitle =

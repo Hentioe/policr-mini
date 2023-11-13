@@ -10,7 +10,8 @@ defmodule PolicrMiniBot.Captcha do
     ImageCaptcha,
     CustomCaptcha,
     ArithmeticCaptcha,
-    FallbackCaptcha
+    FallbackCaptcha,
+    GridCAPTCHA
   }
 
   require Logger
@@ -98,6 +99,7 @@ defmodule PolicrMiniBot.Captcha do
     image: ImageCaptcha,
     custom: CustomCaptcha,
     arithmetic: ArithmeticCaptcha,
+    grid: GridCAPTCHA,
     # 当前的备用验证就是主动验证
     initiative: FallbackCaptcha
   ]

@@ -22,6 +22,19 @@ defmodule PolicrMiniBot.ImageProvider do
     end
   end
 
+  defmodule Image do
+    @moduledoc """
+    单张图片。
+    """
+
+    defstruct [:name, :path]
+
+    @type t :: %__MODULE__{
+            name: binary | nil,
+            path: binary
+          }
+  end
+
   defmodule Album do
     @moduledoc """
     一个图集。表示一个图片分类，在清单结构中，它包含了本类别的所有图片。
@@ -32,7 +45,7 @@ defmodule PolicrMiniBot.ImageProvider do
             id: binary,
             name: I18nStr.t(),
             parents: [binary],
-            images: [binary]
+            images: [Image.t()]
           }
 
     def new(%{"id" => id, "name" => name, "parents" => parents}) do
@@ -140,19 +153,6 @@ defmodule PolicrMiniBot.ImageProvider do
     end
   end
 
-  defmodule Image do
-    @moduledoc """
-    单张图片。
-    """
-
-    defstruct [:name, :path]
-
-    @type t :: %__MODULE__{
-            name: binary | nil,
-            path: binary
-          }
-  end
-
   use Agent
 
   def start_link(_) do
@@ -223,7 +223,7 @@ defmodule PolicrMiniBot.ImageProvider do
 
   defp gen_strategy(%{manifest: manifest}, max_count) do
     manifest.albums
-    |> conflict_free_gen(max_count)
+    |> conflict_free_albums(max_count)
     |> Enum.map(fn album ->
       image = Enum.random(album.images)
 
@@ -231,8 +231,15 @@ defmodule PolicrMiniBot.ImageProvider do
     end)
   end
 
-  @spec conflict_free_gen([Album.t()], integer) :: [Album.t()]
-  defp conflict_free_gen(albums, max_count, results \\ []) do
+  @spec random_albums(non_neg_integer()) :: [Album.t()]
+  def random_albums(expected_count) do
+    Agent.get(__MODULE__, fn %{manifest: manifest} ->
+      conflict_free_albums(manifest.albums, expected_count)
+    end)
+  end
+
+  @spec conflict_free_albums([Album.t()], integer) :: [Album.t()]
+  defp conflict_free_albums(albums, max_count, results \\ []) do
     if max_count == 0 || Enum.empty?(albums) do
       results
     else
@@ -251,7 +258,7 @@ defmodule PolicrMiniBot.ImageProvider do
             current.parents -- album.parents == current.parents
         end)
 
-      conflict_free_gen(albums, max_count - 1, results ++ [current])
+      conflict_free_albums(albums, max_count - 1, results ++ [current])
     end
   end
 
