@@ -21,6 +21,13 @@ config :policr_mini, PolicrMiniWeb.Endpoint,
 # 配置图片服务。
 config :policr_mini, PolicrMiniBot.ImageProvider, root: "_assets"
 
+# 配置网格验证。
+config :policr_mini, PolicrMiniBot.GridCAPTCHA,
+  # 个体图片宽度
+  indi_width: 180,
+  # 个体图片高度
+  indi_height: 120
+
 # 配置机器人。
 config :policr_mini, PolicrMiniBot,
   auto_gen_commands: false,

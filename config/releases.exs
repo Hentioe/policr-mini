@@ -99,6 +99,15 @@ config :policr_mini, PolicrMiniBot.ImageProvider,
       environment variable `POLICR_MINI_BOT_ASSETS_PATH` is missing.
       """)
 
+# 配置网格验证。
+config :policr_mini, PolicrMiniBot.GridCAPTCHA,
+  # 个体图片宽度
+  indi_width:
+    String.to_integer(System.get_env("POLICR_MINI_BOT_GRID_CAPTCHA_INDI_WIDTH") || "180"),
+  # 个体图片高度
+  indi_height:
+    String.to_integer(System.get_env("POLICR_MINI_BOT_GRID_CAPTCHA_INDI_HEIGHT") || "120")
+
 # 配置 Telegex 全局选项。
 config :telegex,
   token:

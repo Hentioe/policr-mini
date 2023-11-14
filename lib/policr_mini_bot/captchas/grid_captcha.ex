@@ -116,18 +116,22 @@ defmodule PolicrMiniBot.GridCAPTCHA do
   end
 
   defp generate_image(photos) do
-    cache_path = Path.join(ImageProvider.root(), "_cache")
-
+    # TODO: 配置化缓存目录。
+    target_dir = Path.join(ImageProvider.root(), "_cache")
     # TODO: 在 `ImageProver` 启动时检查目录是否存在，不存在则创建。
-    :ok = File.mkdir_p(cache_path)
+    :ok = File.mkdir_p(target_dir)
 
+    # TODO: 配置化水印字体。
     scheme = %ImgGrider.Scheme{
-      target_dir: cache_path,
-      # TODO: 通过配置文件配置图片的尺寸。
-      indi_width: 180,
-      indi_height: 120
+      target_dir: target_dir,
+      indi_width: config_get(:indi_width, 180),
+      indi_height: config_get(:indi_height, 120)
     }
 
     {:ok, path} = ImgGrider.generate(photos, scheme)
+  end
+
+  defp config_get(key, default \\ nil) do
+    Application.get_env(:policr_mini, __MODULE__)[key] || default
   end
 end
