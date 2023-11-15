@@ -8,7 +8,7 @@ defmodule PolicrMiniWeb.Admin.API.ProfileController do
   import PolicrMiniWeb.Helper
 
   alias PolicrMini.DefaultsServer
-  alias PolicrMiniBot.{ImageProvider, UpdatesPoller}
+  alias PolicrMiniBot.ImageProvider
 
   require Logger
 
@@ -89,18 +89,20 @@ defmodule PolicrMiniWeb.Admin.API.ProfileController do
   end
 
   def update_albums(conn, _parms) do
+    # 上传图集不仅会重启图片提供服务，还会在恰当的时机停止和启动更新处理器，以避免验证受到影响。
+    updates_handler = PolicrMiniBot.Supervisor.updates_handler()
+
     try do
       with {:ok, _} <- check_sys_permissions(conn) do
         if File.exists?(ImageProvider.temp_albums_root()) do
-          :ok = Supervisor.terminate_child(PolicrMiniBot.Supervisor, UpdatesPoller)
-
+          :ok = Supervisor.terminate_child(PolicrMiniBot.Supervisor, updates_handler)
           :ok = Supervisor.terminate_child(PolicrMiniBot.Supervisor, ImageProvider)
 
           File.rm_rf!(ImageProvider.albums_root())
           File.rename!(ImageProvider.temp_albums_root(), ImageProvider.albums_root())
 
           {:ok, _} = Supervisor.restart_child(PolicrMiniBot.Supervisor, ImageProvider)
-          {:ok, _} = Supervisor.restart_child(PolicrMiniBot.Supervisor, UpdatesPoller)
+          {:ok, _} = Supervisor.restart_child(PolicrMiniBot.Supervisor, updates_handler)
 
           render(conn, "result.json", %{ok: true})
         else
@@ -109,10 +111,10 @@ defmodule PolicrMiniWeb.Admin.API.ProfileController do
       end
     rescue
       e ->
-        Logger.error("Deployment of image set failed: #{inspect(error: e)}")
+        Logger.error("Deployment of albums failed: #{inspect(error: e)}")
 
         Supervisor.restart_child(PolicrMiniBot.Supervisor, ImageProvider)
-        Supervisor.restart_child(PolicrMiniBot.Supervisor, UpdatesPoller)
+        Supervisor.restart_child(PolicrMiniBot.Supervisor, updates_handler)
 
         render(conn, "result.json", %{ok: false})
     end
