@@ -1,10 +1,4 @@
-FROM debian:bullseye
-
-
-RUN apt-get update \
-    && apt-get install libssl1.1 libsctp1 -y \
-    && rm -rf /var/lib/apt/lists/* \
-    && rm -rf /var/lib/apt/lists/partial/*
+FROM gramoss/mini-run-base:20231115
 
 
 ARG APP_HOME=/home/policr_mini
