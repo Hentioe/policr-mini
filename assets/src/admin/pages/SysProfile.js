@@ -60,12 +60,14 @@ const modeOptions = [
   { value: 1, label: "定制验证（自定义）" },
   { value: 2, label: "算术验证" },
   { value: 3, label: "主动验证" },
+  { value: 4, label: "网格验证（推荐）" },
 ];
 const modeMapping = {
   image: 0,
   custom: 1,
   arithmetic: 2,
   initiative: 3,
+  grid: 4,
 };
 
 const killingMethodOptions = [

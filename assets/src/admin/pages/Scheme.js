@@ -112,6 +112,7 @@ const modeValueMapping = {
   custom: "定制验证（自定义）",
   arithmetic: "算数验证",
   initiative: "主动验证",
+  grid: "网格验证",
 };
 
 const killMethodMapping = {
