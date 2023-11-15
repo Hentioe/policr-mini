@@ -5,7 +5,7 @@ name: default
 
 steps:
   - name: app-compile
-    image: gramoss/mini-build-base:20231113
+    image: gramoss/mini-build-base:20231115
     pull: always
     environment:
       MIX_ENV: prod
@@ -22,7 +22,7 @@ steps:
       - pnpm --prefix assets run deploy
 
   - name: app-build
-    image: gramoss/mini-build-base:20231113
+    image: gramoss/mini-build-base:20231115
     environment:
       MIX_ENV: prod
     commands:
