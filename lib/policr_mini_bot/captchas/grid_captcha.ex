@@ -125,7 +125,8 @@ defmodule PolicrMiniBot.GridCAPTCHA do
     scheme = %ImgGrider.Scheme{
       target_dir: target_dir,
       indi_width: config_get(:indi_width, 180),
-      indi_height: config_get(:indi_height, 120)
+      indi_height: config_get(:indi_height, 120),
+      watermark_font_family: config_get(:watermark_font_family, "FreeMono")
     }
 
     {:ok, path} = ImgGrider.generate(photos, scheme)

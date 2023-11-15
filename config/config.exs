@@ -26,7 +26,9 @@ config :policr_mini, PolicrMiniBot.GridCAPTCHA,
   # 个体图片宽度
   indi_width: 180,
   # 个体图片高度
-  indi_height: 120
+  indi_height: 120,
+  # 水印字体
+  watermark_font_family: "FreeMono"
 
 # 配置机器人。
 config :policr_mini, PolicrMiniBot,
