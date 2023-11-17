@@ -16,7 +16,7 @@ defmodule PolicrMiniBot.GridCAPTCHA do
   @expected_similar_count 3
 
   @impl true
-  def make!(_chat_id, scheme) do
+  def make!(_chat_id, _scheme) do
     # 获取图集列表（等于网格大小）。
     albums = ImageProvider.random_albums(@grid_size)
     # 检查图集数量是否充足。
@@ -98,7 +98,7 @@ defmodule PolicrMiniBot.GridCAPTCHA do
     do: _generate_incorrect_candidates(correct_candidate, incorrect_candidates, count)
 
   # 生成数量达到 8 个，直接返回。
-  defp _generate_incorrect_candidates(correct_candidate, incorrect_candidates, count = 8) do
+  defp _generate_incorrect_candidates(_correct_candidate, incorrect_candidates, _count = 8) do
     incorrect_candidates
   end
 
@@ -129,10 +129,10 @@ defmodule PolicrMiniBot.GridCAPTCHA do
       watermark_font_family: config_get(:watermark_font_family, "FreeMono")
     }
 
-    {:ok, path} = ImgGrider.generate(photos, scheme)
+    ImgGrider.generate(photos, scheme)
   end
 
-  defp config_get(key, default \\ nil) do
+  defp config_get(key, default) do
     Application.get_env(:policr_mini, __MODULE__)[key] || default
   end
 end
