@@ -66,11 +66,11 @@ defmodule PolicrMini.MixProject do
       {:cachex, "~> 3.6"},
       {:finch, "~> 0.16.0"},
       {:multipart, "~> 0.4.0"},
-      {:casex, "~> 0.4"},
-      {:earmark, "~> 1.4"},
-      {:uuid, "~> 2.0", hex: :uuid_erl},
-      {:yaml_elixir, "~> 2.7"},
-      {:unzip, "~> 0.8"},
+      {:casex, "~> 0.4.2"},
+      {:earmark, "~> 1.4.46"},
+      {:uuid, "~> 2.0.7", hex: :uuid_erl},
+      {:yaml_elixir, "~> 2.9.0"},
+      {:unzip, "~> 0.9.0"},
       {:mime, "~> 2.0"},
       {:img_grider, git: "https://github.com/gramlabs-oss/img_grider.git"}
     ]
