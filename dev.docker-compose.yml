@@ -16,4 +16,3 @@ services:
       TELEGRAM_API_HASH: $TELEGRAM_API_HASH
       TELEGRAM_LOCAL: 1
       TELEGRAM_STAT: 1
-    restart: always
