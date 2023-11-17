@@ -44,6 +44,7 @@ defmodule PolicrMini.MixProject do
       # {:dep_from_git, git: "https://github.com/elixir-lang/my_dep.git", tag: "0.1.0"}
       {:dialyxir, "~> 1.4", only: [:dev], runtime: false},
       {:credo, "~> 1.7", only: [:dev, :test], runtime: false},
+      {:rustler, "~> 0.30.0", runtime: false},
       {:telegex, "~> 1.3.2"},
       {:phoenix, "~> 1.5"},
       {:phoenix_ecto, "~> 4.2"},
@@ -72,6 +73,7 @@ defmodule PolicrMini.MixProject do
       {:yaml_elixir, "~> 2.9.0"},
       {:unzip, "~> 0.9.0"},
       {:mime, "~> 2.0"},
+      # 此库依赖 Rust
       {:img_grider, git: "https://github.com/gramlabs-oss/img_grider.git"}
     ]
   end

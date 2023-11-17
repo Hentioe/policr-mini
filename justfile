@@ -1,5 +1,6 @@
 format:
     just mix-format front-format
+    just cargo-for imgcore fmt
 
 mix-format:
     mix format
@@ -9,7 +10,9 @@ front-format:
 
 setup:
     mix deps.get
-    just front-setup dev-env up -d
+    just front-setup
+    just dev-env up -d
+    just cargo-for imgcore build
     mix ecto.setup
 
 front-setup:
@@ -23,6 +26,10 @@ run +args='':
 
 test:
     mix test
+    just cargo-for imgcore test
+
+cargo-for $native_mod='' +args='':
+     (cd native/$native_mod && cargo {{args}})
 
 mix-clean:
     mix clean
@@ -34,6 +41,8 @@ front-clean:
 
 clean:
     just mix-clean front-clean
+    just cargo-for imgcore clean
+    rm -rf priv/native
 
 destory:
     just clean dev-env down -v
