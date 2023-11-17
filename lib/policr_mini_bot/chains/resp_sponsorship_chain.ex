@@ -17,7 +17,7 @@ defmodule PolicrMiniBot.RespSponsorshipChain do
     wainting_time = SpeedLimiter.get(speed_limit_key)
 
     if wainting_time == 0 do
-      token = gen_and_cache_new_token(chat_id)
+      token = gen_cached_token(chat_id)
 
       web_root = PolicrMiniWeb.root_url(has_end_slash: true)
 
@@ -54,12 +54,14 @@ defmodule PolicrMiniBot.RespSponsorshipChain do
     {:ok, context}
   end
 
-  defp gen_and_cache_new_token(chat_id) do
-    # TODO: 使用 `Telegex.Tools.gen_secret_token/1` 函数替代此库。
-    token = NotQwerty123.RandomPassword.gen_password(length: 24)
-    token = String.upcase(token)
+  defp gen_cached_token(chat_id) do
+    token =
+      12
+      |> :crypto.strong_rand_bytes()
+      |> Base.encode16()
+      |> String.upcase()
 
-    true = Cachex.put!(:sponsorship, "#{token}", chat_id, ttl: @default_ttl)
+    true = Cachex.put!(:sponsorship, token, chat_id, ttl: @default_ttl)
 
     token
   end

@@ -69,7 +69,6 @@ defmodule PolicrMini.MixProject do
       {:casex, "~> 0.4"},
       {:earmark, "~> 1.4"},
       {:uuid, "~> 2.0", hex: :uuid_erl},
-      {:not_qwerty123, "~> 2.3"},
       {:yaml_elixir, "~> 2.7"},
       {:unzip, "~> 0.8"},
       {:mime, "~> 2.0"},
