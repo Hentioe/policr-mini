@@ -6,5 +6,8 @@
         "**/priv/static/**": true,
         "**/assets/node_modules/**": true
     },
+    "rust-analyzer.linkedProjects": [
+        "native/imgcore/Cargo.toml"
+    ],
     "nixEnvSelector.nixFile": "${workspaceRoot}/shell.nix"
 }
