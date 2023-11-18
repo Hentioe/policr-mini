@@ -45,8 +45,8 @@ npm-debug.log
 # Ignore dev-env secret config.
 /dev.env
 
-# Ignore native target dirs.
-/native/*/target/
-
 # Ignore native libraries.
 /priv/native/
+
+# Ignore tests output assets.
+/test/assets/output/
