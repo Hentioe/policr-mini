@@ -1,10 +1,11 @@
 use magick_rust::{
     bindings::{
-        DestroyPixelIterator, NewPixelIterator, PixelGetNextIteratorRow, PixelSetColor,
-        PixelSyncIterator,
+        DestroyPixelIterator, NewPixelIterator, PixelGetCurrentIteratorRow, PixelSetColor,
+        PixelSetIteratorRow, PixelSyncIterator,
     },
     magick_wand_genesis, MagickWand,
 };
+use rand::prelude::*;
 use std::{path::PathBuf, str::Utf8Error, sync::Once};
 use thiserror::Error as ThisError;
 
@@ -65,22 +66,33 @@ fn _rewrite_image(image: PathBuf, output_dir: PathBuf) -> Result<String> {
     let wand = MagickWand::new();
     wand.read_image(image.to_str().ok_or(Error::InvalidUnicode)?)?;
 
+    let width = wand.get_image_width();
+    let height = wand.get_image_height();
+
+    // 生成随机行和列。
+    let mut rng = thread_rng();
+    let rand_row = rng.gen_range(1..=height);
+    let rand_col = rng.gen_range(1..=width);
+
     unsafe {
         // 创建像素迭代器。
         let iterator_ptr = NewPixelIterator(wand.wand);
-        // TODO: 根据图片尺寸，随机有效的像素位置。
         let row_width_ptr = &mut (1_usize) as *mut usize;
-        let pixels =
-            std::slice::from_raw_parts_mut(PixelGetNextIteratorRow(iterator_ptr, row_width_ptr), 1);
-        // 设置像素为黑色。
-        PixelSetColor(pixels[0], "#000000\0".as_ptr() as *const i8);
+        // 设置当前的像素行。
+        PixelSetIteratorRow(iterator_ptr, (rand_row - 1) as isize);
+        // 获取当前行的像素列表。
+        let pixels = std::slice::from_raw_parts_mut(
+            PixelGetCurrentIteratorRow(iterator_ptr, row_width_ptr),
+            rand_col,
+        );
+        // 设置列中的随机像素为黑色。
+        PixelSetColor(pixels[rand_col - 1], "#000000\0".as_ptr() as *const i8);
         // 同步像素迭代器。
         PixelSyncIterator(iterator_ptr);
         // 销毁像素迭代器。
         DestroyPixelIterator(iterator_ptr);
     };
     // 写入图片到输出位置。
-    // TODO: 支持原格式输出。
     let file_name = format!(
         "rewritten-{}",
         image
