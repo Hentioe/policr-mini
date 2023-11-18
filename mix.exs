@@ -45,6 +45,7 @@ defmodule PolicrMini.MixProject do
       {:dialyxir, "~> 1.4", only: [:dev], runtime: false},
       {:credo, "~> 1.7", only: [:dev, :test], runtime: false},
       {:rustler, "~> 0.30.0", runtime: false},
+      {:benchee, "~> 1.0", only: :dev},
       {:telegex, "~> 1.3.2"},
       {:phoenix, "~> 1.5"},
       {:phoenix_ecto, "~> 4.2"},
