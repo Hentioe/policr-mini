@@ -1,5 +1,5 @@
 [package]
-name = "imgcore"
+name = "imgkit"
 version = "0.1.0"
 edition = "2021"
 
@@ -7,7 +7,7 @@ edition = "2021"
 
 
 [lib]
-name = "imgcore"
+name = "imgkit"
 path = "src/lib.rs"
 crate-type = ["cdylib", "rlib"]
 

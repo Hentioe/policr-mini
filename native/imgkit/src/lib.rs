@@ -53,7 +53,7 @@ impl rustler::types::Encoder for Error {
 
 type Result<T> = std::result::Result<T, Error>;
 
-rustler::init!("Elixir.PolicrMini.ImgCore", [rewrite_image]);
+rustler::init!("Elixir.PolicrMini.ImgKit", [rewrite_image]);
 
 #[rustler::nif]
 fn rewrite_image(image: String, outout_dir: String) -> Result<String> {

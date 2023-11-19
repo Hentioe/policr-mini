@@ -5,7 +5,7 @@ defmodule PolicrMiniBot.ImageCAPTCHA do
 
   use PolicrMiniBot.Captcha
 
-  alias PolicrMini.ImgCore
+  alias PolicrMini.ImgKit
   alias PolicrMiniBot.ImageProvider
 
   defmodule Error do
@@ -31,7 +31,7 @@ defmodule PolicrMiniBot.ImageCAPTCHA do
     target_dir = Path.join(ImageProvider.root(), "_cache")
     :ok = File.mkdir_p(target_dir)
     # 重写并获取输出图片。
-    {:ok, photo} = ImgCore.rewrite_image(correct_image.path, target_dir)
+    {:ok, photo} = ImgKit.rewrite_image(correct_image.path, target_dir)
 
     %Captcha.Data{
       question: "图片中的事物是？",
