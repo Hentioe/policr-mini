@@ -39,6 +39,10 @@ front-clean:
     rm -rf assets/node_modules
     rm -rf priv/static
 
+clean-assets-output:
+    rm -rf test/assets/output/*
+    rm -rf _assets/_cache/*
+
 clean:
     just mix-clean front-clean
     just cargo-for imgcore clean
