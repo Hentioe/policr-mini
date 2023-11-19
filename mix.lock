@@ -29,7 +29,7 @@
   "gettext": {:hex, :gettext, "0.22.1", "e7942988383c3d9eed4bdc22fc63e712b655ae94a672a27e4900e3d4a2c43581", [:mix], [{:expo, "~> 0.4.0", [hex: :expo, repo: "hexpm", optional: false]}], "hexpm", "ad105b8dab668ee3f90c0d3d94ba75e9aead27a62495c101d94f2657a190ac5d"},
   "honeydew": {:hex, :honeydew, "1.5.0", "53088c1d87399efa5c0939adc8d32a9713b8fe6ce00a77c6769d2d363abac6bc", [:mix], [{:ecto, "~> 3.0", [hex: :ecto, repo: "hexpm", optional: true]}], "hexpm", "f71669e25f6a972e970ecbd79c34c4ad4b28369be78e4f8164fe8d0c5a674907"},
   "hpax": {:hex, :hpax, "0.1.2", "09a75600d9d8bbd064cdd741f21fc06fc1f4cf3d0fcc335e5aa19be1a7235c84", [:mix], [], "hexpm", "2c87843d5a23f5f16748ebe77969880e29809580efdaccd615cd3bed628a8c13"},
-  "img_grider": {:git, "https://github.com/gramlabs-oss/img_grider.git", "0f6247533c2c56a19daf4577c379bd5630f1df4a", []},
+  "img_grider": {:git, "https://github.com/gramlabs-oss/img_grider.git", "4351282481031090f7e9fc560e8bea9436d1dda6", []},
   "jason": {:hex, :jason, "1.4.1", "af1504e35f629ddcdd6addb3513c3853991f694921b1b9368b0bd32beb9f1b63", [:mix], [{:decimal, "~> 1.0 or ~> 2.0", [hex: :decimal, repo: "hexpm", optional: true]}], "hexpm", "fbb01ecdfd565b56261302f7e1fcc27c4fb8f32d56eab74db621fc154604a7a1"},
   "jumper": {:hex, :jumper, "1.0.1", "3c00542ef1a83532b72269fab9f0f0c82bf23a35e27d278bfd9ed0865cecabff", [:mix], [], "hexpm", "318c59078ac220e966d27af3646026db9b5a5e6703cb2aa3e26bcfaba65b7433"},
   "mime": {:hex, :mime, "2.0.5", "dc34c8efd439abe6ae0343edbb8556f4d63f178594894720607772a041b04b02", [:mix], [], "hexpm", "da0d64a365c45bc9935cc5c8a7fc5e49a0e0f9932a761c55d6c52b142780a05c"},
