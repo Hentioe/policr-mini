@@ -36,11 +36,6 @@ defmodule PolicrMiniBot.MessageCaller do
       field :attachment, String.t()
     end
 
-    # 作为普通文本消息发送
-    def call(%{text: text} = _sender, chat_id, optional) when text != nil do
-      Telegex.send_message(chat_id, text, optional)
-    end
-
     # 作为图片消息发送
     def call(%{attachment: <<"photo/" <> file_id>>} = _sender, chat_id, optional) do
       Telegex.send_photo(chat_id, file_id, optional)
@@ -62,8 +57,13 @@ defmodule PolicrMiniBot.MessageCaller do
     end
 
     # 作为错误消息发送：未知的附件类型
-    def call(%{attachment: _attachment} = _sender, chat_id, optional) do
+    def call(%{attachment: attachment} = _sender, chat_id, optional) when attachment != nil do
       Telegex.send_message(chat_id, commands_text("这是一条错误：消息生成失败，不受支持的附件类型或无效的附件字符串。"), optional)
+    end
+
+    # 作为普通文本消息发送
+    def call(%{text: text} = _sender, chat_id, optional) when text != nil do
+      Telegex.send_message(chat_id, text, optional)
     end
   end
 
@@ -134,6 +134,13 @@ defmodule PolicrMiniBot.MessageCaller do
       opts
       |> Keyword.put_new(:disable_notification, true)
       |> Keyword.put_new(:disable_web_page_preview, true)
+
+    sender =
+      if caption = Keyword.get(opts, :caption) do
+        %{sender | text: caption}
+      else
+        sender
+      end
 
     call(sender, chat_id, opts)
   end
