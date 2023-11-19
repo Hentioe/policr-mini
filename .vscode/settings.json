@@ -7,7 +7,8 @@
         "**/assets/node_modules/**": true
     },
     "rust-analyzer.linkedProjects": [
-        "native/imgkit/Cargo.toml"
+        "native/imgkit/Cargo.toml",
+        "native/oskit/Cargo.toml"
     ],
     "nixEnvSelector.nixFile": "${workspaceRoot}/shell.nix"
 }
