@@ -7,7 +7,7 @@ defmodule PolicrMiniBot.Captcha do
   alias Telegex.Type.{InlineKeyboardButton, InlineKeyboardMarkup}
 
   alias PolicrMiniBot.{
-    ImageCaptcha,
+    ImageCAPTCHA,
     CustomCaptcha,
     ArithmeticCaptcha,
     FallbackCaptcha,
@@ -96,7 +96,7 @@ defmodule PolicrMiniBot.Captcha do
   end
 
   @captcha_mapping [
-    image: ImageCaptcha,
+    image: ImageCAPTCHA,
     custom: CustomCaptcha,
     arithmetic: ArithmeticCaptcha,
     grid: GridCAPTCHA,

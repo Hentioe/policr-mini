@@ -8,6 +8,7 @@ use magick_rust::{
 use rand::prelude::*;
 use std::{path::PathBuf, str::Utf8Error, sync::Once};
 use thiserror::Error as ThisError;
+use uuid::Uuid;
 
 static START: Once = Once::new();
 
@@ -65,6 +66,7 @@ fn _rewrite_image(image: PathBuf, output_dir: PathBuf) -> Result<String> {
     // 创建 wand 并读取图片。
     let wand = MagickWand::new();
     wand.read_image(image.to_str().ok_or(Error::InvalidUnicode)?)?;
+    let format = wand.get_image_format()?.to_lowercase();
 
     let width = wand.get_image_width();
     let height = wand.get_image_height();
@@ -92,21 +94,18 @@ fn _rewrite_image(image: PathBuf, output_dir: PathBuf) -> Result<String> {
         // 销毁像素迭代器。
         DestroyPixelIterator(iterator_ptr);
     };
-    // 写入图片到输出位置。
-    let file_name = format!(
-        "rewritten-{}",
-        image
-            .file_name()
-            .ok_or(Error::CannotGetFileName)?
-            .to_str()
-            .ok_or(Error::InvalidUnicode)?
-    );
+    // 写入图片到输出位置（使用输入的图像格式作为扩展名）。
+    let file_name = format!("rewritten-{}", random_fname(&format));
     let path_buf = output_dir.join(file_name);
     let file_path = path_buf.to_str().ok_or(Error::InvalidUnicode)?;
     wand.write_image(file_path)?;
 
     // 返回输出图片的路径。
     Ok(file_path.to_owned())
+}
+
+fn random_fname(ext: &str) -> String {
+    format!("{}.{}", Uuid::new_v4(), ext)
 }
 
 #[cfg(test)]

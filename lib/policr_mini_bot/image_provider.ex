@@ -208,27 +208,25 @@ defmodule PolicrMiniBot.ImageProvider do
   end
 
   @doc """
-  生成无图集冲突图片列表。
-
-  注意：如果生成不了指定的最大数量（例如图集数量不够，或者满足不冲突关系的图集数量不够），将会返回小于指定的最大数量的图片列表。
+  生成无图集冲突的图片列表（包含名称）。
   """
-  @spec bomb(integer) :: [Image.t()]
-  def bomb(max_count) do
-    Agent.get(__MODULE__, &gen_strategy(&1, max_count))
-  end
+  @spec random_images(integer) :: [Image.t()]
+  def random_images(max_count) do
+    gen_fun = fn
+      %{manifest: nil} ->
+        []
 
-  defp gen_strategy(%{manifest: nil}, _max_count) do
-    []
-  end
+      %{manifest: manifest} ->
+        manifest.albums
+        |> conflict_free_albums(max_count)
+        |> Enum.map(fn album ->
+          image = Enum.random(album.images)
 
-  defp gen_strategy(%{manifest: manifest}, max_count) do
-    manifest.albums
-    |> conflict_free_albums(max_count)
-    |> Enum.map(fn album ->
-      image = Enum.random(album.images)
+          %{image | name: album.name}
+        end)
+    end
 
-      %{image | name: album.name}
-    end)
+    Agent.get(__MODULE__, gen_fun)
   end
 
   @spec random_albums(non_neg_integer()) :: [Album.t()]
