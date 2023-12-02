@@ -8,7 +8,8 @@
     },
     "rust-analyzer.linkedProjects": [
         "native/imgkit/Cargo.toml",
-        "native/oskit/Cargo.toml"
+        "native/oskit/Cargo.toml",
+        "native/ziputil/Cargo.toml",
     ],
     "nixEnvSelector.nixFile": "${workspaceRoot}/shell.nix"
 }

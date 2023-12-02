@@ -7,7 +7,7 @@ defmodule PolicrMiniWeb.Admin.API.ProfileController do
 
   import PolicrMiniWeb.Helper
 
-  alias PolicrMini.DefaultsServer
+  alias PolicrMini.{DefaultsServer, ZipUtil}
   alias PolicrMiniBot.ImageProvider
 
   require Logger
@@ -49,7 +49,6 @@ defmodule PolicrMiniWeb.Admin.API.ProfileController do
     with {:ok, _} <- check_sys_permissions(conn),
          {:ok, _} <- uploaded_check(zip.path),
          {:ok, unziped_albums_dir} <- unzip_albulms(zip.path) do
-
       temp_albums_dir = ImageProvider.temp_albums_root()
 
       if File.exists?(temp_albums_dir) do
@@ -74,9 +73,9 @@ defmodule PolicrMiniWeb.Admin.API.ProfileController do
   end
 
   defp unzip_albulms(zip_path) do
-    unzip_cwd = Path.dirname(zip_path)
+    output_dir = Path.dirname(zip_path)
 
-    unziped_albums_dir = Path.join(unzip_cwd, "_albums")
+    unziped_albums_dir = Path.join(output_dir, "_albums")
 
     if File.exists?(unziped_albums_dir) do
       # 先删除 cwd 目录中的旧解压图集，再进行解压。
@@ -85,9 +84,8 @@ defmodule PolicrMiniWeb.Admin.API.ProfileController do
       File.rm_rf!(unziped_albums_dir)
     end
 
-    case :zip.unzip(String.to_charlist(zip_path), cwd: String.to_charlist(unzip_cwd)) do
+    case ZipUtil.unzip_file(zip_path, output_dir) do
       {:ok, _} -> {:ok, unziped_albums_dir}
-
       e -> e
     end
   end
