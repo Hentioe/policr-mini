@@ -15,7 +15,7 @@ defmodule PolicrMiniWeb.Admin.API.ProfileController do
   action_fallback PolicrMiniWeb.API.FallbackController
 
   def index(conn, _params) do
-    # 此 API 调用无需系统权限
+    # 此 API 调用无需系统权限。
     scheme = DefaultsServer.get_scheme()
     manifest = ImageProvider.manifest()
     temp_manifest = ImageProvider.gen_manifest(ImageProvider.temp_albums_root())
@@ -47,25 +47,48 @@ defmodule PolicrMiniWeb.Admin.API.ProfileController do
   def upload_temp_albums(conn, %{"zip" => %{content_type: content_type} = zip} = _params)
       when content_type == "application/zip" do
     with {:ok, _} <- check_sys_permissions(conn),
-         {:ok, _} <- uploaded_check(zip.path) do
-      unzip_cwd = Path.dirname(zip.path)
+         {:ok, _} <- uploaded_check(zip.path),
+         {:ok, unziped_albums_dir} <- unzip_albulms(zip.path) do
 
-      {:ok, _} = :zip.unzip(String.to_charlist(zip.path), cwd: String.to_charlist(unzip_cwd))
+      temp_albums_dir = ImageProvider.temp_albums_root()
 
-      if File.exists?(ImageProvider.temp_albums_root()) do
-        File.rm_rf!(ImageProvider.temp_albums_root())
+      if File.exists?(temp_albums_dir) do
+        # 删除临时图集目录
+        Logger.debug("Removing temp albums directory: #{inspect(temp_albums_dir)}")
+
+        File.rm_rf!(temp_albums_dir)
       end
 
       try do
-        File.cp_r!(Path.join(unzip_cwd, "_albums"), ImageProvider.temp_albums_root())
+        # 复制解压后的图集到临时图集目录
+        File.cp_r!(unziped_albums_dir, temp_albums_dir)
 
         render(conn, "result.json", %{ok: true})
       rescue
         e ->
-          Logger.error("Processing uploaded resources failed: #{inspect(error: e)}")
+          Logger.error("Processing uploaded albums failed: #{inspect(exception: e)}")
 
           render(conn, "result.json", %{ok: false})
       end
+    end
+  end
+
+  defp unzip_albulms(zip_path) do
+    unzip_cwd = Path.dirname(zip_path)
+
+    unziped_albums_dir = Path.join(unzip_cwd, "_albums")
+
+    if File.exists?(unziped_albums_dir) do
+      # 先删除 cwd 目录中的旧解压图集，再进行解压。
+      Logger.debug("Removing old unziped albums directory: #{inspect(unziped_albums_dir)}")
+
+      File.rm_rf!(unziped_albums_dir)
+    end
+
+    case :zip.unzip(String.to_charlist(zip_path), cwd: String.to_charlist(unzip_cwd)) do
+      {:ok, _} -> {:ok, unziped_albums_dir}
+
+      e -> e
     end
   end
 
