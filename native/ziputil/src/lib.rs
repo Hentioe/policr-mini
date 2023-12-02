@@ -40,7 +40,7 @@ impl rustler::types::Encoder for Error {
 
 rustler::init!("Elixir.PolicrMini.ZipUtil", [unzip_file]);
 
-#[rustler::nif]
+#[rustler::nif(schedule = "DirtyCpu")]
 fn unzip_file(zip_file: String, output_dir: String) -> Result<()> {
     _unzip_file(zip_file.into(), output_dir.into())
 }
