@@ -3,6 +3,8 @@ defmodule PolicrMiniBot.ImageProvider do
   图片供应商。
   """
 
+  require Logger
+
   defmodule I18nStr do
     @moduledoc false
     defstruct [:zh_hans, :zh_hant, :en]
@@ -280,5 +282,10 @@ defmodule PolicrMiniBot.ImageProvider do
     |> Enum.filter(fn path -> !File.dir?(path) && format_included.(path) end)
     # 构造成图片结构体
     |> Enum.map(fn path -> %Image{path: path} end)
+  rescue
+    e ->
+      Logger.error("Scanning album images failed: #{inspect(exception: e)}")
+
+      []
   end
 end
