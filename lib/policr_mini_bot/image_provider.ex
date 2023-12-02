@@ -267,7 +267,8 @@ defmodule PolicrMiniBot.ImageProvider do
     files = File.ls!(album_path)
 
     format_included = fn path ->
-      format = path |> Path.extname() |> String.slice(1..-1)
+      # 范围中的 `1//1` 表示将 start > stop 的范围显式标记为递增，
+      format = path |> Path.extname() |> String.slice(1..-1//1)
 
       Enum.member?(include_formats, format)
     end
