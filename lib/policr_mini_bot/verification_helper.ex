@@ -695,7 +695,7 @@ defmodule PolicrMiniBot.VerificationHelper do
   @spec kick_chat_member(integer, integer, integer) ::
           {:ok, boolean} | Telegex.Type.error()
   defp kick_chat_member(chat_id, user_id, delay_unban_secs) do
-    case PolicrMiniBot.config_get(:unban_method) do
+    case PolicrMiniBot.config_get(:unban_method, :until_date) do
       :api_call ->
         r = Telegex.ban_chat_member(chat_id, user_id)
 
