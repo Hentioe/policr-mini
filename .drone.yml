@@ -49,7 +49,7 @@ steps:
       username: telestd
       password:
         from_secret: hub_pass_telestd
-      dockerfile: Dockerfile
+      dockerfile: Dockerfile.amd64ci
       tags: develop
     when:
       branch:
@@ -64,7 +64,7 @@ steps:
       username: telestd
       password:
         from_secret: hub_pass_telestd
-      dockerfile: Dockerfile
+      dockerfile: Dockerfile.amd64ci
     when:
       branch:
         - master
