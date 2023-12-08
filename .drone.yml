@@ -49,7 +49,7 @@ steps:
       username: gramoss
       password:
         from_secret: gramoss_hub_password
-      dockerfile: Dockerfile
+      dockerfile: Dockerfile.amd64ci
       tags: void-base
     when:
       branch:
