@@ -96,7 +96,7 @@ services:
     restart: always
 
   server:
-    image: telestd/policr-mini:latest
+    image: gramoss/policr-mini:latest
     ports:
       - ${POLICR_MINI_SERVER_PORT}:${POLICR_MINI_SERVER_PORT}
       #- ${POLICR_MINI_BOT_WEBHOOK_SERVER_PORT}:${POLICR_MINI_BOT_WEBHOOK_SERVER_PORT}
@@ -202,13 +202,13 @@ _供参考：目前 Policr Mini 官方实例已在实验本地 API 服务 + Webh
 
 ### 部署特定版本
 
-文件 `docker-compose.yml` 中的 `server` -> `image` 就是以本项目代码构建而成的镜像，值 `telestd/policr-mini:latest` 表示 `telestd` 帐号下的 `policr-mini` 镜像，标签是 `latest`。此处的镜像是由 CI 服务器自动构建和推送的。
+文件 `docker-compose.yml` 中的 `server` -> `image` 就是以本项目代码构建而成的镜像，值 `gramoss/policr-mini:latest` 表示 `gramoss` 帐号下的 `policr-mini` 镜像，标签是 `latest`。此处的镜像是由 CI 服务器自动构建和推送的。
 
-受文档的更新频率所限，上述配置中的镜像可能总是 `latest` 标签。此标签的镜像始终构建于最新的 `master` 分支之上，通常较为稳定，但功能上并不是最新的。您也可以将此标签修改为具体日期，如 `20241010` 表示构建于 `2024-10-10` 当天的镜像。若您想确保自己总是知道部署和升级的是什么版本时建议使用日期标签。从[此页面](https://hub.docker.com/r/telestd/policr-mini/tags)可以看到最新构建的基于日期的镜像版本，通常在更新频道发布更新说明时也会附带镜像的日期标签。
+受文档的更新频率所限，上述配置中的镜像可能总是 `latest` 标签。此标签的镜像始终构建于最新的 `master` 分支之上，通常较为稳定，但功能上并不是最新的。您也可以将此标签修改为具体日期，如 `20241010` 表示构建于 `2024-10-10` 当天的镜像。若您想确保自己总是知道部署和升级的是什么版本时建议使用日期标签。从[此页面](https://hub.docker.com/r/gramoss/policr-mini/tags)可以看到最新构建的基于日期的镜像版本，通常在更新频道发布更新说明时也会附带镜像的日期标签。
 
 除了日期标签和 `latest`，还有 `develop` 标签。它表示以 `develop` 分支（即开发中的代码）构建的镜像。此标签不会基于任何形式来表示版本（即没有版本），始终构建于最新的开发分支代码之上。 有时候开发分支会比 `master` 分支的更新内容多得多，通常用于大更新后的线上测试。
 
-修改为 `telestd/policr-mini:develop` 使用开发分支的镜像。
+修改为 `gramoss/policr-mini:develop` 使用开发分支的镜像。
 
 ### 启动
 
