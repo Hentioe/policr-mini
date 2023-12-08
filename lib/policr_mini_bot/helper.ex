@@ -219,20 +219,19 @@ defmodule PolicrMiniBot.Helper do
   请注意：此函数输出 `MarkdownV2` 格式，且不能定制。
 
   ## 例子
-      iex>PolicrMiniBot.Helper.build_mention(%{id: 101, first_name: "Michael", last_name: "Jackson"}, :full_name)
+      iex>PolicrMiniBot.Helper.scheme_mention(%{id: 101, first_name: "Michael", last_name: "Jackson"}, :full_name)
       "[Michael Jackson](tg://user?id=101)"
-      iex>PolicrMiniBot.Helper.build_mention(%{id: 101, first_name: "小红在上海鬼混", last_name: nil}, :mosaic_full_name)
+      iex>PolicrMiniBot.Helper.scheme_mention(%{id: 101, first_name: "小红在上海鬼混", last_name: nil}, :mosaic_full_name)
       "[小||红在上海鬼||混](tg://user?id=101)"
   """
-  @deprecated "Use `mention/2` instead."
-  @spec build_mention(mention_user, mention_scheme) :: String.t()
-  def build_mention(user, scheme) do
+  @spec scheme_mention(mention_user, mention_scheme) :: String.t()
+  def scheme_mention(user, scheme) do
     id = user[:id]
 
     display_text =
       case scheme do
         :user_id -> to_string(id)
-        :full_name -> Telegex.Tools.safe_markdown(fullname(user))
+        :full_name -> user |> fullname() |> Telegex.Tools.safe_markdown()
         :mosaic_full_name -> user |> fullname() |> mosaic_name("MarkdownV2")
       end
 

@@ -284,7 +284,7 @@ defmodule PolicrMiniBot.ImageProvider do
     |> Enum.map(fn path -> %Image{path: path} end)
   rescue
     e ->
-      Logger.error("Scanning albums images failed: #{inspect(exception: e)}")
+      Logger.error("Scanning album images failed: #{inspect(exception: e)}")
 
       []
   end

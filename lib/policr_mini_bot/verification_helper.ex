@@ -342,7 +342,7 @@ defmodule PolicrMiniBot.VerificationHelper do
       if pending_count == 1 do
         thello =
           commands_text("新成员 %{mention} 你好！",
-            mention: build_mention(new_chat_user, mention_scheme)
+            mention: scheme_mention(new_chat_user, mention_scheme)
           )
 
         tdesc = commands_text("您当前需要完成验证才能解除限制，验证有效时间不超过 %{count} 秒。", count: "__#{v.seconds}__")
@@ -358,7 +358,7 @@ defmodule PolicrMiniBot.VerificationHelper do
       else
         thello =
           commands_text("最近加入的 %{mention} 和另外 %{remaining_count} 个还未验证的新成员，你们好！",
-            mention: build_mention(new_chat_user, mention_scheme),
+            mention: scheme_mention(new_chat_user, mention_scheme),
             remaining_count: pending_count - 1
           )
 
@@ -420,7 +420,7 @@ defmodule PolicrMiniBot.VerificationHelper do
       if pending_count == 1 do
         theader =
           commands_text("用户 %{mention} 正在验证！",
-            mention: build_mention(new_chat_user, mention_scheme)
+            mention: scheme_mention(new_chat_user, mention_scheme)
           )
 
         tdesc = commands_text("加群请求会根据验证结果自动处理，并按照方案决定是否进一步封禁。")
@@ -435,7 +435,7 @@ defmodule PolicrMiniBot.VerificationHelper do
       else
         theader =
           commands_text("最近申请加入的 %{mention} 和另外 %{remaining_count} 个用户正在验证！",
-            mention: build_mention(new_chat_user, mention_scheme),
+            mention: scheme_mention(new_chat_user, mention_scheme),
             remaining_count: pending_count - 1
           )
 
@@ -695,7 +695,7 @@ defmodule PolicrMiniBot.VerificationHelper do
   @spec kick_chat_member(integer, integer, integer) ::
           {:ok, boolean} | Telegex.Type.error()
   defp kick_chat_member(chat_id, user_id, delay_unban_secs) do
-    case PolicrMiniBot.config_get(:unban_method) do
+    case PolicrMiniBot.config_get(:unban_method, :until_date) do
       :api_call ->
         r = Telegex.ban_chat_member(chat_id, user_id)
 

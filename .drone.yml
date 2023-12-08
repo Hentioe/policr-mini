@@ -17,7 +17,7 @@ steps:
   - name: assets-build
     image: node:lts-hydrogen
     commands:
-      - npm install --location=global pnpm@8.10.2
+      - npm install --location=global pnpm@8.11.0
       - pnpm --prefix assets install
       - pnpm --prefix assets run deploy
 
@@ -64,7 +64,7 @@ steps:
       username: telestd
       password:
         from_secret: hub_pass_telestd
-      dockerfile: Dockerfile
+      dockerfile: Dockerfile.amd64ci
       tags: develop
     when:
       branch:
@@ -79,7 +79,7 @@ steps:
       username: telestd
       password:
         from_secret: hub_pass_telestd
-      dockerfile: Dockerfile
+      dockerfile: Dockerfile.amd64ci
     when:
       branch:
         - master
