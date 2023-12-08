@@ -21,7 +21,7 @@ steps:
       - pnpm --prefix assets install
       - pnpm --prefix assets run deploy
 
-  - name: app-build
+  - name: app-release
     image: gramoss/mini-build-base:void
     environment:
       MIX_ENV: prod
@@ -42,28 +42,13 @@ steps:
     commands:
       - echo -n "$(date +'%Y%m%d'),latest" > .tags
 
-  - name: image-push-void-base
+  - name: image-push-develop
     image: plugins/docker
     settings:
       repo: gramoss/policr-mini
       username: gramoss
       password:
         from_secret: gramoss_hub_password
-      dockerfile: Dockerfile.amd64ci
-      tags: void-base
-    when:
-      branch:
-        - test/void-base
-      event:
-        - push
-
-  - name: image-push-develop
-    image: plugins/docker
-    settings:
-      repo: telestd/policr-mini
-      username: telestd
-      password:
-        from_secret: hub_pass_telestd
       dockerfile: Dockerfile.amd64ci
       tags: develop
     when:
@@ -75,10 +60,10 @@ steps:
   - name: image-push-master
     image: plugins/docker
     settings:
-      repo: telestd/policr-mini
-      username: telestd
+      repo: gramoss/policr-mini
+      username: gramoss
       password:
-        from_secret: hub_pass_telestd
+        from_secret: gramoss_hub_password
       dockerfile: Dockerfile.amd64ci
     when:
       branch:
