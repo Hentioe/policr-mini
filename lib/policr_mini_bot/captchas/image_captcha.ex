@@ -27,11 +27,20 @@ defmodule PolicrMiniBot.ImageCAPTCHA do
     candidates = Enum.map(images, fn image -> [image.name.zh_hans] end)
     # 获取正确索引位置的图片。
     correct_image = Enum.at(images, correct_index - 1)
-    # TODO: 在 `ImageProver` 启动时检查目录是否存在，不存在则创建。
-    target_dir = Path.join(ImageProvider.root(), "_cache")
-    :ok = File.mkdir_p(target_dir)
-    # 重写并获取输出图片。
-    {:ok, photo} = ImgKit.rewrite_image(correct_image.path, target_dir)
+
+    photo =
+      if PolicrMini.opt_exists?("--disable-image-rewrite") do
+        # 如果禁用重写，直接返回原图。
+        correct_image.path
+      else
+        # TODO: 在 `ImageProver` 启动时检查目录是否存在，不存在则创建。
+        target_dir = Path.join(ImageProvider.root(), "_cache")
+        :ok = File.mkdir_p(target_dir)
+        # 重写并返回输出图片。
+        {:ok, photo} = ImgKit.rewrite_image(correct_image.path, target_dir)
+
+        photo
+      end
 
     %Captcha.Data{
       question: "图片中的事物是？",

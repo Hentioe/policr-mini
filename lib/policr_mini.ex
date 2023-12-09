@@ -29,4 +29,29 @@ defmodule PolicrMini do
   end
 
   def mix_env, do: Application.get_env(:policr_mini, :environment)
+
+  @opts ["--independent", "--disable-image-rewrite"]
+
+  @doc """
+  检查可选项是否存在。
+
+  ## 当前存在以下可选项：
+    - `--independent`: 启用独立运营。
+    - `--disable-image-rewrite`: 禁用图片重写。
+
+  ## 例子
+      iex> PolicrMini.opt_exists?("--independent")
+      false
+      iex> PolicrMini.opt_exists?("--disable-image-rewrite")
+      false
+  """
+  def opt_exists?(opt_name) when opt_name in @opts do
+    :opts |> config_get([]) |> Enum.member?(opt_name)
+  end
+
+  def opt_exists?(_opt_name), do: false
+
+  def config_get(key, default \\ nil) do
+    Application.get_env(:policr_mini, key, default)
+  end
 end

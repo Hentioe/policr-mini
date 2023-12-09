@@ -8,7 +8,7 @@ defmodule PolicrMiniWeb.PageController do
     bot_first_name = PolicrMiniBot.name()
     bot_username = PolicrMiniBot.username()
     is_third_party = bot_username not in PolicrMiniBot.official_bots()
-    is_independent = PolicrMiniBot.opt_exist?("--independent")
+    is_independent = PolicrMini.opt_exists?("--independent")
 
     global = %{
       bot_username: bot_username,

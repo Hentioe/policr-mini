@@ -129,21 +129,4 @@ defmodule PolicrMiniBot do
   def config_get(key, default \\ nil) do
     Application.get_env(:policr_mini, __MODULE__)[key] || default
   end
-
-  @config_opts ["--independent"]
-
-  @doc """
-  检查可选项是否存在。
-
-  ## 当前存在以下可选项：
-    - `--independent`: 启用独立运营
-
-  ## 例子
-      iex> PolicrMiniBot.opt_exist?("--independent")
-      false
-  """
-  @spec opt_exist?(String.t()) :: boolean
-  def opt_exist?(opt_name) when opt_name in @config_opts do
-    Enum.member?(config_get(:opts, []), opt_name)
-  end
 end

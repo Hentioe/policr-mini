@@ -8,7 +8,8 @@
 import Config
 
 config :policr_mini,
-  ecto_repos: [PolicrMini.Repo]
+  ecto_repos: [PolicrMini.Repo],
+  opts: []
 
 # Configures the endpoint
 config :policr_mini, PolicrMiniWeb.Endpoint,
@@ -33,8 +34,7 @@ config :policr_mini, PolicrMiniBot.GridCAPTCHA,
 # 配置机器人。
 config :policr_mini, PolicrMiniBot,
   auto_gen_commands: false,
-  mosaic_method: :spoiler,
-  opts: []
+  mosaic_method: :spoiler
 
 # 配置 Telegex 的适配器。
 config :telegex,

@@ -4,6 +4,10 @@
 # remember to add this file to your .gitignore.
 import Config
 
+config :policr_mini,
+  # 通过空格间隔的可选项配置列表
+  opts: String.split(System.get_env("POLICR_MINI_OPTS", ""))
+
 database_url =
   System.get_env("POLICR_MINI_DATABASE_URL") ||
     raise """
@@ -44,9 +48,6 @@ unban_method =
       """
   end
 
-# 使用空白字符（一个或多个空格）间隔的可选项
-opts = String.split(System.get_env("POLICR_MINI_OPTS") || "")
-
 # 配置机器人。
 config :policr_mini, PolicrMiniBot,
   # 工作模式。
@@ -68,9 +69,7 @@ config :policr_mini, PolicrMiniBot,
   # 机器人名称（用于显示）。
   name: System.get_env("POLICR_MINI_BOT_NAME"),
   # 解封方法。
-  unban_method: unban_method,
-  # 可选项。
-  opts: opts
+  unban_method: unban_method
 
 # 配置 Webhook。
 config :policr_mini, PolicrMiniBot.UpdatesAngler,
