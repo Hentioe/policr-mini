@@ -1,9 +1,16 @@
 {
     "files.watcherExclude": {
+        // 忽略 Elixir 的构建目录。
         "**/_build/**": true,
+        // 忽略 Rust 模块的构建目录。
+        "**/native/**/target/**": true,
+        // 忽略 ElixirLS 的缓存目录。
         "**/.elixir_ls/**": true,
+        // 忽略 Elixir 的依赖目录。
         "**/deps/**": true,
+        // 忽略前端输出目录。
         "**/priv/static/**": true,
+        // 忽略前端依赖库目录。
         "**/assets/node_modules/**": true
     },
     "rust-analyzer.linkedProjects": [
