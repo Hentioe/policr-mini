@@ -1,7 +1,6 @@
 format:
     just mix-format front-format
     just cargo-for imgkit fmt
-    just cargo-for oskit fmt
 
 mix-format:
     mix format
@@ -14,7 +13,6 @@ setup:
     just front-setup
     just dev-env up -d
     just cargo-for imgkit build
-    just cargo-for oskit build
     mix ecto.setup
 
 front-setup:
@@ -29,7 +27,6 @@ run +args='':
 test:
     mix test
     just cargo-for imgkit test
-    just cargo-for oskit test
 
 cargo-for $native_mod='' +args='':
      (cd native/$native_mod && cargo {{args}})
@@ -49,7 +46,6 @@ clean-assets-output:
 clean:
     just mix-clean front-clean
     just cargo-for imgkit clean
-    just cargo-for oskit clean
     rm -rf priv/native
 
 destory:
