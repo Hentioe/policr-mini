@@ -112,8 +112,12 @@ services:
       #POLICR_MINI_BOT_WORK_MODE: ${POLICR_MINI_BOT_WORK_MODE}
       #POLICR_MINI_BOT_WEBHOOK_URL: ${POLICR_MINI_BOT_WEBHOOK_URL}
       #POLICR_MINI_BOT_WEBHOOK_SERVER_PORT: ${POLICR_MINI_BOT_WEBHOOK_SERVER_PORT}
+      POLICR_MINI_BOT_GRID_CAPTCHA_INDI_WIDTH: ${POLICR_MINI_BOT_GRID_CAPTCHA_INDI_WIDTH}
+      POLICR_MINI_BOT_GRID_CAPTCHA_INDI_HEIGHT: ${POLICR_MINI_BOT_GRID_CAPTCHA_INDI_HEIGHT}
+      POLICR_MINI_BOT_GRID_CAPTCHA_WATERMARK_FONT_FAMILY: ${POLICR_MINI_BOT_GRID_CAPTCHA_WATERMARK_FONT_FAMILY}
       POLICR_MINI_BOT_ASSETS_PATH: /_assets
       POLICR_MINI_BOT_AUTO_GEN_COMMANDS: ${POLICR_MINI_BOT_AUTO_GEN_COMMANDS}
+      POLICR_MINI_BOT_MOSAIC_METHOD: ${POLICR_MINI_BOT_MOSAIC_METHOD}
       POLICR_MINI_UNBAN_METHOD: ${POLICR_MINI_UNBAN_METHOD}
       POLICR_MINI_OPTS: ${POLICR_MINI_OPTS}
     volumes:
@@ -138,9 +142,13 @@ POLICR_MINI_BOT_OWNER_ID=<填入机器人拥有者的 ID> # 就是机器人主�
 POLICR_MINI_BOT_WORK_MODE=<填入工作模式> # 可选 polling/webhook。留空默认 polling
 POLICR_MINI_BOT_WEBHOOK_URL=<填入 Webhook URL> # 可选配置，非 webhook 模式请留空
 POLICR_MINI_BOT_WEBHOOK_SERVER_PORT=<填入 Webhook 的服务端口> # 可选配置，非 webhook 模式请留空
+POLICR_MINI_BOT_GRID_CAPTCHA_INDI_WIDTH=180 # 网格验证的单个图片格子宽度，视验证资源修改
+POLICR_MINI_BOT_GRID_CAPTCHA_INDI_HEIGHT=120 # 网格验证的单个图片格子宽度，视验证资源修改
+POLICR_MINI_BOT_GRID_CAPTCHA_WATERMARK_FONT_FAMILY=Lato # 网格验证的水印字体（每一个单元格编号文字的字体）
 POLICR_MINI_BOT_AUTO_GEN_COMMANDS=true # 是否自动生成机器人命令，已预设值
+POLICR_MINI_BOT_MOSAIC_METHOD=spoiler # 马赛克方法，预设值为 spoiler。也可设置为 classic
 POLICR_MINI_UNBAN_METHOD=until_date # 解封方法，预设值为过期时间。也可设置为 api_call
-POLICR_MINI_OPTS="" # 可选参数，此处预设为空
+POLICR_MINI_OPTS="" # 可选配置，此处预设为空
 ```
 
 请根据以上内容和注释填充正确的变量值，注意值不需要尖括号（`<>`）。有些环境下无法识别注释，所以赋值后也建议将 `#` 及后面的中文解释一并删除。
@@ -163,6 +171,8 @@ POLICR_MINI_OPTS="" # 可选参数，此处预设为空
 可选配置是一系列开关，这些开关不需要值，因此无需独立配置。当前可选配置存在以下参数：
 
 - `--independent`: 让机器人处于完全独立的运营模式，包括不和官方实例通信（例如获取共享的第三方实例列表）。
+- `--disable-image-rewrite`: 禁用验证图片重写。通常来讲不需要禁用，若服务器性能太低，此选项可以放弃安全性换取性能的提升。详情参见[图片重写机制](./图片重写机制)。
+- `--allow-client-switch-grid`: 允许后台用户切换到网格验证。默认不允许，因为此选项对性能占用较高。详情参见[网格验证](./网格验证)。
 
 可选配置的值就是一个个的可选参数，多个参数用空格间隔开来。如：
 
@@ -198,7 +208,17 @@ _注意：如果 Webhook 服务直接暴露，可能会成为易于攻击的“�
 
 _待补充：此部分教程还未撰写。_
 
-_供参考：目前 Policr Mini 官方实例已在实验本地 API 服务 + Webhook 模式。_
+_供参考：目前 Policr Mini 官方实例已在实验 Webhook + 本地 API 后端工作模型。_
+
+### 图片重写机制
+
+图片重写机制会在发送原始的图片验证资源前，随机操作图片的单个像素，将其重写为其它颜色。这样做可以让每一次发送的图片都具有新的 Hash 值，避免总是引用服务器上的同一个 `file_id`。这个机制让收集所有验证图片的 `file_id` 和对应名称的行为变得没有意义，增加了破解难度。
+
+图片重写机制是默认启用的，它可以提高图片验证的安全性，在图片体积合理的前提下对性能的影响也极小。如果你仍然想将其关闭，可在 `POLICR_MINI_OPTS` 变量中添加 `--disable-image-rewrite` 选项。
+
+### 网格验证
+
+网格验证是一种新的验证方式，它复用图片验证的资源，从中合成图片产生新的动态验证内容。网格验证的安全性和难度远大于常规的图片验证，其对服务器的性能要求也更高，所以它默认是不对后台用户开放的。向 `POLICR_MINI_OPTS` 添加 `--allow-client-switch-grid` 选项即可允许所有后台用户切换到该验证方式。
 
 ### 部署特定版本
 
@@ -221,15 +241,15 @@ docker compose up -d
 查看容器日志：
 
 ```bash
-docker logs policr-mini_server_1 # 容器不一定是这个名称
+docker compose logs server
 ```
 
 如果输出以下内容，表示启动成功：
 
 ```log
-18:51:36.722 [info] Buildtime/Runtime: [otp-26.2, elixir-1.16.0-rc.0] / [erts-14.2]
+18:51:36.722 [info] Buildtime/Runtime: [otp-26.2.1, elixir-1.16.0] / [erts-14.2]
 18:51:36.899 [info] Already up
-18:51:37.170 [info] Running PolicrMiniWeb.Endpoint with cowboy 2.10.0 at :::8080 (http)
+18:51:37.170 [info] Running PolicrMiniWeb.Endpoint with cowboy 2.10.0 at 0.0.0.0:8080 (http)
 18:51:37.174 [info] Access PolicrMiniWeb.Endpoint at http://localhost:8080
 18:51:37.401 [info] Checking bot information...
 18:51:37.484 [info] Bot (@your_bot_username) is working (polling)
@@ -259,7 +279,7 @@ _待补充：因为 Nginx 涉及到的无关东西太多，例如 SSL 证书等�
 
 为了彻底杜绝 ip 暴漏导致的风险，还可以考虑为 80 和 443 端口设置 ip 白名单。参照 Cloudflare 官方的 [ip 范围页面](https://www.cloudflare.com/ips/) 将所有 ip 添加到白名单即可。
 
-当然，像例如 22 这类端口更应设置白名单，通过跳板服务器连入。这样 bot 服务器就彻底的没有为流量攻击创造条件，只能被 CC 攻击。但 CC 攻击可通过 Cloudflare 的防火墙规则或速率限制轻松抵御。实际上，官方实例一直有遭遇 CC 攻击，但是强度太低，甚至不需要防御。
+当然，像例如 22 这类端口更应设置白名单，通过跳板服务器连入。这样 bot 服务器就彻底的没有为流量攻击创造条件，只能被 CC 攻击。但 CC 攻击可通过 Cloudflare 的防火墙规则或速率限制轻松抵御。实际上，官方实例曾一直有遭遇 CC 攻击，但是强度太低，甚至不需要打工干戈的防御。
 
 而这一切，都是免费的。
 
