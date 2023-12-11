@@ -81,11 +81,19 @@ defmodule PolicrMiniWeb.Admin.API.ChatController do
   end
 
   # 检查自定义验证是否存在问答
-  defp check_vmethod(%{"chat_id" => chat_id, "verification_mode" => vmethod}) when vmethod == 1 do
+  defp check_vmethod(%{"chat_id" => chat_id, "verification_mode" => 1}) do
     if Chats.get_custom_kits_count(chat_id) > 0 do
       :ok
     else
       {:error, %{description: "请在自定义页面添加问答"}}
+    end
+  end
+
+  defp check_vmethod(%{"verification_mode" => 4}) do
+    if PolicrMini.opt_exists?("--allow-client-switch-grid") do
+      :ok
+    else
+      {:error, %{description: "您不能主动切换到网格验证，此功能被运营者禁用。"}}
     end
   end
 

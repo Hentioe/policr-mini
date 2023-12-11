@@ -3,6 +3,8 @@ import Config
 # Definition environment
 config :policr_mini, :environment, :dev
 
+config :policr_mini, opts: ["--allow-client-switch-grid"]
+
 # Configure your database
 config :policr_mini, PolicrMini.Repo,
   username: "postgres",
