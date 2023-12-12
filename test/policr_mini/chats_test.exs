@@ -424,6 +424,22 @@ defmodule PolicrMini.ChatsTest do
       assert verification2.chosen == updated_chosen
     end
 
+    test "increase_verification_send_times/1" do
+      verification_params = build_verification_params()
+      {:ok, v} = create_verification(verification_params)
+
+      assert v.send_times == 0
+
+      :ok = increase_verification_send_times(v.id)
+      :ok = increase_verification_send_times(v.id)
+      :ok = increase_verification_send_times(v.id)
+
+      v = Repo.reload(v)
+
+      assert v != nil
+      assert v.send_times == 3
+    end
+
     test "find_last_pending_verification/1" do
       verification_params = build_verification_params()
 

@@ -10,6 +10,8 @@ defmodule PolicrMini.Chats do
   alias PolicrMini.Chats.CustomKit
   alias PolicrMini.Schema.Permission
 
+  require Logger
+
   @type vsource :: :joined | :join_request
 
   @type scheme_change_result :: {:ok, Scheme.t()} | {:error, Ecto.Changeset.t()}
@@ -514,6 +516,31 @@ defmodule PolicrMini.Chats do
       order_by: ^order_by
     )
     |> Repo.all()
+  end
+
+  @doc """
+  自增指定验证的发送次数。
+  """
+  @spec increase_verification_send_times(integer) :: :ok | :ignore
+  def increase_verification_send_times(id) when not is_nil(id) do
+    case Repo.update_all(from(v in Verification, where: v.id == ^id, select: v.send_times),
+           inc: [send_times: 1]
+         ) do
+      {1, _} ->
+        :ok
+
+      {count, r} when count > 1 ->
+        # TODO: 完善：进入此分支后回滚更新。
+        # 自增发送次数的验证不止一个
+        Logger.warning(
+          "Increase verification send times, but more than one verification found: #{inspect(count: count, result: r)}"
+        )
+
+        :ok
+
+      {0, _} ->
+        :ignore
+    end
   end
 
   @doc """
