@@ -3,6 +3,10 @@ defmodule PolicrMiniBot.ImageProvider do
   图片供应商。
   """
 
+  # TODO: 将此模块改为基于 GenServer，以便捕获更多有关进程重启的细节。
+
+  use Agent
+
   require Logger
 
   defmodule I18nStr do
@@ -155,14 +159,16 @@ defmodule PolicrMiniBot.ImageProvider do
     end
   end
 
-  use Agent
-
   def start_link(_) do
     manifest = gen_manifest(albums_root())
 
     state = %{manifest: manifest}
 
-    Agent.start_link(fn -> state end, name: __MODULE__)
+    {:ok, _pid} = ok_r = Agent.start_link(fn -> state end, name: __MODULE__)
+
+    Logger.info("Image provider started")
+
+    ok_r
   end
 
   @spec manifest() :: Manifest.t()
@@ -231,11 +237,22 @@ defmodule PolicrMiniBot.ImageProvider do
     Agent.get(__MODULE__, gen_fun)
   end
 
-  @spec random_albums(non_neg_integer()) :: [Album.t()]
+  @doc """
+  生成期待数量的随机图集列表。
+
+  如果图集数量不够，可能会返回低于 `expected_count` 的长度的列表，甚至返回空列表。
+  """
+  @spec random_albums(non_neg_integer) :: [Album.t()]
   def random_albums(expected_count) do
-    Agent.get(__MODULE__, fn %{manifest: manifest} ->
-      conflict_free_albums(manifest.albums, expected_count)
-    end)
+    gen_fun = fn
+      %{manifest: nil} ->
+        []
+
+      %{manifest: manifest} ->
+        conflict_free_albums(manifest.albums, expected_count)
+    end
+
+    Agent.get(__MODULE__, gen_fun)
   end
 
   @spec conflict_free_albums([Album.t()], integer) :: [Album.t()]
