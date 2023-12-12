@@ -144,7 +144,7 @@ defmodule PolicrMiniWeb do
     if has_end_slash do
       (String.ends_with?(url, "/") && url) || url <> "/"
     else
-      (String.ends_with?(url, "/") && String.slice(url, 0..-2)) || url
+      (String.ends_with?(url, "/") && String.slice(url, 0..-2//1)) || url
     end
   end
 
