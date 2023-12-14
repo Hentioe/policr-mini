@@ -92,13 +92,15 @@ defmodule PolicrMiniBot.RespStartChain do
   def handle_args(["verification", "v1", target_chat_id], %{chat: %{id: from_user_id}} = _message) do
     target_chat_id = String.to_integer(target_chat_id)
 
-    if verification = Chats.find_pending_verification(target_chat_id, from_user_id) do
+    if v = Chats.find_pending_verification(target_chat_id, from_user_id) do
       scheme = Chats.find_or_init_scheme!(target_chat_id)
+      # 自增发送次数。
+      update_params = %{send_times: v.send_times + 1}
 
-      case send_verification(verification, scheme) do
-        {:ok, _} ->
-          :ok
-
+      with {:ok, _} <- send_verification(v, scheme),
+           {:ok, _v} <- Chats.update_verification(v, update_params) do
+        :ok
+      else
         {:error, %{error_code: 403}} = e ->
           Logger.warning(
             "Verification failed to send due to user blocking: #{inspect(user_id: from_user_id)}",

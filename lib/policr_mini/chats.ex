@@ -343,10 +343,11 @@ defmodule PolicrMini.Chats do
 
   @doc """
   获取或创建指定群聊和用户的等待完成验证。
+
+  函数名缩写来源：`get_cr_pend_verif` -> `get_or_create_pending_verification`。
   """
-  @spec get_or_create_pending_verification(integer, integer, map) ::
-          verification_change_result
-  def get_or_create_pending_verification(chat_id, target_user_id, params \\ %{}) do
+  @spec get_cr_pend_verif(integer, integer, map) :: verification_change_result
+  def get_cr_pend_verif(chat_id, target_user_id, params \\ %{}) do
     case find_pending_verification(chat_id, target_user_id) do
       nil ->
         params =

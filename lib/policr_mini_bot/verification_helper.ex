@@ -98,7 +98,7 @@ defmodule PolicrMiniBot.VerificationHelper do
       # 2. 尝试转换可能不匹配的数据来源
       # 3. 写入到入口消息
       # 4. 更新验证数据中的消息 ID
-      with {:ok, v} <- Chats.get_or_create_pending_verification(chat_id, user.id, params),
+      with {:ok, v} <- Chats.get_cr_pend_verif(chat_id, user.id, params),
            {:ok, v} <- try_convert_souce(:joined, v, scheme),
            {:ok, %{message_id: message_id}} <- put_entry_message(v, scheme, []),
            {:ok, v} = ok_r <- Chats.update_verification(v, %{message_id: message_id}) do
@@ -192,10 +192,10 @@ defmodule PolicrMiniBot.VerificationHelper do
       # 3. 写入到入口消息
       # 4. 更新验证数据中的消息 ID
       # 5. 发送验证
-      with {:ok, v} <- Chats.get_or_create_pending_verification(chat_id, user.id, params),
+      with {:ok, %{send_times: st} = v} <- Chats.get_cr_pend_verif(chat_id, user.id, params),
            {:ok, v} <- try_convert_souce(:join_request, v, scheme),
-           {:ok, %{message_id: message_id}} <- put_entry_message(v, scheme, []),
-           {:ok, v} <- Chats.update_verification(v, %{message_id: message_id}),
+           {:ok, %{message_id: msgid}} <- put_entry_message(v, scheme, []),
+           {:ok, v} <- Chats.update_verification(v, %{message_id: msgid, send_times: st + 1}),
            {:ok, v} = ok_r <- send_verification(Repo.preload(v, [:chat]), scheme) do
         # 验证创建成功
 
