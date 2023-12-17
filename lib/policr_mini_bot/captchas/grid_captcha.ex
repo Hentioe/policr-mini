@@ -15,7 +15,7 @@ defmodule PolicrMiniBot.GridCAPTCHA do
     raise Error, message
   end
 
-  @font_family "FreeMono"
+  @fallback_font_family "Lato"
   @grid_size 9
   @expected_similar_count 3
 
@@ -134,7 +134,7 @@ defmodule PolicrMiniBot.GridCAPTCHA do
       target_dir: target_dir,
       indi_width: config_get(:indi_width, 180),
       indi_height: config_get(:indi_height, 120),
-      watermark_font_family: config_get(:watermark_font_family, @font_family)
+      watermark_font_family: config_get(:watermark_font_family, @fallback_font_family)
     }
 
     ImgGrider.generate(photos, scheme)

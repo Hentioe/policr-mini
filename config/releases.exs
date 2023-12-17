@@ -108,7 +108,7 @@ config :policr_mini, PolicrMiniBot.GridCAPTCHA,
     String.to_integer(System.get_env("POLICR_MINI_BOT_GRID_CAPTCHA_INDI_HEIGHT") || "120"),
   # 个体图片高度
   watermark_font_family:
-    System.get_env("POLICR_MINI_BOT_GRID_CAPTCHA_WATERMARK_FONT_FAMILY") || "FreeMono"
+    System.get_env("POLICR_MINI_BOT_GRID_CAPTCHA_WATERMARK_FONT_FAMILY") || "Lato"
 
 # 配置 Telegex 全局选项。
 config :telegex,

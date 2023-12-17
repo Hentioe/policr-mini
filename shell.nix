@@ -1,7 +1,7 @@
 with import <nixpkgs> { };
 
 mkShell {
-  buildInputs = [ python3 inotify-tools pkg-config imagemagick ];
+  buildInputs = [ python3 inotify-tools pkg-config imagemagick lato ];
   shellHook = ''
     export ERL_AFLAGS="+C multi_time_warp";
   '';
