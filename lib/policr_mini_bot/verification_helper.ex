@@ -304,6 +304,22 @@ defmodule PolicrMiniBot.VerificationHelper do
   # 目标来源和验证数据相匹配，直接返回验证数据
   def try_convert_souce(_, v, _scheme), do: {:ok, v}
 
+  @doc """
+  在发送验证之前检查验证的有效性。
+  """
+  @spec check_verification(Verification.t()) ::
+          {:ok, Verification.t()} | {:error, :too_many_send_times}
+  def check_verification(_v = %{send_times: st}) when st > 3 do
+    # 如果同一次验证被发送超过三次，则返回 `:too_many_send_times` 错误。
+    # TODO: 限制发送次数通过 scheme 自定义。
+
+    {:error, :too_many_send_times}
+  end
+
+  def check_verification(v) do
+    {:ok, v}
+  end
+
   @spec put_or_delete_entry_message(integer, Scheme.t()) :: :ok | {:error, any}
   def put_or_delete_entry_message(chat_id, scheme) do
     if v = Chats.find_last_pending_verification(chat_id) do
