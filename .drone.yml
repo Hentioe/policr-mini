@@ -14,7 +14,7 @@ steps:
       - mix deps.get
       - mix compile
 
-  - name: assets-build
+  - name: app-assets-build
     image: node:lts-hydrogen
     commands:
       - npm install --location=global pnpm@8.11.0
@@ -57,7 +57,7 @@ steps:
       event:
         - push
 
-  - name: image-push-master
+  - name: image-push-stable
     image: plugins/docker
     settings:
       repo: gramoss/policr-mini
