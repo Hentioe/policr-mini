@@ -1,0 +1,7 @@
+/_build/
+/deps/
+/assets/node_modules/
+/priv/static/
+/priv/native/
+/.tool-versions
+/rust-toolchain

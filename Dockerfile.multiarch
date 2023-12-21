@@ -1,0 +1,69 @@
+# 使用构建基础镜像复制源代码执行编译
+FROM gramoss/mini-build-base:void as compile
+
+ARG TARGETARCH
+
+ENV MIX_ENV=prod
+
+WORKDIR /src
+
+COPY . /src/
+
+RUN set -xe \
+    && if [ "$TARGETARCH" = "arm64" ]; then \
+    # Avoid QEMU/arm64 build failed. \
+    export ERL_FLAGS="+JMsingle true"; \
+    fi \
+    && xbps-install -Sy git \
+    && mix deps.get \
+    && mix compile
+
+
+# 使用 Node 镜像构建前端
+FROM node:lts-hydrogen as assets-build
+
+WORKDIR /src
+
+COPY --from=compile /src/ /src/
+
+RUN set -xe \
+    && npm install --location=global pnpm@8.11.0 \
+    && pnpm --prefix assets install \
+    && pnpm --prefix assets run deploy
+
+
+# 使用构建基础镜像 release 应用
+FROM gramoss/mini-build-base:void as release
+
+ARG TARGETARCH
+
+ENV MIX_ENV=prod
+
+WORKDIR /src
+
+COPY --from=assets-build /src/ /src/
+
+RUN set -xe \
+    && if [ "$TARGETARCH" = "arm64" ]; then \
+    # Avoid QEMU/arm64 build failed. \
+    export ERL_FLAGS="+JMsingle true"; \
+    fi \
+    && xbps-install -Sy git \
+    && mix local.hex --force \
+    && mix local.rebar --force \
+    && mix phx.digest \
+    && mix release
+
+
+# 使用运行基础镜像打包
+FROM gramoss/mini-run-base:void
+
+ARG APP_HOME=/home/policr_mini
+
+COPY --from=release /src/_build/prod/rel/policr_mini $APP_HOME
+
+WORKDIR $APP_HOME
+
+ENV PATH="$APP_HOME/bin:$PATH"
+
+ENTRYPOINT [ "policr_mini", "start" ]
