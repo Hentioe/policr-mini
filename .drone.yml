@@ -17,7 +17,7 @@ steps:
   - name: app-assets-build
     image: node:lts-hydrogen
     commands:
-      - npm install --location=global pnpm@8.11.0
+      - npm install --location=global pnpm@8.13.0
       - pnpm --prefix assets install
       - pnpm --prefix assets run deploy
 
