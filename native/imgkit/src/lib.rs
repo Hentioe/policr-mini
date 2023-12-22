@@ -6,7 +6,7 @@ use magick_rust::{
     magick_wand_genesis, MagickWand,
 };
 use rand::prelude::*;
-use std::{path::PathBuf, str::Utf8Error, sync::Once};
+use std::{ffi::c_char, path::PathBuf, str::Utf8Error, sync::Once};
 use thiserror::Error as ThisError;
 use uuid::Uuid;
 
@@ -88,7 +88,7 @@ fn _rewrite_image(image: PathBuf, output_dir: PathBuf) -> Result<String> {
             rand_col,
         );
         // 设置列中的随机像素为黑色。
-        PixelSetColor(pixels[rand_col - 1], "#000000\0".as_ptr() as *const i8);
+        PixelSetColor(pixels[rand_col - 1], "#000000\0".as_ptr() as *const c_char);
         // 同步像素迭代器。
         PixelSyncIterator(iterator_ptr);
         // 销毁像素迭代器。
