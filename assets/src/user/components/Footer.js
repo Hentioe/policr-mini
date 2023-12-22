@@ -116,18 +116,8 @@ export default () => {
               </div>
               <div tw="flex flex-col">
                 <NavLink href="https://t.me/policr_changelog">更新频道</NavLink>
-                <NavLink
-                  onClick={() => {
-                    dispatch(
-                      openModal({
-                        content: buildPageContentMissingConfirm({
-                          title: "编辑百科",
-                        }),
-                      })
-                    );
-                  }}
-                >
-                  编辑百科
+                <NavLink target="_blank" href="https://blog.gramlabs.org/">
+                  博客动态
                 </NavLink>
                 <NavLink
                   onClick={() => {

@@ -130,16 +130,8 @@ export default () => {
           <MenuLink target="_blank" href="https://mini.gramlabs.org/community">
             <MenuText>社群</MenuText>
           </MenuLink>
-          <MenuLink
-            onClick={() => {
-              dispatch(
-                openModal({
-                  content: buildPageContentMissingConfirm({ title: "维基" }),
-                })
-              );
-            }}
-          >
-            <MenuText>维基</MenuText>
+          <MenuLink target="_blank" href="https://blog.gramlabs.org/">
+            <MenuText>博客</MenuText>
           </MenuLink>
           <MenuLink
             onClick={() => {
