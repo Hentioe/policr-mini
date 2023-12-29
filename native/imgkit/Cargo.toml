@@ -12,7 +12,7 @@ path = "src/lib.rs"
 crate-type = ["cdylib", "rlib"]
 
 [dependencies]
-magick_rust = "0.19.1"
+magick_rust = { git = "https://github.com/Hentioe/magick-rust.git", branch = "master" }
 rand = "0.8.5"
 rustler = "0.30.0"
 thiserror = "1.0.50"
