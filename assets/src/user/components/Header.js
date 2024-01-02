@@ -124,15 +124,15 @@ export default () => {
           <RouteMenuLink to="/">
             <MenuText>首页</MenuText>
           </RouteMenuLink>
-          <RouteMenuLink to="/login">
-            <MenuText>后台</MenuText>
-          </RouteMenuLink>
-          <MenuLink target="_blank" href="https://mini.gramlabs.org/community">
-            <MenuText>社群</MenuText>
-          </MenuLink>
           <MenuLink target="_blank" href="https://blog.gramlabs.org/">
             <MenuText>博客</MenuText>
           </MenuLink>
+          <MenuLink target="_blank" href="https://mini.gramlabs.org/community">
+            <MenuText>社群</MenuText>
+          </MenuLink>
+          <RouteMenuLink to="/login">
+            <MenuText>后台</MenuText>
+          </RouteMenuLink>
           <MenuLink
             onClick={() => {
               dispatch(
