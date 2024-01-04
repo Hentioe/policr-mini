@@ -33,6 +33,9 @@ defmodule PolicrMiniBot.HandleSelfPermissionsChangeChain do
   - 封禁成员（Ban users）
   """
 
+  defguard invite_promote?(status_new, status_old)
+           when status_new == "administrator" and status_old in ["left", "kicked"]
+
   @impl true
   def match?(%{my_chat_member: nil} = _update, _context) do
     false
@@ -45,8 +48,18 @@ defmodule PolicrMiniBot.HandleSelfPermissionsChangeChain do
   end
 
   @impl true
-  def match?(_update, %{action: action} = _context)
-      when action in [:self_joined, :self_lefted] do
+  def match?(
+        %{
+          my_chat_member:
+            %{
+              new_chat_member: %{status: status_new},
+              old_chat_member: %{status: status_old}
+            } = _my_chat_member
+        } = _update,
+        %{action: action} = _context
+      )
+      # 忽略 `self_joined` 时，必须确保并非是邀请的同时提升权限，否则会忽略掉这一情况下的权限提升。
+      when action in [:self_joined, :self_lefted] and not invite_promote?(status_new, status_old) do
     false
   end
 
@@ -124,9 +137,13 @@ defmodule PolicrMiniBot.HandleSelfPermissionsChangeChain do
         } = _update,
         context
       )
-      when status_new == "administrator" and status_old in ["left", "kicked"] do
+      when invite_promote?(status_new, status_old) do
     # TODO：将此情况添加到头部注释中。
-    handle_self_promoted(my_chat_member)
+    Logger.info("Bot (@#{context.bot.username}) was added to the group as an administrator",
+      chat_id: context.chat_id
+    )
+
+    handle_self_promoted(my_chat_member, context)
 
     {:ok, context}
   end
@@ -146,7 +163,9 @@ defmodule PolicrMiniBot.HandleSelfPermissionsChangeChain do
       when status_new in ["restricted", "member"] and status_old == "administrator" do
     %{chat: %{id: chat_id}} = my_chat_member
 
-    Logger.debug("I have been demoted to a regular member: #{inspect(chat_id: chat_id)}")
+    Logger.info("Bot (@#{context.bot.username})  have been demoted to a regular member",
+      chat_id: chat_id
+    )
 
     if can_send_messages?(new_chat_member) == false do
       # 如果没有发送消息权限，将直接退群。
@@ -187,7 +206,7 @@ defmodule PolicrMiniBot.HandleSelfPermissionsChangeChain do
       )
       when status_new == "administrator" and status_old in ["restricted", "member"] do
     # 处理自身被提升为管理员。
-    handle_self_promoted(my_chat_member)
+    handle_self_promoted(my_chat_member, context)
 
     {:ok, context}
   end
@@ -207,7 +226,7 @@ defmodule PolicrMiniBot.HandleSelfPermissionsChangeChain do
       when status_new == "administrator" and status_old == "administrator" do
     %{chat: %{id: chat_id}} = my_chat_member
 
-    Logger.debug("My permissions have changed: #{inspect(chat_id: chat_id)}")
+    Logger.info("Bot (@#{context.bot.username}) permissions have changed", chat_id: chat_id)
 
     case rights_change_action(my_chat_member) do
       :restore_rights ->
@@ -357,11 +376,12 @@ defmodule PolicrMiniBot.HandleSelfPermissionsChangeChain do
     end
   end
 
-  @spec handle_self_promoted(Telegex.Type.ChatMemberUpdated.t()) :: no_return()
-  defp handle_self_promoted(my_chat_member) do
+  @spec handle_self_promoted(Telegex.Type.ChatMemberUpdated.t(), ChainContext.t()) ::
+          no_return()
+  defp handle_self_promoted(my_chat_member, context) do
     %{chat: %{id: chat_id}, new_chat_member: new_chat_member} = my_chat_member
 
-    Logger.debug("I was promoted to administrator: #{inspect(chat_id: chat_id)}")
+    Logger.info("Bot (@#{context.bot.username}) was promoted to administrator", chat_id: chat_id)
 
     # 尝试修正群管理员个数为零导致的权限问题。
     fix_chat_empty_admins(my_chat_member)

@@ -85,7 +85,7 @@ defmodule PolicrMiniBot.HandleSelfJoinedChain do
   def handle(%{my_chat_member: my_chat_member} = _update, context) do
     %{chat: %{id: chat_id, type: chat_type}} = my_chat_member
 
-    Logger.debug("Bot (@#{context.bot.username}) invited to a new group", chat_id: chat_id)
+    Logger.info("Bot (@#{context.bot.username}) invited to a new group", chat_id: chat_id)
 
     context = action(context, :self_joined)
 
@@ -96,7 +96,7 @@ defmodule PolicrMiniBot.HandleSelfJoinedChain do
       exits(chat_type, chat_id)
     end
 
-    {:stop, context}
+    {:ok, context}
   end
 
   @spec _handle(integer | binary, map) :: no_return()

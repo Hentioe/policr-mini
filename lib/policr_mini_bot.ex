@@ -35,6 +35,8 @@ defmodule PolicrMiniBot do
 
         import PolicrMiniBot.ChainContext
         import PolicrMiniBot.Helper
+
+        alias PolicrMiniBot.ChainContext
       end
     end
   end
