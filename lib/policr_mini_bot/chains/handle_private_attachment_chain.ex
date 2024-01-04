@@ -9,6 +9,8 @@ defmodule PolicrMiniBot.HandlePrivateAttachmentChain do
 
   use PolicrMiniBot.Chain, :message
 
+  # alias Telegex.Type.ReplyParameters
+
   # 忽略非私聊。
   @impl true
   def match?(%{chat: %{type: chat_type}} = _message, _context) when chat_type != "private" do
@@ -27,7 +29,7 @@ defmodule PolicrMiniBot.HandlePrivateAttachmentChain do
   @impl true
   def match?(_message, _context), do: true
 
-  @max_size_hint 15 * 1024
+  @max_size_hint 25 * 1024
 
   @impl true
   def handle(message, context) do
@@ -50,9 +52,9 @@ defmodule PolicrMiniBot.HandlePrivateAttachmentChain do
 
            <code>photo/#{photo_size.file_id}</code>
 
-           高度: <code>#{photo_size.height}</code> px
-           宽度: <code>#{photo_size.width}</code> px
-           大小: <code>#{photo_size.file_size}</code> bytes
+           高度: <code>#{photo_size.height} px</code>
+           宽度: <code>#{photo_size.width} px</code>
+           大小: <code>#{bytes_to_kb(photo_size.file_size)} kb</code>
            """, photo_size.file_size}
 
         document ->
@@ -62,7 +64,7 @@ defmodule PolicrMiniBot.HandlePrivateAttachmentChain do
            <code>document/#{document.file_id}</code>
 
            名称: <code>#{document.file_name}</code>
-           大小: <code>#{document.file_size}</code> bytes
+           大小: <code>#{bytes_to_kb(document.file_size)} kb</code>
            """, document.file_size}
 
         video ->
@@ -72,9 +74,9 @@ defmodule PolicrMiniBot.HandlePrivateAttachmentChain do
            <code>video/#{video.file_id}</code>
 
            格式: <code>#{video.mime_type}</code>
-           高度: <code>#{video.height}</code> px
-           宽度: <code>#{video.width}</code> px
-           大小: <code>#{video.file_size}</code> bytes
+           高度: <code>#{video.height} px</code>
+           宽度: <code>#{video.width} px</code>
+           大小: <code>#{bytes_to_kb(video.file_size)} kb</code>
            """, video.file_size}
 
         audio ->
@@ -84,13 +86,12 @@ defmodule PolicrMiniBot.HandlePrivateAttachmentChain do
            <code>audio/#{audio.file_id}</code>
 
            格式: <code>#{audio.mime_type}</code>
-           大小: <code>#{audio.file_size}</code> bytes
+           大小: <code>#{bytes_to_kb(audio.file_size)} kb</code>
            """, audio.file_size}
       end
 
     text = text <> "\n<i>用法提示：请直接将附件字符串复制到后台相对应的编辑框中。</i>"
 
-    # TODO: 将此处的 `file_size` 转换为以 KB 为单位的值。
     text =
       if file_size > @max_size_hint do
         text <> "\n\n<b>注意：附件过大，会拖慢用户验证的速度。请尽量避免使用大文件，图片可采取压缩后再使用。</b>"
@@ -98,8 +99,16 @@ defmodule PolicrMiniBot.HandlePrivateAttachmentChain do
         text
       end
 
-    Telegex.send_message(chat_id, text, reply_to_message_id: message_id, parse_mode: "HTML")
+    # TODO: `reply_parameters` 参数暂时无效，待 Telegex 项目单独测试。
+    Telegex.send_message(chat_id, text,
+      reply_to_message_id: message_id,
+      parse_mode: "HTML"
+    )
 
     {:ok, context}
+  end
+
+  defp bytes_to_kb(bytes) do
+    bytes |> Decimal.div(1024) |> Decimal.to_float() |> Float.round(2)
   end
 end
