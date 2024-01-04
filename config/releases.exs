@@ -74,11 +74,7 @@ config :policr_mini, PolicrMiniBot,
 # 配置 Webhook。
 config :policr_mini, PolicrMiniBot.UpdatesAngler,
   # Webhook URL。
-  webhook_url:
-    System.get_env("POLICR_MINI_BOT_WEBHOOK_URL") ||
-      raise("""
-      environment variable `POLICR_MINI_BOT_WEBHOOK_URL` is missing.
-      """),
+  webhook_url: System.get_env("POLICR_MINI_BOT_WEBHOOK_URL"),
   # Webhook 服务器端口。
   server_port: String.to_integer(System.get_env("POLICR_MINI_BOT_WEBHOOK_SERVER_PORT") || "4001")
 
