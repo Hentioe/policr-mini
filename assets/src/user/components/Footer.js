@@ -38,7 +38,7 @@ const buildPageContentMissingConfirm = ({ title }) => (
       <a
         tw="text-blue-600"
         target="_blank"
-        href="https://t.me/policr_changelog"
+        href="https://t.me/policr_changelog?boost"
       >
         更新频道
       </a>
@@ -115,7 +115,7 @@ export default () => {
                 <RouteNavLink to="/terms">服务条款</RouteNavLink>
               </div>
               <div tw="flex flex-col">
-                <NavLink href="https://t.me/policr_changelog">更新频道</NavLink>
+                <NavLink href="https://t.me/policr_changelog?boost">更新频道</NavLink>
                 <NavLink target="_blank" href="https://blog.gramlabs.org/">
                   博客动态
                 </NavLink>
@@ -130,7 +130,7 @@ export default () => {
                               <a
                                 tw="text-blue-600"
                                 target="_blank"
-                                href="https://t.me/policr_changelog"
+                                href="https://t.me/policr_changelog?boost"
                               >
                                 更新频道
                               </a>

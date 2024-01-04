@@ -218,7 +218,7 @@ defmodule PolicrMiniBot.HandleSelfJoinedChain do
           },
           %InlineKeyboardButton{
             text: commands_text("订阅更新"),
-            url: "https://t.me/policr_changelog"
+            url: "https://t.me/policr_changelog?boost"
           }
         ],
         [

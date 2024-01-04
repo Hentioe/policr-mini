@@ -169,7 +169,7 @@ const buildPageContentMissingConfirm = ({ title }) => (
       <a
         tw="text-blue-600"
         target="_blank"
-        href="https://t.me/policr_changelog"
+        href="https://t.me/policr_changelog?boost"
       >
         更新频道
       </a>
