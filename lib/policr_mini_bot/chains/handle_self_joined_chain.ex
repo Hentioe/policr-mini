@@ -96,7 +96,7 @@ defmodule PolicrMiniBot.HandleSelfJoinedChain do
       exits(chat_type, chat_id)
     end
 
-    {:ok, %{context | stop: true}}
+    {:stop, context}
   end
 
   @spec _handle(integer | binary, map) :: no_return()
@@ -106,7 +106,7 @@ defmodule PolicrMiniBot.HandleSelfJoinedChain do
     with {:ok, chat} <- synchronize_chat(chat_id, true),
          {:ok, chat} <- Syncing.sync_for_chat_permissions(chat),
          {:ok, _} <- Chats.find_or_init_scheme(chat_id),
-         :ok <- response(chat_id, context) do
+         :ok <- response_success(chat_id, context) do
       if Enum.empty?(chat.permissions) do
         # 如果找不到任何管理员，发送相应提示。
         # TODO: 此处的文字需要国际化
@@ -154,7 +154,7 @@ defmodule PolicrMiniBot.HandleSelfJoinedChain do
   end
 
   # 发送响应消息。
-  defp response(chat_id, context) when is_integer(chat_id) do
+  defp response_success(chat_id, context) when is_integer(chat_id) do
     ttitle = commands_text("欢迎使用")
     tdesc = commands_text("已成功登记本群信息，所有管理员皆可登入后台。")
 
@@ -212,6 +212,10 @@ defmodule PolicrMiniBot.HandleSelfJoinedChain do
     markup = %InlineKeyboardMarkup{
       inline_keyboard: [
         [
+          %InlineKeyboardButton{
+            text: commands_text("最近更新"),
+            url: "https://blog.gramlabs.org/posts/policr-mini-updates-2024-01-01.html"
+          },
           %InlineKeyboardButton{
             text: commands_text("订阅更新"),
             url: "https://t.me/policr_changelog"
