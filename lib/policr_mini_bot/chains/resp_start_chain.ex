@@ -46,8 +46,8 @@ defmodule PolicrMiniBot.RespStartChain do
   # 处理空参数。
   @impl true
   def handle(%{chat: chat} = _message, context) do
-    theader = commands_text("您好，我是一个专注于新成员验证的机器人。")
-    tdesc = commands_text("我具有稳定的服务，便于操作的网页后台。并不断增强与优化的核心功能，保持长期维护。同时我是开源的，可自由复制部署的。")
+    theader = commands_text("我是一个专注于新成员验证的机器人。")
+    tdesc = commands_text("我具有稳定的服务，便于操作的网页后台。不断增强与优化的核心功能，并保持长期维护。同时我是开源的，可自由复制部署的。")
 
     tfooter =
       commands_text("访问 %{here_link} 更加了解一下我吧～",
