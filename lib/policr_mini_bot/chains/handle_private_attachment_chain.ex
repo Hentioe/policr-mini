@@ -9,7 +9,7 @@ defmodule PolicrMiniBot.HandlePrivateAttachmentChain do
 
   use PolicrMiniBot.Chain, :message
 
-  # alias Telegex.Type.ReplyParameters
+  alias Telegex.Type.ReplyParameters
 
   # 忽略非私聊。
   @impl true
@@ -101,7 +101,7 @@ defmodule PolicrMiniBot.HandlePrivateAttachmentChain do
 
     # TODO: `reply_parameters` 参数暂时无效，待 Telegex 项目单独测试。
     Telegex.send_message(chat_id, text,
-      reply_to_message_id: message_id,
+      reply_parameters: %ReplyParameters{message_id: message_id},
       parse_mode: "HTML"
     )
 

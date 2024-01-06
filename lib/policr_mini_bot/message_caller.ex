@@ -8,6 +8,8 @@ defmodule PolicrMiniBot.MessageCaller do
 
   require Logger
 
+  # TODO: 参数 `reply_to_message_id` 已过时，应使用 `Telegex.Type.ReplyParameters.t()` 代替。
+
   @type tgerr :: Telegex.Type.error()
   @type tgmsg :: Telegex.Type.Message.t()
   @type call_opts :: [
