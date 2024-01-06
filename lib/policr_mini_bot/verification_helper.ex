@@ -520,8 +520,12 @@ defmodule PolicrMiniBot.VerificationHelper do
       logging: true
     ]
 
-    with {:ok, _} <- send_verification_message(v, data, text, send_opts),
-         {:ok, v} <- Chats.update_verification(v, %{indices: data.correct_indices}) do
+    updated_params = %{indices: data.correct_indices, send_times: v.send_times + 1}
+
+    # 不能接收 `check_verification/1` 的返回值，因为此处并非一个实际值，会影响后续的更新。
+    with {:ok, _} <- check_verification(Map.merge(v, updated_params)),
+         {:ok, _} <- send_verification_message(v, data, text, send_opts),
+         {:ok, v} <- Chats.update_verification(v, updated_params) do
       {:ok, v}
     else
       e -> e

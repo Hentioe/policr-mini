@@ -94,14 +94,11 @@ defmodule PolicrMiniBot.RespStartChain do
 
     if v = Chats.find_pending_verification(target_chat_id, from_user_id) do
       scheme = Chats.find_or_init_scheme!(target_chat_id)
-      # 自增发送次数。
-      updated_params = %{send_times: v.send_times + 1}
 
-      with {:ok, v} <- check_verification(v),
-           {:ok, _} <- send_verification(v, scheme),
-           {:ok, _v} <- Chats.update_verification(v, updated_params) do
-        :ok
-      else
+      case send_verification(v, scheme) do
+        {:ok, _} ->
+          :ok
+
         {:error, :too_many_send_times} ->
           send_text(from_user_id, commands_text("同一个验证的发送次数过多，请使用旧消息完成验证。"), logging: true)
 
