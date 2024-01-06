@@ -13,7 +13,7 @@ defmodule PolicrMiniBot.RespLoginChain do
 
   @sync_comment_text commands_text(
                        "如果您确定自己是群管理员，且群组中的确使用了本机器人。请通知群主或其它管理员在群内使用 %{command} 命令同步最新数据。",
-                       command: "`/sync`"
+                       command: "<code>/sync</code>"
                      )
 
   def handle(%{chat: %{type: "private"}} = message, context) do
