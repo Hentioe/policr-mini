@@ -73,7 +73,7 @@ defmodule PolicrMini.Chats.Scheme do
 
   def default_params do
     %{
-      verification_mode: :image,
+      verification_mode: :grid,
       seconds: 300,
       timeout_killing_method: :kick,
       wrong_killing_method: :kick,
