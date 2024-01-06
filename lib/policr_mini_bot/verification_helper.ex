@@ -559,7 +559,14 @@ defmodule PolicrMiniBot.VerificationHelper do
   """
   @spec time_left_text(Verification.t()) :: integer()
   def time_left_text(%Verification{seconds: seconds, inserted_at: inserted_at}) do
-    seconds - DateTime.diff(DateTime.utc_now(), inserted_at)
+    left_secs = seconds - DateTime.diff(DateTime.utc_now(), inserted_at)
+
+    if left_secs < 0 do
+      # 如果剩余秒数小于 0 则返回 0（通常是机器人停止后超时处理取消产生的现象）
+      0
+    else
+      left_secs
+    end
   end
 
   @doc """
