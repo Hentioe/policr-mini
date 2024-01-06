@@ -8,11 +8,10 @@ services:
     environment:
       POSTGRES_PASSWORD: postgres
 
-  local-api:
-    image: aiogram/telegram-bot-api
+  telegram-bot-api:
+    image: gramoss/telegram-bot-api:ade0841
     network_mode: host
     environment:
       TELEGRAM_API_ID: $TELEGRAM_API_ID
       TELEGRAM_API_HASH: $TELEGRAM_API_HASH
-      TELEGRAM_LOCAL: 1
-      TELEGRAM_STAT: 1
+      TELEGRAM_LOCAL_MODE: true
