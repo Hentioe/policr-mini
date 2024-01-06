@@ -17,7 +17,7 @@
 
 ### 新的变化
 
-从我们博客文章了解最近的更新：<https://blog.gramlabs.org/posts/policr-mini-updates-2024-01-01.html>
+从我们的博客文章了解最近的更新：<https://blog.gramlabs.org/posts/policr-mini-updates-2024-01-01.html>
 
 ## 当前状态
 
