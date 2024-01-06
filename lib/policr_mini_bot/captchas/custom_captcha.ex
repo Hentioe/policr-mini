@@ -54,7 +54,7 @@ defmodule PolicrMiniBot.CustomCaptcha do
       |> Enum.filter(&String.starts_with?(elem(&1, 0), "+"))
       |> Enum.map(fn {_, index} -> index + 1 end)
 
-    candidates = Enum.map(answers, fn ans -> [String.slice(ans, 1..-1)] end)
+    candidates = Enum.map(answers, fn ans -> [String.slice(ans, 1..-1//1)] end)
 
     %Captcha.Data{
       question: custom_kit.title,

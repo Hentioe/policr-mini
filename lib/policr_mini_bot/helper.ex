@@ -299,7 +299,7 @@ defmodule PolicrMiniBot.Helper do
   end
 
   defp _mosaic_name(name, %{method: :classic}) do
-    "#{String.slice(name, 0..0)}███#{String.slice(name, -1..-1)}"
+    "#{String.slice(name, 0..0)}███#{String.slice(name, -1..-1//1)}"
   end
 
   defp _mosaic_name(name, %{len: len, method: :spoiler, parse_mode: parse_mode}) do
