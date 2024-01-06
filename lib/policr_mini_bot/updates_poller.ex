@@ -3,15 +3,6 @@ defmodule PolicrMiniBot.UpdatesPoller do
 
   use Telegex.GenPoller
 
-  # 注意：当前并未依赖对编辑消息、频道消息、内联查询等更新类型的接收才能实现的功能，如有需要需提前更新此列表。
-  @allowed_updates [
-    "message",
-    "callback_query",
-    "my_chat_member",
-    "chat_member",
-    "chat_join_request"
-  ]
-
   @impl true
   def on_boot do
     # Initialize the bot.
@@ -22,7 +13,7 @@ defmodule PolicrMiniBot.UpdatesPoller do
     Logger.info("Bot (@#{bot_info.username}) is working (polling)")
 
     # Create configuration (can be empty, because there are default values)
-    %Telegex.Polling.Config{allowed_updates: @allowed_updates}
+    %Telegex.Polling.Config{allowed_updates: PolicrMiniBot.allowed_updates()}
     # You must return the `Telegex.Polling.Config` struct ↑
   end
 

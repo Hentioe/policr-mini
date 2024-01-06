@@ -13,7 +13,13 @@ defmodule PolicrMiniBot.UpdatesAngler do
     {:ok, true} = Telegex.delete_webhook()
     # set the webhook (url and secret token)
     secret_token = Telegex.Tools.gen_secret_token()
-    {:ok, true} = Telegex.set_webhook(env_config[:webhook_url], secret_token: secret_token)
+
+    {:ok, true} =
+      Telegex.set_webhook(env_config[:webhook_url],
+        secret_token: secret_token,
+        allowed_updates: PolicrMiniBot.allowed_updates()
+      )
+
     # specify port for web server
     # port has a default value of 4000, but it may change with library upgrades
     config = %Telegex.Hook.Config{
