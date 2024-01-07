@@ -32,7 +32,7 @@ import {
 const dateTimeFormat = "yyyy-MM-dd";
 
 const InlineKeybordButton = styled.div`
-  ${tw`shadow-sm bg-blue-400 text-white rounded-md px-4 py-2 text-sm mt-1 flex justify-center bg-opacity-75 cursor-pointer`}
+  ${tw`shadow-sm bg-blue-400 text-white rounded-md px-4 py-2 text-sm flex justify-center bg-opacity-75 cursor-pointer`}
 `;
 
 const Divider = styled.div`
@@ -423,30 +423,50 @@ export default () => {
               </div>
               <div tw="w-10/12">
                 <div tw="shadow rounded-md text-sm pb-4 tracking-wide">
-                  <img src="/images/et-400x225.jpg" tw="w-full rounded-t" />
+                  <img src="/images/grid-540x360.jpg" tw="w-full rounded-t" />
                   <div tw="px-4 pt-1">
-                    <Paragraph tw="italic">
+                    <Paragraph>
                       来自『<span tw="font-bold">POLICR · 中文社区</span>
                       』的验证，请确认问题并选择您认为正确的答案。
                     </Paragraph>
                     <br />
-                    <Paragraph tw="font-bold">图片中的事物是？</Paragraph>
+                    <Paragraph tw="font-bold">
+                      选出所有「树林」的图片编号
+                    </Paragraph>
                     <br />
                     <Paragraph>
                       您还剩 <span tw="underline">198</span>{" "}
-                      秒，通过可解除封印。
+                      秒，通过可解除限制。
                     </Paragraph>
                   </div>
                 </div>
-                <div tw="mt-2">
+                <div tw="mt-2 grid grid-cols-3 gap-1">
                   <InlineKeybordButton>
-                    <span tw="select-none">地铁</span>
+                    <span tw="select-none">159</span>
                   </InlineKeybordButton>
                   <InlineKeybordButton>
-                    <span tw="select-none">公路</span>
+                    <span tw="select-none">932</span>
                   </InlineKeybordButton>
                   <InlineKeybordButton>
-                    <span tw="select-none">外星人</span>
+                    <span tw="select-none">518</span>
+                  </InlineKeybordButton>
+                  <InlineKeybordButton>
+                    <span tw="select-none">482</span>
+                  </InlineKeybordButton>
+                  <InlineKeybordButton>
+                    <span tw="select-none">594</span>
+                  </InlineKeybordButton>
+                  <InlineKeybordButton>
+                    <span tw="select-none">259</span>
+                  </InlineKeybordButton>
+                  <InlineKeybordButton>
+                    <span tw="select-none">721</span>
+                  </InlineKeybordButton>
+                  <InlineKeybordButton>
+                    <span tw="select-none">361</span>
+                  </InlineKeybordButton>
+                  <InlineKeybordButton>
+                    <span tw="select-none">319</span>
                   </InlineKeybordButton>
                 </div>
               </div>
