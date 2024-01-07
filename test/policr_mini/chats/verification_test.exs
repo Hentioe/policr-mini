@@ -66,8 +66,7 @@ defmodule PolicrMini.Chats.VerificationTest do
              :target_user_id,
              :seconds,
              :status,
-             :source,
-             :send_times
+             :source
            ]
 
     assert changeset.valid?

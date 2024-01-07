@@ -358,7 +358,7 @@ defmodule PolicrMiniBot.Helper do
 
   ## 例子
       iex> PolicrMiniBot.Helper.default!(:vmode)
-      :image
+      :grid
       iex> PolicrMiniBot.Helper.default!(:vseconds)
       300
       iex> PolicrMiniBot.Helper.default!(:tkmethod)

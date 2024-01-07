@@ -8,8 +8,8 @@ defmodule PolicrMini.Chats.Verification do
   alias PolicrMini.EctoEnums.{VerificationStatusEnum, VerificationSource}
   alias PolicrMini.Instances.Chat
 
-  @required_fields ~w(chat_id target_user_id seconds status source send_times)a
-  @optional_fields ~w(target_user_name target_user_language_code message_id indices chosen)a
+  @required_fields ~w(chat_id target_user_id seconds status source)a
+  @optional_fields ~w(target_user_name target_user_language_code message_id indices chosen send_times)a
 
   schema "verifications" do
     belongs_to :chat, Chat

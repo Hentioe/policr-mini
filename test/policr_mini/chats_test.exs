@@ -88,7 +88,7 @@ defmodule PolicrMini.ChatsTest do
       {:ok, default} = default_scheme()
 
       assert default.chat_id == 0
-      assert default.verification_mode == :image
+      assert default.verification_mode == :grid
       assert default.seconds == 300
       assert default.timeout_killing_method == :kick
       assert default.wrong_killing_method == :kick
