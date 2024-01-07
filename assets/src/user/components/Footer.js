@@ -68,17 +68,16 @@ export default () => {
           </div>
           <div tw="ml-6 text-black">
             <p tw="text-xl font-bold tracking-wide">policrmini</p>
-            <p tw="text-xs font-bold tracking-wider">
+            <p tw="text-sm md:text-base font-bold tracking-wider">
               项目组：
-              <a tw="text-black" target="_blank" href="https://gramlabs.org/">
+              <a tw="text-black" target="_blank" href="https://blog.gramlabs.org/">
                 GramLabs
               </a>
             </p>
-            <p tw="text-xs text-gray-800 tracking-wider leading-relaxed">
-              GramLabs 是一个部分开源的 Telegram 技术社区，含义是“Telegram
-              实验室”。GramLabs 正在尝试孵化一些 Telegram 生态的基础应用。
+            <p tw="text-xs md:text-sm text-gray-800 tracking-wider leading-relaxed">
+              GramLabs 意为“Telegram 实验室”，旨在探索更多免费的 Telegram
+              基础应用。
             </p>
-            <p tw="text-xs font-bold tracking-wider">隶属于：POLICR</p>
           </div>
         </div>
         <div tw="w-full lg:w-5/12 flex justify-center lg:justify-end">
@@ -115,7 +114,9 @@ export default () => {
                 <RouteNavLink to="/terms">服务条款</RouteNavLink>
               </div>
               <div tw="flex flex-col">
-                <NavLink href="https://t.me/policr_changelog?boost">更新频道</NavLink>
+                <NavLink href="https://t.me/policr_changelog?boost">
+                  更新频道
+                </NavLink>
                 <NavLink target="_blank" href="https://blog.gramlabs.org/">
                   博客动态
                 </NavLink>
