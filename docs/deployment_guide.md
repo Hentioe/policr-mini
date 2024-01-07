@@ -110,6 +110,7 @@ services:
       POLICR_MINI_BOT_NAME: ${POLICR_MINI_BOT_NAME}
       POLICR_MINI_BOT_OWNER_ID: ${POLICR_MINI_BOT_OWNER_ID}
       #POLICR_MINI_BOT_WORK_MODE: ${POLICR_MINI_BOT_WORK_MODE}
+      #POLICR_MINI_BOT_API_BASE_URL: ${POLICR_MINI_BOT_API_BASE_URL}
       #POLICR_MINI_BOT_WEBHOOK_URL: ${POLICR_MINI_BOT_WEBHOOK_URL}
       #POLICR_MINI_BOT_WEBHOOK_SERVER_PORT: ${POLICR_MINI_BOT_WEBHOOK_SERVER_PORT}
       POLICR_MINI_BOT_GRID_CAPTCHA_INDI_WIDTH: ${POLICR_MINI_BOT_GRID_CAPTCHA_INDI_WIDTH}
@@ -171,8 +172,8 @@ POLICR_MINI_OPTS="" # 可选配置，此处预设为空
 可选配置是一系列开关，这些开关不需要值，因此无需独立配置。当前可选配置存在以下参数：
 
 - `--independent`: 让机器人处于完全独立的运营模式，包括不和官方实例通信（例如获取共享的第三方实例列表）。
-- `--disable-image-rewrite`: 禁用验证图片重写。通常来讲不需要禁用，若服务器性能太低，此选项可以放弃安全性换取性能的提升。详情参见[图片重写机制](./图片重写机制)。
-- `--allow-client-switch-grid`: 允许后台用户切换到网格验证。默认不允许，因为此选项对性能占用较高。详情参见[网格验证](./网格验证)。
+- `--disable-image-rewrite`: 禁用验证图片重写。通常来讲不需要禁用，若服务器性能太低，此选项可以放弃安全性换取性能的提升。详情参见[图片重写机制](#图片重写机制)。
+- `--allow-client-switch-grid`: 允许后台用户切换到网格验证。默认不允许，因为此选项对性能占用较高。详情参见[网格验证](#网格验证)。
 
 可选配置的值就是一个个的可选参数，多个参数用空格间隔开来。如：
 
@@ -204,11 +205,34 @@ _注意：如果 Webhook 服务直接暴露，可能会成为易于攻击的“�
 
 ### 本地 API 服务
 
-部署本地 API 服务可让机器人获得最快的响应速度，且脱离主流的部署地域（荷兰之外）。此外，它还可以避免 Webhook 服务遭遇攻击，及其它的部分硬性限制的解除。
+部署本地 API 服务可让机器人获得最快的响应速度，并脱离主流的部署地域（荷兰之外）。此外，它还可以避免 Webhook 服务遭遇攻击，及其它的部分硬性限制的解除。
 
-_待补充：此部分教程还未撰写。_
+使用我们的 Bot API 镜像，详情可了解[这篇文章](https://blog.gramlabs.org/posts/our-telegram-bot-api-image.html)。下面是一个例子：
 
-_供参考：目前 Policr Mini 官方实例已在实验 Webhook + 本地 API 后端工作模型。_
+```yaml
+services:
+  # db 服务（已忽略）
+
+  telegram-bot-api:
+    image: gramoss/telegram-bot-api:ade0841
+    environment:
+      TELEGRAM_API_ID: ${TELEGRAM_API_ID}
+      TELEGRAM_API_HASH: ${TELEGRAM_API_HASH}
+      TELEGRAM_LOCAL_MODE: true
+
+  server:
+    # 机器人服务（已部分忽略）
+    environment:
+      POLICR_MINI_BOT_API_BASE_URL: http://telegram-bot-api:8081/bot
+      POLICR_MINI_BOT_WEBHOOK_URL: http://server:4001/updates_hook
+      POLICR_MINI_BOT_WEBHOOK_SERVER_PORT: 4001
+```
+
+如上，你需要向 bot 服务添加 `POLICR_MINI_BOT_API_BASE_URL`、`POLICR_MINI_BOT_WEBHOOK_URL` 和 `POLICR_MINI_BOT_WEBHOOK_SERVER_PORT` 这三个环境变量，它们在上面的模板中已经给出，取消注释即可。同时你需要在 `telegram-bot-api` 服务中注入 `TELEGRAM_API_ID` 和 `TELEGRAM_API_HASH` 两个环境变量。
+
+我们预设 Bot API 服务的端口为 `8081`，这是该镜像默认的端口。有关 Bot API 服务需要的两个变量值，请参考[官方页面](https://core.telegram.org/api/obtaining_api_id)获取。
+
+_部署本地 Bot API 时，你应该先找出机器人的数据中心位置，并将 Bot API 和机器人部署在离数据中心地域最近的位置。_
 
 ### 图片重写机制
 
