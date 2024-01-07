@@ -125,7 +125,7 @@ defmodule PolicrMiniBot do
     end
   end
 
-  @official_bots ["policr_mini_bot", "policr_mini_test_bot"]
+  @official_bots ["policr_mini_bot", "policr_mini_dev_bot", "policr_mini_pre_bot"]
 
   def official_bots, do: @official_bots
 
