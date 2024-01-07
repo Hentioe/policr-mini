@@ -50,7 +50,7 @@ config :policr_mini, PolicrMiniBot.Scheduler,
     # 修正过期验证，每 5 分钟。
     expired_check: [
       schedule: "*/5 * * * *",
-      task: {PolicrMiniBot.Runner.ExpiredChecker, :run, []}
+      task: {PolicrMiniBot.Runner.ExpiredFixer, :run, []}
     ],
     # 工作状态检查，每 4 小时。
     working_check: [
