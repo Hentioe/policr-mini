@@ -268,8 +268,11 @@ defmodule PolicrMiniBot.Helper do
   @spec _mosaic_name(String.t(), MosaicConfig.t()) :: String.t()
 
   # 只有一个字符的名称，不打马赛克。
-  defp _mosaic_name(name, %{len: 1} = _config) do
-    name
+  defp _mosaic_name(name, %{len: 1} = config) do
+    case config.parse_mode do
+      "MarkdownV2" -> Telegex.Tools.safe_markdown(name)
+      "HTML" -> Telegex.Tools.safe_html(name)
+    end
   end
 
   # 两个字符的名称，遮挡第二个字符（经典）。
