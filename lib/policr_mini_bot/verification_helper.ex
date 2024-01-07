@@ -187,15 +187,15 @@ defmodule PolicrMiniBot.VerificationHelper do
       }
 
       # 主要流程：
-      # 1. 创建（或获取进行中的）验证数据
-      # 2. 尝试转换可能不匹配的数据来源
-      # 3. 写入到入口消息
-      # 4. 更新验证数据中的消息 ID
-      # 5. 发送验证
-      with {:ok, %{send_times: st} = v} <- Chats.get_cr_pend_verif(chat_id, user.id, params),
+      # 1. 创建（或获取进行中的）验证数据。
+      # 2. 尝试转换可能不匹配的数据来源。
+      # 3. 添加到入口消息。
+      # 4. 更新验证数据中的消息 ID。
+      # 5. 私聊发送验证消息。
+      with {:ok, v} <- Chats.get_cr_pend_verif(chat_id, user.id, params),
            {:ok, v} <- try_convert_souce(:join_request, v, scheme),
-           {:ok, %{message_id: msgid}} <- put_entry_message(v, scheme, []),
-           {:ok, v} <- Chats.update_verification(v, %{message_id: msgid, send_times: st + 1}),
+           {:ok, %{message_id: message_id}} <- put_entry_message(v, scheme, []),
+           {:ok, v} <- Chats.update_verification(v, %{message_id: message_id}),
            {:ok, v} = ok_r <- send_verification(Repo.preload(v, [:chat]), scheme) do
         # 验证创建成功
 
@@ -232,6 +232,12 @@ defmodule PolicrMiniBot.VerificationHelper do
           """
 
           send_text(chat_id, text, parse_mode: "MarkdownV2", logging: true)
+
+          e
+
+        {:error, :too_many_send_times} = e ->
+          # 验证发送次数过多
+          send_text(user.id, commands_text("同一个验证的发送次数过多，请使用旧消息完成验证。"), logging: true)
 
           e
 
@@ -488,9 +494,10 @@ defmodule PolicrMiniBot.VerificationHelper do
   发送并更新验证。
 
   如果验证发送成功，验证记录将被更新（包含正确答案），并返回更新后的验证记录。
+
+  注意：每发送成功一次，验证记录的 `send_times` 会自增 1。如果发送次数超过 3 会拒绝发送，并返回 `too_many_send_times` 错误原因。
   """
-  @spec send_verification(Verification.t(), Scheme.t()) ::
-          {:ok, Verification.t()} | {:error, any}
+  @spec send_verification(Verification.t(), Scheme.t()) :: {:ok, Verification.t()} | {:error, any}
   def send_verification(v, scheme) do
     mode = scheme.verification_mode || default!(:vmode)
     data = Captcha.make(mode, v.chat_id, scheme)
