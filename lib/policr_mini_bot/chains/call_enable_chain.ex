@@ -11,11 +11,11 @@ defmodule PolicrMiniBot.CallEnableChain do
   alias PolicrMini.Instances.Chat
 
   @impl true
-  def handle(callback_query, %{from_admin: from_admin} = _context)
+  def handle(callback_query, %{from_admin: from_admin} = context)
       when from_admin == nil or from_admin == false do
     Telegex.answer_callback_query(callback_query.id, text: "您没有权限～", show_alert: true)
 
-    :ok
+    {:stop, context}
   end
 
   @impl true
