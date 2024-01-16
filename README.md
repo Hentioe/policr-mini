@@ -15,6 +15,11 @@
 
 ## 当前动态
 
+### 下阶段计划
+
+- [ ] 新的 Web 控制台
+- [ ] 多选验证支持
+
 ### 新的变化
 
 从我们的博客文章了解最近的更新：<https://blog.gramlabs.org/posts/policr-mini-updates-2024-01-01.html>
