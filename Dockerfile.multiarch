@@ -1,5 +1,5 @@
 # 使用构建基础镜像复制源代码执行编译
-FROM gramoss/mini-build-base:20240109 as compile
+FROM gramoss/mini-build-base:20240202 as compile
 
 ARG TARGETARCH
 
@@ -33,7 +33,7 @@ RUN set -xe \
 
 
 # 使用构建基础镜像 release 应用
-FROM gramoss/mini-build-base:20240109 as release
+FROM gramoss/mini-build-base:20240202 as release
 
 ARG TARGETARCH
 
@@ -56,7 +56,7 @@ RUN set -xe \
 
 
 # 使用运行基础镜像打包
-FROM gramoss/mini-run-base:20240109
+FROM gramoss/mini-run-base:20240202
 
 ARG APP_HOME=/home/policr_mini
 
