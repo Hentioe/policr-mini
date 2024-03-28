@@ -1,7 +1,11 @@
+import Root from "./layouts/Root";
+
 export default () => {
   return (
-    <div>
-      Console
-    </div>
+    <Root>
+      <div tw="text-red-600">
+        Console
+      </div>
+    </Root>
   );
 };
