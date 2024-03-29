@@ -1,5 +1,3 @@
-import tw, { styled } from "twin.macro";
+import tw from "twin.macro";
 
-export default styled.div({
-  ...tw`bg-zinc-50 min-h-screen`,
-});
+export default tw.div`h-screen max-h-screen min-h-screen`;
