@@ -61,3 +61,12 @@ steps:
     when:
       branch: master
       event: push
+
+  schedule-pre-deploy:
+    image: curlimages/curl
+    commands:
+      - curl -f -X POST $PRE_DEPLOY_HOOK_URL
+    secrets: [PRE_DEPLOY_HOOK_URL]
+    when:
+      branch: develop
+      event: push
