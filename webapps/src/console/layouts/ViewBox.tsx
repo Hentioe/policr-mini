@@ -7,7 +7,7 @@ const Root = styled.div({
 
 const Box = styled.div({
   background: `linear-gradient(to bottom right, #fbb6e1, #bceabc)`,
-  ...tw`flex h-full w-full lg:w-[80rem] border-x border-zinc-300 shadow`,
+  ...tw`flex h-full w-full lg:w-[80rem] border-x border-zinc-300 lg:shadow`,
 });
 
 // 视图盒子，主要内容的容器。
