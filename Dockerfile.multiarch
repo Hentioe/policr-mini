@@ -1,5 +1,5 @@
 # 使用构建基础镜像复制源代码执行编译
-FROM gramoss/mini-build-base:20240202 as compile
+FROM gramoss/mini-build-base:20240329 as compile
 
 ARG TARGETARCH
 
@@ -27,13 +27,13 @@ WORKDIR /src
 COPY --from=compile /src/ /src/
 
 RUN set -xe \
-    && npm install --location=global pnpm@8.14.0 \
+    && npm install --location=global pnpm@8.15.5 \
     && pnpm --prefix assets install \
     && pnpm --prefix assets run deploy
 
 
 # 使用构建基础镜像 release 应用
-FROM gramoss/mini-build-base:20240202 as release
+FROM gramoss/mini-build-base:20240329 as release
 
 ARG TARGETARCH
 
@@ -56,7 +56,7 @@ RUN set -xe \
 
 
 # 使用运行基础镜像打包
-FROM gramoss/mini-run-base:20240202
+FROM gramoss/mini-run-base:20240329
 
 ARG APP_HOME=/home/policr_mini
 

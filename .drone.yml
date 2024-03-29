@@ -5,7 +5,7 @@ name: default
 
 steps:
   - name: app-compile
-    image: gramoss/mini-build-base:20240202
+    image: gramoss/mini-build-base:20240329
     pull: always
     environment:
       MIX_ENV: prod
@@ -17,12 +17,12 @@ steps:
   - name: app-assets-build
     image: node:lts-hydrogen
     commands:
-      - npm install --location=global pnpm@8.14.0
+      - npm install --location=global pnpm@8.15.5
       - pnpm --prefix assets install
       - pnpm --prefix assets run deploy
 
   - name: app-release
-    image: gramoss/mini-build-base:20240202
+    image: gramoss/mini-build-base:20240329
     environment:
       MIX_ENV: prod
     commands:

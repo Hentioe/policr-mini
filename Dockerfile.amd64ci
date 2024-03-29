@@ -1,4 +1,4 @@
-FROM gramoss/mini-run-base:20240202
+FROM gramoss/mini-run-base:20240329
 
 
 ARG APP_HOME=/home/policr_mini
