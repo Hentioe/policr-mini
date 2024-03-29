@@ -12,6 +12,9 @@ assets-format:
 front-setup:
     just front-pnpm install
 
+front-check:
+    just front-format front-lint
+
 front-format:
     just front-pnpm run format
 
