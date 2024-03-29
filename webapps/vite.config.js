@@ -23,5 +23,19 @@ export default defineConfig(({ command }) => {
         },
       }),
     ],
+    build: {
+      outDir: "../priv/static",
+      emptyOutDir: false, // 不要清空，因为同时存在旧 webpack 构建的项目
+      rollupOptions: {
+        input: {
+          console: "./src/console/main.tsx",
+        },
+        output: {
+          entryFileNames: "assets/[name].js", // remove hash
+          chunkFileNames: "assets/[name].js",
+          assetFileNames: "assets/[name][extname]",
+        },
+      },
+    },
   };
 });

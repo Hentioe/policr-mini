@@ -4,8 +4,9 @@
   "description": "Policr Mini front-end",
   "scripts": {
     "dev": "vite",
+    "deploy": "vite build",
     "test": "echo \"Error: no test specified\" && exit 1",
-    "lint": "eslint src/ --ext .ts --ext .tsx --ext .js",
+    "lint": "eslint src/ --ext .ts,.tsx,.js --report-unused-disable-directives --max-warnings 0",
     "format": "dprint fmt"
   },
   "author": "Hentioe",
