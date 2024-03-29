@@ -29,7 +29,7 @@ front-pnpm +args:
 
 setup:
     mix deps.get
-    just assets-setup
+    just assets-setup front-setup
     just dev-env up -d
     just cargo-for imgkit build
     just cargo-for ziputil build
