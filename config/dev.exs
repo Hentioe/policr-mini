@@ -39,6 +39,11 @@ config :policr_mini, PolicrMiniWeb.Endpoint,
       "run",
       "watch",
       cd: Path.expand("../assets", __DIR__)
+    ],
+    pnpm: [
+      "run",
+      "dev",
+      cd: Path.expand("../webapps", __DIR__)
     ]
   ]
 

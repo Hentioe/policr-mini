@@ -1,0 +1,19 @@
+{
+  "compilerOptions": {
+    "forceConsistentCasingInFileNames": true,
+    "strict": true,
+    "noImplicitAny": true,
+    "outDir": "./dist",
+    "module": "es6",
+    "target": "es2015",
+    "jsx": "preserve",
+    "jsxImportSource": "solid-js",
+    "sourceMap": true,
+    "allowJs": true,
+    "moduleResolution": "node"
+  },
+  "include": [
+    "src",
+    "types"
+  ]
+}

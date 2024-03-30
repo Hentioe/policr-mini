@@ -14,8 +14,13 @@ defmodule PolicrMiniWeb.Router do
   end
 
   pipeline :admin do
-    plug PolicrMiniWeb.TokenAuthentication, from: :page
+    plug PolicrMiniWeb.TokenAuthentication, from: :admin
     plug :put_layout, {PolicrMiniWeb.LayoutView, :admin}
+  end
+
+  pipeline :console do
+    plug PolicrMiniWeb.TokenAuthentication, from: :console
+    plug :put_layout, {PolicrMiniWeb.LayoutView, :console}
   end
 
   pipeline :admin_api do
@@ -96,6 +101,13 @@ defmodule PolicrMiniWeb.Router do
 
   scope "/admin", PolicrMiniWeb.Admin do
     pipe_through [:browser, :admin]
+
+    get "/logout", PageController, :logout
+    get "/*path", PageController, :index
+  end
+
+  scope "/console", PolicrMiniWeb.Console do
+    pipe_through [:browser, :console]
 
     get "/logout", PageController, :logout
     get "/*path", PageController, :index

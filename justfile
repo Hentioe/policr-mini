@@ -1,23 +1,41 @@
 format:
-    just mix-format front-format
+    just mix-format assets-format
     just cargo-for imgkit fmt
     just cargo-for ziputil fmt
 
 mix-format:
     mix format
 
-front-format:
+assets-format:
     assets/node_modules/.bin/prettier --write assets/
+
+front-setup:
+    just front-pnpm install
+
+front-check:
+    just front-format front-lint
+
+front-format:
+    just front-pnpm run format
+
+front-lint:
+    just front-pnpm run lint
+
+front-clean:
+    rm -rf webapps/node_modules
+
+front-pnpm +args:
+    (cd webapps && pnpm {{args}})
 
 setup:
     mix deps.get
-    just front-setup
+    just assets-setup front-setup
     just dev-env up -d
     just cargo-for imgkit build
     just cargo-for ziputil build
     mix ecto.setup
 
-front-setup:
+assets-setup:
     pnpm install --prefix assets
 
 dev-env +args:
@@ -38,7 +56,7 @@ mix-clean:
     mix clean
     rm -rf deps _build
 
-front-clean:
+assets-clean:
     rm -rf assets/node_modules
     rm -rf priv/static
 
@@ -47,7 +65,7 @@ clean-assets-output:
     rm -rf _assets/_cache/*
 
 clean:
-    just mix-clean front-clean
+    just mix-clean assets-clean
     just cargo-for imgkit clean
     just cargo-for ziputil clean
     rm -rf priv/native
