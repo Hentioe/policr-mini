@@ -18,7 +18,7 @@ defmodule PolicrMiniWeb.Admin.PageController do
 
   def logout(conn, _params) do
     conn
-    |> delete_resp_cookie("token", path: PolicrMiniWeb.TokenAuthentication.cookie_path())
+    |> delete_resp_cookie("token", path: "/admin")
     |> Phoenix.Controller.redirect(to: "/login")
     |> halt()
   end

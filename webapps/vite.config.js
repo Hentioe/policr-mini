@@ -13,6 +13,9 @@ export default defineConfig(({ command }) => {
   }
 
   return {
+    server: {
+      host: "0.0.0.0",
+    },
     plugins: [
       solid({
         babel: {

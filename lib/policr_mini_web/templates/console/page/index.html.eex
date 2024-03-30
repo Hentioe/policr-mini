@@ -3,8 +3,8 @@
 </script>
 <div id="app"></div>
 <%= if PolicrMini.mix_env() == :dev do %>
-  <script type="module" src="http://localhost:5173/@vite/client"></script>
-  <script type="module" src="http://localhost:5173/src/console/main.tsx"></script>
+  <script type="module" src="http://0.0.0.0:5173/@vite/client"></script>
+  <script type="module" src="http://0.0.0.0:5173/src/console/main.tsx"></script>
 <% else %>
   <script type="text/javascript" src="<%= Routes.static_path(@conn, ~s{/assets/console.js}) %>"></script>
 <% end %>

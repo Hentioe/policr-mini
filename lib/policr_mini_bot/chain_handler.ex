@@ -22,6 +22,8 @@ defmodule PolicrMiniBot.ChainHandler do
     PolicrMiniBot.RespSyncChain,
     # 响应 `/login` 命令。
     PolicrMiniBot.RespLoginChain,
+    # 响应 `/console` 命令。
+    PolicrMiniBot.RespConsoleChain,
     # 响应 `/sponsorship` 命令。
     PolicrMiniBot.RespSponsorshipChain,
     # 响应 `/embarrass_member` 命令。

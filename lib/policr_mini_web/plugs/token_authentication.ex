@@ -15,17 +15,13 @@ defmodule PolicrMiniWeb.TokenAuthentication do
   alias PolicrMini.Schema.User
   alias PolicrMini.UserBusiness
 
-  @cookie_path "/admin"
-
-  def cookie_path, do: @cookie_path
-
   def init(opts) do
     opts
-    |> Keyword.put_new(:from, :page)
+    |> Keyword.put_new(:from, :admin)
     |> Enum.into(%{})
   end
 
-  def call(conn, %{from: :page}) do
+  def call(conn, %{from: :admin}) do
     {token_from, token} = find_token(conn)
 
     if user = verify(token) do
@@ -34,14 +30,35 @@ defmodule PolicrMiniWeb.TokenAuthentication do
           # 将 token 写入 cookie 并重定向到不带参数的 admin 页面
           # TODO: 此处不应该直接重定向到后台首页，而是当前页面
           conn
-          |> put_resp_cookie("token", token, max_age: @expired_sec, path: @cookie_path)
-          |> redirect_to_admin()
+          |> put_resp_cookie("token", token, max_age: @expired_sec, path: "/admin")
+          |> redirect_to("/admin")
 
         :cookies ->
           assign(conn, :user, user)
       end
     else
-      redirect_to_login(conn)
+      redirect_to(conn, "/login")
+    end
+  end
+
+  def call(conn, %{from: :console}) do
+    {token_from, token} = find_token(conn)
+
+    if user = verify(token) do
+      case token_from do
+        :query ->
+          # 将 token 写入 cookie 并重定向到不带参数的 console 页面
+          # TODO: 此处不应该直接重定向到后台首页，而是当前页面
+          conn
+          |> put_resp_cookie("token", token, max_age: @expired_sec, path: "/console")
+          |> redirect_to("/console")
+
+        :cookies ->
+          assign(conn, :user, user)
+      end
+    else
+      # TODO: 重定向到进入控制台的说明页面
+      resp_unauthorized(conn)
     end
   end
 
@@ -102,17 +119,10 @@ defmodule PolicrMiniWeb.TokenAuthentication do
     end
   end
 
-  @spec redirect_to_login(Plug.Conn.t()) :: Plug.Conn.t()
-  defp redirect_to_login(%Plug.Conn{} = conn) do
+  @spec redirect_to(Plug.Conn.t(), String.t()) :: Plug.Conn.t()
+  defp redirect_to(%Plug.Conn{} = conn, path) do
     conn
-    |> Phoenix.Controller.redirect(to: "/login")
-    |> halt()
-  end
-
-  @spec redirect_to_admin(Plug.Conn.t()) :: Plug.Conn.t()
-  defp redirect_to_admin(%Plug.Conn{} = conn) do
-    conn
-    |> Phoenix.Controller.redirect(to: "/admin")
+    |> Phoenix.Controller.redirect(to: path)
     |> halt()
   end
 

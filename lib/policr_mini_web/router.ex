@@ -14,12 +14,12 @@ defmodule PolicrMiniWeb.Router do
   end
 
   pipeline :admin do
-    plug PolicrMiniWeb.TokenAuthentication, from: :page
+    plug PolicrMiniWeb.TokenAuthentication, from: :admin
     plug :put_layout, {PolicrMiniWeb.LayoutView, :admin}
   end
 
   pipeline :console do
-    # plug PolicrMiniWeb.TokenAuthentication, from: :page
+    plug PolicrMiniWeb.TokenAuthentication, from: :console
     plug :put_layout, {PolicrMiniWeb.LayoutView, :console}
   end
 
