@@ -15,6 +15,14 @@ config :policr_mini, PolicrMini.Repo,
   pool_size: 10,
   migration_timestamps: [type: :utc_datetime]
 
+# 配置 InfluxDB 连接
+config :policr_mini, PolicrMini.InfluxConn,
+  auth: [method: :token, token: "__token__"],
+  bucket: "policr_mini_dev",
+  org: "policr_mini",
+  host: "localhost",
+  version: :v2
+
 # For development, we disable any cache and enable
 # debugging and code reloading.
 #

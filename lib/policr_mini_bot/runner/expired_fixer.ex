@@ -1,7 +1,7 @@
 defmodule PolicrMiniBot.Runner.ExpiredFixer do
   @moduledoc false
 
-  alias PolicrMini.Chats
+  alias PolicrMini.{Chats, Stats}
   alias PolicrMini.Chats.Verification
 
   require Logger
@@ -48,8 +48,11 @@ defmodule PolicrMiniBot.Runner.ExpiredFixer do
       chat_id: v.chat_id
     )
 
-    # TODO: 将统计自增和更新状态放在同一个事务中。
+    # 写入验证数据点（其它）
+    Stats.write_verf(v.chat_id, v.target_user_id, :other, v.source)
+
     with {:ok, _} <- Chats.update_verification(v, %{status: :expired}),
+         # TODO: 将统计自增和更新状态放在同一个事务中（待删除，被时序数据替代）。
          {:ok, _} <- Chats.increment_statistic(v.chat_id, v.target_user_language_code, :other) do
       user_processing(v)
 

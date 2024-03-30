@@ -6,6 +6,18 @@ services:
     environment:
       POSTGRES_PASSWORD: postgres
 
+  tsdb:
+    image: influxdb:2.7
+    ports:
+      - 8086:8086
+    environment:
+      DOCKER_INFLUXDB_INIT_MODE: setup
+      DOCKER_INFLUXDB_INIT_USERNAME: demo
+      DOCKER_INFLUXDB_INIT_PASSWORD: demopass
+      DOCKER_INFLUXDB_INIT_ORG: policr_mini
+      DOCKER_INFLUXDB_INIT_BUCKET: policr_mini_dev
+      DOCKER_INFLUXDB_INIT_ADMIN_TOKEN: __token__
+
   telegram-bot-api:
     image: gramoss/telegram-bot-api:7.1
     network_mode: host

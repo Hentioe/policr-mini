@@ -5,7 +5,7 @@ defmodule PolicrMiniBot.CallAnswerChain do
 
   use PolicrMiniBot.Chain, {:callback_query, prefix: "ans:"}
 
-  alias PolicrMini.{Chats, Counter}
+  alias PolicrMini.{Chats, Stats, Counter}
   alias PolicrMini.Chats.{Verification, Scheme, Operation}
   alias PolicrMiniBot.{Disposable, Worker, JoinReuquestHosting}
   alias Telegex.Type.User, as: TgUser
@@ -141,7 +141,11 @@ defmodule PolicrMiniBot.CallAnswerChain do
           {:ok, Verification.t()} | {:error, any()}
   def handle_correct_answer(v, message_id, from_user) do
     # 自增统计数据（通过）
+    # TODO: 待删除（等待基于时序数据的统计功能启用）
     async_run(fn -> Chats.increment_statistic(v.chat_id, v.target_user_language_code, :passed) end)
+
+    # 写入验证数据点（通过）
+    Stats.write_verf(v.chat_id, v.target_user_id, :passed, v.source)
 
     # 计数器自增（通过的总数）
     Counter.increment(:verification_passed_total)
@@ -263,9 +267,13 @@ defmodule PolicrMiniBot.CallAnswerChain do
     # 获取方案中的配置项
     wkmethod = scheme.wrong_killing_method || default!(:wkmethod)
     # 自增统计数据（错误）
+    # TODO: 待删除（被时序数据替代）
     async_run(fn ->
       Chats.increment_statistic(v.chat_id, v.target_user_language_code, :wronged)
     end)
+
+    # 写入验证数据点（错误）
+    Stats.write_verf(v.chat_id, v.target_user_id, :rejected, v.source)
 
     case Chats.update_verification(v, %{status: :wronged}) do
       {:ok, v} ->

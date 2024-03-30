@@ -27,6 +27,14 @@ secret_key_base =
     You can generate one by calling: mix phx.gen.secret
     """
 
+# 配置 InfluxDB 连接
+config :policr_mini, PolicrMini.InfluxConn,
+  auth: [method: :token, token: System.get_env("POLICR_MINI_INFLUX_TOKEN")],
+  bucket: System.get_env("POLICR_MINI_INFLUX_BUCKET") || "policr_mini_prod",
+  org: System.get_env("POLICR_MINI_INFLUX_ORG") || "policr_mini",
+  host: System.get_env("POLICR_MINI_INFLUX_HOST"),
+  version: :v2
+
 config :policr_mini, PolicrMiniWeb.Endpoint,
   http: [
     port: String.to_integer(System.get_env("POLICR_MINI_SERVER_PORT") || "4000"),

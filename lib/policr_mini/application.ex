@@ -26,6 +26,8 @@ defmodule PolicrMini.Application do
       ]
       # Start the Ecto repository
       |> serve_children(PolicrMini.Repo, true)
+      # Start the InfluxDB connection
+      |> serve_children(PolicrMini.InfluxConn, true)
       # Start the Cacher
       |> serve_children(PolicrMini.Cache, true)
       # Start the runtime migrator
