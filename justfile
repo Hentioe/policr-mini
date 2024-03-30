@@ -1,13 +1,58 @@
+setup:
+    mix deps.get
+    just assets-setup front-setup
+    just dev-env up -d
+    just cargo-for imgkit build
+    just cargo-for ziputil build
+    mix ecto.setup
+
+run +args='':
+    iex -S mix {{args}}
+
+check:
+    just mix-check
+    just front-check
+
 format:
-    just mix-format assets-format
+    just mix-format assets-format front-format
     just cargo-for imgkit fmt
     just cargo-for ziputil fmt
+
+
+lint:
+    just mix-lint front-lint
+    just cargo-for imgkit clippy
+    just cargo-for ziputil clippy
+
+clean:
+    just mix-clean assets-clean front-clean assets-output-clean
+    just cargo-for imgkit clean
+    just cargo-for ziputil clean
+    rm -rf priv/native
+
+mix-check:
+    just mix-format mix-lint
+
+mix-lint:
+    mix credo --strict --mute-exit-status
+    mix dialyzer
 
 mix-format:
     mix format
 
+mix-clean:
+    mix clean
+    rm -rf deps _build
+
+assets-setup:
+    pnpm install --prefix assets
+
 assets-format:
     assets/node_modules/.bin/prettier --write assets/
+
+assets-clean:
+    rm -rf assets/node_modules
+    rm -rf priv/static
 
 front-setup:
     just front-pnpm install
@@ -27,22 +72,8 @@ front-clean:
 front-pnpm +args:
     (cd webapps && pnpm {{args}})
 
-setup:
-    mix deps.get
-    just assets-setup front-setup
-    just dev-env up -d
-    just cargo-for imgkit build
-    just cargo-for ziputil build
-    mix ecto.setup
-
-assets-setup:
-    pnpm install --prefix assets
-
 dev-env +args:
     docker compose -f docker-compose.dev.yml --env-file dev.env {{args}}
-
-run +args='':
-    iex -S mix {{args}}
 
 test:
     mix test
@@ -52,23 +83,10 @@ test:
 cargo-for $native_mod='' +args='':
      (cd native/$native_mod && cargo {{args}})
 
-mix-clean:
-    mix clean
-    rm -rf deps _build
-
-assets-clean:
-    rm -rf assets/node_modules
-    rm -rf priv/static
-
-clean-assets-output:
+assets-output-clean:
     rm -rf test/assets/output/*
     rm -rf _assets/_cache/*
 
-clean:
-    just mix-clean assets-clean
-    just cargo-for imgkit clean
-    just cargo-for ziputil clean
-    rm -rf priv/native
-
 destory:
-    just clean dev-env down -v
+    just clean
+    just dev-env down -v
