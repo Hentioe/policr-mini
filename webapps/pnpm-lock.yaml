@@ -11,6 +11,12 @@ dependencies:
   '@solid-primitives/i18n':
     specifier: ^2.1.1
     version: 2.1.1(solid-js@1.8.16)
+  '@solidjs/router':
+    specifier: ^0.13.1
+    version: 0.13.1(solid-js@1.8.16)
+  camelcase-keys:
+    specifier: ^9.1.3
+    version: 9.1.3
   solid-icons:
     specifier: ^1.1.0
     version: 1.1.0(solid-js@1.8.16)
@@ -20,6 +26,9 @@ dependencies:
   solid-styled-components:
     specifier: ^0.28.5
     version: 0.28.5(solid-js@1.8.16)
+  solid-swr:
+    specifier: ^4.0.3
+    version: 4.0.3(solid-js@1.8.16)
   tailwindcss:
     specifier: ^3.4.3
     version: 3.4.3
@@ -865,6 +874,14 @@ packages:
     resolution: {integrity: sha512-1p9B8hveu+gzFRWfXcRtdzzEdr7gw3c8uLXm+2bU33JHgiI8kYJsWvG128sE6vU1ZtYGPrGq980Jd6hxYupyZQ==}
     peerDependencies:
       solid-js: ^1.6.12
+    dependencies:
+      solid-js: 1.8.16
+    dev: false
+
+  /@solidjs/router@0.13.1(solid-js@1.8.16):
+    resolution: {integrity: sha512-Rz5Lf0ssWMuN+Wm2GFO0vwZoO/KSwYFSuCUzWrRAvje5M0ZYZrMk5FZxuzdJT+zg8KuqWJQlRALks5E0r+FjAA==}
+    peerDependencies:
+      solid-js: ^1.8.6
     dependencies:
       solid-js: 1.8.16
     dev: false
@@ -1855,6 +1872,21 @@ packages:
     engines: {node: '>= 6'}
     dev: false
 
+  /camelcase-keys@9.1.3:
+    resolution: {integrity: sha512-Rircqi9ch8AnZscQcsA1C47NFdaO3wukpmIRzYcDOrmvgt78hM/sj5pZhZNec2NM12uk5vTwRHZ4anGcrC4ZTg==}
+    engines: {node: '>=16'}
+    dependencies:
+      camelcase: 8.0.0
+      map-obj: 5.0.0
+      quick-lru: 6.1.2
+      type-fest: 4.14.0
+    dev: false
+
+  /camelcase@8.0.0:
+    resolution: {integrity: sha512-8WB3Jcas3swSvjIeA2yvCJ+Miyz5l1ZmB6HFb9R1317dt9LCQoswg/BGrmAmkWVEszSrrg4RwmO46qIm2OEnSA==}
+    engines: {node: '>=16'}
+    dev: false
+
   /caniuse-lite@1.0.30001600:
     resolution: {integrity: sha512-+2S9/2JFhYmYaDpZvo0lKkfvuKIglrx68MwOBqMGHhQsNkLjB5xtc/TGoEPs+MxjSyN/72qer2g97nzR641mOQ==}
     dev: true
@@ -1960,6 +1992,11 @@ packages:
   /deep-is@0.1.4:
     resolution: {integrity: sha512-oIPzksmTg4/MriiaYGO+okXDT7ztn/w3Eptv/+gSIdMdKsJo0u4CfYNFJPy+4SKMuCqGw2wxnA+URMg3t8a/bQ==}
     dev: true
+
+  /dequal@2.0.3:
+    resolution: {integrity: sha512-0je+qPKHEMohvfRTCEo3CrPG6cAzAYgmzKyxRiYSSDkS6eGJdyVJm7WaYA5ECaAD9wLB2T4EEeymA5aFVcYXCA==}
+    engines: {node: '>=6'}
+    dev: false
 
   /didyoumean@1.2.2:
     resolution: {integrity: sha512-gxtyfqMg7GKyhQmb056K7M3xszy/myH8w+B4RT+QXBQsvAOdc3XymqDDPHx1BgPgsdAA5SIifona89YtRATDzw==}
@@ -2563,6 +2600,11 @@ packages:
       yallist: 4.0.0
     dev: true
 
+  /map-obj@5.0.0:
+    resolution: {integrity: sha512-2L3MIgJynYrZ3TYMriLDLWocz15okFakV6J12HXvMXDHui2x/zgChzg1u9mFFGbbGWE+GsLpQByt4POb9Or+uA==}
+    engines: {node: ^12.20.0 || ^14.13.1 || >=16.0.0}
+    dev: false
+
   /merge-anything@5.1.7:
     resolution: {integrity: sha512-eRtbOb1N5iyH0tkQDAoQ4Ipsp/5qSR79Dzrz8hEPxRX10RWWR/iQXdoKmBSRCThY1Fh5EhISDtpSc93fpxUniQ==}
     engines: {node: '>=12.13'}
@@ -2816,6 +2858,11 @@ packages:
   /queue-microtask@1.2.3:
     resolution: {integrity: sha512-NuaNSa6flKT5JaSYQzJok04JzTL1CA6aGhv5rfLW3PgqA+M2ChpZQnAC8h8i4ZFkBS8X5RqkDBHA7r4hej3K9A==}
 
+  /quick-lru@6.1.2:
+    resolution: {integrity: sha512-AAFUA5O1d83pIHEhJwWCq/RQcRukCkn/NSm2QsTEMle5f2hP0ChI2+3Xb051PZCkLryI/Ir1MVKviT2FIloaTQ==}
+    engines: {node: '>=12'}
+    dev: false
+
   /read-cache@1.0.0:
     resolution: {integrity: sha512-Owdv/Ft7IjOgm/i0xvNDZ1LrRANRfew4b2prF3OWMQLxLfu3bS8FVhCsrSCMK4lR56Y9ya+AThoTpDCTxCmpRA==}
     dependencies:
@@ -2972,6 +3019,15 @@ packages:
     dependencies:
       csstype: 3.1.3
       goober: 2.1.14(csstype@3.1.3)
+      solid-js: 1.8.16
+    dev: false
+
+  /solid-swr@4.0.3(solid-js@1.8.16):
+    resolution: {integrity: sha512-b1W8udNVYIfUCCHEh093+GaFucXsd/7pJLLDO77yVXGHVpakmQjidKfSpxBvdV1+GWHOxIClWi2ysKHdJkY/Hw==}
+    peerDependencies:
+      solid-js: 1.x.x
+    dependencies:
+      dequal: 2.0.3
       solid-js: 1.8.16
     dev: false
 
@@ -3161,6 +3217,11 @@ packages:
     resolution: {integrity: sha512-Ne+eE4r0/iWnpAxD852z3A+N0Bt5RN//NjJwRd2VFHEmrywxf5vsZlh4R6lixl6B+wz/8d+maTSAkN1FIkI3LQ==}
     engines: {node: '>=10'}
     dev: true
+
+  /type-fest@4.14.0:
+    resolution: {integrity: sha512-on5/Cw89wwqGZQu+yWO0gGMGu8VNxsaW9SB2HE8yJjllEk7IDTwnSN1dUVldYILhYPN5HzD7WAaw2cc/jBfn0Q==}
+    engines: {node: '>=16'}
+    dev: false
 
   /typescript@5.4.3:
     resolution: {integrity: sha512-KrPd3PKaCLr78MalgiwJnA25Nm8HAmdwN3mYUYZgG/wizIo9EainNVQI9/yDavtVFRN2h3k8uf3GLHuhDMgEHg==}
