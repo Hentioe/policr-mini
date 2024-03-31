@@ -45,7 +45,7 @@ export default () => {
       </header>
       <div tw="p-2">
         <p tw="p-2 w-full bg-white/30 text-zinc-600 text-xs rounded tracking-wider">
-          {store.currentChat?.title || "无描述"}
+          {store.currentChat?.description || "无描述"}
         </p>
       </div>
       <main tw="mt-2 flex-1 overflow-y-auto" class="hidden-scrollbar">
