@@ -61,6 +61,7 @@ defmodule PolicrMini.MixProject do
       {:telemetry_poller, "~> 0.5"},
       {:gettext, "~> 0.22"},
       {:jason, "~> 1.4"},
+      {:tarams, "~> 1.8"},
       {:plug_cowboy, "~> 2.6"},
       {:remote_ip, "~> 1.1"},
       {:quantum, "~> 3.5"},
