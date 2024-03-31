@@ -5,7 +5,7 @@
     "noImplicitAny": true,
     "outDir": "./dist",
     "module": "es6",
-    "target": "es2015",
+    "target": "es2016",
     "jsx": "preserve",
     "jsxImportSource": "solid-js",
     "sourceMap": true,
