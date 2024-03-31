@@ -17,6 +17,7 @@ export type PageId =
 
 export type Store = {
   drawerEl?: HTMLDivElement;
+  drawerOpen?: boolean;
   currentChat?: Chat;
   currentPage?: PageId;
 };
@@ -26,9 +27,21 @@ const [store, setStore] = createStore<Store>();
 export function useGlobalStore() {
   const draw = () => {
     if (store.drawerEl != null) {
+      if (drawPosition() === "relative") {
+        // 如果相对布局（非移动设备），不支持滑动。
+        return;
+      }
+
       const currentLeft = store.drawerEl.style.left;
-      store.drawerEl.style.left = currentLeft === "0px" ? "-16rem" : "0px";
+      const isOpen = currentLeft === "0px";
+      store.drawerEl.style.left = isOpen ? "-16rem" : "0px";
+
+      setStore({ drawerOpen: !isOpen });
     }
+  };
+
+  const drawPosition = (): string | undefined => {
+    return store.drawerEl?.computedStyleMap().get("position")?.toString();
   };
 
   const setDrawerEl = (el: HTMLDivElement) => {
@@ -38,5 +51,5 @@ export function useGlobalStore() {
   const setCurrentChat = (chat: Chat) => setStore({ currentChat: chat });
   const setCurrentPage = (pageId: PageId) => setStore({ currentPage: pageId });
 
-  return { store, draw, setDrawerEl, setCurrentChat, setCurrentPage };
+  return { store, draw, drawPosition, setDrawerEl, setCurrentChat, setCurrentPage };
 }

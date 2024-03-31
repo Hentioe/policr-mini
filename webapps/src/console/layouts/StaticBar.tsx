@@ -3,6 +3,7 @@ import { AiFillGithub } from "solid-icons/ai";
 import { BiLogosTelegram } from "solid-icons/bi";
 import { FaBrandsBloggerB } from "solid-icons/fa";
 import { IoLanguageOutline } from "solid-icons/io";
+import { IoCloseSharp } from "solid-icons/io";
 import { createEffect, createSignal, For, JSXElement } from "solid-js";
 import useSWR from "solid-swr";
 import tw, { styled } from "twin.macro";
@@ -81,7 +82,7 @@ type ChatsRepo = {
 
 export default () => {
   const navigate = useNavigate();
-  const { store, setCurrentChat } = useGlobalStore();
+  const { store, draw, setCurrentChat } = useGlobalStore();
   const [chats, loadChats] = createSignal<Chat[]>([]);
 
   const { data } = useSWR<ChatsRepo>(() => "/admin/api/chats", { fetcher: getter });
@@ -137,6 +138,11 @@ export default () => {
   return (
     <Root>
       <div>
+        <div tw="lg:hidden">
+          <ItemBox disableInteractive>
+            <IoCloseSharp size="2rem" tw="text-white rounded-full bg-white/20" onClick={draw} />
+          </ItemBox>
+        </div>
         <ItemBox disableInteractive>
           <ChatBoxRoot disableInteractive>
             <img title="Avatar" src="/images/avatar-100x100.jpg" tw="rounded-full" />

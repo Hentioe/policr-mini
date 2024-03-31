@@ -1,6 +1,6 @@
-import { A } from "@solidjs/router";
+import { A, useLocation } from "@solidjs/router";
 import { FiMoreHorizontal } from "solid-icons/fi";
-import { Show } from "solid-js";
+import { createEffect, Show } from "solid-js";
 import tw, { styled } from "twin.macro";
 import { PageId, useGlobalStore } from "../globalStore";
 import { useTranslation } from "../i18n";
@@ -16,7 +16,14 @@ const MenuLinkRoot = styled(A)((ps: ActiveProp) => [
 
 export default () => {
   const t = useTranslation();
-  const { store } = useGlobalStore();
+  const location = useLocation();
+  const { store, draw } = useGlobalStore();
+
+  createEffect(() => {
+    if (location.pathname) {
+      draw();
+    }
+  });
 
   const MenuLink = (props: { pageId: PageId; description?: string } & ActiveProp) => {
     return (
