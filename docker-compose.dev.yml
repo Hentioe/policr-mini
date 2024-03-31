@@ -18,7 +18,7 @@ services:
       DOCKER_INFLUXDB_INIT_BUCKET: policr_mini_dev
       DOCKER_INFLUXDB_INIT_ADMIN_TOKEN: __token__
 
-  telegram-bot-api:
+  bot-api:
     image: gramoss/telegram-bot-api:7.1
     network_mode: host
     environment:
