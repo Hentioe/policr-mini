@@ -10,7 +10,7 @@ import { getter } from "../api";
 import { Chat, useGlobalStore } from "../globalStore";
 
 const Root = styled.div({
-  ...tw`w-[5rem] py-2 flex flex-col`,
+  ...tw`w-[4rem] lg:w-[5rem] py-2 flex flex-col`,
 });
 
 type ActiveProp = {
@@ -26,13 +26,13 @@ type disableInteractiveProp = {
 };
 
 const ItemBoxRoot = styled.div(() => [
-  tw`flex relative items-center justify-center px-2 my-2`,
+  tw`flex relative items-center justify-center px-1 lg:px-2 my-2`,
 ]);
 
 const ItemBoxLeft = styled.div((ps: ActiveProp & HoveredProp) => [
-  tw`absolute left-0 w-[0.3rem] h-[0.6rem] rounded-r`,
-  ps.hovered && !ps.active ? tw`bg-blue-400/40 h-[2rem]` : tw`bg-transparent`,
-  ps.active && tw`bg-blue-400`,
+  tw`absolute left-0`,
+  ps.hovered && !ps.active ? tw`bg-blue-400/40 h-[1rem] lg:h-[2rem] w-[0.15rem] lg:w-[0.3rem]` : tw`bg-transparent`,
+  ps.active && tw`bg-blue-400 w-[0.15rem] lg:w-[0.3rem] h-[0.25rem] lg:h-[0.5rem] rounded-r`,
 ]);
 
 const ItemBox = (props: { children: JSXElement } & ActiveProp & disableInteractiveProp) => {
@@ -55,7 +55,7 @@ const ItemBox = (props: { children: JSXElement } & ActiveProp & disableInteracti
 };
 
 const ChatBoxRoot = styled.div((ps: ActiveProp & disableInteractiveProp) => [
-  tw`w-[3rem] lg:w-[3.5rem] h-[3rem] lg:h-[3.5rem] flex items-center justify-center rounded-xl`,
+  tw`w-[2.5rem] lg:w-[3.5rem] h-[2.5rem] lg:h-[3.5rem] flex items-center justify-center rounded-xl`,
   ps.active ? tw`bg-white/40` : !ps.disableInteractive && tw`hover:bg-white/20`,
   !ps.disableInteractive && tw`cursor-pointer`,
 ]);
@@ -145,8 +145,8 @@ export default () => {
       </div>
       <div tw="flex-1 overflow-y-auto" class="hidden-scrollbar">
         <For each={chats()}>
-          {(c, i) => (
-            <ItemBox active={i() === 2}>
+          {(c) => (
+            <ItemBox active={store.currentChat?.id === c.id}>
               <ChatBox chat={c}>
                 <img
                   title={c.title}

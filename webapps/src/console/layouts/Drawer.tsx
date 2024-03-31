@@ -4,7 +4,7 @@ import { useGlobalStore } from "../globalStore";
 
 const Drawer = styled.div({
   boxShadow: `0 0 2px rgba(0,0,0,0.15)`,
-  ...tw`h-full flex w-[20rem] absolute lg:relative left-[-20rem] lg:left-0 transition-all duration-500 z-50`,
+  ...tw`h-full flex w-[16rem] lg:w-[20rem] absolute lg:relative left-[-16rem] lg:left-0 transition-all duration-500 z-50`,
 });
 
 export default (props: { children: JSX.Element }) => {

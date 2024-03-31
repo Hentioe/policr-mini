@@ -21,7 +21,7 @@ export default () => {
   const MenuLink = (props: { pageId: PageId; description?: string } & ActiveProp) => {
     return (
       <MenuLinkRoot href={`/${store.currentChat?.id}/${props.pageId}`} active={store.currentPage === props.pageId}>
-        <div tw="ml-[2rem] select-none tracking-wide">
+        <div tw="ml-[1.25rem] lg:ml-[2rem] select-none tracking-wide">
           <p tw="font-medium">{t(`pages.${props.pageId}`)}</p>
           <Show when={props.description}>
             <p tw="mt-2 text-xs lg:text-[0.8rem] text-zinc-600 mr-[2rem]">
@@ -36,7 +36,7 @@ export default () => {
   return (
     <div tw="flex flex-col w-full bg-white/20 pt-4">
       <header tw="flex justify-between px-2 text-white font-bold">
-        <span tw="flex items-center justify-center truncate bg-zinc-800/20 px-3 w-[10rem] h-[1.8rem] rounded-xl">
+        <span tw="flex items-center justify-center truncate bg-zinc-800/20 px-3 w-[8rem] lg:w-[10rem] h-[1.8rem] rounded-xl">
           {store.currentChat?.title || "未选择群组"}
         </span>
         <span tw="flex items-center justify-center bg-zinc-800/20 font-bold rounded-full w-[1.8rem] h-[1.8rem] hover:shadow cursor-pointer">

@@ -27,7 +27,7 @@ export function useGlobalStore() {
   const draw = () => {
     if (store.drawerEl != null) {
       const currentLeft = store.drawerEl.style.left;
-      store.drawerEl.style.left = currentLeft === "0px" ? "-20rem" : "0px";
+      store.drawerEl.style.left = currentLeft === "0px" ? "-16rem" : "0px";
     }
   };
 
