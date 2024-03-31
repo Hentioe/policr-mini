@@ -8,12 +8,12 @@ export default () => {
   const { setCurrentPage } = useGlobalStore();
 
   onMount(() => {
-    setCurrentPage("scheme");
+    setCurrentPage("operations");
   });
 
   return (
     <GeneralFrameBox>
-      {t("pages.scheme")}
+      {t("pages.operations")}
     </GeneralFrameBox>
   );
 };

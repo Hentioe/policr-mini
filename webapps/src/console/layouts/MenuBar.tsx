@@ -3,6 +3,7 @@ import { FiMoreHorizontal } from "solid-icons/fi";
 import { Show } from "solid-js";
 import tw, { styled } from "twin.macro";
 import { PageId, useGlobalStore } from "../globalStore";
+import { useTranslation } from "../i18n";
 
 type ActiveProp = {
   active?: boolean;
@@ -14,13 +15,14 @@ const MenuLinkRoot = styled(A)((ps: ActiveProp) => [
 ]);
 
 export default () => {
+  const t = useTranslation();
   const { store } = useGlobalStore();
 
-  const MenuLink = (props: { pageId: PageId; title: string; description?: string } & ActiveProp) => {
+  const MenuLink = (props: { pageId: PageId; description?: string } & ActiveProp) => {
     return (
       <MenuLinkRoot href={`/${store.currentChat?.id}/${props.pageId}`} active={store.currentPage === props.pageId}>
         <div tw="ml-[2rem] select-none tracking-wide">
-          <p tw="font-medium">{props.title}</p>
+          <p tw="font-medium">{t(`pages.${props.pageId}`)}</p>
           <Show when={props.description}>
             <p tw="mt-2 text-xs lg:text-[0.8rem] text-zinc-600 mr-[2rem]">
               {props.description}
@@ -50,37 +52,30 @@ export default () => {
         <div>
           <MenuLink
             pageId="dashboard"
-            title="仪表盘"
             description="详细的群组统计数据"
           />
           <MenuLink
             pageId="scheme"
-            title="当前方案"
             description="查看或修改验证模型"
           />
           <MenuLink
             pageId="custom"
-            title="定制验证"
             description="自定义验证问答列表"
           />
           <MenuLink
             pageId="welcome"
-            title="欢迎消息"
             description="新成员加入的欢迎内容"
           />
           <MenuLink
             pageId="verifications"
-            title="验证历史"
             description="所有可查询的验证记录"
           />
           <MenuLink
             pageId="operations"
-            title="操作历史"
             description="所有可查询的操作记录"
           />
           <MenuLink
             pageId="permissions"
-            title="控制权限"
             description="管理具有控制权限的成员"
           />
         </div>
