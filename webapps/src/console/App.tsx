@@ -22,8 +22,8 @@ const View = (props: RouteSectionProps) => (
       <MenuBar />
     </Drawer>
     <Content>
+      <Header />
       <Frame>
-        <Header />
         {props.children}
       </Frame>
     </Content>

@@ -17,7 +17,7 @@ export type PageId =
 
 export type Store = {
   drawerEl?: HTMLDivElement;
-  drawerOpen?: boolean;
+  drawerIsOut?: boolean;
   currentChat?: Chat;
   currentPage?: PageId;
 };
@@ -25,18 +25,22 @@ export type Store = {
 const [store, setStore] = createStore<Store>();
 
 export function useGlobalStore() {
-  const draw = () => {
+  const draw = (isOut?: boolean) => {
     if (store.drawerEl != null) {
       if (drawPosition() === "relative") {
         // 如果相对布局（非移动设备），不支持滑动。
         return;
       }
 
-      const currentLeft = store.drawerEl.style.left;
-      const isOpen = currentLeft === "0px";
-      store.drawerEl.style.left = isOpen ? "-16rem" : "0px";
+      if (isOut != null) {
+        store.drawerEl.style.left = isOut ? "-16rem" : "0px";
+      } else {
+        const currentLeft = store.drawerEl.style.left;
+        isOut = currentLeft === "0px";
+        store.drawerEl.style.left = isOut ? "-16rem" : "0px";
+      }
 
-      setStore({ drawerOpen: !isOpen });
+      setStore({ drawerIsOut: !isOut });
     }
   };
 
