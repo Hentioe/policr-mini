@@ -7,5 +7,5 @@
   <script type="module" src="http://0.0.0.0:5173/src/console/main.tsx"></script>
 <% else %>
   <link rel="stylesheet"  href="<%= Routes.static_path(@conn, ~s{/assets/console.css}) %>" />
-  <script type="text/javascript" src="<%= Routes.static_path(@conn, ~s{/assets/console.js}) %>"></script>
+  <script type="module" type="text/javascript" src="<%= Routes.static_path(@conn, ~s{/assets/console.js}) %>"></script>
 <% end %>

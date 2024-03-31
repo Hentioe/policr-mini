@@ -13,6 +13,9 @@ export default defineConfig(({ command }) => {
   }
 
   return {
+    esbuild: {
+      target: "es2016",
+    },
     server: {
       host: "0.0.0.0",
     },

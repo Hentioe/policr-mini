@@ -23,6 +23,11 @@ defmodule PolicrMiniWeb.Router do
     plug :put_layout, {PolicrMiniWeb.LayoutView, :console}
   end
 
+  pipeline :console_api do
+    plug :accepts, ["json"]
+    plug PolicrMiniWeb.TokenAuthentication, from: :api
+  end
+
   pipeline :admin_api do
     plug :accepts, ["json"]
     plug PolicrMiniWeb.TokenAuthentication, from: :api
@@ -36,6 +41,12 @@ defmodule PolicrMiniWeb.Router do
     get "/terms", TermController, :index
     get "/sponsorship_histories", SponsorshipHistoryController, :index
     post "/sponsorship_histories", SponsorshipHistoryController, :add
+  end
+
+  scope "/console/api", PolicrMiniWeb.Console.API do
+    pipe_through [:console_api]
+
+    get "/:chat_id/stats", StatsController, :query
   end
 
   scope "/admin/api", PolicrMiniWeb.Admin.API do

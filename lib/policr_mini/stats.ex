@@ -146,4 +146,12 @@ defmodule PolicrMini.Stats do
          }}
     end
   end
+
+  def delete_all do
+    PolicrMini.InfluxConn.delete(%{
+      start: DateTime.to_iso8601(~U[1970-01-01T00:00:00.00Z]),
+      stop: DateTime.to_iso8601(DateTime.utc_now()),
+      predicate: ~S(_measurement="verifications")
+    })
+  end
 end

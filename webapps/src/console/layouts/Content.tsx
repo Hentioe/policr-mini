@@ -3,7 +3,7 @@ import tw, { styled } from "twin.macro";
 import { useGlobalStore } from "../globalStore";
 
 const Root = styled.div((ps: { blur: boolean }) => [
-  tw`w-full h-full`,
+  tw`w-full h-full flex flex-col`,
   ps.blur && tw`blur`,
 ]);
 

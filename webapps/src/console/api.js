@@ -24,4 +24,12 @@ const puter = (url, body = null) => builder(url, "PUT", body);
 const deleter = (url, body = null) => builder(url, "DELETE", body);
 const poster = (url, body = null) => builder(url, "POST", body);
 
+export function buildConsoleApiUrl(chatId, path) {
+  if (chatId != null) {
+    return `/console/api/${chatId}${path}`;
+  }
+
+  return undefined;
+}
+
 export { deleter, getter, poster, puter };
