@@ -51,6 +51,8 @@ defmodule PolicrMiniWeb.TokenAuthentication do
           # TODO: 此处不应该直接重定向到后台首页，而是当前页面
           conn
           |> put_resp_cookie("token", token, max_age: @expired_sec, path: "/console")
+          # 因为要调用 admin 的 API，所以需要设置相同的 cookie 在 /admin 路径下
+          |> put_resp_cookie("token", token, max_age: @expired_sec, path: "/admin")
           |> redirect_to("/console")
 
         :cookies ->
