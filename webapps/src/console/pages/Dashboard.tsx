@@ -34,10 +34,15 @@ const colors = {
   other: "#BBBBBB",
 };
 
+function findMaxCount(points: Point[]): number {
+  return _.max(points.map((p) => p.count));
+}
+
 export default () => {
   const { store, setCurrentPage } = useGlobalStore();
   // eslint-disable-next-line @typescript-eslint/no-unused-vars
   const [range, setRange] = createSignal<Range>("7d");
+  const [maxCount, setMaxCount] = createSignal<number>(10);
   const [statsCategories, setStatsCategories] = createSignal<string[]>([]);
   const [statsPasssedSeriesData, setStatsPasssedSeriesData] = createSignal<number[]>([]);
   const [statsRejectedSeriesData, setStatsRejectedSeriesData] = createSignal<number[]>([]);
@@ -57,6 +62,8 @@ export default () => {
 
   createEffect(() => {
     if (data.v != null) {
+      setMaxCount(findMaxCount(data.v.points));
+
       const times: string[] = [];
       data.v.points.filter((p) => p.status === "passed").forEach((p) => {
         times.push(p.time);
@@ -100,6 +107,10 @@ export default () => {
         type: "datetime",
         categories: statsCategories(),
         labels: { show: true, datetimeUTC: false, format: "yyyy-MM-dd" },
+      },
+      yaxis: {
+        // 避免 y 轴显示小数（强制 max 值太小时步进为 1）
+        stepSize: maxCount() < 10 ? 1 : undefined,
       },
       tooltip: {
         x: {
