@@ -4,6 +4,7 @@ import { SolidApexCharts } from "solid-apexcharts";
 import { createEffect, createSignal, onMount } from "solid-js";
 import { createStore } from "solid-js/store";
 import useSWR from "solid-swr";
+import tinycolor from "tinycolor2";
 import { buildConsoleApiUrl, getter } from "../api";
 import { useGlobalStore } from "../globalStore";
 import { GeneralFrameBox } from "../layouts/Frame";
@@ -24,6 +25,13 @@ type Dailies = {
   rejected: number;
   timeout: number;
   other: number;
+};
+
+const colors = {
+  passed: "#80FF97",
+  rejected: "#FF8080",
+  timeout: "#FFCB80",
+  other: "#BBBBBB",
 };
 
 export default () => {
@@ -98,6 +106,7 @@ export default () => {
           format: "yyyy/MM/dd HH:mm:ss",
         },
       },
+      colors: [colors.passed, colors.rejected, colors.timeout, colors.other],
     };
   };
 
@@ -120,12 +129,19 @@ export default () => {
     },
   ];
 
-  const Card = (props: { title: string; value: number }) => (
+  const Card = (props: { title: string; value: number; baseColor: string }) => (
     <div tw="w-6/12 lg:flex-1 lg:h-full pb-4 odd:pr-1 even:pl-1 lg:odd:pr-4 lg:even:pl-0 lg:pr-4 lg:last:pr-0">
       <div tw="h-full bg-white/30 rounded-xl flex flex-col">
-        <h2 tw="py-2 lg:py-4 text-center font-medium border-b border-black/20">{props.title}</h2>
+        <h2
+          style={{ color: tinycolor(props.baseColor).darken(40) }}
+          tw="py-2 lg:py-4 text-center font-medium border-b border-black/20"
+        >
+          {props.title}
+        </h2>
         <div tw="flex-1 flex justify-center items-center">
-          <p tw="font-bold text-3xl lg:text-4xl">{props.value}</p>
+          <p style={{ color: tinycolor(props.baseColor).darken(30) }} tw="font-bold text-3xl lg:text-4xl">
+            {props.value}
+          </p>
         </div>
         <p tw="text-center text-zinc-600 text-sm">今日</p>
       </div>
@@ -136,10 +152,10 @@ export default () => {
     <GeneralFrameBox>
       <div tw="h-full flex flex-col">
         <div tw="h-[50%] lg:h-[30%] flex flex-wrap justify-between">
-          <Card title="验证通过" value={dailies.passed} />
-          <Card title="验证失败" value={dailies.rejected} />
-          <Card title="验证超时" value={dailies.timeout} />
-          <Card title="其它" value={dailies.other} />
+          <Card baseColor={colors.passed} title="验证通过" value={dailies.passed} />
+          <Card baseColor={colors.rejected} title="验证失败" value={dailies.rejected} />
+          <Card baseColor={colors.timeout} title="验证超时" value={dailies.timeout} />
+          <Card baseColor={colors.other} title="其它" value={dailies.other} />
         </div>
         <div tw="flex-1 bg-white/30 rounded-xl">
           <header tw="p-3">
@@ -148,7 +164,7 @@ export default () => {
           <SolidApexCharts
             width="95%"
             height="80%"
-            type="line"
+            type="area"
             options={statsOptions()}
             series={statsSeries()}
           />

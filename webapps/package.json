@@ -24,6 +24,7 @@
     "solid-styled-components": "^0.28.5",
     "solid-swr": "^4.0.3",
     "tailwindcss": "^3.4.3",
+    "tinycolor2": "^1.6.0",
     "ts-deepmerge": "^7.0.0",
     "twin.macro": "^3.4.1"
   },

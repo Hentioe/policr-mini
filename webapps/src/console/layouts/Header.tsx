@@ -16,7 +16,7 @@ export default () => {
   };
 
   return (
-    <header tw="border-b border-black/10 flex justify-center items-center">
+    <header tw="flex justify-center items-center lg:mt-2">
       <div
         onClick={handleDrawOpen}
         tw="block lg:hidden flex justify-center w-[2.5rem] py-2 lg:py-4 hover:bg-white/20 rounded-full"
