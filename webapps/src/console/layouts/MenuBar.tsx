@@ -51,11 +51,13 @@ export default () => {
         </span>
       </header>
       <div tw="p-2">
-        <p tw="p-2 w-full bg-white/30 text-zinc-600 text-xs rounded tracking-wider">
-          {store.currentChat?.description || "无描述"}
-        </p>
+        <div tw="p-2 bg-white/30 rounded">
+          <p tw="w-full text-zinc-600 text-xs tracking-wider line-clamp-5">
+            {store.currentChat?.description || "无描述"}
+          </p>
+        </div>
       </div>
-      <main tw="mt-2 flex-1 overflow-y-auto" class="hidden-scrollbar">
+      <main tw="flex-1 overflow-y-auto" class="hidden-scrollbar">
         <div>
           <MenuLink
             pageId="dashboard"
