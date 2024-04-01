@@ -1,7 +1,7 @@
 import { ApexOptions } from "apexcharts";
 import * as _ from "lodash";
 import { SolidApexCharts } from "solid-apexcharts";
-import { createEffect, createSignal, onMount } from "solid-js";
+import { createEffect, createSignal, Match, onMount, Switch } from "solid-js";
 import { createStore } from "solid-js/store";
 import useSWR from "solid-swr";
 import tinycolor from "tinycolor2";
@@ -38,11 +38,18 @@ function findMaxCount(points: Point[]): number {
   return _.max(points.map((p) => p.count));
 }
 
+function findFirstCategorizedPoints(points: Point[]): Point[] {
+  return points.filter((p) =>
+    p.status === "passed" || p.status === "rejected" || p.status === "timeout" || p.status === "other"
+  );
+}
+
 export default () => {
   const { store, setCurrentPage } = useGlobalStore();
   // eslint-disable-next-line @typescript-eslint/no-unused-vars
   const [range, setRange] = createSignal<Range>("7d");
   const [maxCount, setMaxCount] = createSignal<number>(10);
+  const [empty, setEmpty] = createSignal(false);
   const [statsCategories, setStatsCategories] = createSignal<string[]>([]);
   const [statsPasssedSeriesData, setStatsPasssedSeriesData] = createSignal<number[]>([]);
   const [statsRejectedSeriesData, setStatsRejectedSeriesData] = createSignal<number[]>([]);
@@ -61,19 +68,26 @@ export default () => {
   });
 
   createEffect(() => {
+    console.log(empty());
     if (data.v != null) {
       setMaxCount(findMaxCount(data.v.points));
 
       const times: string[] = [];
-      data.v.points.filter((p) => p.status === "passed").forEach((p) => {
-        times.push(p.time);
-      });
+      const categorizedPoints = findFirstCategorizedPoints(data.v.points);
+      if (categorizedPoints.length > 0) {
+        setEmpty(false);
+        categorizedPoints.forEach((p: Point) => {
+          times.push(p.time);
+        });
 
-      setStatsCategories(times);
-      setStatsPasssedSeriesData(statusCounts(data.v.points, "passed"));
-      setStatsRejectedSeriesData(statusCounts(data.v.points, "rejected"));
-      setStatsTimeoutSeriesData(statusCounts(data.v.points, "timeout"));
-      setStatsOtherSeriesData(statusCounts(data.v.points, "other"));
+        setStatsCategories(times);
+        setStatsPasssedSeriesData(statusCounts(data.v.points, "passed"));
+        setStatsRejectedSeriesData(statusCounts(data.v.points, "rejected"));
+        setStatsTimeoutSeriesData(statusCounts(data.v.points, "timeout"));
+        setStatsOtherSeriesData(statusCounts(data.v.points, "other"));
+      } else {
+        setEmpty(true);
+      }
     }
   });
 
@@ -168,17 +182,26 @@ export default () => {
           <Card baseColor={colors.timeout} title="验证超时" value={dailies.timeout} />
           <Card baseColor={colors.other} title="其它" value={dailies.other} />
         </div>
-        <div tw="flex-1 bg-white/30 rounded-xl">
+        <div tw="flex-1 bg-white/30 rounded-xl flex flex-col">
           <header tw="p-3">
             <h2 tw="font-medium">验证次数统计（最近一周）</h2>
           </header>
-          <SolidApexCharts
-            width="95%"
-            height="80%"
-            type="area"
-            options={statsOptions()}
-            series={statsSeries()}
-          />
+          <Switch>
+            <Match when={!empty()}>
+              <SolidApexCharts
+                width="95%"
+                height="80%"
+                type="area"
+                options={statsOptions()}
+                series={statsSeries()}
+              />
+            </Match>
+            <Match when={empty()}>
+              <div tw="flex-1 flex justify-center items-center">
+                <p tw="text-zinc-600/80 text-xl lg:text-2xl">没有统计数据</p>
+              </div>
+            </Match>
+          </Switch>
         </div>
       </div>
     </GeneralFrameBox>
