@@ -121,7 +121,7 @@ config :telegex,
       raise("""
       environment variable `POLICR_MINI_BOT_TOKEN` is missing.
       """),
-  api_base_url: System.get_env("POLICR_MINI_BOT_API_BASE_URL") || "https://api.telegram.org/bot"
+  api_base_url: System.get_env("POLICR_MINI_BOT_API_BASE_URL") || "https://api.telegram.org"
 
 # ## Using releases (Elixir v1.9+)
 #

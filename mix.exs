@@ -46,7 +46,7 @@ defmodule PolicrMini.MixProject do
       {:credo, "~> 1.7", only: [:dev, :test], runtime: false},
       {:rustler, "~> 0.32.1", runtime: false},
       {:benchee, "~> 1.0", only: :dev},
-      {:telegex, "~> 1.5"},
+      {:telegex, git: "https://github.com/Hentioe/telegex.git", branch: "v1.6"},
       {:phoenix, "~> 1.5"},
       {:phoenix_ecto, "~> 4.2"},
       {:postgrex, "~> 0.17"},

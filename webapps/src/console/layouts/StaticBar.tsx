@@ -156,7 +156,7 @@ export default () => {
               <ChatBox chat={c}>
                 <img
                   title={c.title}
-                  src="/images/telegram-128x128.png"
+                  src={`/admin/api/chats/${c.id}/photo`}
                   tw="rounded-full w-[80%] h-[80%]"
                 />
               </ChatBox>

@@ -223,7 +223,7 @@ services:
   server:
     # 机器人服务（已部分忽略）
     environment:
-      POLICR_MINI_BOT_API_BASE_URL: http://telegram-bot-api:8081/bot
+      POLICR_MINI_BOT_API_BASE_URL: http://telegram-bot-api:8081
       POLICR_MINI_BOT_WEBHOOK_URL: http://server:4001/updates_hook
       POLICR_MINI_BOT_WEBHOOK_SERVER_PORT: 4001
 ```

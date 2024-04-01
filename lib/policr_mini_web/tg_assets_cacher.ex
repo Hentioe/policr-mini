@@ -32,7 +32,7 @@ defmodule PolicrMiniWeb.TgAssetsCacher do
             fallback_photo
         end
 
-      Cachex.expire(:photo, file_id, :timer.hours(2))
+      Cachex.expire(:photo, file_id, :timer.hours(1))
 
       photo
     else
@@ -44,8 +44,15 @@ defmodule PolicrMiniWeb.TgAssetsCacher do
   defp fetch_photo(file_id, fallback_photo) do
     case Telegex.get_file(file_id) do
       {:ok, %{file_path: file_path}} ->
+        relative_path =
+          if String.starts_with?(file_path, "/") do
+            file_path |> String.slice(1..-1)
+          else
+            file_path
+          end
+
         file_url =
-          "https://api.telegram.org/file/bot#{Telegex.Instance.token()}/#{file_path}"
+          "#{Telegex.Global.api_base_url()}/file/bot#{Telegex.Instance.token()}/#{relative_path}"
 
         {:commit, fetch_assets_file(file_url, fallback_photo)}
 
@@ -58,7 +65,7 @@ defmodule PolicrMiniWeb.TgAssetsCacher do
 
   @spec fetch_assets_file(binary, binary) :: String.t()
   defp fetch_assets_file(file_url, fallback_photo) do
-    etag_finder = fn {header, _} -> header == "ETag" end
+    etag_finder = fn {header, _} -> header == "etag" end
 
     fetch_fun = fn %{headers: headers, body: body} ->
       if etag = Enum.find(headers, etag_finder) do
