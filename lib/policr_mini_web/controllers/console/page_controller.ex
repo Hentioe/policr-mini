@@ -1,6 +1,8 @@
 defmodule PolicrMiniWeb.Console.PageController do
   use PolicrMiniWeb, :controller
 
+  alias PolicrMiniWeb.TgAssetsCacher
+
   def index(%{assigns: %{user: user}} = conn, _params) do
     owner_id = Application.get_env(:policr_mini, PolicrMiniBot)[:owner_id]
     %{is_third_party: is_third_party, name: name} = PolicrMiniBot.info()
@@ -13,6 +15,14 @@ defmodule PolicrMiniWeb.Console.PageController do
     }
 
     render(conn, "index.html", global: global)
+  end
+
+  def photo(%{assigns: %{user: user}} = conn, _params) do
+    if user.photo_id == nil || user.photo_id == "unset" do
+      Phoenix.Controller.redirect(conn, to: "/images/avatar-100x100.jpg")
+    else
+      Phoenix.Controller.redirect(conn, to: TgAssetsCacher.get_photo_asset(user.photo_id))
+    end
   end
 
   def logout(conn, _params) do

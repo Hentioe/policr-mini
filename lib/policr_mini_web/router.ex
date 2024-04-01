@@ -120,6 +120,7 @@ defmodule PolicrMiniWeb.Router do
   scope "/console", PolicrMiniWeb.Console do
     pipe_through [:browser, :console]
 
+    get "/photo", PageController, :photo
     get "/logout", PageController, :logout
     get "/*path", PageController, :index
   end

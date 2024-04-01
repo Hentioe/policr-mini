@@ -6,13 +6,14 @@ defmodule PolicrMini.Schema.User do
   use PolicrMini.Schema
 
   @required_fields ~w(id token_ver)a
-  @optional_fields ~w(first_name last_name username)a
+  @optional_fields ~w(first_name last_name username photo_id)a
 
   @primary_key {:id, :integer, autogenerate: false}
   schema "users" do
     field :first_name, :string
     field :last_name, :string
     field :username, :string
+    field :photo_id, :string
     field :token_ver, :integer
 
     timestamps()

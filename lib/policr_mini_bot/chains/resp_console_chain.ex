@@ -5,7 +5,8 @@ defmodule PolicrMiniBot.RespConsoleChain do
 
   use PolicrMiniBot.Chain, {:command, :console}
 
-  alias PolicrMini.PermissionBusiness
+  alias PolicrMini.{PermissionBusiness, UserBusiness}
+  alias PolicrMini.Schema.User
   alias PolicrMiniBot.Worker
   alias Telegex.Type.{InlineKeyboardButton, InlineKeyboardMarkup}
 
@@ -23,6 +24,9 @@ defmodule PolicrMiniBot.RespConsoleChain do
 
     with {:ok, :isadmin} <- check_user(user_id),
          {:ok, token} <- PolicrMiniWeb.create_token(user_id) do
+      # 检查用户头像
+      check_user_photo(user_id)
+
       text = """
       #{commands_text("控制台是新的功能管理页面，具有更美观的界面，同时兼容移动与桌面访问和更强大的功能。控制台将在未来取代旧后台页面。")}
 
@@ -113,5 +117,56 @@ defmodule PolicrMiniBot.RespConsoleChain do
     list = PermissionBusiness.find_list(user_id: user_id)
 
     if length(list) > 0, do: {:ok, :isadmin}, else: {:error, :nonadmin}
+  end
+
+  defp check_user_photo(user_id, force \\ false) do
+    # 根据 id 查询出用户
+    case User.get(user_id) do
+      {:ok, user} ->
+        _check_user_photo(user, force)
+
+      {:error, :not_found, _} ->
+        Logger.warning("User not found: #{inspect(user_id)}")
+
+        {:error, :not_found}
+    end
+  end
+
+  defp _check_user_photo(user, true) do
+    with {:ok, %{photos: photos}} <- Telegex.get_user_profile_photos(user.id),
+         {:ok, user} <- UserBusiness.update(user, %{photo_id: user_photo_id(photos)}) do
+      {:ok, user}
+    else
+      e ->
+        e
+    end
+  end
+
+  defp _check_user_photo(%{photo_id: photo_id} = user, false) when photo_id == nil do
+    _check_user_photo(user, true)
+  end
+
+  defp _check_user_photo(user, false) do
+    {:ok, user}
+  end
+
+  @spec user_photo_id(list) :: String.t()
+
+  defp user_photo_id([]) do
+    # 空图像
+    "unset"
+  end
+
+  defp user_photo_id([first_photo_sizes | _]) do
+    finder = fn size ->
+      size.width == 320 and size.height == 320
+    end
+
+    if size = Enum.find(first_photo_sizes, finder) do
+      size.file_id
+    else
+      # 没有 320x320 尺寸的图片
+      "unset"
+    end
   end
 end

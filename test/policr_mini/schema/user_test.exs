@@ -14,6 +14,7 @@ defmodule PolicrMini.Schema.UserTest do
                  :first_name,
                  :last_name,
                  :username,
+                 :photo_id,
                  :token_ver,
                  :inserted_at,
                  :updated_at

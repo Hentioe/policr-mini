@@ -140,12 +140,12 @@ export default () => {
       <div>
         <div tw="lg:hidden">
           <ItemBox disableInteractive>
-            <IoCloseSharp size="2rem" tw="text-white rounded-full bg-white/20" onClick={draw} />
+            <IoCloseSharp size="2rem" tw="text-white rounded-full bg-white/20" onClick={[draw, undefined]} />
           </ItemBox>
         </div>
         <ItemBox disableInteractive>
           <ChatBoxRoot disableInteractive>
-            <img title="Avatar" src="/images/avatar-100x100.jpg" tw="rounded-full" />
+            <img title="Avatar" src="/console/photo" tw="rounded-full" />
           </ChatBoxRoot>
         </ItemBox>
       </div>
