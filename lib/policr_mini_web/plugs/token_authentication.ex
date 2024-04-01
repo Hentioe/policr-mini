@@ -33,7 +33,7 @@ defmodule PolicrMiniWeb.TokenAuthentication do
           |> put_resp_cookie("token", token, max_age: @expired_sec, path: "/admin")
           |> redirect_to("/admin")
 
-        :cookies ->
+        :cookie ->
           assign(conn, :user, user)
       end
     else
@@ -42,7 +42,7 @@ defmodule PolicrMiniWeb.TokenAuthentication do
   end
 
   def call(conn, %{from: :console}) do
-    {token_from, token} = find_token(conn)
+    {token_from, token} = find_token(conn, "id_token")
 
     if user = verify(token) do
       case token_from do
@@ -50,12 +50,12 @@ defmodule PolicrMiniWeb.TokenAuthentication do
           # 将 token 写入 cookie 并重定向到不带参数的 console 页面
           # TODO: 此处不应该直接重定向到后台首页，而是当前页面
           conn
-          |> put_resp_cookie("token", token, max_age: @expired_sec, path: "/console")
-          # 因为要调用 admin 的 API，所以需要设置相同的 cookie 在 /admin 路径下
+          # 由于控制台依赖 admin API，所以需要在 admin 路径下设置 token
           |> put_resp_cookie("token", token, max_age: @expired_sec, path: "/admin")
+          |> put_resp_cookie("id_token", token, max_age: @expired_sec, path: "/console")
           |> redirect_to("/console")
 
-        :cookies ->
+        :cookie ->
           assign(conn, :user, user)
       end
     else
@@ -64,7 +64,7 @@ defmodule PolicrMiniWeb.TokenAuthentication do
     end
   end
 
-  def call(conn, %{from: :api}) do
+  def call(conn, %{from: :admin_api}) do
     {_, token} = find_token(conn)
 
     if user = verify(token) do
@@ -74,13 +74,23 @@ defmodule PolicrMiniWeb.TokenAuthentication do
     end
   end
 
-  @spec find_token(Plug.Conn.t()) :: {:query | :cookies, String.t()} | nil
-  defp find_token(%Plug.Conn{} = conn) do
+  def call(conn, %{from: :console_api}) do
+    {_, token} = find_token(conn, "id_token")
+
+    if user = verify(token) do
+      assign(conn, :user, user)
+    else
+      resp_unauthorized(conn)
+    end
+  end
+
+  @spec find_token(Plug.Conn.t(), String.t()) :: {:query | :cookie, String.t()} | nil
+  defp find_token(%Plug.Conn{} = conn, name \\ "token") do
     token =
       conn
       |> fetch_query_params()
       |> Map.get(:query_params)
-      |> Map.get("token")
+      |> Map.get(name)
 
     token = token && String.trim(token)
 
@@ -91,11 +101,11 @@ defmodule PolicrMiniWeb.TokenAuthentication do
         conn
         |> fetch_cookies()
         |> Map.get(:req_cookies)
-        |> Map.get("token")
+        |> Map.get(name)
 
       token = token && String.trim(token)
 
-      {:cookies, token}
+      {:cookie, token}
     end
   end
 

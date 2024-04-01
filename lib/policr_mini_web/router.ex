@@ -25,12 +25,12 @@ defmodule PolicrMiniWeb.Router do
 
   pipeline :console_api do
     plug :accepts, ["json"]
-    plug PolicrMiniWeb.TokenAuthentication, from: :api
+    plug PolicrMiniWeb.TokenAuthentication, from: :console_api
   end
 
   pipeline :admin_api do
     plug :accepts, ["json"]
-    plug PolicrMiniWeb.TokenAuthentication, from: :api
+    plug PolicrMiniWeb.TokenAuthentication, from: :admin_api
   end
 
   scope "/api", PolicrMiniWeb.API do

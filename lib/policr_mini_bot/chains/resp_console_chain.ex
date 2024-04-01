@@ -101,7 +101,7 @@ defmodule PolicrMiniBot.RespConsoleChain do
         [
           %InlineKeyboardButton{
             text: commands_text("进入控制台"),
-            url: "#{root_url}/console?token=#{token}"
+            url: "#{root_url}/console?id_token=#{token}"
           }
         ]
       ]
