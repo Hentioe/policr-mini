@@ -73,7 +73,13 @@ export default () => {
 
   const statusCounts = (points: Point[], status: string): number[] => {
     if (data.v != null) {
-      return points.filter((p) => p.status === status).map((p) => p.count);
+      return points.filter((p) => p.status === status).map((p) => {
+        if (p.count == null) {
+          return 0;
+        } else {
+          return p.count;
+        }
+      });
     }
 
     return [];

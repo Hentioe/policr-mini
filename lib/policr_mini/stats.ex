@@ -126,7 +126,6 @@ defmodule PolicrMini.Stats do
         |> filter(fn: (r) => r._measurement == "verifications" and r._field == "count" and r.chat_id == "#{chat_id}")
         |> group(columns: ["status", "count"])
         |> aggregateWindow(every: #{every}, fn: sum)
-        |> cumulativeSum()
         |> keep(columns: ["_time", "status", "_value"])
       }
 
