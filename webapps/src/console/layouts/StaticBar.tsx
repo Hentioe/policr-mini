@@ -166,19 +166,25 @@ export default () => {
       </div>
       <div>
         <ItemBox disableInteractive>
-          <IconBox scheme="telegram">
-            <BiLogosTelegram size="1.5rem" />
-          </IconBox>
+          <a rel="noopener" href="https://t.me/policr_changelog" target="_blank">
+            <IconBox scheme="telegram">
+              <BiLogosTelegram size="1.5rem" />
+            </IconBox>
+          </a>
         </ItemBox>
         <ItemBox disableInteractive>
-          <IconBox scheme="blog">
-            <FaBrandsBloggerB size="1.5rem" />
-          </IconBox>
+          <a rel="noopener" href="https://blog.gramlabs.org/" target="_blank">
+            <IconBox scheme="blog">
+              <FaBrandsBloggerB size="1.5rem" />
+            </IconBox>
+          </a>
         </ItemBox>
         <ItemBox disableInteractive>
-          <IconBox scheme="github">
-            <AiFillGithub size="1.5rem" />
-          </IconBox>
+          <a rel="noopener" href="https://github.com/Hentioe/policr-mini" target="_blank">
+            <IconBox scheme="github">
+              <AiFillGithub size="1.5rem" />
+            </IconBox>
+          </a>
         </ItemBox>
         <ItemBox disableInteractive>
           <IconBox scheme="language">
