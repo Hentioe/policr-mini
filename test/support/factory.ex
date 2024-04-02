@@ -74,21 +74,6 @@ defmodule PolicrMini.Factory do
     }
   end
 
-  def build(:statistic) do
-    utc_now_date = Date.utc_today()
-
-    begin_at = DateTime.new!(utc_now_date, ~T[00:00:00], "Etc/UTC")
-    end_at = DateTime.add(begin_at, 3600 * 24 - 1, :second)
-
-    %PolicrMini.Chats.Statistic{
-      verifications_count: 0,
-      languages_top: %{},
-      begin_at: begin_at,
-      end_at: end_at,
-      verification_status: :other
-    }
-  end
-
   def build(:third_party) do
     %PolicrMini.Instances.ThirdParty{
       name: "开发实例",

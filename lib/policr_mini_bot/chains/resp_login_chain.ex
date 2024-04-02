@@ -11,10 +11,12 @@ defmodule PolicrMiniBot.RespLoginChain do
 
   require Logger
 
-  @sync_comment_text commands_text(
-                       "如果您确定自己是群管理员，且群组中的确使用了本机器人。请通知群主或其它管理员在群内使用 %{command} 命令同步最新数据。",
-                       command: "<code>/sync</code>"
-                     )
+  defp sync_comment_text do
+    commands_text(
+      "如果您确定自己是群管理员，且群组中的确使用了本机器人。请通知群主或其它管理员在群内使用 %{command} 命令同步最新数据。",
+      command: "<code>/sync</code>"
+    )
+  end
 
   def handle(%{chat: %{type: "private"}} = message, context) do
     %{chat: %{id: chat_id}, from: %{id: user_id}} = message
@@ -28,7 +30,8 @@ defmodule PolicrMiniBot.RespLoginChain do
           day_count: 1
         )
 
-      tcomment = commands_text("安全小贴士：不可将按钮中的链接或登录令牌分享于他人，除非您想将控制权短暂的共享于他。")
+      safe_comment = commands_text("安全小贴士：不可将按钮中的链接或登录令牌分享于他人，除非您想将控制权短暂的共享于他。")
+      console_comment = commands_text("使用 /console 命令，可体验全新的功能管理页面！")
 
       text = """
       #{theader}
@@ -37,7 +40,8 @@ defmodule PolicrMiniBot.RespLoginChain do
 
       #{tfooter}
 
-      <i>#{tcomment}</i>
+      <i>#{safe_comment}</i>
+      <i>#{console_comment}</i>
       """
 
       reply_markup = make_markup(user_id, token)
@@ -55,7 +59,7 @@ defmodule PolicrMiniBot.RespLoginChain do
       {:error, :nonadmin} ->
         theader = commands_text("未找到和您相关的权限记录")
 
-        tcomment = @sync_comment_text
+        tcomment = sync_comment_text()
 
         text = """
         <b>#{theader}</b>
@@ -63,7 +67,7 @@ defmodule PolicrMiniBot.RespLoginChain do
         <i>#{tcomment}</i>
         """
 
-        # 由于依赖 `@sync_comment_text` 此处只能以 HTML 发送
+        # 由于依赖 `sync_comment_text()` 此处只能以 HTML 发送
         send_text(chat_id, text, parse_mode: "HTML", logging: true)
 
         {:ok, context}
@@ -71,7 +75,7 @@ defmodule PolicrMiniBot.RespLoginChain do
       {:error, :notfound} ->
         theader = commands_text("未找到和您相关的用户记录")
 
-        tcomment = @sync_comment_text
+        tcomment = sync_comment_text()
 
         text = """
         <b>#{theader}</b>
@@ -79,7 +83,7 @@ defmodule PolicrMiniBot.RespLoginChain do
         <i>#{tcomment}</i>
         """
 
-        # 由于依赖 `@sync_comment_text` 此处只能以 HTML 发送
+        # 由于依赖 `sync_comment_text()` 此处只能以 HTML 发送
         send_text(chat_id, text, parse_mode: "HTML", logging: true)
 
         {:ok, context}

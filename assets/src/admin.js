@@ -16,7 +16,6 @@ import readonlyBgSvg from "../static/svg/readonly_bg.svg";
 import { getFetcher } from "./admin/helper";
 import { Sidebar, Chats } from "./admin/components";
 import {
-  StatisticsPage,
   SchemePage,
   TemplatePage,
   VerificationsPage,
@@ -78,10 +77,6 @@ const App = () => {
                 </div>
                 <div tw="w-full min-h-screen flex flex-col md:w-8/12 xl:w-6/12 border-solid border-0 border-l border-r border-gray-300">
                   <Routes>
-                    <Route
-                      path="/admin/chats/:id/statistics"
-                      element={<StatisticsPage />}
-                    />
                     <Route
                       path="/admin/chats/:id/scheme"
                       element={<SchemePage />}

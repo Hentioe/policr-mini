@@ -48,16 +48,15 @@ defmodule PolicrMiniBot.Runner.ExpiredFixer do
       chat_id: v.chat_id
     )
 
-    # 写入验证数据点（其它）
-    Stats.write_verf(v.chat_id, v.target_user_id, :other, v.source)
+    case Chats.update_verification(v, %{status: :expired}) do
+      {:ok, _} ->
+        # 写入验证数据点（其它）
+        Stats.write_verf(v.chat_id, v.target_user_id, :other, v.source)
 
-    with {:ok, _} <- Chats.update_verification(v, %{status: :expired}),
-         # TODO: 将统计自增和更新状态放在同一个事务中（待删除，被时序数据替代）。
-         {:ok, _} <- Chats.increment_statistic(v.chat_id, v.target_user_language_code, :other) do
-      user_processing(v)
+        handle_user(v)
 
-      :ok
-    else
+        :ok
+
       {:error, reason} ->
         # 更新过期验证失败
         Logger.error("Update expired verification failed: #{inspect(reason: reason)}")
@@ -66,16 +65,16 @@ defmodule PolicrMiniBot.Runner.ExpiredFixer do
     end
   end
 
-  @spec user_processing(Verification.t()) :: :ok
+  @spec handle_user(Verification.t()) :: :ok
   # 来源为 `:join_request` 的验证，拒绝加入请求
-  defp user_processing(%{source: :join_request} = v) do
+  defp handle_user(%{source: :join_request} = v) do
     async_run(fn -> Telegex.decline_chat_join_request(v.chat_id, v.target_user_id) end)
 
     :ok
   end
 
   # 来源为 `:joined` 的验证，忽略处理（因为权限已被限制）
-  defp user_processing(%{source: :joined} = _v) do
+  defp handle_user(%{source: :joined} = _v) do
     :ok
   end
 

@@ -1,4 +1,3 @@
-import StatisticsPage from "./pages/Statistics";
 import SchemePage from "./pages/Scheme";
 import TemplatePage from "./pages/Template";
 import VerificationsPage from "./pages/Verifications";
@@ -15,7 +14,6 @@ import SysSponsorshipPage from "./pages/SysSponsorship";
 import SysProfilePage from "./pages/SysProfile";
 
 export {
-  StatisticsPage,
   SchemePage,
   TemplatePage,
   VerificationsPage,

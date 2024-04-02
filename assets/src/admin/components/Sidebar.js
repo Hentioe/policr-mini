@@ -4,7 +4,6 @@ import { useLocation, Link as RouteLink } from "react-router-dom";
 import tw, { styled } from "twin.macro";
 import MoonLoader from "react-spinners/MoonLoader";
 import Switch from "react-switch";
-import useSWR from "swr";
 
 import {
   camelizeJson,
@@ -97,39 +96,6 @@ const ArrowUpIcon = () => (
   </svg>
 );
 
-const passedCount = (dayStatistic) => {
-  if (dayStatistic.passedStatistic == null) return 0;
-
-  return dayStatistic.passedStatistic.verificationsCount;
-};
-
-const notPassedCount = (dayStatistic) => {
-  let timeoutCount = 0;
-  let wrongedCount = 0;
-
-  if (dayStatistic.timeoutStatistic != null) {
-    timeoutCount = dayStatistic.timeoutStatistic.verificationsCount;
-  }
-  if (dayStatistic.wrongedStatistic != null) {
-    wrongedCount = dayStatistic.wrongedStatistic.verificationsCount;
-  }
-
-  return timeoutCount + wrongedCount;
-};
-
-const rate = (count1, count2) => {
-  if (count1 == count2) {
-    return ["--", 0.0];
-  } else if (count2 == 0) {
-    return ["rise", 100.0];
-  } else {
-    const r = parseFloat((((count1 - count2) / count2) * 100).toFixed(2));
-
-    if (r > 0) return ["rise", r];
-    else return ["decline", -r];
-  }
-};
-
 const changeTakeover = async ({ chatId, isTakeOver }) => {
   const endpoint = `/admin/api/chats/${chatId}/takeover?value=${isTakeOver}`;
   return fetch(endpoint, {
@@ -140,20 +106,11 @@ const changeTakeover = async ({ chatId, isTakeOver }) => {
   }).then((r) => camelizeJson(r));
 };
 
-const makeTodayStatisticsEndpoint = (chat_id) =>
-  `/admin/api/statistics/find_recently?chat_id=${chat_id}`;
-
 export default () => {
   const location = useLocation();
   const dispatch = useDispatch();
 
   const chatsState = useSelector((state) => state.chats);
-
-  const { data: recentStatisticsData, error } = useSWR(
-    chatsState && chatsState.isLoaded && chatsState.selected
-      ? makeTodayStatisticsEndpoint(chatsState.selected)
-      : null
-  );
 
   const [isTakeOver, setIsTakeOver] = useState(false);
   const [isOnOwnerMenu, setIsOnOwnerMenu] = useState(
@@ -205,22 +162,6 @@ export default () => {
     setIsOnOwnerMenu(isSysLink({ path: location.pathname }));
   }, [location]);
 
-  useEffect(() => {
-    if (recentStatisticsData) {
-      const todayPassedCount = passedCount(recentStatisticsData.today);
-      const yesterdayPassedCount = passedCount(recentStatisticsData.yesterday);
-
-      setPassedRate(rate(todayPassedCount, yesterdayPassedCount));
-
-      const todayNotPassedCount = notPassedCount(recentStatisticsData.today);
-      const yesterdayNotPassedCount = notPassedCount(
-        recentStatisticsData.yesterday
-      );
-
-      setNotPassedRate(rate(todayNotPassedCount, yesterdayNotPassedCount));
-    }
-  }, [recentStatisticsData]);
-
   return (
     <nav>
       <MenuBox
@@ -254,11 +195,6 @@ export default () => {
             </svg>
           </a>
         </div>
-        {/* <NavItem
-          title="数据统计"
-          href={`/admin/chats/${chatsState.selected}/statistics`}
-          selected={isSelect("statistics", location.pathname)}
-        /> */}
         <NavItem
           title="方案定制"
           href={`/admin/chats/${chatsState.selected}/scheme`}
@@ -300,61 +236,7 @@ export default () => {
             <div tw="pt-3 px-6" style={{ marginLeft: 2, marginRight: 2 }}>
               <span tw="xl:text-lg text-gray-600">数据统计</span>
               <div tw="flex items-center justify-between">
-                <div tw="flex flex-col items-center">
-                  <span tw="text-xs lg:text-sm text-gray-500 mt-2">
-                    今日验证通过
-                  </span>
-                  <span tw="text-sm font-bold mt-1 tracking-wide">
-                    {recentStatisticsData == undefined
-                      ? "计算中"
-                      : passedCount(recentStatisticsData.today)}
-                  </span>
-                  <div tw="mt-2 text-xs lg:text-sm">
-                    <span tw="text-gray-600">较昨日</span>
-                    {["--", "rise"].includes(passedRate[0]) ? (
-                      <span tw="text-green-700">
-                        {" "}
-                        <ArrowUpIcon />{" "}
-                      </span>
-                    ) : (
-                      <span tw="text-red-700">
-                        {" "}
-                        <ArrowDownIcon />{" "}
-                      </span>
-                    )}
-                    <span tw="text-black font-bold tracking-wide">
-                      {Math.ceil(passedRate[1])}%
-                    </span>
-                  </div>
-                </div>
-                <div tw="bg-gray-300 h-10" style={{ width: 1 }}></div>
-                <div tw="flex flex-col items-center">
-                  <span tw="text-xs lg:text-sm text-gray-500 mt-2">
-                    今日验证失败
-                  </span>
-                  <span tw="text-sm font-bold mt-1 tracking-wider">
-                    {recentStatisticsData == undefined
-                      ? "计算中"
-                      : notPassedCount(recentStatisticsData.today)}
-                  </span>
-                  <div tw="mt-2 text-xs lg:text-sm">
-                    <span tw="text-gray-600">较昨日</span>
-                    {["--", "decline"].includes(notPassedRate[0]) ? (
-                      <span tw="text-green-700">
-                        {" "}
-                        <ArrowDownIcon />{" "}
-                      </span>
-                    ) : (
-                      <span tw="text-red-700">
-                        {" "}
-                        <ArrowUpIcon />{" "}
-                      </span>
-                    )}
-                    <span tw="text-black font-bold tracking-wide">
-                      {Math.ceil(notPassedRate[1])}%
-                    </span>
-                  </div>
-                </div>
+                <p tw="text-gray-500/80 text-sm">私聊 <span>/console</span> 命令，从全新的控制台页面查看完整统计。</p>
               </div>
             </div>
             <div

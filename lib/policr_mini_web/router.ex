@@ -76,8 +76,6 @@ defmodule PolicrMiniWeb.Router do
     delete "/permissions/:id/withdraw", PermissionController, :withdraw
     put "/permissions/chats/:chat_id/sync", PermissionController, :sync
 
-    get "/statistics/find_recently", StatisticController, :find_recently
-
     put "/verifications/:id/kill", VerificationController, :kill
 
     get "/third_parties", ThirdPartyController, :index

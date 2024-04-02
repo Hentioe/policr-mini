@@ -140,10 +140,6 @@ defmodule PolicrMiniBot.CallAnswerChain do
   @spec handle_correct_answer(Verification.t(), integer, TgUser.t()) ::
           {:ok, Verification.t()} | {:error, any()}
   def handle_correct_answer(v, message_id, from_user) do
-    # 自增统计数据（通过）
-    # TODO: 待删除（等待基于时序数据的统计功能启用）
-    async_run(fn -> Chats.increment_statistic(v.chat_id, v.target_user_language_code, :passed) end)
-
     # 写入验证数据点（通过）
     Stats.write_verf(v.chat_id, v.target_user_id, :passed, v.source)
 
@@ -266,12 +262,6 @@ defmodule PolicrMiniBot.CallAnswerChain do
   def handle_wrong_answer(v, scheme, message_id) do
     # 获取方案中的配置项
     wkmethod = scheme.wrong_killing_method || default!(:wkmethod)
-    # 自增统计数据（错误）
-    # TODO: 待删除（被时序数据替代）
-    async_run(fn ->
-      Chats.increment_statistic(v.chat_id, v.target_user_language_code, :wronged)
-    end)
-
     # 写入验证数据点（错误）
     Stats.write_verf(v.chat_id, v.target_user_id, :rejected, v.source)
 

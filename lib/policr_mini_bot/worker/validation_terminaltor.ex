@@ -50,9 +50,6 @@ defmodule PolicrMiniBot.Worker.ValidationTerminator do
     v = Repo.reload(v)
     # 为等待状态才实施操作
     if v.status == :waiting do
-      # 自增统计数据（超时）
-      # TODO: 待删除（被时序数据替代）
-      Chats.increment_statistic(v.chat_id, v.target_user_language_code, :timeout)
       # 写入验证数据点（超时）
       Stats.write_verf(v.chat_id, v.target_user_id, :timeout, v.source)
 
@@ -109,14 +106,6 @@ defmodule PolicrMiniBot.Worker.ValidationTerminator do
 
       # 添加操作记录
       create_operation(veri, kmeth, :admin)
-
-      # 添加统计（其它）
-      Chats.increment_statistic(
-        veri.chat_id,
-        veri.target_user_language_code,
-        :other
-      )
-
       # 写入验证数据点（其它）
       Stats.write_verf(v.chat_id, v.target_user_id, :other, v.source)
 
