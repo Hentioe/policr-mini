@@ -141,7 +141,7 @@ defmodule PolicrMiniBot.CallAnswerChain do
           {:ok, Verification.t()} | {:error, any()}
   def handle_correct_answer(v, message_id, from_user) do
     # 写入验证数据点（通过）
-    Stats.write_verf(v.chat_id, v.target_user_id, :passed, v.source)
+    Stats.write_verf(v.chat_id, v.target_user_id, v.target_user_language_code, :passed, v.source)
 
     # 计数器自增（通过的总数）
     Counter.increment(:verification_passed_total)
@@ -263,7 +263,13 @@ defmodule PolicrMiniBot.CallAnswerChain do
     # 获取方案中的配置项
     wkmethod = scheme.wrong_killing_method || default!(:wkmethod)
     # 写入验证数据点（错误）
-    Stats.write_verf(v.chat_id, v.target_user_id, :rejected, v.source)
+    Stats.write_verf(
+      v.chat_id,
+      v.target_user_id,
+      v.target_user_language_code,
+      :rejected,
+      v.source
+    )
 
     case Chats.update_verification(v, %{status: :wronged}) do
       {:ok, v} ->

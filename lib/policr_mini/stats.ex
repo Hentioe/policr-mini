@@ -50,8 +50,8 @@ defmodule PolicrMini.Stats do
     @type verf_status :: :passed | :rejected | :timeout | :other
     @type verf_source :: :joined | :join_request
 
-    @spec from_verf(integer, integer, verf_status, verf_source) :: __MODULE__.t()
-    def from_verf(chat_id, user_id, status, source) do
+    @spec from_verf(integer, integer, String.t(), verf_status, verf_source) :: __MODULE__.t()
+    def from_verf(chat_id, user_id, user_language_code, status, source) do
       %__MODULE__{
         measurement: "verifications",
         fields: %{
@@ -60,6 +60,7 @@ defmodule PolicrMini.Stats do
         tags: %{
           chat_id: chat_id,
           user_id: user_id,
+          user_language_code: user_language_code,
           status: to_string(status),
           source: to_string(source)
         },
@@ -94,12 +95,13 @@ defmodule PolicrMini.Stats do
   @spec write_verf(
           integer,
           integer,
+          String.t(),
           WritePoint.verf_status(),
           WritePoint.verf_source()
         ) ::
           write_result
-  def write_verf(chat_id, user_id, status, source) do
-    point = WritePoint.from_verf(chat_id, user_id, status, source)
+  def write_verf(chat_id, user_id, user_language_code, status, source) do
+    point = WritePoint.from_verf(chat_id, user_id, user_language_code, status, source)
 
     write(point)
   end

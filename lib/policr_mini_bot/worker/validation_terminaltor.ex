@@ -51,7 +51,13 @@ defmodule PolicrMiniBot.Worker.ValidationTerminator do
     # 为等待状态才实施操作
     if v.status == :waiting do
       # 写入验证数据点（超时）
-      Stats.write_verf(v.chat_id, v.target_user_id, :timeout, v.source)
+      Stats.write_verf(
+        v.chat_id,
+        v.target_user_id,
+        v.target_user_language_code,
+        :timeout,
+        v.source
+      )
 
       # 添加操作记录
       kmethod = scheme.timeout_killing_method || default!(:tkmethod)
@@ -107,7 +113,7 @@ defmodule PolicrMiniBot.Worker.ValidationTerminator do
       # 添加操作记录
       create_operation(veri, kmeth, :admin)
       # 写入验证数据点（其它）
-      Stats.write_verf(v.chat_id, v.target_user_id, :other, v.source)
+      Stats.write_verf(v.chat_id, v.target_user_id, v.target_user_language_code, :other, v.source)
 
       # 更新状态为超时
       Chats.update_verification(veri, %{status: status})
