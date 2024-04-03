@@ -73,7 +73,15 @@ const IconBox = styled(ChatBoxRoot)((ps: IconSchemeProp) => [
   ps.scheme === "telegram" && tw`hover:bg-sky-400 text-sky-400 hover:text-white hover:rounded-2xl `,
 ]);
 
-// 页面除此载入时的 URL
+function saveLastChatId(chatId: number) {
+  localStorage.setItem("lastChatId", chatId.toString());
+}
+
+function lastChatId(): string | null {
+  return localStorage.getItem("lastChatId");
+}
+
+// 页面初次载入时的 URL
 const loadedUrlPath = window.location.pathname;
 
 type ChatsRepo = {
@@ -93,24 +101,23 @@ export default () => {
       const chats = data.v.chats.map((c: Chat) => ({ id: c.id, title: c.title, description: c.description }));
       // 装载到全局 chats
       loadChats(chats);
-      // 解析 loadedUrlPath 中的 chatId
-      const chatId = loadedUrlPath.match(/\/console\/(-\d+)/)?.[1];
+      // 解析 loadedUrlPath 中的 chatId 和 pageId
+      const chatId = loadedUrlPath.match(/\/console\/(-\d+)/)?.[1] || lastChatId();
       const pageId = loadedUrlPath.match(/\/console\/-\d+\/([^/]+)/)?.[1];
-      if (chatId != null) {
-        // 如果 chatId 存在，设置为当前群聊
-        const chat = chats.find((c) => c.id.toString() === chatId);
-        if (chat != null) {
-          setCurrentChat(chat);
+      // 查找 chatId 对应的 chat
+      const chat = chats.find((c) => c.id.toString() === chatId);
+      console.log(chat);
+      if (chat != null) {
+        // 如果 chat 存在，设置为当前群聊
+        setCurrentChat(chat);
 
-          if (pageId == null) {
-            // 如果路径中不存在 pageId，主动导航到缺省页面
-            // TODO: 需进一步判断 pageId 是否有效
-            navigate(`/${chat.id}`);
-          }
+        if (pageId == null) {
+          // 如果路径中不存在 pageId，主动导航到缺省页面
+          // TODO: 需进一步判断 pageId 是否有效
+          navigate(`/${chat.id}`);
         }
       } else {
-        // 如果 chatId 不存在，设置第一个 chat 为 currentChat
-        // TODO: 如果不存在，自动导航到上次访问的 chat
+        // 如果 chat 不存在，设置第一个 chat 为 currentChat
         if (chats.length > 0) {
           const c = chats[0];
           setCurrentChat(c);
@@ -126,6 +133,8 @@ export default () => {
     const handleSelect = () => {
       setCurrentChat(props.chat);
       navigate(`/${props.chat.id}`);
+      // 保存访问的 chatId 到本地
+      saveLastChatId(props.chat.id);
     };
 
     return (
