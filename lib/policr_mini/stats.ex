@@ -1,7 +1,8 @@
 defmodule PolicrMini.Stats do
   @moduledoc false
 
-  alias PolicrMini.InfluxConn
+  alias PolicrMini.{Chats, InfluxConn}
+  alias PolicrMini.Chats.Verification
 
   require Logger
 
@@ -89,9 +90,17 @@ defmodule PolicrMini.Stats do
     end
   end
 
+  def write(v) when is_struct(v, Verification) do
+    point =
+      WritePoint.from_verf(v.chat_id, v.user_id, v.target_user_language_code, v.status, v.source)
+
+    write(point)
+  end
+
   @doc """
   写入一个验证数据点。
   """
+  @deprecated "Use `write/1` instead."
   @spec write_verf(
           integer,
           integer,
@@ -148,11 +157,48 @@ defmodule PolicrMini.Stats do
     end
   end
 
-  def delete_all do
+  @doc """
+  重新生成最近一周。
+  """
+  @spec regen_recent_week(integer) :: :ok
+  def regen_recent_week(chat_id) do
+    dtart = DateTime.utc_now()
+    dend = DateTime.add(dtart, -7, :day)
+
+    regen(chat_id, dtart, dend)
+  end
+
+  @doc """
+  从指定时间区间重新生成统计数据。
+  """
+  @spec regen(integer, DateTime.t(), DateTime.t()) :: :ok
+  def regen(chat_id, dstart, dend) do
+    # 清空此时间段的时序数据
+    delete_by_time_range(chat_id, dstart, dend)
+    # 从此时间段的验证记录中重新生成时序数据
+    # todo: 加上时区
+    verfs = Chats.time_range_verfs(chat_id, dstart, dend)
+
+    # todo: 批量写入时序数据
+    verfs
+    |> Stream.each(&write/1)
+    |> Stream.run()
+
+    :ok
+  end
+
+  @spec delete_by_time_range(integer, DateTime.t(), DateTime.t()) :: :ok
+  def delete_by_time_range(chat_id, dstart, dend) do
     PolicrMini.InfluxConn.delete(%{
-      start: DateTime.to_iso8601(~U[1970-01-01T00:00:00.00Z]),
-      stop: DateTime.to_iso8601(DateTime.utc_now()),
-      predicate: ~S(_measurement="verifications")
+      start: DateTime.to_iso8601(dstart),
+      stop: DateTime.to_iso8601(dend),
+      predicate: ~s(_measurement="verifications" and chat_id="#{chat_id}")
     })
+
+    :ok
+  end
+
+  def clear_all(chat_id) do
+    delete_by_time_range(chat_id, ~U[1970-01-01T00:00:00.00Z], DateTime.utc_now())
   end
 end

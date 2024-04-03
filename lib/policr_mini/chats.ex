@@ -494,4 +494,18 @@ defmodule PolicrMini.Chats do
       []
     end
   end
+
+  @doc """
+  获取指定时间区间内的验证列表，不包含正在进行的验证。
+  """
+  @spec time_range_verfs(integer, DateTime.t(), DateTime.t()) :: [Verification.t()]
+  def time_range_verfs(chat_id, dstart, dend) do
+    from(v in Verification,
+      where: v.chat_id == ^chat_id,
+      where: v.inserted_at >= ^dstart,
+      where: v.updated_at <= ^dend,
+      where: v.status != :waiting
+    )
+    |> Repo.all()
+  end
 end
