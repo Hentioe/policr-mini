@@ -68,7 +68,6 @@ export default () => {
   });
 
   createEffect(() => {
-    console.log(empty());
     if (data.v != null) {
       setMaxCount(findMaxCount(data.v.points));
 
