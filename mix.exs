@@ -76,6 +76,7 @@ defmodule PolicrMini.MixProject do
       {:unzip, "~> 0.11"},
       {:mime, "~> 2.0"},
       {:instream, "~> 2.2"},
+      {:figlet, git: "https://github.com/Hentioe/figlet", branch: "compatible_1.16"},
       # 此库依赖 Rust
       {:img_grider, git: "https://github.com/gramlabs-oss/img_grider.git"}
     ]
