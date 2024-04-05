@@ -106,7 +106,6 @@ export default () => {
       const pageId = loadedUrlPath.match(/\/console\/-\d+\/([^/]+)/)?.[1];
       // 查找 chatId 对应的 chat
       const chat = chats.find((c) => c.id.toString() === chatId);
-      console.log(chat);
       if (chat != null) {
         // 如果 chat 存在，设置为当前群聊
         setCurrentChat(chat);

@@ -7,6 +7,9 @@ const Root = styled.div((ps: { blur: boolean }) => [
   ps.blur && tw`blur`,
 ]);
 
+const GESTURE_DISTANCE = 150;
+const MIX_GESTURE_ANGLE = 25;
+
 // 根据起始坐标和当前坐标判断是否为抽屉手势
 function isDrawerGesture(startX: number, startY: number, currentX: number, currentY: number) {
   let angle = (Math.atan2(currentY - startY, currentX - startX) * 180) / Math.PI;
@@ -19,7 +22,7 @@ function isDrawerGesture(startX: number, startY: number, currentX: number, curre
     angle = 180 - Math.abs(angle);
   }
 
-  return angle >= 0 && angle <= 25;
+  return angle >= 0 && angle <= MIX_GESTURE_ANGLE;
 }
 
 export default (props: { children: JSXElement }) => {
@@ -64,13 +67,13 @@ export default (props: { children: JSXElement }) => {
 
   const needOut = (currentX: number) => {
     if (startX != null && !store.drawerIsOut) {
-      return currentX - startX > 50;
+      return currentX - startX > GESTURE_DISTANCE;
     }
   };
 
   const needIn = (currentX: number) => {
     if (startX != null && store.drawerIsOut) {
-      return (currentX <= 0 && startX > 0) || startX - currentX > 50;
+      return (currentX <= 0 && startX > 0) || startX - currentX > GESTURE_DISTANCE;
     }
   };
 
