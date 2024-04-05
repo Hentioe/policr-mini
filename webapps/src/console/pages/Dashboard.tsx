@@ -115,7 +115,7 @@ export default () => {
 
   const statsOptions: () => ApexOptions = () => {
     return {
-      chart: { toolbar: { show: false } },
+      chart: { toolbar: { show: false }, zoom: { enabled: false } },
       xaxis: {
         type: "datetime",
         categories: statsCategories(),
@@ -158,7 +158,7 @@ export default () => {
       <div tw="h-full bg-white/30 rounded-xl flex flex-col">
         <h2
           style={{ color: tinycolor(props.baseColor).darken(40) }}
-          tw="py-2 lg:py-4 text-center font-medium border-b border-black/20"
+          tw="py-2 lg:py-4 text-center font-medium border-b border-black/10"
         >
           {props.title}
         </h2>
