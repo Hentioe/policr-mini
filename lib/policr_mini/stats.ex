@@ -50,29 +50,11 @@ defmodule PolicrMini.Stats do
 
     @type verf_status :: :passed | :rejected | :timeout | :other
     @type verf_source :: :joined | :join_request
-
-    @spec from_verf(integer, integer, String.t(), verf_status, verf_source) :: __MODULE__.t()
-    def from_verf(chat_id, user_id, user_language_code, status, source) do
-      %__MODULE__{
-        measurement: "verifications",
-        fields: %{
-          count: 1
-        },
-        tags: %{
-          chat_id: chat_id,
-          user_id: user_id,
-          user_language_code: user_language_code,
-          status: to_string(status),
-          source: to_string(source)
-        },
-        timestamp: DateTime.utc_now()
-      }
-    end
   end
 
   @type write_result :: :ok | {:error, FluxError.t()}
 
-  @spec write(WritePoint.t()) :: write_result
+  @spec write(any) :: write_result
   def write(point) when is_struct(point, WritePoint) do
     point = %{
       measurement: point.measurement,
@@ -90,27 +72,30 @@ defmodule PolicrMini.Stats do
     end
   end
 
+  # 写入一个验证数据点。
   def write(v) when is_struct(v, Verification) do
-    point =
-      WritePoint.from_verf(v.chat_id, v.user_id, v.target_user_language_code, v.status, v.source)
+    status =
+      case v.status do
+        :passed -> :passed
+        :wronged -> :rejected
+        :timeout -> :timeout
+        _ -> :other
+      end
 
-    write(point)
-  end
-
-  @doc """
-  写入一个验证数据点。
-  """
-  @deprecated "Use `write/1` instead."
-  @spec write_verf(
-          integer,
-          integer,
-          String.t(),
-          WritePoint.verf_status(),
-          WritePoint.verf_source()
-        ) ::
-          write_result
-  def write_verf(chat_id, user_id, user_language_code, status, source) do
-    point = WritePoint.from_verf(chat_id, user_id, user_language_code, status, source)
+    point = %WritePoint{
+      measurement: "verifications",
+      fields: %{
+        count: 1
+      },
+      tags: %{
+        chat_id: v.chat_id,
+        user_id: v.user_id,
+        user_language_code: v.user_language_code,
+        status: to_string(status),
+        source: to_string(v.source)
+      },
+      timestamp: DateTime.utc_now()
+    }
 
     write(point)
   end
