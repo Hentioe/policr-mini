@@ -89,8 +89,8 @@ defmodule PolicrMini.Stats do
       },
       tags: %{
         chat_id: v.chat_id,
-        user_id: v.user_id,
-        user_language_code: v.user_language_code,
+        user_id: v.target_user_id,
+        user_language_code: v.target_user_language_code,
         status: to_string(status),
         source: to_string(v.source)
       },
