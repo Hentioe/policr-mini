@@ -1,4 +1,4 @@
-defmodule PolicrMiniWeb.TgAssetsCacher do
+defmodule PolicrMiniWeb.TgAssetsFetcher do
   @moduledoc false
 
   require Logger
@@ -15,8 +15,8 @@ defmodule PolicrMiniWeb.TgAssetsCacher do
   ## 参数：
   - `filed_id`: 文件 ID。如果值为 `nil` 则直接返回后备图片。
   """
-  @spec get_photo_asset(binary | nil, photo_asset_opts) :: binary
-  def get_photo_asset(file_id, opts \\ []) do
+  @spec get_photo(binary | nil, photo_asset_opts) :: binary
+  def get_photo(file_id, opts \\ []) do
     fallback_photo = Keyword.get(opts, :fallback, @fallback_photo)
 
     if file_id do
@@ -46,7 +46,7 @@ defmodule PolicrMiniWeb.TgAssetsCacher do
       {:ok, %{file_path: file_path}} ->
         relative_path =
           if String.starts_with?(file_path, "/") do
-            file_path |> String.slice(1..-1)
+            String.slice(file_path, 1..-1//1)
           else
             file_path
           end
@@ -70,7 +70,7 @@ defmodule PolicrMiniWeb.TgAssetsCacher do
     fetch_fun = fn %{headers: headers, body: body} ->
       if etag = Enum.find(headers, etag_finder) do
         filename =
-          "photo_cache_" <> (etag |> elem(1) |> String.slice(1..-2)) <> Path.extname(file_url)
+          "photo_cache_" <> (etag |> elem(1) |> String.slice(1..-2//1)) <> Path.extname(file_url)
 
         fetch_from_local(filename, body, fallback_photo)
       else

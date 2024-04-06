@@ -1,8 +1,4 @@
 defmodule PolicrMiniWeb.Admin.API.ChatController do
-  @moduledoc """
-  和 Chat 相关的后台 API 控制器。
-  """
-
   use PolicrMiniWeb, :controller
 
   alias PolicrMini.{
@@ -13,7 +9,7 @@ defmodule PolicrMiniWeb.Admin.API.ChatController do
   }
 
   alias PolicrMini.Instances.Chat
-  alias PolicrMiniWeb.TgAssetsCacher
+  alias PolicrMiniWeb.TgAssetsFetcher
 
   import PolicrMiniWeb.Helper
   import PolicrMiniBot.Helper
@@ -31,7 +27,7 @@ defmodule PolicrMiniWeb.Admin.API.ChatController do
   def photo(conn, %{"id" => id}) do
     with {:ok, _} <- check_permissions(conn, id),
          {:ok, chat} <- Chat.get(id) do
-      Phoenix.Controller.redirect(conn, to: TgAssetsCacher.get_photo_asset(chat.small_photo_id))
+      Phoenix.Controller.redirect(conn, to: TgAssetsFetcher.get_photo(chat.small_photo_id))
     end
   end
 

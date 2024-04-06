@@ -1,7 +1,7 @@
 defmodule PolicrMiniWeb.Console.PageController do
   use PolicrMiniWeb, :controller
 
-  alias PolicrMiniWeb.TgAssetsCacher
+  alias PolicrMiniWeb.TgAssetsFetcher
 
   def index(%{assigns: %{user: user}} = conn, _params) do
     owner_id = Application.get_env(:policr_mini, PolicrMiniBot)[:owner_id]
@@ -21,7 +21,7 @@ defmodule PolicrMiniWeb.Console.PageController do
     if user.photo_id == nil || user.photo_id == "unset" do
       Phoenix.Controller.redirect(conn, to: "/images/avatar-100x100.jpg")
     else
-      Phoenix.Controller.redirect(conn, to: TgAssetsCacher.get_photo_asset(user.photo_id))
+      Phoenix.Controller.redirect(conn, to: TgAssetsFetcher.get_photo(user.photo_id))
     end
   end
 

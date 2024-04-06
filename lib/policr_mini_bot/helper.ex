@@ -288,7 +288,7 @@ defmodule PolicrMiniBot.Helper do
 
   # 3-5 个字符，遮挡除首尾外的中间字符（经典）。
   defp _mosaic_name(name, %{len: len, method: :classic}) when len >= 3 and len <= 5 do
-    String.slice(name, 0..0) <> String.duplicate("░", len - 2) <> String.slice(name, -1..-1)
+    String.slice(name, 0..0) <> String.duplicate("░", len - 2) <> String.slice(name, -1..-1//1)
   end
 
   # 3-5 个字符，遮挡除首尾外的中间字符（Spoiler）。
