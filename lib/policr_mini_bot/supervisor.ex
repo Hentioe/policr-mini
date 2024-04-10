@@ -3,8 +3,16 @@ defmodule PolicrMiniBot.Supervisor do
 
   use Supervisor
 
-  def start_link(_opts) do
-    Supervisor.start_link(__MODULE__, :ok, name: __MODULE__)
+  require Logger
+
+  def start_link(opts) do
+    if Keyword.get(opts, :serve, false) do
+      Supervisor.start_link(__MODULE__, :ok, name: __MODULE__)
+    else
+      Logger.warning("Bot is not serving")
+
+      :ignore
+    end
   end
 
   @impl true

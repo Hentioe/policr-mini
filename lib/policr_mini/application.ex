@@ -24,28 +24,29 @@ defmodule PolicrMini.Application do
 
     children =
       [
-        {Finch, name: PolicrMini.Finch}
+        # Start the Ecto repository
+        PolicrMini.Repo,
+        # Start the runtime migrator
+        {PolicrMini.RuntimeMigrator, serve: runtime_migrate?},
+        # Start the InfluxDB connection
+        PolicrMini.InfluxConn,
+        # Start the Finch
+        {Finch, name: PolicrMini.Finch},
+        # Start the Cacher
+        PolicrMini.Cache,
+        # Start the Counter
+        PolicrMini.Counter,
+        # Start the defaults server
+        PolicrMini.DefaultsServer,
+        # Start the Web telemetry
+        PolicrMiniWeb.Telemetry,
+        # Start the PubSub system
+        {Phoenix.PubSub, name: PolicrMini.PubSub},
+        # Start the Endpoint (http/https)
+        PolicrMiniWeb.Endpoint,
+        # Start the Telegram bot
+        {PolicrMiniBot.Supervisor, serve: tg_serve?}
       ]
-      # Start the Ecto repository
-      |> serve_children(PolicrMini.Repo, true)
-      # Start the InfluxDB connection
-      |> serve_children(PolicrMini.InfluxConn, true)
-      # Start the Cacher
-      |> serve_children(PolicrMini.Cache, true)
-      # Start the runtime migrator
-      |> serve_children(PolicrMini.DBServer, runtime_migrate?)
-      # Start the Counter
-      |> serve_children(PolicrMini.Counter, true)
-      # Start the defaults server
-      |> serve_children(PolicrMini.DefaultsServer, true)
-      # Start the Telemetry supervisor
-      |> serve_children(PolicrMiniWeb.Telemetry, true)
-      # Start the PubSub system
-      |> serve_children({Phoenix.PubSub, name: PolicrMini.PubSub}, true)
-      # Start the Endpoint (http/https)
-      |> serve_children(PolicrMiniWeb.Endpoint, true)
-      # Start the Telegram bot
-      |> serve_children(PolicrMiniBot.Supervisor, tg_serve?)
 
     # See https://hexdocs.pm/elixir/Supervisor.html
     # for other strategies and supported options
@@ -58,15 +59,6 @@ defmodule PolicrMini.Application do
   def config_change(changed, _new, removed) do
     PolicrMiniWeb.Endpoint.config_change(changed, removed)
     :ok
-  end
-
-  defp serve_children(children, child, server?) do
-    children ++
-      if server? do
-        [child]
-      else
-        []
-      end
   end
 
   defp print_buildtime_runtime_info do
