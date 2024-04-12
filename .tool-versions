@@ -1,4 +1,3 @@
 erlang 26.2.3
 elixir 1.16.2-otp-26
-nodejs lts-hydrogen
-pnpm 8.15.5
+pnpm 8.15.6
