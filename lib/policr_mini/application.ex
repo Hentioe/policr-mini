@@ -45,7 +45,9 @@ defmodule PolicrMini.Application do
         # Start the Endpoint (http/https)
         PolicrMiniWeb.Endpoint,
         # Start the Telegram bot
-        {PolicrMiniBot.Supervisor, serve: tg_serve?}
+        {PolicrMiniBot.Supervisor, serve: tg_serve?},
+        # Start the stateful TaskCenter
+        PolicrMini.StatefulTaskCenter
       ]
 
     # See https://hexdocs.pm/elixir/Supervisor.html
