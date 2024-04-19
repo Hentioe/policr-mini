@@ -6,7 +6,7 @@ defmodule PolicrMiniBot.Runner.WorkingChecker do
   当发现普通群（非超级群）将直接取消接管，并删除所有权限记录。当发现频道时将直接取消接管。
   """
 
-  alias PolicrMini.{Instances, ChatBusiness, PermissionBusiness}
+  alias PolicrMini.{Instances, PermissionBusiness, Serveds}
   alias PolicrMini.Instances.Chat
 
   import PolicrMiniBot.Common
@@ -36,7 +36,7 @@ defmodule PolicrMiniBot.Runner.WorkingChecker do
   def run do
     Logger.info("Working status check started")
 
-    takeovred_chats = ChatBusiness.find_takeovered()
+    takeovred_chats = Serveds.find_takeovered_chats()
 
     takeovred_chats
     |> Stream.each(&check_chat/1)
