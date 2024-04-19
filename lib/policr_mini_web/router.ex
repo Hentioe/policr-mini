@@ -84,6 +84,7 @@ defmodule PolicrMiniWeb.Router do
     delete "/third_parties/:id", ThirdPartyController, :delete
 
     get "/tasks", TaskController, :index
+    put "/tasks/reset_stats", TaskController, :reset_stats
 
     get "/terms", TermController, :index
     put "/terms", TermController, :add_or_update

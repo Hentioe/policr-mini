@@ -1,7 +1,7 @@
 defmodule PolicrMini.Stats do
   @moduledoc false
 
-  alias PolicrMini.{Chats, InfluxConn}
+  alias PolicrMini.{Chats, InfluxConn, Serveds}
   alias PolicrMini.Chats.Verification
 
   require Logger
@@ -185,5 +185,21 @@ defmodule PolicrMini.Stats do
 
   def clear_all(chat_id) do
     delete_by_time_range(chat_id, ~U[1970-01-01T00:00:00.00Z], DateTime.utc_now())
+  end
+
+  @doc """
+  重置指定群组的统计数据（仅生成最近的数据）。
+  """
+  def reset_recently(chat_id) do
+    # 清空此群组的所有数据
+    :ok = clear_all(chat_id)
+    # 重新生成最近一周的数据
+    :ok = regen_recent_week(chat_id)
+  end
+
+  def reset_all_stats do
+    for chat <- Serveds.find_takeovered_chats() do
+      reset_recently(chat.id)
+    end
   end
 end

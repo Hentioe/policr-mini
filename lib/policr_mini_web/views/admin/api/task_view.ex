@@ -1,8 +1,4 @@
 defmodule PolicrMiniWeb.Admin.API.TaskView do
-  @moduledoc """
-  定时任务的 JSON 视图。
-  """
-
   use PolicrMiniWeb, :view
 
   @spec render(String.t(), map()) :: map()
@@ -14,5 +10,9 @@ defmodule PolicrMiniWeb.Admin.API.TaskView do
 
   def render("job.json", %{task: task}) do
     task |> Map.from_struct()
+  end
+
+  def render("result.json", %{ok: ok}) do
+    %{ok: ok}
   end
 end

@@ -64,7 +64,7 @@ defmodule PolicrMini.StatefulTaskCenter do
     use GenServer
 
     typedstruct module: Job do
-      field :name, String.t()
+      field :name, atom | String.t()
       field :status, :pending | :running | :done
       field :start_at, DateTime.t()
       field :end_at, DateTime.t()
