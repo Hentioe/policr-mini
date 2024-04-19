@@ -17,5 +17,8 @@
         "native/imgkit/Cargo.toml",
         "native/ziputil/Cargo.toml",
     ],
+    // 配置工作区的 TypeScript 路径（允许切换到工作区版本）
+    "typescript.tsdk": "webapps/node_modules/typescript/lib",
+    // 配置 Nix 环境选择器的 Nix 文件路径
     "nixEnvSelector.nixFile": "${workspaceRoot}/shell.nix"
 }

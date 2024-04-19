@@ -12,11 +12,11 @@ steps:
   app-assets-build:
     image: node:20
     commands:
-      - npm install --location=global pnpm@8.15.7
+      - npm install --location=global pnpm@9.0.4
       - pnpm --prefix assets install
       - pnpm --prefix assets run deploy
       - pnpm --prefix webapps install
-      - pnpm --prefix webapps run deploy
+      - pnpm --prefix webapps build
 
   app-release:
     image: gramoss/mini-build-base:20240329

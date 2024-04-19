@@ -1,9 +1,10 @@
+import process from "node:process";
 import { defineConfig } from "vite";
 import solid from "vite-plugin-solid";
 
-export default defineConfig(({ command }) => {
-  const isDev = command !== "build";
-  if (isDev) {
+export default defineConfig(({ mode }) => {
+  // The development mode starts a watcher, we need to listen to stdin to avoid orphan processes.
+  if (mode === "development") {
     // Terminate the watcher when Phoenix quits
     process.stdin.on("close", () => {
       process.exit(0);
@@ -13,12 +14,6 @@ export default defineConfig(({ command }) => {
   }
 
   return {
-    esbuild: {
-      target: "es2016",
-    },
-    server: {
-      host: "0.0.0.0",
-    },
     plugins: [
       solid({
         babel: {

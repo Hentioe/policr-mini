@@ -27,9 +27,11 @@ WORKDIR /src
 COPY --from=compile /src/ /src/
 
 RUN set -xe \
-    && npm install --location=global pnpm@8.15.7 \
+    && npm install --location=global pnpm@9.0.4 \
     && pnpm --prefix assets install \
-    && pnpm --prefix assets run deploy
+    && pnpm --prefix assets run deploy \
+    && pnpm --prefix webapps install \
+    && pnpm --prefix webapps build
 
 
 # 使用构建基础镜像 release 应用

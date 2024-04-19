@@ -42,7 +42,7 @@ config :policr_mini, PolicrMiniWeb.Endpoint,
     ],
     pnpm: [
       "run",
-      "dev",
+      "watch",
       cd: Path.expand("../webapps", __DIR__)
     ]
   ]
