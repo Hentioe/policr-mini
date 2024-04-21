@@ -1,4 +1,4 @@
-defmodule PolicrMiniBot.Worker.ValidationTerminator do
+defmodule PolicrMiniBot.Worker.VerificationTerminator do
   @moduledoc """
   负责终止验证（处理超时）的 Worker。
   """
@@ -48,28 +48,31 @@ defmodule PolicrMiniBot.Worker.ValidationTerminator do
 
     # 读取最新的验证数据，因为用户参与验证可能会同时发生
     v = Repo.reload(v)
-    # 为等待状态才实施操作
-    if v.status == :waiting do
+    # 为等待状态才实施操作（超时处理）
+    with :waiting <- v.status,
+         {:ok, v} <- Chats.update_verification(v, %{status: :timeout}) do
+      Chats.update_verification(v, %{status: :timeout})
       # 写入验证数据点（超时）
       Stats.write(v)
-
       # 添加操作记录
       kmethod = scheme.timeout_killing_method || default!(:tkmethod)
       create_operation(v, kmethod, :system)
       # 计数器自增（超时总数）
       PolicrMini.Counter.increment(:verification_timeout_total)
-      # 更新状态为超时
-      Chats.update_verification(v, %{status: :timeout})
       # 击杀用户（原因为超时）
       kill(v, scheme, :timeout)
       # 更新或删除入口消息
       put_or_delete_entry_message(v.chat_id, scheme)
     else
-      Logger.debug("[#{v.id}] Verification has ended, ignoring timeout processing")
+      {:error, reason} ->
+        Logger.error("[#{v.id}] Verification timeout handling failed: #{inspect(reason: reason)}")
+
+      status when is_atom(status) ->
+        Logger.debug("[#{v.id}] Verification has ended, ignore timeout handing")
     end
 
     Logger.debug(
-      "[#{v.id}] Verification processing has ended for timeout: #{inspect(chat_id: chat_id, user_id: user_id)}"
+      "[#{v.id}] Verification handling has ended for timeout: #{inspect(chat_id: chat_id, user_id: user_id)}"
     )
 
     # 从缓存中删除任务
@@ -92,7 +95,11 @@ defmodule PolicrMiniBot.Worker.ValidationTerminator do
     )
 
     # 为等待状态才实施操作
-    if veri.status == :waiting do
+    with :waiting <- v.status,
+         {:ok, v} <- Chats.update_verification(v, %{status: status}) do
+      # 写入验证数据点（其它）
+      Stats.write(v)
+
       # 终止超时处理任务
       :ok = PolicrMiniBot.Worker.cancel_terminate_validation_job(chat_id, user_id)
 
@@ -102,14 +109,12 @@ defmodule PolicrMiniBot.Worker.ValidationTerminator do
         "[#{v.id}] Verification manually terminated by the administrator: #{inspect(chat_id: chat_id, user_id: user_id)}"
       )
 
-      kmeth = if status == :manual_ban, do: :ban, else: :kick
+      k = if status == :manual_ban, do: :ban, else: :kick
 
       # 添加操作记录
-      create_operation(veri, kmeth, :admin)
-      # 写入验证数据点（其它）
-      Stats.write(v)
+      create_operation(v, k, :admin)
 
-      # 更新状态为超时
+      # 更新状态为
       Chats.update_verification(veri, %{status: status})
       # 击杀用户（原因即状态）
       kill(veri, scheme, status)
@@ -123,7 +128,13 @@ defmodule PolicrMiniBot.Worker.ValidationTerminator do
       # 从缓存中删除任务
       JobCacher.delete_job(job_key(:terminate, veri))
     else
-      Logger.debug("[#{v.id}] Verification has ended, ignoring termination")
+      {:error, reason} ->
+        Logger.error(
+          "[#{v.id}] Manual verification termination failed: #{inspect(reason: reason)}"
+        )
+
+      status when is_atom(status) ->
+        Logger.debug("[#{v.id}] Verification has ended, ignore termination")
     end
 
     :ok

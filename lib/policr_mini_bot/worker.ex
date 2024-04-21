@@ -73,7 +73,7 @@ defmodule PolicrMiniBot.Worker do
     `PolicrMiniBot.Worker.cancel_terminate_validation_job/2` 即可取消。
   """
   defdelegate async_terminate_validation(veri, scheme, waiting_secs),
-    to: __MODULE__.ValidationTerminator,
+    to: __MODULE__.VerificationTerminator,
     as: :async_terminate
 
   @doc """
@@ -82,11 +82,11 @@ defmodule PolicrMiniBot.Worker do
   手动终止验证会取消超时处理任务，并更新验证入口消息。若验证的状态不是 `waiting` 则忽略处理。
   """
   defdelegate manual_terminate_validation(veri, status),
-    to: __MODULE__.ValidationTerminator,
+    to: __MODULE__.VerificationTerminator,
     as: :manual_terminate
 
   def cancel_terminate_validation_job(chat_id, user_id) do
-    key = __MODULE__.ValidationTerminator.job_key(:terminate, [chat_id, user_id])
+    key = __MODULE__.VerificationTerminator.job_key(:terminate, [chat_id, user_id])
 
     if job = JobCacher.pop_job(key) do
       case Honeydew.cancel(job) do

@@ -49,10 +49,11 @@ defmodule PolicrMiniBot.Runner.ExpiredFixer do
     )
 
     case Chats.update_verification(v, %{status: :expired}) do
-      {:ok, _} ->
+      {:ok, v} ->
         # 写入验证数据点（其它）
         Stats.write(v)
 
+        # 处理用户
         handle_user(v)
 
         :ok
