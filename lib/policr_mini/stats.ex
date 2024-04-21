@@ -147,8 +147,8 @@ defmodule PolicrMini.Stats do
   """
   @spec regen_recent_week(integer) :: :ok
   def regen_recent_week(chat_id) do
-    dtart = DateTime.utc_now()
-    dend = DateTime.add(dtart, -7, :day)
+    dend = DateTime.utc_now()
+    dtart = DateTime.add(dend, -7, :day)
 
     regen(chat_id, dtart, dend)
   end
@@ -162,10 +162,10 @@ defmodule PolicrMini.Stats do
     delete_by_time_range(chat_id, dstart, dend)
     # 从此时间段的验证记录中重新生成时序数据
     # todo: 加上时区
-    verfs = Chats.time_range_verfs(chat_id, dstart, dend)
+    vs = Chats.time_range_verfs(chat_id, dstart, dend)
 
-    # todo: 批量写入时序数据
-    verfs
+    # todo: 批量写入
+    vs
     |> Stream.each(&write/1)
     |> Stream.run()
 
@@ -201,5 +201,7 @@ defmodule PolicrMini.Stats do
     for chat <- Serveds.find_takeovered_chats() do
       reset_recently(chat.id)
     end
+
+    :ok
   end
 end

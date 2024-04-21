@@ -9,7 +9,14 @@ defmodule PolicrMini.StatefulTaskCenter do
   require Logger
 
   defdelegate schedule(name, fun), to: Scheduler, as: :run
-  defdelegate state, to: Scheduler
+
+  def jobs do
+    state = Scheduler.state()
+
+    state
+    |> Enum.into([])
+    |> Enum.map(&elem(&1, 1))
+  end
 
   def start_link(_) do
     Supervisor.start_link(__MODULE__, [], name: __MODULE__)
@@ -64,6 +71,8 @@ defmodule PolicrMini.StatefulTaskCenter do
     use GenServer
 
     typedstruct module: Job do
+      @derive Jason.Encoder
+
       field :name, atom | String.t()
       field :status, :pending | :running | :done
       field :start_at, DateTime.t()

@@ -10,9 +10,10 @@ defmodule PolicrMiniWeb.Admin.API.TaskController do
 
   def index(conn, _params) do
     with {:ok, _} <- check_sys_permissions(conn) do
-      jobs = Runner.jobs()
+      scheduled_jobs = Runner.jobs()
+      stateful_jobs = StatefulTaskCenter.jobs()
 
-      render(conn, "index.json", %{jobs: jobs})
+      render(conn, "index.json", %{scheduled_jobs: scheduled_jobs, stateful_jobs: stateful_jobs})
     end
   end
 

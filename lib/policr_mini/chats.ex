@@ -503,7 +503,7 @@ defmodule PolicrMini.Chats do
     from(v in Verification,
       where: v.chat_id == ^chat_id,
       where: v.inserted_at >= ^dstart,
-      where: v.updated_at <= ^dend,
+      where: v.inserted_at <= ^dend,
       where: v.status != :waiting
     )
     |> Repo.all()
