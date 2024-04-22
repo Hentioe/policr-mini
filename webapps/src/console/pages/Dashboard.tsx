@@ -5,6 +5,7 @@ import { createEffect, createSignal, Match, onMount, Switch } from "solid-js";
 import { createStore } from "solid-js/store";
 import useSWR from "solid-swr";
 import tinycolor from "tinycolor2";
+import tw, { styled } from "twin.macro";
 import { buildConsoleApiUrl, getter } from "../api";
 import { useGlobalStore } from "../globalStore";
 import { GeneralFrameBox } from "../layouts/Frame";
@@ -18,7 +19,7 @@ type QueryResult = {
   points: Point[];
 };
 
-type Range = "7d" | "30d";
+type RangeType = "7d" | "30d";
 
 type Dailies = {
   passed: number;
@@ -34,20 +35,30 @@ const colors = {
   other: "#BBBBBB",
 };
 
+const RangeOption = styled.li((ps: { active?: boolean }) => [
+  tw`inline px-2 mx-1 rounded cursor-pointer select-none`,
+  ps.active ? tw`bg-blue-500 text-white` : tw`hover:bg-blue-500/10`,
+]);
+
 function findMaxCount(points: Point[]): number {
   return _.max(points.map((p) => p.count));
 }
 
 function findFirstCategorizedPoints(points: Point[]): Point[] {
-  return points.filter((p) =>
+  const existsP = points.find((p) =>
     p.status === "passed" || p.status === "rejected" || p.status === "timeout" || p.status === "other"
   );
+
+  if (existsP != null) {
+    return points.filter((p) => p.status === existsP.status);
+  }
+
+  return [];
 }
 
 export default () => {
   const { store, setCurrentPage } = useGlobalStore();
-  // eslint-disable-next-line @typescript-eslint/no-unused-vars
-  const [range, setRange] = createSignal<Range>("7d");
+  const [range, setRange] = createSignal<RangeType>("7d");
   const [maxCount, setMaxCount] = createSignal<number>(10);
   const [empty, setEmpty] = createSignal(false);
   const [statsCategories, setStatsCategories] = createSignal<string[]>([]);
@@ -153,7 +164,7 @@ export default () => {
     },
   ];
 
-  const Card = (props: { title: string; value: number; baseColor: string }) => (
+  const TodayCard = (props: { title: string; value: number; baseColor: string }) => (
     <div tw="w-6/12 lg:flex-1 lg:h-full pb-4 odd:pr-1 even:pl-1 lg:odd:pr-4 lg:even:pl-0 lg:pr-4 lg:last:pr-0">
       <div tw="h-full bg-white/30 rounded-xl flex flex-col">
         <h2
@@ -176,14 +187,18 @@ export default () => {
     <GeneralFrameBox>
       <div tw="h-full flex flex-col">
         <div tw="h-[50%] lg:h-[30%] flex flex-wrap justify-between">
-          <Card baseColor={colors.passed} title="验证通过" value={dailies.passed} />
-          <Card baseColor={colors.rejected} title="验证失败" value={dailies.rejected} />
-          <Card baseColor={colors.timeout} title="验证超时" value={dailies.timeout} />
-          <Card baseColor={colors.other} title="其它" value={dailies.other} />
+          <TodayCard baseColor={colors.passed} title="验证通过" value={dailies.passed} />
+          <TodayCard baseColor={colors.rejected} title="验证失败" value={dailies.rejected} />
+          <TodayCard baseColor={colors.timeout} title="验证超时" value={dailies.timeout} />
+          <TodayCard baseColor={colors.other} title="其它" value={dailies.other} />
         </div>
         <div tw="flex-1 bg-white/30 rounded-xl flex flex-col">
-          <header tw="p-3">
-            <h2 tw="font-medium">验证次数统计（最近一周）</h2>
+          <header tw="p-3 flex">
+            <h2 tw="font-medium">验证次数统计</h2>
+            <ul>
+              <RangeOption active={range() === "7d"} onClick={() => setRange("7d")}>一周</RangeOption>
+              <RangeOption active={range() === "30d"} onClick={() => setRange("30d")}>一个月</RangeOption>
+            </ul>
           </header>
           <Switch>
             <Match when={!empty()}>

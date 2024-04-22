@@ -143,12 +143,12 @@ defmodule PolicrMini.Stats do
   end
 
   @doc """
-  重新生成最近一周。
+  重新生成特定群组最近指定天数的统计数据。
   """
-  @spec regen_recent_week(integer) :: :ok
-  def regen_recent_week(chat_id) do
+  @spec regen_recent_days(integer, integer) :: :ok
+  def regen_recent_days(chat_id, days) do
     dend = DateTime.utc_now()
-    dtart = DateTime.add(dend, -7, :day)
+    dtart = DateTime.add(dend, -days, :day)
 
     regen(chat_id, dtart, dend)
   end
@@ -193,8 +193,8 @@ defmodule PolicrMini.Stats do
   def reset_recently(chat_id) do
     # 清空此群组的所有数据
     :ok = clear_all(chat_id)
-    # 重新生成最近一周的数据
-    :ok = regen_recent_week(chat_id)
+    # 重新生成最近一个月的数据
+    :ok = regen_recent_days(chat_id, 30)
   end
 
   def reset_all_stats do
