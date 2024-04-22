@@ -66,6 +66,10 @@ defmodule PolicrMiniBot.BootHelper do
       %BotCommand{
         command: "login",
         description: "登入后台"
+      },
+      %BotCommand{
+        command: "console",
+        description: "进入控制台"
       }
     ]
 
