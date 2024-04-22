@@ -102,6 +102,15 @@ export default () => {
     });
   };
 
+  const JobResult = ({ result }) => {
+    // 如果 result 是 Object，则展示为 JSON
+    if (typeof result === "object") {
+      return <pre tw="bg-gray-100 p-2 rounded"><code>{JSON.stringify(result, null, 2)}</code></pre>
+    }
+
+    return <span>{result}</span>
+  }
+
 
   const StatefulJobs = ({ jobs }) => {
     if (jobs.length === 0) {
@@ -135,7 +144,9 @@ export default () => {
           </JobDetail>
           <JobDetail>
             <JobDetailName>结果</JobDetailName>
-            <JobDetailValue>{job.result}</JobDetailValue>
+            <JobDetailValue>
+              <JobResult result={job.result} />
+            </JobDetailValue>
           </JobDetail>
         </Job>
       ))}

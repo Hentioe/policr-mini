@@ -194,14 +194,15 @@ defmodule PolicrMini.Stats do
     # 清空此群组的所有数据
     :ok = clear_all(chat_id)
     # 重新生成最近一个月的数据
-    :ok = regen_recent_days(chat_id, 30)
+    regen_recent_days(chat_id, 30)
   end
 
   def reset_all_stats do
-    for chat <- Serveds.find_takeovered_chats() do
-      reset_recently(chat.id)
-    end
+    r =
+      for chat <- Serveds.find_takeovered_chats() do
+        reset_recently(chat.id)
+      end
 
-    :ok
+    %{count: length(r)}
   end
 end
