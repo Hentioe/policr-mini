@@ -28,9 +28,11 @@ defmodule PolicrMiniBot.RespConsoleChain do
       check_user_photo(user_id)
 
       text = """
-      #{commands_text("控制台是新的功能管理页面，具有更美观的界面，同时兼容移动与桌面访问和更强大的功能。控制台将在未来取代旧后台页面。")}
+      <b>#{commands_text("进入控制台")}</b>
 
-      <i>#{commands_text("控制台正在积极开发中，关注更新频道获取后续更新通知。")}</i>
+      <i>#{commands_text("控制台是新的功能管理页面，具有更美观的界面、更强大的功能、同时兼容移动与桌面访问。控制台将在未来取代旧后台页面。")}</i>
+
+      #{commands_text("控制台正在积极开发中，关注%{channel}获取后续更新通知。", channel: "<a href=\"https://t.me/policr_changelog\">#{commands_text("更新频道")}</a>")}
       """
 
       reply_markup = build_markup(token)
