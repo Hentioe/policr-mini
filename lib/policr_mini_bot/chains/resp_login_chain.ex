@@ -23,25 +23,19 @@ defmodule PolicrMiniBot.RespLoginChain do
 
     with {:ok, :isadmin} <- check_user(user_id),
          {:ok, token} <- PolicrMiniWeb.create_token(user_id) do
-      theader = commands_text("已为您创建一枚令牌，点击下方按钮可直接进入后台。亦或复制令牌手动登入。")
-
-      tfooter =
-        commands_text("有效期为 %{day_count} 天，过期需重新申请和登入。如怀疑泄漏请立即吊销。",
-          day_count: 1
-        )
-
-      safe_comment = commands_text("安全小贴士：不可将按钮中的链接或登录令牌分享于他人，除非您想将控制权短暂的共享于他。")
-      console_comment = commands_text("使用 /console 命令，可体验全新的功能管理页面！")
-
       text = """
-      #{theader}
+      <b>#{commands_text("进入后台")}</b>
+
+      #{commands_text("已为您创建一枚令牌，点击下方按钮可直接进入后台。亦或复制令牌手动登入。")}
 
       <code>#{token}</code>
 
-      #{tfooter}
+      #{commands_text("有效期为 %{day_count} 天，过期需重新申请和登入。如怀疑泄漏请立即吊销。",
+      day_count: 1)}
 
-      <i>#{safe_comment}</i>
-      <i>#{console_comment}</i>
+      <i>#{commands_text("安全小贴士：不可将按钮中的链接或登录令牌分享于他人，除非您想将控制权短暂的共享于他。")}</i>
+
+      <i>#{commands_text("使用 /console 命令，可体验全新的功能管理页面！")}</i>
       """
 
       reply_markup = make_markup(user_id, token)
