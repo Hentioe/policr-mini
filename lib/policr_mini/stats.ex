@@ -94,7 +94,7 @@ defmodule PolicrMini.Stats do
         status: to_string(status),
         source: to_string(v.source)
       },
-      timestamp: DateTime.utc_now()
+      timestamp: v.updated_at
     }
 
     write(point)
