@@ -12,7 +12,7 @@ steps:
   app-assets-build:
     image: node:20
     commands:
-      - npm install --location=global pnpm@9.0.4
+      - npm install --location=global pnpm@9.0.5
       - pnpm --prefix assets install
       - pnpm --prefix assets run deploy
       - pnpm --prefix webapps install
