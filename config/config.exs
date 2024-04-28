@@ -52,10 +52,15 @@ config :policr_mini, PolicrMiniBot.Scheduler,
       schedule: "*/5 * * * *",
       task: {PolicrMiniBot.Runner.ExpiredFixer, :run, []}
     ],
-    # 工作状态检查，每 4 小时。
-    working_check: [
-      schedule: "0 */4 * * *",
-      task: {PolicrMiniBot.Runner.WorkingChecker, :run, []}
+    # 工作状态检查，每 4 小时。todo: 待移除。
+    # working_check: [
+    #   schedule: "0 */4 * * *",
+    #   task: {PolicrMiniBot.Runner.WorkingChecker, :run, []}
+    # ],
+    # 定期清理缓存，每一分钟
+    cache_clean: [
+      schedule: "*/1 * * * *",
+      task: {PolicrMiniBot.Runner.CacheCleaner, :schedule, []}
     ],
     # 已离开检查，每日。
     left_check: [
