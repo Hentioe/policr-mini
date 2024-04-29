@@ -23,14 +23,18 @@ defmodule PolicrMiniBot.Runner.CacheCleaner do
           rm(file)
 
           Logger.debug("Removed cache file: #{file}")
+
+          :ok
+        else
+          :ignored
         end
       end
 
     # 日志中输出删除的文件数量
     succeeded_count = Enum.count(r, &(&1 == :ok))
 
-    if succeeded_count < 0 do
-      Logger.warning("Removed #{succeeded_count} cache file(s)")
+    if succeeded_count > 0 do
+      Logger.info("Removed #{succeeded_count} cache file(s)")
     end
 
     Logger.debug("Finish cleaning cache files")
