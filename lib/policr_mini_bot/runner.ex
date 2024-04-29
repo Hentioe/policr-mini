@@ -22,24 +22,28 @@ defmodule PolicrMiniBot.Runner do
         next_run_datetime: Crontab.Scheduler.get_next_run_date!(job.schedule),
         timezone: job.timezone |> Atom.to_string() |> String.upcase()
       }
-      |> put_text()
+      |> put_texts()
     end
 
-    @spec put_text(map) :: map
-    def put_text(%{name: :expired_check} = job) do
+    @spec put_texts(map) :: map
+    def put_texts(%{name: :expired_check} = job) do
       %{job | name_text: "过期验证检查", schedule_text: "每 5 分钟"}
     end
 
-    def put_text(%{name: :working_check} = job) do
+    def put_texts(%{name: :working_check} = job) do
       %{job | name_text: "工作状态检查", schedule_text: "每 4 小时"}
     end
 
-    def put_text(%{name: :left_check} = job) do
+    def put_texts(%{name: :left_check} = job) do
       %{job | name_text: "退出检查", schedule_text: "每日"}
     end
 
-    def put_text(%{name: :third_parties_running_days_update} = job) do
+    def put_texts(%{name: :third_parties_running_days_update} = job) do
       %{job | name_text: "第三方实例运行天数更新", schedule_text: "每日"}
+    end
+
+    def put_texts(%{name: name} = job) do
+      %{job | name_text: name}
     end
   end
 
