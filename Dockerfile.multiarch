@@ -27,7 +27,7 @@ WORKDIR /src
 COPY --from=compile /src/ /src/
 
 RUN set -xe \
-    && npm install --location=global pnpm@9.0.5 \
+    && npm install --location=global pnpm@9.1.0-0 \
     && pnpm --prefix assets install \
     && pnpm --prefix assets run deploy \
     && pnpm --prefix webapps install \
