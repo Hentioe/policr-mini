@@ -48,7 +48,7 @@ assets-setup:
     pnpm install --prefix assets
 
 assets-format:
-    assets/node_modules/.bin/prettier --write assets/
+    prettier --write assets/
 
 assets-clean:
     rm -rf assets/node_modules
