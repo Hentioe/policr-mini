@@ -52,18 +52,6 @@ defmodule PolicrMiniBot.Worker do
   @callback job_key(task :: atom, args :: any) :: any
 
   @doc """
-  异步删除消息。
-
-  删除请求失败会自动重试，最多重试三次。
-
-  ## 可选参数
-    - `delay_secs`: 延迟删除的秒数。
-  """
-  defdelegate async_delete_message(chat_id, message_id, opts \\ []),
-    to: __MODULE__.MessageCleaner,
-    as: :async_delete
-
-  @doc """
   异步终止验证。
 
   通过 `waiting_secs` 强制延迟执行，延迟秒数即验证倒计时的时间。

@@ -6,7 +6,6 @@ defmodule PolicrMiniBot.HandleLeftMessageChain do
   use PolicrMiniBot.Chain, :message
 
   alias PolicrMini.Chats
-  alias PolicrMiniBot.Worker
 
   require Logger
 
@@ -42,7 +41,7 @@ defmodule PolicrMiniBot.HandleLeftMessageChain do
       )
 
       # 删除服务消息。
-      Worker.async_delete_message(chat.id, message_id)
+      async_delete_message(chat.id, message_id)
 
       {:ok, %{context | deleted: true}}
     else

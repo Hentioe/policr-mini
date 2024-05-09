@@ -21,7 +21,6 @@ defmodule PolicrMiniBot.HandleAdminPermissionsChangeChain do
 
   alias PolicrMini.Instances.Chat
   alias PolicrMiniBot.Helper.Syncing
-  alias PolicrMiniBot.Worker
 
   require Logger
 
@@ -135,7 +134,7 @@ defmodule PolicrMiniBot.HandleAdminPermissionsChangeChain do
 
       case send_text(chat_id, text, parse_mode: "HTML") do
         {:ok, msg} ->
-          Worker.async_delete_message(chat_id, msg.message_id, delay_secs: 4)
+          async_delete_message_after(chat_id, msg.message_id, 4)
 
         {:error, reason} ->
           Logger.warning(

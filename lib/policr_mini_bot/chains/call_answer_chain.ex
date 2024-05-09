@@ -197,7 +197,7 @@ defmodule PolicrMiniBot.CallAnswerChain do
     """
 
     async do
-      Worker.async_delete_message(v.target_user_id, message_id)
+      async_delete_message(v.target_user_id, message_id)
 
       send_text(v.target_user_id, text, parse_mode: "MarkdownV2", logging: true)
     end
@@ -220,7 +220,7 @@ defmodule PolicrMiniBot.CallAnswerChain do
     """
 
     async do
-      Worker.async_delete_message(v.target_user_id, message_id)
+      async_delete_message(v.target_user_id, message_id)
 
       send_text(v.target_user_id, text, parse_mode: "MarkdownV2", logging: true)
     end
@@ -242,7 +242,7 @@ defmodule PolicrMiniBot.CallAnswerChain do
       case send_text(v.chat_id, text, parse_mode: "MarkdownV2") do
         {:ok, %{message_id: message_id}} ->
           # 延迟 8 秒删除通知消息
-          Worker.async_delete_message(v.chat_id, message_id, delay_secs: 8)
+          async_delete_message_after(v.chat_id, message_id, 8)
 
         {:error, reason} ->
           Logger.error("Send notification failed: #{inspect(reason: reason)}",
@@ -331,7 +331,7 @@ defmodule PolicrMiniBot.CallAnswerChain do
       end
 
     async do
-      Worker.async_delete_message(v.target_user_id, message_id)
+      async_delete_message(v.target_user_id, message_id)
 
       send_text(v.target_user_id, text, parse_mode: "MarkdownV2", logging: true)
     end
@@ -361,7 +361,7 @@ defmodule PolicrMiniBot.CallAnswerChain do
       end
 
     async do
-      Worker.async_delete_message(v.target_user_id, message_id)
+      async_delete_message(v.target_user_id, message_id)
 
       send_text(v.target_user_id, text, parse_mode: "MarkdownV2", logging: true)
     end

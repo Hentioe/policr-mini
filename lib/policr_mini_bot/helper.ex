@@ -525,4 +525,26 @@ defmodule PolicrMiniBot.Helper do
   def can_promote_members?(_chat_member) do
     false
   end
+
+  @spec async_delete_message(integer, integer) :: {:error, any()} | {:ok, Honeycomb.Bee.t()}
+  def async_delete_message(chat_id, message_id) do
+    run = {__MODULE__, :delete_message!, [chat_id, message_id]}
+
+    Honeycomb.brew_honey(:cleaner, "delete-#{chat_id}-#{message_id}", run, stateless: true)
+  end
+
+  @spec async_delete_message_after(integer, integer, integer) ::
+          {:error, any()} | {:ok, Honeycomb.Bee.t()}
+  def async_delete_message_after(chat_id, message_id, second) do
+    run = {__MODULE__, :delete_message!, [chat_id, message_id]}
+
+    Honeycomb.brew_honey_after(:cleaner, "delete-#{chat_id}-#{message_id}", run, second * 1000,
+      stateless: true
+    )
+  end
+
+  @spec delete_message!(integer, integer) :: {:ok, true}
+  def delete_message!(chat_id, message_id) do
+    {:ok, true} = Telegex.delete_message(chat_id, message_id)
+  end
 end

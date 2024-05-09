@@ -602,7 +602,7 @@ defmodule PolicrMiniBot.VerificationHelper do
 
     case send_text(v.chat_id, text, parse_mode: "MarkdownV2") do
       {:ok, %{message_id: message_id}} ->
-        Worker.async_delete_message(v.chat_id, message_id, delay_secs: 8)
+        async_delete_message_after(v.chat_id, message_id, 8)
 
         :ok
 

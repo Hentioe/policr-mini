@@ -10,7 +10,6 @@ defmodule PolicrMiniBot.HandleJoinedMessageChain do
   use PolicrMiniBot.Chain, :message
 
   alias PolicrMini.Chats
-  alias PolicrMiniBot.Worker
 
   require Logger
 
@@ -37,7 +36,7 @@ defmodule PolicrMiniBot.HandleJoinedMessageChain do
 
         if Enum.member?(service_message_cleanup, :joined) do
           # 删除服务消息。
-          Worker.async_delete_message(chat.id, message.message_id)
+          async_delete_message(chat.id, message.message_id)
         end
     end
 

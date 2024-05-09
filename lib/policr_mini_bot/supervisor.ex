@@ -18,7 +18,6 @@ defmodule PolicrMiniBot.Supervisor do
   @impl true
   def init(_init_arg) do
     # 初始化 workers。
-    PolicrMiniBot.Worker.MessageCleaner.init_queue()
     PolicrMiniBot.Worker.VerificationTerminator.init_queue()
 
     children = [
@@ -36,7 +35,9 @@ defmodule PolicrMiniBot.Supervisor do
       PolicrMiniBot.Scheduler,
       # 加群请求托管。
       PolicrMiniBot.JoinReuquestHosting,
-      # 更新处理器（兼容两个模式）。
+      # 消息清理的 Honeycomb 系统
+      {Honeycomb, queen: PolicrMiniBot.CleanerQueen},
+      # 更新处理器（兼容两个模式）
       updates_handler()
     ]
 

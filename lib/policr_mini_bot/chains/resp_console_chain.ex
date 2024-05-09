@@ -7,7 +7,6 @@ defmodule PolicrMiniBot.RespConsoleChain do
 
   alias PolicrMini.{PermissionBusiness, UserBusiness}
   alias PolicrMini.Schema.User
-  alias PolicrMiniBot.Worker
   alias Telegex.Type.{InlineKeyboardButton, InlineKeyboardMarkup}
 
   require Logger
@@ -87,13 +86,13 @@ defmodule PolicrMiniBot.RespConsoleChain do
 
     case send_text(chat_id, text, reply_to_message_id: message_id) do
       {:ok, %{message_id: message_id}} ->
-        Worker.async_delete_message(chat_id, message_id, delay_secs: 8)
+        async_delete_message_after(chat_id, message_id, 8)
 
       {:error, reason} ->
         Logger.error("Command response failed: #{inspect(command: "/console", reason: reason)}")
     end
 
-    Worker.async_delete_message(chat_id, message_id)
+    async_delete_message(chat_id, message_id)
 
     {:ok, %{context | deleted: true}}
   end

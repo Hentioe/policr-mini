@@ -6,7 +6,6 @@ defmodule PolicrMiniBot.RespEmbarrassMemberChain do
   use PolicrMiniBot.Chain, {:command, :embarrass_member}
 
   alias PolicrMini.Chats
-  alias PolicrMiniBot.Worker
 
   import PolicrMiniBot.VerificationHelper
 
@@ -15,7 +14,7 @@ defmodule PolicrMiniBot.RespEmbarrassMemberChain do
   @impl true
   def handle(message, %{from_admin: from_admin} = context) when from_admin != true do
     # 无权限，直接删除命令消息
-    Worker.async_delete_message(message.chat.id, message.message_id)
+    async_delete_message(message.chat.id, message.message_id)
 
     {:ok, context}
   end

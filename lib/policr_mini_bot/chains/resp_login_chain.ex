@@ -6,7 +6,6 @@ defmodule PolicrMiniBot.RespLoginChain do
   use PolicrMiniBot.Chain, {:command, :login}
 
   alias PolicrMini.PermissionBusiness
-  alias PolicrMiniBot.Worker
   alias Telegex.Type.{InlineKeyboardButton, InlineKeyboardMarkup}
 
   require Logger
@@ -90,13 +89,13 @@ defmodule PolicrMiniBot.RespLoginChain do
 
     case send_text(chat_id, text, reply_to_message_id: message_id) do
       {:ok, %{message_id: message_id}} ->
-        Worker.async_delete_message(chat_id, message_id, delay_secs: 8)
+        async_delete_message_after(chat_id, message_id, 8)
 
       {:error, reason} ->
         Logger.error("Command response failed: #{inspect(command: "/login", reason: reason)}")
     end
 
-    Worker.async_delete_message(chat_id, message_id)
+    async_delete_message(chat_id, message_id)
 
     {:ok, %{context | deleted: true}}
   end

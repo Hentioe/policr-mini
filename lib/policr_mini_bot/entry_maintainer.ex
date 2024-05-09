@@ -4,9 +4,9 @@ defmodule PolicrMiniBot.EntryMaintainer do
   use GenServer
   use PolicrMiniBot.MessageCaller
 
-  alias PolicrMiniBot.Worker
-
   require Logger
+
+  import PolicrMiniBot.Helper
 
   use TypedStruct
 
@@ -54,7 +54,7 @@ defmodule PolicrMiniBot.EntryMaintainer do
       # 删除消息 ID
       :ok = delete_message_id(source, chat_id)
       # 异步删除消息
-      Worker.async_delete_message(chat_id, last_message_id)
+      async_delete_message(chat_id, last_message_id)
     end
 
     :ok
@@ -71,14 +71,14 @@ defmodule PolicrMiniBot.EntryMaintainer do
 
       current_message_id > last_message_id ->
         # 当前消息在上一条消息之后，删除旧消息
-        Worker.async_delete_message(chat_id, last_message_id)
+        async_delete_message(chat_id, last_message_id)
 
         # 更新消息 ID
         :ok = put_message_id(source, chat_id, current_message_id)
 
       current_message_id < last_message_id ->
         # 当前消息在最新消息之前，已过时，直接删除
-        Worker.async_delete_message(chat_id, current_message_id)
+        async_delete_message(chat_id, current_message_id)
 
         :ok
 
