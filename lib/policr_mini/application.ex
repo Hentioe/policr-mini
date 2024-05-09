@@ -46,8 +46,8 @@ defmodule PolicrMini.Application do
         PolicrMiniWeb.Endpoint,
         # Start the Telegram bot
         {PolicrMiniBot.Supervisor, serve: tg_serve?},
-        # Start the stateful TaskCenter
-        PolicrMini.StatefulTaskCenter
+        # 启动后台任务的 Honeycomb 系统
+        {Honeycomb, queen: PolicrMini.BackgroundQueen}
       ]
 
     # See https://hexdocs.pm/elixir/Supervisor.html
