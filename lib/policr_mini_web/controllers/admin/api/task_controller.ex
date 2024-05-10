@@ -21,7 +21,7 @@ defmodule PolicrMiniWeb.Admin.API.TaskController do
     run = &Stats.reset_all_stats/0
 
     with {:ok, _} <- check_sys_permissions(conn),
-         {:ok, bee} <- Honeycomb.brew_honey(:background, "reset_all_stats", run) do
+         {:ok, bee} <- Honeycomb.gather_honey(:background, "reset_all_stats", run) do
       render(conn, "result.json", %{bee: bee})
     end
   end

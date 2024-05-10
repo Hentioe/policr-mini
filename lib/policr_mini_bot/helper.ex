@@ -530,7 +530,7 @@ defmodule PolicrMiniBot.Helper do
   def async_delete_message(chat_id, message_id) do
     run = {__MODULE__, :delete_message!, [chat_id, message_id]}
 
-    Honeycomb.brew_honey(:cleaner, "delete-#{chat_id}-#{message_id}", run, stateless: true)
+    Honeycomb.gather_honey(:cleaner, "delete-#{chat_id}-#{message_id}", run, stateless: true)
   end
 
   @spec async_delete_message_after(integer, integer, integer) ::
@@ -538,7 +538,7 @@ defmodule PolicrMiniBot.Helper do
   def async_delete_message_after(chat_id, message_id, second) do
     run = {__MODULE__, :delete_message!, [chat_id, message_id]}
 
-    Honeycomb.brew_honey_after(:cleaner, "delete-#{chat_id}-#{message_id}", run, second * 1000,
+    Honeycomb.gather_honey_after(:cleaner, "delete-#{chat_id}-#{message_id}", run, second * 1000,
       stateless: true
     )
   end
@@ -546,5 +546,23 @@ defmodule PolicrMiniBot.Helper do
   @spec delete_message!(integer, integer) :: {:ok, true}
   def delete_message!(chat_id, message_id) do
     {:ok, true} = Telegex.delete_message(chat_id, message_id)
+  end
+
+  @doc """
+  智能发送器，用于可靠的调用 `Telegex.send_*` 系列函数。此函数可以提高消息的达到成功率，可以一定程度的避免临时的网络错误，并绕过调用频率限制。
+
+  注意：通过此函数发送的消息存在重复发送的可能性，因为网络超时的情况下自动重试前，无法判断此前的发送是否成功达到（需尽可能避免网络超时发生）。
+  """
+  @spec smart_sender(atom, [any()]) ::
+          {:error, Telegex.Type.error()} | {:ok, Telegex.Type.Message.t()}
+  def smart_sender(method \\ :send_message, args) when is_atom(method) and is_list(args) do
+    run = fn ->
+      {:ok, _} = apply(Telegex, method, args)
+    end
+
+    case Honeycomb.gather_honey_sync(:smart_sender, :anon, run) do
+      {:ok, _} = ok_r -> ok_r
+      {:exception, %MatchError{term: other}} -> other
+    end
   end
 end

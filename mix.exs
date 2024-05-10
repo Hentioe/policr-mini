@@ -27,8 +27,16 @@ defmodule PolicrMini.MixProject do
   def application do
     [
       mod: {PolicrMini.Application, []},
-      extra_applications: [:logger, :runtime_tools]
+      extra_applications: [:logger, :runtime_tools] ++ extra_applications(Mix.env())
     ]
+  end
+
+  defp extra_applications(:dev) do
+    [:wx, :observer]
+  end
+
+  defp extra_applications(_) do
+    []
   end
 
   # Specifies which paths to compile per environment.
@@ -76,10 +84,10 @@ defmodule PolicrMini.MixProject do
       {:unzip, "~> 0.11"},
       {:mime, "~> 2.0"},
       {:instream, "~> 2.2"},
+      {:honeycomb, "~> 0.1.0"},
       {:figlet, git: "https://github.com/Hentioe/figlet", branch: "compatible_1.16"},
       # 此库依赖 Rust
-      {:img_grider, git: "https://github.com/gramlabs-oss/img_grider.git"},
-      {:honeycomb, git: "https://github.com/Hentioe/honeycomb.git"}
+      {:img_grider, git: "https://github.com/gramlabs-oss/img_grider.git"}
     ]
   end
 

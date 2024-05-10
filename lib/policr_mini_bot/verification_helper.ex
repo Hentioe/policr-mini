@@ -531,7 +531,7 @@ defmodule PolicrMiniBot.VerificationHelper do
 
     # 不能接收 `check_verification/1` 的返回值，因为此处并非一个实际值，会影响后续的更新。
     with {:ok, _} <- check_verification(Map.merge(v, updated_params)),
-         {:ok, _} <- send_verification_message(v, data, text, send_opts),
+         {:ok, _} <- send_vmessage(v, data, text, send_opts),
          {:ok, v} <- Chats.update_verification(v, updated_params) do
       {:ok, v}
     else
@@ -542,10 +542,10 @@ defmodule PolicrMiniBot.VerificationHelper do
   @doc """
   发送验证消息。
   """
-  @spec send_verification_message(Verification.t(), captcha_data, String.t(), send_opts) ::
+  @spec send_vmessage(Verification.t(), captcha_data, String.t(), send_opts) ::
           {:ok, tgmsg} | {:error, tgerr}
   # 发送图片验证消息
-  def send_verification_message(v, %{photo: photo} = _captcha_data, text, opts)
+  def send_vmessage(v, %{photo: photo} = _captcha_data, text, opts)
       when photo != nil do
     opts = Keyword.merge(opts, caption: text)
 
@@ -553,7 +553,7 @@ defmodule PolicrMiniBot.VerificationHelper do
   end
 
   # 发送附件验证消息
-  def send_verification_message(v, %{attachment: attachment} = _captcha_data, text, opts)
+  def send_vmessage(v, %{attachment: attachment} = _captcha_data, text, opts)
       when attachment != nil do
     opts = Keyword.merge(opts, caption: text)
 
@@ -561,7 +561,7 @@ defmodule PolicrMiniBot.VerificationHelper do
   end
 
   # 发送文本验证消息
-  def send_verification_message(v, _captcha_data, text, opts) do
+  def send_vmessage(v, _captcha_data, text, opts) do
     send_text(v.target_user_id, text, opts)
   end
 

@@ -8,6 +8,8 @@ defmodule PolicrMiniBot.MessageCaller do
 
   require Logger
 
+  import PolicrMiniBot.Helper
+
   # TODO: 参数 `reply_to_message_id` 已过时，应使用 `Telegex.Type.ReplyParameters.t()` 代替。
 
   @type tgerr :: Telegex.Type.error()
@@ -40,32 +42,33 @@ defmodule PolicrMiniBot.MessageCaller do
 
     # 作为图片消息发送
     def call(%{attachment: <<"photo/" <> file_id>>} = _sender, chat_id, optional) do
-      Telegex.send_photo(chat_id, file_id, optional)
+      smart_sender(:send_photo, [chat_id, file_id, optional])
     end
 
     # 作为视频消息发送
     def call(%{attachment: <<"video/" <> file_id>>} = _sender, chat_id, optional) do
-      Telegex.send_video(chat_id, file_id, optional)
+      smart_sender(:send_video, [chat_id, file_id, optional])
     end
 
     # 作为音频消息发送
     def call(%{attachment: <<"audio/" <> file_id>>} = _sender, chat_id, optional) do
-      Telegex.send_audio(chat_id, file_id, optional)
+      smart_sender(:send_audio, [chat_id, file_id, optional])
     end
 
     # 作为文件消息发送
     def call(%{attachment: <<"document/" <> file_id>>} = _sender, chat_id, optional) do
-      Telegex.send_document(chat_id, file_id, optional)
+      smart_sender(:send_document, [chat_id, file_id, optional])
     end
 
     # 作为错误消息发送：未知的附件类型
     def call(%{attachment: attachment} = _sender, chat_id, optional) when attachment != nil do
-      Telegex.send_message(chat_id, commands_text("这是一条错误：消息生成失败，不受支持的附件类型或无效的附件字符串。"), optional)
+      text = commands_text("这是一条错误：消息生成失败，不受支持的附件类型或无效的附件字符串。")
+      smart_sender([chat_id, text, optional])
     end
 
     # 作为普通文本消息发送
     def call(%{text: text} = _sender, chat_id, optional) when text != nil do
-      Telegex.send_message(chat_id, text, optional)
+      smart_sender([chat_id, text, optional])
     end
   end
 

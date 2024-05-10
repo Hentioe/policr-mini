@@ -37,6 +37,8 @@ defmodule PolicrMiniBot.Supervisor do
       PolicrMiniBot.JoinReuquestHosting,
       # 消息清理的 Honeycomb 系统
       {Honeycomb, queen: PolicrMiniBot.CleanerQueen},
+      # 消息发送的 Honeycomb 系统
+      {Honeycomb, queen: PolicrMiniBot.SenderQueen},
       # 更新处理器（兼容两个模式）
       updates_handler()
     ]
