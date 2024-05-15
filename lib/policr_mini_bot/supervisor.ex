@@ -39,6 +39,12 @@ defmodule PolicrMiniBot.Supervisor do
       {Honeycomb, queen: PolicrMiniBot.CleanerQueen},
       # 消息发送的 Honeycomb 系统
       {Honeycomb, queen: PolicrMiniBot.SenderQueen},
+      # 入口消息的 Honeycomb 系统
+      {Honeycomb, queen: PolicrMiniBot.EntryQueen},
+      # 入口管理器的进程注册表
+      {Registry, keys: :unique, name: PolicrMiniBot.EntryManager.Registry},
+      # 入口管理器
+      PolicrMiniBot.EntryManager,
       # 更新处理器（兼容两个模式）
       updates_handler()
     ]
