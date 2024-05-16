@@ -14,11 +14,21 @@ defmodule PolicrMiniBot.ChatEntry do
 
   @interval 2000
 
+  defmodule Sent do
+    typedstruct do
+      field :message_id, integer()
+      field :time, DateTime.t()
+    end
+
+    def new(message_id) do
+      %__MODULE__{message_id: message_id, time: DateTime.utc_now()}
+    end
+  end
+
   typedstruct module: State do
     field :chat, Chat.t()
     field :members, [User.t()], default: []
-    field :last_sent_time, DateTime.t()
-    field :last_message_id, DateTime.t()
+    field :sent, Sent.t()
     field :sched_stopped, boolean(), default: true
     # todo: 添加 request 队列
   end
@@ -30,7 +40,7 @@ defmodule PolicrMiniBot.ChatEntry do
   def start_link(opts) do
     chat = Keyword.fetch!(opts, :chat)
 
-    GenServer.start(__MODULE__, %State{chat: chat}, name: namegen(chat.id))
+    GenServer.start(__MODULE__, %State{chat: chat, sent: %Sent{}}, name: namegen(chat.id))
   end
 
   @impl true
@@ -47,8 +57,8 @@ defmodule PolicrMiniBot.ChatEntry do
     members = [user | state.members]
 
     cond do
-      state.sched_stopped && state.last_sent_time ->
-        diff = DateTime.diff(DateTime.utc_now(), state.last_sent_time, :millisecond)
+      state.sched_stopped && state.sent.time ->
+        diff = DateTime.diff(DateTime.utc_now(), state.sent.time, :millisecond)
 
         if diff > @interval do
           # 如果调度未开始，且与上次的发送时间的间隔大于 `@interval`，立即调度。
@@ -74,13 +84,8 @@ defmodule PolicrMiniBot.ChatEntry do
   end
 
   @impl true
-  def handle_cast({:update_message_id, message_id}, state) do
-    {:noreply, %{state | last_message_id: message_id}}
-  end
-
-  @impl true
-  def handle_cast({:update_last_sent_time, dt}, state) do
-    {:noreply, %{state | last_sent_time: dt}}
+  def handle_cast({:update_sent, sent}, state) do
+    {:noreply, %{state | sent: sent}}
   end
 
   @impl true
@@ -97,7 +102,7 @@ defmodule PolicrMiniBot.ChatEntry do
     Logger.debug("Entry scheduler triggered", chat_id: state.chat.id)
 
     server = self()
-    last_message_id = state.last_message_id
+    last_message_id = state.sent.message_id
 
     run = fn ->
       members_count = length(members)
@@ -108,20 +113,19 @@ defmodule PolicrMiniBot.ChatEntry do
       #{DateTime.utc_now()}
       """
 
-      {method, args} =
-        if last_message_id do
-          {:edit_message_text, [text, [chat_id: state.chat.id, message_id: last_message_id]]}
-        else
-          {:send_message, [state.chat.id, text]}
-        end
+      if last_message_id do
+        {:ok, _} = async_delete_message(state.chat.id, last_message_id)
+      end
 
-      case smart_sender(method, args) do
+      case smart_sender([state.chat.id, text]) do
         {:ok, %{message_id: message_id}} ->
-          :ok = GenServer.cast(server, {:update_message_id, message_id})
-          :ok = GenServer.cast(server, {:update_last_sent_time, message_id})
+          sent = Sent.new(message_id)
+          :ok = GenServer.cast(server, {:update_sent, sent})
 
         {:error, reason} ->
-          Logger.warning("Failed to send message: #{inspect(reason)}", chat_id: state.chat.id)
+          Logger.warning("Failed to send entry message: #{inspect(reason)}",
+            chat_id: state.chat.id
+          )
       end
 
       _ = Process.send_after(server, :schedule, @interval)
@@ -132,3 +136,5 @@ defmodule PolicrMiniBot.ChatEntry do
     {:noreply, %{state | members: []}}
   end
 end
+
+# PolicrMiniBot.ChatEntry.member_joined %PolicrMini.Instances.Chat{id: -1001486769003}, 1
