@@ -25,7 +25,7 @@ defmodule PolicrMiniBot.Supervisor do
       PolicrMiniBot.Worker.JobCacher,
       # 图片提供服务
       PolicrMiniBot.ImageProvider,
-      # 验证入口维护器
+      # 验证入口维护器（过时）
       PolicrMiniBot.EntryMaintainer,
       # 一次性处理保证
       PolicrMiniBot.Disposable,
@@ -42,9 +42,9 @@ defmodule PolicrMiniBot.Supervisor do
       # 入口消息的 Honeycomb 系统
       {Honeycomb, queen: PolicrMiniBot.EntryQueen},
       # 入口管理器的进程注册表
-      {Registry, keys: :unique, name: PolicrMiniBot.EntryManager.Registry},
+      {Registry, keys: :unique, name: PolicrMiniBot.Entry.Manager.Registry},
       # 入口管理器
-      PolicrMiniBot.EntryManager,
+      PolicrMiniBot.Entry.Manager,
       # 更新处理器（兼容两个模式）
       updates_handler()
     ]

@@ -1,6 +1,8 @@
 defmodule PolicrMiniBot.EntryMaintainer do
   @moduledoc false
 
+  # todo: 彻底用 PolicrMiniBot.Entry.* 模块取代。
+
   use GenServer
   use PolicrMiniBot.MessageCaller
 

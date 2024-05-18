@@ -1,20 +1,21 @@
-defmodule PolicrMiniBot.ChatEntry do
+defmodule PolicrMiniBot.Entry.Maintainer do
   @moduledoc false
 
   use GenServer
   use TypedStruct
 
   import PolicrMiniBot.Helper
+  import PolicrMiniBot.Entry.Helper
 
   require Logger
 
   alias PolicrMini.Instances.Chat
-  alias PolicrMiniBot.EntryManager
+  alias PolicrMiniBot.Entry.Manager
   alias Telegex.Type.User
 
   @interval 2000
 
-  # todo: 关闭系统后保存 `sent` 数据。
+  # todo: 保留成员队列（暂缓）。
 
   defmodule Sent do
     typedstruct do
@@ -37,26 +38,30 @@ defmodule PolicrMiniBot.ChatEntry do
   end
 
   def namegen(chat_id) do
-    {:via, Registry, {EntryManager.Registry, chat_id}}
+    {:via, Registry, {Manager.Registry, chat_id}}
   end
 
   def start_link(opts) do
     chat = Keyword.fetch!(opts, :chat)
+    message_id = load_entry_message_id(chat.id)
+    state = %State{chat: chat, sent: %Sent{message_id: message_id}}
 
-    GenServer.start(__MODULE__, %State{chat: chat, sent: %Sent{}}, name: namegen(chat.id))
+    GenServer.start(__MODULE__, state, name: namegen(chat.id))
   end
 
   @impl true
   def init(init_arg) do
+    false = Process.flag(:trap_exit, true)
+
     {:ok, init_arg}
   end
 
   def member_joined(chat, user) do
-    GenServer.cast(EntryManager.chat_entry(chat), {:member_joined, user})
+    GenServer.cast(Manager.maintainer(chat), {:member_joined, user})
   end
 
   def member_completed(chat, user) do
-    GenServer.cast(EntryManager.chat_entry(chat), {:member_completed, user})
+    GenServer.cast(Manager.maintainer(chat), {:member_completed, user})
   end
 
   @impl true
@@ -124,7 +129,7 @@ defmodule PolicrMiniBot.ChatEntry do
   @impl true
   def handle_info(:schedule, %{dirty: false} = state) do
     # 成员列表是空的，停止调度。
-    Logger.debug("Entry scheduler stopped", chat_id: state.chat.id)
+    Logger.debug("Entry maintainer scheduler stopped", chat_id: state.chat.id)
 
     {:noreply, %{state | sched_stopped: true}}
   end
@@ -132,7 +137,7 @@ defmodule PolicrMiniBot.ChatEntry do
   @impl true
   def handle_info(:schedule, %{dirty: true, members: members} = state) do
     # 合并成员列表为单条消息内容，发送或编辑消息。
-    Logger.debug("Entry scheduler triggered", chat_id: state.chat.id)
+    Logger.debug("Entry maintainer scheduler triggered", chat_id: state.chat.id)
 
     server = self()
     last_message_id = state.sent.message_id
@@ -169,6 +174,22 @@ defmodule PolicrMiniBot.ChatEntry do
     {:noreply, %{state | dirty: false}}
   end
 
+  @impl true
+  def handle_info({:EXIT, _, :shutdown}, state) do
+    if message_id = state.sent.message_id do
+      # 保存入口消息 ID
+      Logger.warning("Saving entry message_id: #{state.sent.message_id}",
+        chat_id: state.chat.id
+      )
+
+      :ok = save_entry_message_id(state.chat.id, message_id)
+    else
+      :ok = clear_entry_message_id(state.chat.id)
+    end
+
+    {:stop, :normal, state}
+  end
+
   defp clean_last_one(user, state) do
     Logger.debug("Last entry member completed: #{user.id}", chat_id: state.chat.id)
 
@@ -193,19 +214,19 @@ defmodule PolicrMiniBot.ChatEntry do
 
         if diff > @interval do
           # 如果调度未开始，且与上次的发送时间的间隔大于 `@interval`，立即调度。
-          Logger.debug("Entry schedule immediately triggered", chat_id: state.chat.id)
+          Logger.debug("Entry maintainer schedule immediately triggered", chat_id: state.chat.id)
 
           :ok = Process.send(self(), :schedule, [])
         else
           # 如果小于 1 秒，等待 1 秒后再调度。
-          Logger.debug("Entry schedule delayed triggered", chat_id: state.chat.id)
+          Logger.debug("Entry maintainer schedule delayed triggered", chat_id: state.chat.id)
 
           _ = Process.send_after(self(), :schedule, @interval)
         end
 
       state.sched_stopped ->
         # 如果调度未开始，且上次发送时间为空，立即调度。
-        Logger.debug("Entry schedule immediately triggered", chat_id: state.chat.id)
+        Logger.debug("Entry maintainer schedule immediately triggered", chat_id: state.chat.id)
 
         :ok = Process.send(self(), :schedule, [])
 
@@ -217,5 +238,5 @@ defmodule PolicrMiniBot.ChatEntry do
   end
 end
 
-# PolicrMiniBot.ChatEntry.member_joined %PolicrMini.Instances.Chat{id: -1001486769003}, %{id: 111}
-# PolicrMiniBot.ChatEntry.member_completed %PolicrMini.Instances.Chat{id: -1001486769003}, %{id: 111}
+# PolicrMiniBot.Entry.Maintainer.member_joined %PolicrMini.Instances.Chat{id: -1001486769003}, %{id: 111}
+# PolicrMiniBot.Entry.Maintainer.member_completed %PolicrMini.Instances.Chat{id: -1001486769003}, %{id: 111}
