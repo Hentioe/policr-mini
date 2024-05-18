@@ -52,3 +52,6 @@ npm-debug.log
 
 # Ignore tests output assets.
 /test/assets/output/
+
+# Ignore non-migrated data.
+/nonmigrated_data/
