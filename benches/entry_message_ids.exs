@@ -19,5 +19,5 @@ end
 Benchee.run(%{
   "save_entry_message_id" => fn -> Testing.save_entry_message_id() end,
   "load_entry_message_id" => fn -> Testing.load_entry_message_id() end,
-  "clear_entry_message_id" => fn -> Testing.clear_entry_message_id() end,
+  "clear_entry_message_id" => fn -> Testing.clear_entry_message_id() end
 })

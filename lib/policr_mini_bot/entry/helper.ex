@@ -15,7 +15,7 @@ defmodule PolicrMiniBot.Entry.Helper do
   end
 
   def init_table do
-    {:ok, _} = Dets.open_file(@table, type: :set, auto_save: 5, file: data_path())
+    {:ok, _} = Dets.open_file(@table, type: :set, file: data_path())
 
     :ok
   end
