@@ -1,6 +1,6 @@
 steps:
   app-compile:
-    image: gramoss/mini-build-base:20240329
+    image: gramoss/mini-build-base:20240521
     pull: true
     environment:
       MIX_ENV: prod
@@ -12,14 +12,14 @@ steps:
   app-assets-build:
     image: node:20
     commands:
-      - npm install --location=global pnpm@9.1.0-0
+      - npm install --location=global pnpm@9.1.2
       - pnpm --prefix assets install
       - pnpm --prefix assets run deploy
       - pnpm --prefix webapps install
       - pnpm --prefix webapps build
 
   app-release:
-    image: gramoss/mini-build-base:20240329
+    image: gramoss/mini-build-base:20240521
     environment:
       MIX_ENV: prod
     commands:
