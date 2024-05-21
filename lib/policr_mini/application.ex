@@ -8,10 +8,10 @@ defmodule PolicrMini.Application do
   require Logger
 
   def start(_type, _args) do
+    # 输出 figlet
+    print_figlet()
     # 输出构建时/运行时信息
     print_buildtime_runtime_info()
-    # 输出 Figlet
-    figlet()
     # 初始化 Mnesia 表结构。
     PolicrMini.Mnesia.init()
     # 初始化 workers。
@@ -64,16 +64,13 @@ defmodule PolicrMini.Application do
   end
 
   defp print_buildtime_runtime_info do
-    alias PolicrMini.BuildtimeRuntime.Tools
+    elixir_version = System.version()
+    erts_version = to_string(:erlang.system_info(:version))
 
-    if PolicrMini.mix_env() == :prod do
-      Logger.info(
-        "Buildtime/Runtime: [otp-#{Tools.otp_version()}, elixir-#{Tools.elixir_version()}] / [erts-#{Tools.erts_version()}]"
-      )
-    end
+    Logger.info("TOOLCHAINS: [ELIXIR-#{elixir_version}, ERTS-#{erts_version}]")
   end
 
-  defp figlet do
+  defp print_figlet do
     if PolicrMini.mix_env() != :test do
       font = Application.app_dir(:policr_mini, ["priv", "fonts", "ansi-shadow.flf"])
       :ok = Figlet.text("Policr Mini", font: font)
