@@ -1,7 +1,7 @@
 # 使用构建基础镜像复制源代码执行编译
 FROM gramoss/mini-build-base:20240521 as compile
 
-ARG TARGETARCH
+ARG TARGETARCH BUILDARCH
 
 ENV MIX_ENV=prod
 
@@ -10,8 +10,8 @@ WORKDIR /src
 COPY . /src/
 
 RUN set -xe \
-    && if [ "$TARGETARCH" = "arm64" ]; then \
-    # Avoid QEMU/arm64 build failed. \
+    && if [ "$TARGETARCH" != "$BUILDARCH" ]; then \
+    # Avoid QEMU build failed. \
     export ERL_FLAGS="+JMsingle true"; \
     fi \
     && xbps-install -Sy git \
@@ -37,7 +37,7 @@ RUN set -xe \
 # 使用构建基础镜像 release 应用
 FROM gramoss/mini-build-base:20240521 as release
 
-ARG TARGETARCH
+ARG TARGETARCH BUILDARCH
 
 ENV MIX_ENV=prod
 
@@ -46,8 +46,8 @@ WORKDIR /src
 COPY --from=assets-build /src/ /src/
 
 RUN set -xe \
-    && if [ "$TARGETARCH" = "arm64" ]; then \
-    # Avoid QEMU/arm64 build failed. \
+    && if [ "$TARGETARCH" != "$BUILDARCH" ]; then \
+    # Avoid QEMU build failed. \
     export ERL_FLAGS="+JMsingle true"; \
     fi \
     && xbps-install -Sy git \
