@@ -1,3 +1,7 @@
+when:
+  - branch: [develop, stable]
+    event: push
+
 steps:
   app-compile:
     image: gramoss/mini-build-base:20240521
@@ -36,22 +40,23 @@ steps:
       username: gramoss
       password:
         from_secret: gramoss_pass
-      dockerfile: Dockerfile.amd64ci
+      dockerfile: Dockerfile.multiarch
+      platforms: linux/amd64,linux/arm64/v8
       tags:
         - develop
     when:
       branch: develop
       event: push
 
-  generate-image-tags:
+  stable-image-tags-gen:
     image: busybox
     when:
-      branch: master
+      branch: stable
       event: push
     commands:
       - echo -n "$(date +'%Y%m%d'),latest" > .tags
 
-  multiarch-image-build-push:
+  stable-image-build-push:
     image: woodpeckerci/plugin-docker-buildx
     settings:
       repo: gramoss/policr-mini
@@ -61,7 +66,7 @@ steps:
       dockerfile: Dockerfile.multiarch
       platforms: linux/amd64,linux/arm64/v8
     when:
-      branch: master
+      branch: stable
       event: push
 
   schedule-pre-deploy:
