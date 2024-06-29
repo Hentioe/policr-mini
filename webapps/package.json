@@ -11,6 +11,11 @@
   },
   "author": "Hentioe",
   "license": "MIT",
+  "pnpm": {
+    "overrides": {
+      "rollup": "npm:@rollup/wasm-node"
+    }
+  },
   "dependencies": {
     "@ark-ui/solid": "^2.2.0",
     "@solid-primitives/i18n": "^2.1.1",
