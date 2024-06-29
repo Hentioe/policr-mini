@@ -1,0 +1,16 @@
+FROM gramoss/mini-run-base:20240521
+
+
+ARG APP_HOME=/home/policr_mini
+
+
+COPY _build/prod/rel/policr_mini $APP_HOME
+
+
+WORKDIR $APP_HOME
+
+
+ENV PATH="$APP_HOME/bin:$PATH"
+
+
+ENTRYPOINT [ "policr_mini", "start" ]
