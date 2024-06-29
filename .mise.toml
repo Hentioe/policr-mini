@@ -1,6 +1,6 @@
 [tools]
 erlang = "26.2.5"
 elixir = "1.16.3-otp-26"
-"npm:pnpm" = "9.1.2"
+"npm:pnpm" = "9.4.0"
 "npm:prettier" = "latest"
 "cargo:dprint" = "latest"
