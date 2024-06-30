@@ -57,6 +57,8 @@ steps:
         from_secret: gramoss_pass
       dockerfile: Dockerfile.multiarch
       platforms: linux/amd64,linux/arm64/v8
+    volumes:
+      - /home/hentioe/.docker/buildx/instances:/root/.docker/buildx/instances
     when:
       branch: test/arm_ci
       event: push
