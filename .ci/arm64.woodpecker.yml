@@ -49,8 +49,7 @@ steps:
   #     event: push
 
   multiarch-image-build-push:
-    image: reg.hentioe.dev/library/plugin-docker-buildx:arm64
-    pull: true
+    image: woodpeckerci/plugin-docker-buildx
     settings:
       repo: gramoss/policr-mini
       username: gramoss
