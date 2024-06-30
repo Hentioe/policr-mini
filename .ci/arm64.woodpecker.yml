@@ -58,7 +58,7 @@ steps:
       dockerfile: Dockerfile.multiarch
       platforms: linux/amd64,linux/arm64/v8
     volumes:
-      - /var/lib/docker/buildkit/111:/var/lib/docker/buildkit/111
+      - /var/lib/docker/buildkit/:/var/lib/docker/buildkit/
     when:
       branch: test/arm_ci
       event: push
