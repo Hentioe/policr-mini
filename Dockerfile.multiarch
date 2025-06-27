@@ -20,7 +20,7 @@ RUN set -xe \
 
 
 # 使用 Node 镜像构建前端
-FROM node:20 as assets-build
+FROM node:22 as assets-build
 
 WORKDIR /src
 

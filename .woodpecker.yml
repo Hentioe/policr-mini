@@ -14,7 +14,7 @@ steps:
       - mix compile
 
   app-assets-build:
-    image: node:20
+    image: node:22
     commands:
       - npm install --location=global pnpm@10
       - pnpm --prefix assets install
