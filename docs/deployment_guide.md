@@ -278,7 +278,7 @@ docker compose logs server
 ██║     ╚██████╔╝███████╗██║╚██████╗██║  ██║    ██║ ╚═╝ ██║██║██║ ╚████║██║
 ╚═╝      ╚═════╝ ╚══════╝╚═╝ ╚═════╝╚═╝  ╚═╝    ╚═╝     ╚═╝╚═╝╚═╝  ╚═══╝╚═╝
 
-18:51:36.722 [info] TOOLCHAINS: [ELIXIR-1.16.3, ERTS-14.2.5]
+18:51:36.722 [info] TOOLCHAINS: [ELIXIR-1.18.4, ERTS-16.0.1]
 18:51:36.899 [info] Already up
 18:51:37.170 [info] Running PolicrMiniWeb.Endpoint with cowboy 2.10.0 at 0.0.0.0:8080 (http)
 18:51:37.174 [info] Access PolicrMiniWeb.Endpoint at http://localhost:8080
