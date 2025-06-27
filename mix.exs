@@ -50,8 +50,8 @@ defmodule PolicrMini.MixProject do
     [
       # {:dep_from_hexpm, "~> 0.3.0"},
       # {:dep_from_git, git: "https://github.com/elixir-lang/my_dep.git", tag: "0.1.0"}
-      {:dialyxir, "~> 1.4", only: [:dev], runtime: false},
-      {:credo, "~> 1.7", only: [:dev, :test], runtime: false},
+      {:dialyxir, "~> 1.4.5", only: [:dev], runtime: false},
+      {:credo, "~> 1.7.12", only: [:dev, :test], runtime: false},
       {:rustler, "~> 0.32.1", runtime: false},
       {:benchee, "~> 1.0", only: :dev},
       {:telegex, git: "https://github.com/Hentioe/telegex.git", branch: "v1.6"},
@@ -85,7 +85,7 @@ defmodule PolicrMini.MixProject do
       {:mime, "~> 2.0"},
       {:instream, "~> 2.2"},
       {:honeycomb, "~> 0.1.0"},
-      {:figlet, git: "https://github.com/Hentioe/figlet", branch: "compatible_1.16"},
+      {:figlet, "~> 0.3.2"},
       # 此库依赖 Rust
       {:img_grider, git: "https://github.com/gramlabs-oss/img_grider.git"}
     ]
