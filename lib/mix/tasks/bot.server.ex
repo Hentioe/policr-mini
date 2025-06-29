@@ -1,4 +1,4 @@
-defmodule Mix.Tasks.Tg.Server do
+defmodule Mix.Tasks.Bot.Server do
   @moduledoc false
 
   use Mix.Task

@@ -4,14 +4,102 @@ elixir = "1.18.4-otp-28"
 "npm:pnpm" = "10"
 "cargo:dprint" = "latest"
 
-[tasks.format]
-depends = ["native-format"]
-run = ["dprint fmt", "mix format"]
-
-[tasks.native-format]
+[tasks.setup]
 run = [
-  "mise run cargo-for ziputil fmt",
-  "mise run cargo-for imgkit fmt",
+  "mise run env-deps up -d --wait",
+  "mix deps.get",
+  "mise run assets-setup",
+  "mise run front-setup",
+  "mise run native-setup",
+  "mix ecto.setup",
+]
+
+[tasks.default]
+run = "iex -S mix"
+
+[tasks.bot]
+run = "iex -S mix bot.server"
+
+[tasks.web]
+run = "iex -S mix web.server"
+
+[tasks.full]
+run = "iex -S mix all.server"
+
+[tasks.format]
+depends = ["mix-format", "native-format", "dprint-fmt"]
+
+[tasks.lint]
+depends = ["mix-lint", "front-lint", "native-lint"]
+
+[tasks.check]
+depends = ["format", "lint"]
+
+[tasks.test]
+run = [
+  "mix test",
+  "mise run cargo-for imgkit test",
+  "mise run cargo-for ziputil test",
+]
+
+[tasks.clean]
+depends = ["mix-clean", "native-clean", "front-clean", "outout-clean"]
+
+[tasks.destory]
+depends = ["clean"]
+run = "mise run env-deps down -v"
+
+[tasks.env-deps]
+run = "docker compose -f docker-compose.dev.yml"
+
+[tasks.mix-clean]
+run = ["mix clean", "rm -rf deps _build"]
+
+[tasks.mix-check]
+depends = ["mix-format", "mix-lint"]
+
+[tasks.mix-format]
+run = "mix format"
+
+[tasks.mix-lint]
+run = ["mix credo --strict --mute-exit-status", "mix dialyzer"]
+
+[tasks.native-setup]
+run = [
+  "mise run cargo-for ziputil fetch",
+  "mise run cargo-for imgkit fetch",
+]
+[tasks.native-format]
+run = ["mise run cargo-for ziputil fmt", "mise run cargo-for imgkit fmt"]
+
+[tasks.native-lint]
+run = ["mise run cargo-for ziputil clippy", "mise run cargo-for imgkit clippy"]
+
+[tasks.native-clean]
+run = ["mise run cargo-for imgkit clean", "mise run cargo-for ziputil clean", "rm -rf priv/native"]
+
+[tasks.front-setup]
+run = "mise run front-pnpm install"
+
+[tasks.front-lint]
+run = "mise run front-pnpm run lint"
+
+[tasks.front-clean]
+run = ["rm -rf webapps/node_modules", "rm -rf priv/static/assets"]
+
+[tasks.front-pnpm]
+run = "pnpm --prefix webapps"
+
+[tasks.assets-setup]
+run = "pnpm install --prefix assets"
+
+[tasks.dprint-fmt]
+run = "dprint fmt"
+
+[tasks.outout-clean]
+run = [
+  "rm -rf test/assets/output/*",
+  "rm -rf _assets/_cache/*",
 ]
 
 [tasks.cargo-for]
