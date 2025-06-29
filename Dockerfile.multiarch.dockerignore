@@ -1,7 +1,8 @@
 /_build/
 /deps/
 /assets/node_modules/
+/webapps/node_modules/
 /priv/static/
 /priv/native/
-/.tool-versions
 /rust-toolchain
+/.mise.toml

@@ -1,31 +1,26 @@
-# 使用构建基础镜像复制源代码执行编译
-FROM gramoss/mini-build-base:20240521 as compile
-
+# Use build-base as the build base
+FROM gramoss/mini-build-base:20250628 AS build-base
 ARG TARGETARCH
-
-ENV MIX_ENV=prod
-
 WORKDIR /src
-
-COPY . /src/
-
+ENV MIX_ENV=prod
 RUN set -xe \
     && if [ "$TARGETARCH" = "arm64" ]; then \
     # Avoid QEMU/arm64 build failed. \
     export ERL_FLAGS="+JMsingle true"; \
     fi \
-    && xbps-install -Sy git \
+    && xbps-install -Sy git
+
+# Compile the backend code
+FROM build-base AS compile
+COPY . /src/
+RUN set -xe \
     && mix deps.get \
     && mix compile
 
-
-# 使用 Node 镜像构建前端
-FROM node:22 as assets-build
-
+# Use Node.js build the frontend
+FROM node:22 AS assets-build
 WORKDIR /src
-
 COPY --from=compile /src/ /src/
-
 RUN set -xe \
     && npm install --location=global pnpm@10 \
     && pnpm --prefix assets install \
@@ -33,39 +28,17 @@ RUN set -xe \
     && pnpm --prefix webapps install \
     && pnpm --prefix webapps build
 
-
-# 使用构建基础镜像 release 应用
-FROM gramoss/mini-build-base:20240521 as release
-
-ARG TARGETARCH
-
-ENV MIX_ENV=prod
-
-WORKDIR /src
-
+# Release the application
+FROM compile AS release
 COPY --from=assets-build /src/ /src/
-
 RUN set -xe \
-    && if [ "$TARGETARCH" = "arm64" ]; then \
-    # Avoid QEMU/arm64 build failed. \
-    export ERL_FLAGS="+JMsingle true"; \
-    fi \
-    && xbps-install -Sy git \
-    && mix local.hex --force \
-    && mix local.rebar --force \
     && mix phx.digest \
     && mix release
 
-
-# 使用运行基础镜像打包
-FROM gramoss/mini-run-base:20240521
-
+# Use the run base image to package
+FROM gramoss/mini-run-base:20250628
 ARG APP_HOME=/home/policr_mini
-
-COPY --from=release /src/_build/prod/rel/policr_mini $APP_HOME
-
 WORKDIR $APP_HOME
-
+COPY --from=release /src/_build/prod/rel/policr_mini $APP_HOME
 ENV PATH="$APP_HOME/bin:$PATH"
-
 ENTRYPOINT [ "policr_mini", "start" ]
