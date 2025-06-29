@@ -6,8 +6,7 @@
     "watch": "vite build --watch --mode development",
     "build": "vite build --mode production",
     "test": "echo \"Error: no test specified\" && exit 1",
-    "lint": "eslint src/ --ext .ts,.tsx,.js --report-unused-disable-directives --max-warnings 0",
-    "format": "dprint fmt"
+    "lint": "eslint src/ --ext .ts,.tsx,.js --report-unused-disable-directives --max-warnings 0"
   },
   "author": "Hentioe",
   "license": "MIT",

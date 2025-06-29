@@ -14,10 +14,9 @@ check:
     just front-check
 
 format:
-    just mix-format assets-format front-format
+    just mix-format
     just cargo-for imgkit fmt
     just cargo-for ziputil fmt
-
 
 lint:
     just mix-lint front-lint
@@ -47,9 +46,6 @@ mix-clean:
 assets-setup:
     pnpm install --prefix assets
 
-assets-format:
-    prettier --write assets/
-
 assets-clean:
     rm -rf assets/node_modules
     rm -rf priv/static
@@ -58,7 +54,7 @@ front-setup:
     just front-pnpm install
 
 front-check:
-    just front-format front-lint
+    just front-lint
 
 front-format:
     just front-pnpm run format

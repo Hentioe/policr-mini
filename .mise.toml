@@ -2,5 +2,17 @@
 erlang = "28.0.1"
 elixir = "1.18.4-otp-28"
 "npm:pnpm" = "10"
-"npm:prettier" = "latest"
 "cargo:dprint" = "latest"
+
+[tasks.format]
+depends = ["native-format"]
+run = ["dprint fmt", "mix format"]
+
+[tasks.native-format]
+run = [
+  "mise run cargo-for ziputil fmt",
+  "mise run cargo-for imgkit fmt",
+]
+
+[tasks.cargo-for]
+run = 'cd native/{{arg(name="mod_name")}} && cargo {{arg(name="cargo_args", var=true)}}'

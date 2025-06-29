@@ -126,7 +126,6 @@ services:
     restart: always
     depends_on:
       - db
-
 ```
 
 一般情况下这个文件无需再进行任何编辑，因为它引用了大量的变量。我们只需要对这些变量一一赋值完成或更新配置，即编辑 `.env` 文件：
@@ -181,7 +180,7 @@ POLICR_MINI_OPTS="" # 可选配置，此处预设为空
 POLICR_MINI_OPTS="--independent --<假想的可选参数2>"
 ```
 
->如果您想让自己的实例或所服务的用户受到足够的隐私保护，那么建议添加 `--independent` 可选参数。默认配置下部署的第三方实例的前台首页被访问时（后台不会），客户的浏览器会向官方实例发送请求以获取一些共享数据。此时官方实例是知道有来自第三方实例的用户请求，虽然官方实例并不在意这些请求数据。
+> 如果您想让自己的实例或所服务的用户受到足够的隐私保护，那么建议添加 `--independent` 可选参数。默认配置下部署的第三方实例的前台首页被访问时（后台不会），客户的浏览器会向官方实例发送请求以获取一些共享数据。此时官方实例是知道有来自第三方实例的用户请求，虽然官方实例并不在意这些请求数据。
 
 ### Webhook 模式
 
@@ -189,7 +188,7 @@ POLICR_MINI_OPTS="--independent --<假想的可选参数2>"
 
 _供参考：Policr Mini 官方实例曾以 `polling` 模式长期运行，也因为如此 `webhook` 模式仍处于实验阶段。_
 
-取消 `docker-compose.yml`  文件的部分注释：包括 `ports` 下对 Webhook 服务端口变量的引用、`environment` 下 `POLICR_MINI_BOT_WORK_MODE` 和 `POLICR_MINI_BOT_WEBHOOK_*` 变量的注入和引用。如果你不明白取消注释是什么意思，请直接删除相关行开头的井号。
+取消 `docker-compose.yml` 文件的部分注释：包括 `ports` 下对 Webhook 服务端口变量的引用、`environment` 下 `POLICR_MINI_BOT_WORK_MODE` 和 `POLICR_MINI_BOT_WEBHOOK_*` 变量的注入和引用。如果你不明白取消注释是什么意思，请直接删除相关行开头的井号。
 
 取消注释后，编辑 `.env` 配置，将相关变量一一赋值：
 
