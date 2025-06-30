@@ -8,6 +8,6 @@ defmodule PolicrMiniWeb.PageControllerTest do
     :ets.new(Info, [:set, :named_table])
 
     conn = get(conn, "/")
-    assert html_response(conn, 200) =~ "载入中 - "
+    assert html_response(conn, 200) =~ "首页 - "
   end
 end
