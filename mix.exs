@@ -85,7 +85,6 @@ defmodule PolicrMini.MixProject do
       {:mime, "~> 2.0"},
       {:instream, "~> 2.2"},
       {:honeycomb, "~> 0.1.0"},
-      {:figlet, "~> 0.3.2"},
       # 此库依赖 Rust
       {:img_grider, git: "https://github.com/gramlabs-oss/img_grider.git"}
     ]

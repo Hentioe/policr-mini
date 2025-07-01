@@ -8,8 +8,8 @@ defmodule PolicrMini.Application do
   require Logger
 
   def start(_type, _args) do
-    # 输出 figlet
-    print_figlet()
+    # 输出 banner 消息
+    print_banner()
     # 输出构建时/运行时信息
     print_buildtime_runtime_info()
     # 初始化 Mnesia 表结构。
@@ -70,10 +70,12 @@ defmodule PolicrMini.Application do
     Logger.info("TOOLCHAINS: [ELIXIR-#{elixir_version}, ERTS-#{erts_version}]")
   end
 
-  defp print_figlet do
-    if PolicrMini.mix_env() != :test do
-      font = Application.app_dir(:policr_mini, ["priv", "fonts", "ansi-shadow.flf"])
-      :ok = Figlet.text("Policr Mini", font: font)
+  defp print_banner do
+    if PolicrMini.mix_env() in [:dev, :prod] do
+      banner_path = Application.app_dir(:policr_mini, ["priv", "banner.txt"])
+      banner = File.read!(banner_path)
+
+      IO.write("#{banner}\n")
     end
   end
 end
