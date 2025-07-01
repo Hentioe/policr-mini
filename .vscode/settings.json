@@ -1,24 +1,20 @@
 {
   "files.watcherExclude": {
-    // 忽略 Elixir 的构建目录。
+    // 忽略 Elixir 的构建目录
     "**/_build/**": true,
-    // 忽略 Rust 模块的构建目录。
+    // 忽略 Rust 模块的构建目录
     "**/native/**/target/**": true,
-    // 忽略 ElixirLS 的缓存目录。
+    // 忽略 ElixirLS 的缓存目录
     "**/.elixir_ls/**": true,
-    // 忽略 Elixir 的依赖目录。
+    // 忽略 Elixir 的依赖目录
     "**/deps/**": true,
-    // 忽略前端输出目录。
+    // 忽略前端输出目录
     "**/priv/static/**": true,
-    // 忽略前端依赖库目录。
+    // 忽略前端依赖库目录
     "**/assets/node_modules/**": true
   },
   "rust-analyzer.linkedProjects": [
     "native/imgkit/Cargo.toml",
     "native/ziputil/Cargo.toml"
-  ],
-  // 配置工作区的 TypeScript 路径（允许切换到工作区版本）
-  "typescript.tsdk": "webapps/node_modules/typescript/lib",
-  // 配置 Nix 环境选择器的 Nix 文件路径
-  "nixEnvSelector.nixFile": "${workspaceRoot}/shell.nix"
+  ]
 }
