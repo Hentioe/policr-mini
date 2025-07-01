@@ -5,10 +5,11 @@ use magick_rust::{
     },
     magick_wand_genesis, MagickWand,
 };
-use rand::prelude::*;
+use rand::{prelude::*, rng};
 use std::{ffi::c_char, path::PathBuf, str::Utf8Error, sync::Once};
 use thiserror::Error as ThisError;
-use uuid::Uuid;
+
+rustler::init!("Elixir.PolicrMini.ImgKit");
 
 static START: Once = Once::new();
 
@@ -53,8 +54,6 @@ impl rustler::types::Encoder for Error {
 
 type Result<T> = std::result::Result<T, Error>;
 
-rustler::init!("Elixir.PolicrMini.ImgKit", [rewrite_image]);
-
 #[rustler::nif]
 fn rewrite_image(image: String, outout_dir: String) -> Result<String> {
     _rewrite_image(image.into(), outout_dir.into())
@@ -72,9 +71,9 @@ fn _rewrite_image(image: PathBuf, output_dir: PathBuf) -> Result<String> {
     let height = wand.get_image_height();
 
     // 生成随机行和列。
-    let mut rng = thread_rng();
-    let rand_row = rng.gen_range(1..=height);
-    let rand_col = rng.gen_range(1..=width);
+    let mut rng = rng();
+    let rand_row = rng.random_range(1..=height);
+    let rand_col = rng.random_range(1..=width);
 
     unsafe {
         // 创建像素迭代器。
@@ -88,7 +87,7 @@ fn _rewrite_image(image: PathBuf, output_dir: PathBuf) -> Result<String> {
             rand_col,
         );
         // 设置列中的随机像素为黑色。
-        PixelSetColor(pixels[rand_col - 1], "#000000\0".as_ptr() as *const c_char);
+        PixelSetColor(pixels[rand_col - 1], c"#000000".as_ptr() as *const c_char);
         // 同步像素迭代器。
         PixelSyncIterator(iterator_ptr);
         // 销毁像素迭代器。
@@ -105,7 +104,7 @@ fn _rewrite_image(image: PathBuf, output_dir: PathBuf) -> Result<String> {
 }
 
 fn random_fname(ext: &str) -> String {
-    format!("{}.{}", Uuid::new_v4(), ext)
+    format!("{}.{}", uuid::Uuid::new_v4(), ext)
 }
 
 #[cfg(test)]

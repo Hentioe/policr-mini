@@ -2,6 +2,8 @@ use std::{fs, io, path::PathBuf};
 use thiserror::Error as ThisError;
 use zip::ZipArchive;
 
+rustler::init!("Elixir.PolicrMini.ZipUtil");
+
 #[derive(ThisError, Debug)]
 pub enum Error {
     #[error("IO: {0}")]
@@ -38,14 +40,8 @@ impl rustler::types::Encoder for Error {
     }
 }
 
-rustler::init!("Elixir.PolicrMini.ZipUtil", [unzip_file]);
-
 #[rustler::nif(schedule = "DirtyCpu")]
 fn unzip_file(zip_file: String, output_dir: String) -> Result<()> {
-    _unzip_file(zip_file.into(), output_dir.into())
-}
-
-pub fn _unzip_file(zip_file: PathBuf, output_dir: PathBuf) -> Result<()> {
     // 读取文件并创建 zip 归档。
     let file = fs::File::open(zip_file)?;
     let mut archive = ZipArchive::new(file)?;
@@ -55,7 +51,7 @@ pub fn _unzip_file(zip_file: PathBuf, output_dir: PathBuf) -> Result<()> {
         // 按照官方示例建议，此处应该用 `enclosed_name` 方法以避免攻击。但 `enclosed_name` 方法可能存在乱码问题，且上传压缩文件暂时无需担心攻击。
         let out = String::from_utf8(file.name_raw().to_vec())?;
 
-        let output_path = output_dir.join(out);
+        let output_path = PathBuf::from(&output_dir).join(out);
 
         if (*file.name()).ends_with('/') {
             // 如果是目录，则创建目录。
