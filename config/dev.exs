@@ -9,8 +9,9 @@ config :policr_mini, opts: ["--allow-client-switch-grid"]
 config :policr_mini, PolicrMini.Repo,
   username: "postgres",
   password: "postgres",
-  database: "policr_mini_dev",
   hostname: "localhost",
+  database: "policr_mini_dev",
+  stacktrace: true,
   show_sensitive_data_on_connection_error: true,
   pool_size: 10,
   migration_timestamps: [type: :utc_datetime]
@@ -30,10 +31,11 @@ config :policr_mini, PolicrMini.InfluxConn,
 # watchers to your application. For example, we use it
 # with webpack to recompile .js and .css sources.
 config :policr_mini, PolicrMiniWeb.Endpoint,
-  http: [port: 4000],
+  http: [ip: {127, 0, 0, 1}, port: 4000],
   debug_errors: true,
   code_reloader: true,
   check_origin: false,
+  secret_key_base: "aaaaaaaa",
   watchers: [
     pnpm: [
       "run",

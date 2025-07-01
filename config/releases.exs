@@ -6,8 +6,7 @@ import Config
 
 config :policr_mini,
   # 通过空格间隔的可选项配置列表
-  opts: String.split(System.get_env("POLICR_MINI_OPTS", "")),
-  google_analytics_id: System.get_env("POLICR_MINI_GOOGLE_ANALYTICS_ID")
+  opts: String.split(System.get_env("POLICR_MINI_OPTS", ""))
 
 database_url =
   System.get_env("POLICR_MINI_DATABASE_URL") ||

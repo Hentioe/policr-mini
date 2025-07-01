@@ -19,10 +19,22 @@ config :policr_mini, PolicrMiniWeb.Endpoint,
   pubsub_server: PolicrMini.PubSub,
   live_view: [signing_salt: "hy+GpqGC"]
 
-# 配置图片服务。
+# Configures the mailer
+#
+# By default it uses the "Local" adapter which stores the emails
+# locally. You can see the emails in your browser, at "/dev/mailbox".
+#
+# For production it's recommended to configure a different adapter
+# at the `config/runtime.exs`.
+config :policr_mini, PolicrMini.Mailer, adapter: Swoosh.Adapters.Local
+
+# Swoosh API client is needed for adapters other than SMTP.
+config :swoosh, :api_client, false
+
+# 配置图片服务
 config :policr_mini, PolicrMiniBot.ImageProvider, root: "_assets"
 
-# 配置网格验证。
+# 配置网格验证
 config :policr_mini, PolicrMiniBot.GridCAPTCHA,
   # 个体图片宽度
   indi_width: 180,
@@ -31,20 +43,20 @@ config :policr_mini, PolicrMiniBot.GridCAPTCHA,
   # 水印字体
   watermark_font_family: "Lato"
 
-# 配置机器人。
+# 配置机器人
 config :policr_mini, PolicrMiniBot,
   auto_gen_commands: false,
   mosaic_method: :spoiler
 
-# 配置 Telegex 的适配器。
+# 配置 Telegex 的适配器
 config :telegex,
   caller_adapter: {Finch, [receive_timeout: 5 * 1000]},
   hook_adapter: Cowboy
 
-# 配置根链接。
+# 配置根链接
 config :policr_mini, PolicrMiniWeb, root_url: "http://0.0.0.0:4000/"
 
-# 任务调度配置。
+# 任务调度配置
 config :policr_mini, PolicrMiniBot.Scheduler,
   jobs: [
     # 修正过期验证，每 5 分钟。
@@ -82,4 +94,4 @@ config :phoenix, :json_library, Jason
 
 # Import environment specific config. This must remain at the bottom
 # of this file so it overrides the configuration defined above.
-import_config "#{Mix.env()}.exs"
+import_config "#{config_env()}.exs"

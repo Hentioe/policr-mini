@@ -54,8 +54,6 @@ defmodule PolicrMini do
 
   def opt_exists?(_opt_name), do: false
 
-  def google_analytics_id, do: config_get(:google_analytics_id)
-
   def config_get(key, default \\ nil) do
     Application.get_env(:policr_mini, key, default)
   end

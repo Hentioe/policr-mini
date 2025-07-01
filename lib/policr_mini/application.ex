@@ -7,6 +7,7 @@ defmodule PolicrMini.Application do
 
   require Logger
 
+  @impl true
   def start(_type, _args) do
     # 输出 banner 消息
     print_banner()
@@ -58,6 +59,7 @@ defmodule PolicrMini.Application do
 
   # Tell Phoenix to update the endpoint configuration
   # whenever the application is updated.
+  @impl true
   def config_change(changed, _new, removed) do
     PolicrMiniWeb.Endpoint.config_change(changed, removed)
     :ok
