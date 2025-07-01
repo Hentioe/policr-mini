@@ -96,6 +96,9 @@ run = "pnpm install --prefix assets"
 [tasks.dprint-fmt]
 run = "dprint fmt"
 
+[tasks.bye]
+run = "mise run env-deps stop"
+
 [tasks.outout-clean]
 run = [
   "rm -rf test/assets/output/*",
