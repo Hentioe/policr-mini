@@ -3,7 +3,7 @@ import Config
 # Definition environment
 config :policr_mini, :environment, :prod
 
-config :policr_mini, PolicrMini.Application, runtime_migrate: true, tg_serve: true
+config :policr_mini, PolicrMini.Application, runtime_migrate: true, bot_serve: true
 
 # For production, don't forget to configure the url host
 # to something meaningful, Phoenix uses this information

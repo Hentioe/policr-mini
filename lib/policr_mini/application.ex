@@ -21,7 +21,7 @@ defmodule PolicrMini.Application do
     config = Application.get_env(:policr_mini, __MODULE__)
 
     runtime_migrate? = config[:runtime_migrate] || false
-    tg_serve? = config[:tg_serve] || false
+    bot_serve? = config[:bot_serve] || false
 
     children =
       [
@@ -46,7 +46,7 @@ defmodule PolicrMini.Application do
         # Start the Endpoint (http/https)
         PolicrMiniWeb.Endpoint,
         # Start the Telegram bot
-        {PolicrMiniBot.Supervisor, serve: tg_serve?},
+        {PolicrMiniBot.Supervisor, serve: bot_serve?},
         # 启动后台任务的 Honeycomb 系统
         {Honeycomb, queen: PolicrMini.BackgroundQueen}
       ]

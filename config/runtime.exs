@@ -21,6 +21,10 @@ if System.get_env("PHX_SERVER") do
   config :policr_mini, PolicrMiniWeb.Endpoint, server: true
 end
 
+if System.get_env("BOT_SERVER") do
+  config :policr_mini, PolicrMini.Application, bot_serve: true
+end
+
 if config_env() == :prod do
   config :policr_mini,
     # 读取可选项

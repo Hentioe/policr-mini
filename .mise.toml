@@ -15,16 +15,16 @@ run = [
 ]
 
 [tasks.default]
+env = { PHX_SERVER = "true", BOT_SERVER = "true" }
 run = "iex -S mix"
 
 [tasks.bot]
-run = "iex -S mix bot.server"
+env = { BOT_SERVER = "true" }
+run = "iex -S mix"
 
 [tasks.web]
-run = "iex -S mix web.server"
-
-[tasks.full]
-run = "iex -S mix all.server"
+env = { PHX_SERVER = "true" }
+run = "iex -S mix"
 
 [tasks.format]
 depends = ["mix-format", "native-format", "dprint-fmt"]
