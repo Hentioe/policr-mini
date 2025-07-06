@@ -38,7 +38,6 @@ depends = ["format", "lint"]
 [tasks.test]
 run = [
   "mix test",
-  "mise run cargo-for imgkit test",
   "mise run cargo-for ziputil test",
 ]
 
@@ -65,18 +64,15 @@ run = "mix format"
 run = ["mix credo --strict --mute-exit-status", "mix dialyzer"]
 
 [tasks.native-setup]
-run = [
-  "mise run cargo-for ziputil fetch",
-  "mise run cargo-for imgkit fetch",
-]
+run = ["mise run cargo-for ziputil fetch"]
 [tasks.native-format]
-run = ["mise run cargo-for ziputil fmt", "mise run cargo-for imgkit fmt"]
+run = ["mise run cargo-for ziputil fmt"]
 
 [tasks.native-lint]
-run = ["mise run cargo-for ziputil clippy", "mise run cargo-for imgkit clippy"]
+run = ["mise run cargo-for ziputil clippy"]
 
 [tasks.native-clean]
-run = ["mise run cargo-for imgkit clean", "mise run cargo-for ziputil clean", "rm -rf priv/native"]
+run = ["mise run cargo-for ziputil clean", "rm -rf priv/native"]
 
 [tasks.front-setup]
 run = "mise run front-pnpm install"

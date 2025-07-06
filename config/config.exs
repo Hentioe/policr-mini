@@ -54,7 +54,7 @@ config :telegex,
   hook_adapter: Cowboy
 
 # 配置根链接
-config :policr_mini, PolicrMiniWeb, root_url: "http://localhost:4000/"
+config :policr_mini, PolicrMiniWeb, root_url: "http://0.0.0.0:4000/"
 
 # 配置 Capinde
 config :policr_mini, PolicrMini.Capinde, base_url: "http://localhost:8080"

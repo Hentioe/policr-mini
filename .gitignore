@@ -56,3 +56,6 @@ npm-debug.log
 
 # Ignore direnv
 /.direnv
+
+# Ignore shared assets
+/shared_assets/

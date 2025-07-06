@@ -19,6 +19,15 @@ defmodule PolicrMini.Capinde do
       field :watermark_font_weight, float()
     end
 
+    typedstruct module: ImageParams do
+      @derive JSON.Encoder
+
+      field :type, String.t(), default: "image"
+      field :dynamic_digest, boolean()
+      field :with_choices, boolean()
+      field :choices_count, integer()
+    end
+
     @type special_params :: GridParams.t()
 
     typedstruct do
@@ -60,7 +69,24 @@ defmodule PolicrMini.Capinde do
       end
     end
 
-    @type special_payload :: GridPayload.t()
+    defmodule ImagePayload do
+      @moduledoc false
+
+      typedstruct do
+        field :type, String.t(), default: "image"
+        field :right_indexes, [non_neg_integer()], enforce: true
+        field :choices, [String.t()], enforce: true
+      end
+
+      def from(%{"right_indexes" => right_indexes, "choices" => choices}) do
+        %__MODULE__{
+          right_indexes: right_indexes,
+          choices: choices
+        }
+      end
+    end
+
+    @type special_payload :: GridPayload.t() | ImagePayload.t()
 
     typedstruct do
       field :file_name, String.t(), enforce: true
@@ -69,16 +95,24 @@ defmodule PolicrMini.Capinde do
       field :unique_id, String.t(), enforce: true
     end
 
+    defp from_special_payload(%{"type" => "grid"} = payload) do
+      GridPayload.from(payload)
+    end
+
+    defp from_special_payload(%{"type" => "image"} = payload) do
+      ImagePayload.from(payload)
+    end
+
     def from(%{
           "file_name" => file_name,
           "namespace" => namespace,
-          "special_payload" => special_payload = %{"type" => "grid"},
+          "special_payload" => special_payload,
           "unique_id" => unique_id
         }) do
       %__MODULE__{
         file_name: file_name,
         namespace: namespace,
-        special_payload: GridPayload.from(special_payload),
+        special_payload: from_special_payload(special_payload),
         unique_id: unique_id
       }
     end

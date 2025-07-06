@@ -14,7 +14,6 @@
     "**/assets/node_modules/**": true
   },
   "rust-analyzer.linkedProjects": [
-    "native/imgkit/Cargo.toml",
     "native/ziputil/Cargo.toml"
   ],
   // All CSS files will be opened in Tailwind CSS mode
