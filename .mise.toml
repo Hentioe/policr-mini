@@ -50,7 +50,7 @@ depends = ["clean"]
 run = "mise run env-deps down -v"
 
 [tasks.env-deps]
-run = "docker compose -f docker-compose.dev.yml"
+run = "docker compose -f docker-compose.dev.yml --env-file dev.env"
 
 [tasks.mix-clean]
 run = ["mix clean", "rm -rf deps _build"]
