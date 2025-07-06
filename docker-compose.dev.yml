@@ -26,3 +26,15 @@ services:
       TELEGRAM_API_ID: $TELEGRAM_API_ID
       TELEGRAM_API_HASH: $TELEGRAM_API_HASH
       TELEGRAM_LOCAL_MODE: true
+
+  capinde:
+    image: ${POLICR_MINI_CAPINDE_IMAGE:-hentioe/capinde:0.1.0-beta}
+    ports:
+      - 8080:8080
+    environment:
+      CAPINDE_HOST: 0.0.0.0
+      CAPINDE_NAMESPACE_BASE: /namespace
+      CAPINDE_ALBUMS_BASE: /_albums
+    volumes:
+      - ./shared_assets:/namespace/out
+      - ./_assets/_albums:/_albums

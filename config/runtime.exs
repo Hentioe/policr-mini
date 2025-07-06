@@ -147,6 +147,14 @@ if config_env() == :prod do
         environment variable `POLICR_MINI_SERVER_ROOT_URL` is missing.
         """)
 
+  # 配置 Capinde
+  config :policr_mini, PolicrMini.Capinde,
+    base_url:
+      System.get_env("POLICR_MINI_CAPINDE_BASE_URL") ||
+        raise("""
+        environment variable `POLICR_MINI_CAPINDE_BASE_URL` is missing.
+        """)
+
   # 配置图片提供器
   config :policr_mini, PolicrMiniBot.ImageProvider,
     root:

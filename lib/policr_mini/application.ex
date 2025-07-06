@@ -33,6 +33,8 @@ defmodule PolicrMini.Application do
         PolicrMini.InfluxConn,
         # Start the Finch
         {Finch, name: PolicrMini.Finch},
+        # Start Finch instance for Capinde
+        {Finch, name: PolicrMini.Capinde},
         # Start the Cacher
         PolicrMini.Cache,
         # Start the Counter
