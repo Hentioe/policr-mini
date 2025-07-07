@@ -17,6 +17,10 @@ defmodule PolicrMini.Capinde do
       field :watermark_font_family, String.t(), enforce: true
       field :watermark_font_size, integer()
       field :watermark_font_weight, float()
+      field :right_count, integer()
+      field :with_choices, boolean()
+      field :choices_count, integer()
+      field :unordered_right_parts, boolean()
     end
 
     typedstruct module: ImageParams do
@@ -57,14 +61,16 @@ defmodule PolicrMini.Capinde do
 
       typedstruct do
         field :type, String.t(), default: "grid"
-        field :right_parts, [integer()], enforce: true
+        field :right_parts, [integer(), ...], enforce: true
         field :subject, %{String.t() => String.t()}, enforce: true
+        field :choices, [[non_neg_integer()], ...], default: []
       end
 
-      def from(%{"right_parts" => right_parts, "subject" => subject}) do
+      def from(%{"right_parts" => right_parts, "subject" => subject, "choices" => choices}) do
         %__MODULE__{
           right_parts: right_parts,
-          subject: subject
+          subject: subject,
+          choices: choices
         }
       end
     end
@@ -75,7 +81,7 @@ defmodule PolicrMini.Capinde do
       typedstruct do
         field :type, String.t(), default: "image"
         field :right_indexes, [non_neg_integer()], enforce: true
-        field :choices, [String.t()], enforce: true
+        field :choices, [String.t(), ...], enforce: true
       end
 
       def from(%{"right_indexes" => right_indexes, "choices" => choices}) do

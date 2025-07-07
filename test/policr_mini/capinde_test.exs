@@ -10,8 +10,12 @@ defmodule PolicrMini.CapindeTest do
       ttl_secs: 5,
       special_params: %Input.GridParams{
         cell_width: 180,
-        cell_height: 140,
-        watermark_font_family: "Open Sans"
+        cell_height: 120,
+        watermark_font_family: "Open Sans",
+        right_count: 3,
+        with_choices: true,
+        choices_count: 9,
+        unordered_right_parts: true
       }
     }
 
@@ -20,6 +24,11 @@ defmodule PolicrMini.CapindeTest do
     assert is_struct(generated, Generated)
     assert is_struct(generated.special_payload, Generated.GridPayload)
     assert generated.special_payload.type == "grid"
+    assert length(generated.special_payload.choices) == 9
+
+    for choice <- generated.special_payload.choices do
+      assert length(choice) == 3
+    end
   end
 
   test "generate/1 with image" do
