@@ -4,9 +4,7 @@ defmodule PolicrMiniBot.GridCAPTCHATest do
   import PolicrMiniBot.GridCAPTCHA
 
   test "make!/2" do
-    {:ok, _} = PolicrMiniBot.ImageProvider.start_link([])
-
-    data = make!(-1, %{})
+    data = make!(nil, %{})
 
     assert length(data.candidates) == 3
     assert length(List.flatten(data.candidates)) == 9

@@ -31,9 +31,6 @@ config :policr_mini, PolicrMini.Mailer, adapter: Swoosh.Adapters.Local
 # Swoosh API client is needed for adapters other than SMTP.
 config :swoosh, :api_client, false
 
-# 配置图片服务
-config :policr_mini, PolicrMiniBot.ImageProvider, root: "_assets"
-
 # 配置网格验证
 config :policr_mini, PolicrMiniBot.GridCAPTCHA,
   # 个体图片宽度
@@ -72,11 +69,6 @@ config :policr_mini, PolicrMiniBot.Scheduler,
     #   schedule: "0 */4 * * *",
     #   task: {PolicrMiniBot.Runner.WorkingChecker, :run, []}
     # ],
-    # 定期清理缓存，每一分钟
-    cache_clean: [
-      schedule: "*/1 * * * *",
-      task: {PolicrMiniBot.Runner.CacheCleaner, :schedule, []}
-    ],
     # 已离开检查，每日。
     left_check: [
       schedule: "@daily",

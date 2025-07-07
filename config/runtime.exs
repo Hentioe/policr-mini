@@ -155,14 +155,6 @@ if config_env() == :prod do
         environment variable `POLICR_MINI_CAPINDE_BASE_URL` is missing.
         """)
 
-  # 配置图片提供器
-  config :policr_mini, PolicrMiniBot.ImageProvider,
-    root:
-      System.get_env("POLICR_MINI_BOT_ASSETS_PATH") ||
-        raise("""
-        environment variable `POLICR_MINI_BOT_ASSETS_PATH` is missing.
-        """)
-
   # 配置网格验证
   config :policr_mini, PolicrMiniBot.GridCAPTCHA,
     # 个体图片宽度

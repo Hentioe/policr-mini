@@ -13,9 +13,6 @@
     // 忽略前端依赖库目录
     "**/assets/node_modules/**": true
   },
-  "rust-analyzer.linkedProjects": [
-    "native/ziputil/Cargo.toml"
-  ],
   // All CSS files will be opened in Tailwind CSS mode
   "files.associations": {
     "*.css": "tailwindcss"

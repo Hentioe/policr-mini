@@ -119,7 +119,7 @@ const saveScheme = async ({
   }).then((r) => camelizeJson(r));
 };
 
-const deleteTempAlbums = async () => {
+const deleteUploadedAlbums = async () => {
   const endpoint = `/admin/api/profile/temp_albums`;
 
   return fetch(endpoint, {
@@ -135,7 +135,7 @@ const updateAlbums = async () => {
   }).then((r) => camelizeJson(r));
 };
 
-const addTempAlbums = async (fd) => {
+const uploadAlbums = async (fd) => {
   const endpoint = `/admin/api/profile/temp_albums`;
 
   return fetch(endpoint, {
@@ -319,8 +319,8 @@ export default () => {
     editingLeftedCleared,
   ]);
 
-  const handleDeleteTempAlbums = async () => {
-    const result = await deleteTempAlbums();
+  const handleDeleteUploaded = async () => {
+    const result = await deleteUploadedAlbums();
 
     if (result.errors) {
       toastErrors(result.errors);
@@ -330,23 +330,16 @@ export default () => {
     mutate();
   };
 
-  const handleUpdateAlbums = async () => {
+  const handleDeployAlbums = async () => {
     const result = await updateAlbums();
 
     if (result.errors) {
       toastErrors(result.errors);
       return;
+    } else {
+      toastMessage("更新成功");
+      mutate();
     }
-
-    if (!result.ok)
-      toastMessage(
-        "资源更新可能失败了，已尝试恢复之前的状态。请手动确认当前图片验证是否能正常工作。",
-        {
-          type: "error",
-        }
-      );
-
-    mutate();
   };
 
   const fileInputChange = (e) => {
@@ -357,21 +350,15 @@ export default () => {
 
   const handleUpload = useCallback(async () => {
     const fd = new FormData();
-    fd.append("zip", selectedFile);
+    fd.append("archive", selectedFile);
 
-    const result = await addTempAlbums(fd);
+    const result = await uploadAlbums(fd);
 
     if (result.errors) {
       toastErrors(result.errors);
       return;
-    }
-
-    if (!result.ok)
-      toastMessage("资源上传可能失败了，请通过「查阅日志」页面查看错误详情。", {
-        type: "error",
-      });
-    else {
-      setSelectedFile(null);
+    } else {
+      toastMessage("上传成功，请确认更新");
       mutate();
     }
   }, [selectedFile]);
@@ -553,23 +540,23 @@ export default () => {
             <main>
               <div>
                 <p tw="text-gray-800 font-bold">当前资源</p>
-                {data.manifest ? (
+                {data.deployedInfo.manifest ? (
                   <div>
                     <AlbumsLine>
                       <AlbumsLabel>版本</AlbumsLabel>
-                      <AlbumsValue>{data.manifest.version}</AlbumsValue>
+                      <AlbumsValue>{data.deployedInfo.manifest.version}</AlbumsValue>
                     </AlbumsLine>
                     <AlbumsLine>
                       <AlbumsLabel>生成日期</AlbumsLabel>
-                      <AlbumsValue>{data.manifest.datetime}</AlbumsValue>
+                      <AlbumsValue>{data.deployedInfo.manifest.datetime}</AlbumsValue>
                     </AlbumsLine>
                     <AlbumsLine>
                       <AlbumsLabel>图集总数</AlbumsLabel>
-                      <AlbumsValue>{data.manifest.albumsCount}</AlbumsValue>
+                      <AlbumsValue>{data.deployedInfo.manifest.albums.length}</AlbumsValue>
                     </AlbumsLine>
                     <AlbumsLine>
                       <AlbumsLabel>图片总数</AlbumsLabel>
-                      <AlbumsValue>{data.manifest.imagesCount}</AlbumsValue>
+                      <AlbumsValue>{data.deployedInfo.totalImages}</AlbumsValue>
                     </AlbumsLine>
                   </div>
                 ) : (
@@ -579,32 +566,32 @@ export default () => {
               <div>
                 <p tw="text-gray-800 font-bold">
                   临时资源
-                  {data.tempManifest && (
+                  {data.uploaded && (
                     <span tw="text-yellow-500">（待确认更新）</span>
                   )}
                 </p>
-                {data.tempManifest ? (
+                {data.uploaded ? (
                   <div>
                     <AlbumsLine>
                       <AlbumsLabel>版本</AlbumsLabel>
-                      <AlbumsValue>{data.tempManifest.version}</AlbumsValue>
+                      <AlbumsValue>{data.uploaded.manifest.version}</AlbumsValue>
                     </AlbumsLine>
                     <AlbumsLine>
                       <AlbumsLabel>生成日期</AlbumsLabel>
-                      <AlbumsValue>{data.tempManifest.datetime}</AlbumsValue>
+                      <AlbumsValue>{data.uploaded.manifest.datetime}</AlbumsValue>
                     </AlbumsLine>
                     <AlbumsLine>
                       <AlbumsLabel>图集总数</AlbumsLabel>
-                      <AlbumsValue>{data.tempManifest.albumsCount}</AlbumsValue>
+                      <AlbumsValue>{data.uploaded.manifest.albums.length}</AlbumsValue>
                     </AlbumsLine>
                     <AlbumsLine>
                       <AlbumsLabel>图片总数</AlbumsLabel>
-                      <AlbumsValue>{data.tempManifest.imagesCount}</AlbumsValue>
+                      <AlbumsValue>{data.uploaded.totalImages}</AlbumsValue>
                     </AlbumsLine>
                     <AlbumsLine>
                       <AlbumsLabel>操作</AlbumsLabel>
                       <AlbumsValue>
-                        <ActionButton onClick={handleDeleteTempAlbums}>
+                        <ActionButton onClick={handleDeleteUploaded}>
                           删除此资源
                         </ActionButton>
                       </AlbumsValue>
@@ -644,8 +631,8 @@ export default () => {
                 <div tw="mt-2">
                   <LabelledButton
                     label="cancel"
-                    onClick={handleUpdateAlbums}
-                    disabled={data.tempManifest == null}
+                    onClick={handleDeployAlbums}
+                    disabled={data.uploaded == null}
                   >
                     确认更新
                   </LabelledButton>

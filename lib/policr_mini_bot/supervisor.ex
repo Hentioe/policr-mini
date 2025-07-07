@@ -23,8 +23,6 @@ defmodule PolicrMiniBot.Supervisor do
     children = [
       # 任务缓存
       PolicrMiniBot.Worker.JobCacher,
-      # 图片提供服务
-      PolicrMiniBot.ImageProvider,
       # 验证入口维护器
       PolicrMiniBot.EntryMaintainer,
       # 一次性处理保证

@@ -1,5 +1,89 @@
 defmodule PolicrMini.Capinde do
   @moduledoc false
+  alias Multipart.Part
+
+  defmodule Manifest do
+    @moduledoc false
+
+    use TypedStruct
+
+    defmodule Album do
+      @moduledoc false
+
+      typedstruct do
+        field :id, String.t(), enforce: true
+        field :parents, [String.t(), ...], default: []
+        field :name, %{String.t() => String.t()}, enforce: true
+      end
+
+      def from(%{"id" => id, "parents" => parents, "name" => name}) do
+        %__MODULE__{
+          id: id,
+          parents: parents,
+          name: name
+        }
+      end
+    end
+
+    typedstruct do
+      field :version, Strintg.t(), enforce: true
+      field :datetime, DateTime.t(), enforce: true
+      field :include_formats, [String.t(), ...], enforce: true
+      field :albums, [Album.t(), ...], default: []
+    end
+
+    def from(%{
+          "version" => version,
+          "datetime" => datetime,
+          "include_formats" => include_formats,
+          "albums" => albums
+        }) do
+      {:ok, datetime, _} = DateTime.from_iso8601(datetime)
+
+      %__MODULE__{
+        version: version,
+        datetime: datetime,
+        include_formats: include_formats,
+        albums: Enum.map(albums, &Album.from/1)
+      }
+    end
+  end
+
+  defmodule ArchiveInfo do
+    @moduledoc false
+
+    use TypedStruct
+
+    typedstruct do
+      field :manifest, Manifest.t(), enforce: true
+      field :total_images, integer(), enforce: true
+    end
+
+    def from(%{"manifest" => manifest, "total_images" => total_images}) do
+      %__MODULE__{
+        manifest: Manifest.from(manifest),
+        total_images: total_images
+      }
+    end
+  end
+
+  defmodule DeployedInfo do
+    @moduledoc false
+
+    use TypedStruct
+
+    typedstruct do
+      field :manifest, Manifest.t(), enforce: true
+      field :total_images, integer(), enforce: true
+    end
+
+    def from(%{"manifest" => manifest, "total_images" => total_images}) do
+      %__MODULE__{
+        manifest: Manifest.from(manifest),
+        total_images: total_images
+      }
+    end
+  end
 
   defmodule Input do
     @moduledoc false
@@ -124,32 +208,77 @@ defmodule PolicrMini.Capinde do
     end
   end
 
-  @content_type_header {"Content-Type", "application/json"}
+  def deployed do
+    call("/provider/deployed", :get, %{}, &DeployedInfo.from/1)
+  end
+
+  def uploaded do
+    call("/provider/uploaded", :get, %{}, &ArchiveInfo.from/1)
+  end
+
+  def upload(archive_path) do
+    multipart = Multipart.new()
+
+    multipart =
+      Multipart.add_part(
+        multipart,
+        Part.file_field(archive_path, :archive)
+      )
+
+    body_stream = Multipart.body_stream(multipart)
+    content_length = Multipart.content_length(multipart)
+    content_type = Multipart.content_type(multipart, "multipart/form-data")
+    headers = [{"Content-Type", content_type}, {"Content-Length", to_string(content_length)}]
+
+    Finch.build("POST", "#{endpoint()}/provider/upload", headers, {:stream, body_stream})
+    |> Finch.request(__MODULE__)
+    |> handle_resp(&ArchiveInfo.from/1)
+  end
+
+  def delete_uploaded do
+    call("/provider/uploaded", :delete)
+  end
+
+  def deploy_uploaded do
+    call("/provider/deploy", :put)
+  end
 
   def generate(input) when is_struct(input, Input) do
-    :post
-    |> Finch.build(endpoint(), [@content_type_header], JSON.encode!(input))
+    call("/generate", :post, input, &Generated.from/1)
+  end
+
+  @content_type_header {"Content-Type", "application/json"}
+
+  defp call(path, method, body \\ %{}, cast_fun \\ nil) do
+    method
+    |> Finch.build("#{endpoint()}#{path}", [@content_type_header], JSON.encode!(body))
     |> Finch.request(__MODULE__)
-    |> case_resp()
+    |> handle_resp(cast_fun)
   end
 
-  defp case_resp({:ok, resp}) when resp.status == 200 do
-    {:ok, resp.body |> JSON.decode!() |> Generated.from()}
+  defp handle_resp({:ok, resp}, cast_fun) when resp.status == 200 do
+    body = JSON.decode!(resp.body)
+
+    if cast_fun do
+      {:ok, cast_fun.(body)}
+    else
+      {:ok, body}
+    end
   end
 
-  defp case_resp({:ok, resp}) do
+  defp handle_resp({:ok, resp}, _) do
     %{"message" => message} = JSON.decode!(resp.body)
 
     {:error, %Error{message: message}}
   end
 
-  defp case_resp({:error, reason}) do
+  defp handle_resp({:error, reason}, _) do
     {:error, reason}
   end
 
   defp endpoint do
     base_url = Application.get_env(:policr_mini, __MODULE__, [])[:base_url]
 
-    "#{base_url}/api/generate"
+    "#{base_url}/api"
   end
 end

@@ -7,16 +7,20 @@ defmodule PolicrMiniWeb.Admin.API.ProfileView do
 
   @spec render(String.t(), map()) :: map()
 
-  def render("index.json", %{scheme: scheme, manifest: manifest, temp_manifest: temp_manifest}) do
+  def render("index.json", %{scheme: scheme, deployed_info: deployed_info, uploaded: uploaded}) do
     scheme = render_one(scheme, PolicrMiniWeb.Admin.API.SchemeView, "scheme.json")
+    deployed_info = render("deployed_info.json", %{deployed_info: deployed_info})
 
-    manifest = render("manifest.json", %{manifest: manifest})
-    temp_manifest = render("manifest.json", %{manifest: temp_manifest})
+    uploaded =
+      case uploaded do
+        {:ok, archive_info} -> render("archive_info.json", %{archive_info: archive_info})
+        {:error, _} -> nil
+      end
 
     %{
       scheme: scheme,
-      manifest: manifest,
-      temp_manifest: temp_manifest
+      deployed_info: deployed_info,
+      uploaded: uploaded
     }
   end
 
@@ -27,17 +31,37 @@ defmodule PolicrMiniWeb.Admin.API.ProfileView do
   end
 
   def render("manifest.json", %{manifest: manifest}) do
-    if manifest do
-      albums_count = length(manifest.albums)
+    %{
+      version: manifest.version,
+      datetime: manifest.datetime,
+      include_formats: manifest.include_formats,
+      albums: render_many(manifest.albums, __MODULE__, "album.json", as: :album)
+    }
+  end
 
-      images_count =
-        Enum.reduce(manifest.albums, 0, fn album, acc -> acc + length(album.images) end)
+  def render("archive_info.json", %{archive_info: archive_info}) do
+    manifest = render("manifest.json", %{manifest: archive_info.manifest})
 
-      manifest
-      |> Map.drop([:width, :include_formats, :albums])
-      |> Map.put(:albums_count, albums_count)
-      |> Map.put(:images_count, images_count)
-      |> Map.from_struct()
-    end
+    %{
+      manifest: manifest,
+      total_images: archive_info.total_images
+    }
+  end
+
+  def render("deployed_info.json", %{deployed_info: deployed_info}) do
+    manifest = render("manifest.json", %{manifest: deployed_info.manifest})
+
+    %{
+      manifest: manifest,
+      total_images: deployed_info.total_images
+    }
+  end
+
+  def render("album.json", %{album: album}) do
+    %{
+      id: album.id,
+      parents: album.parents,
+      name: album.name
+    }
   end
 end

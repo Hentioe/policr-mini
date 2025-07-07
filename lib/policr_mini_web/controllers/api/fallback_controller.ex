@@ -24,4 +24,10 @@ defmodule PolicrMiniWeb.API.FallbackController do
     |> put_view(PolicrMiniWeb.API.ErrorView)
     |> render("error.json", %{not_found: info})
   end
+
+  def call(conn, {:error, %PolicrMini.Capinde.Error{message: message}}) do
+    conn
+    |> put_view(PolicrMiniWeb.API.ErrorView)
+    |> render("error.json", %{description: message})
+  end
 end

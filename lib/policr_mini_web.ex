@@ -178,9 +178,6 @@ defmodule PolicrMiniWeb do
   end
 
   def uploaded_path do
-    # TODO: 将 `PolicrMiniBot.ImageProvider` 配置改为全局的配置，键名为 `assets_path`。
-    assets_path = Application.get_env(:policr_mini, PolicrMiniBot.ImageProvider)[:root]
-
-    Path.join(assets_path, "_uploaded")
+    Path.join("_assets", "_uploaded")
   end
 end

@@ -52,7 +52,6 @@ defmodule PolicrMini.MixProject do
       # {:dep_from_git, git: "https://github.com/elixir-lang/my_dep.git", tag: "0.1.0"}
       {:dialyxir, "~> 1.4.5", only: [:dev], runtime: false},
       {:credo, "~> 1.7.12", only: [:dev, :test], runtime: false},
-      {:rustler, "~> 0.34.0", runtime: false},
       {:benchee, "~> 1.0", only: :dev},
       {:telegex, git: "https://github.com/Hentioe/telegex.git", branch: "v1.6"},
       {:phoenix, "~> 1.6.16"},

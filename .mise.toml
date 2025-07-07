@@ -10,7 +10,6 @@ run = [
   "mix deps.get",
   "mise run assets-setup",
   "mise run front-setup",
-  "mise run native-setup",
   "mix ecto.setup",
 ]
 
@@ -27,10 +26,10 @@ env = { PHX_SERVER = "true" }
 run = "iex -S mix"
 
 [tasks.format]
-depends = ["mix-format", "native-format", "dprint-fmt"]
+depends = ["mix-format", "dprint-fmt"]
 
 [tasks.lint]
-depends = ["mix-lint", "front-lint", "native-lint"]
+depends = ["mix-lint", "front-lint"]
 
 [tasks.check]
 depends = ["format", "lint"]
@@ -38,11 +37,10 @@ depends = ["format", "lint"]
 [tasks.test]
 run = [
   "mix test",
-  "mise run cargo-for ziputil test",
 ]
 
 [tasks.clean]
-depends = ["mix-clean", "native-clean", "front-clean", "outout-clean"]
+depends = ["mix-clean", "front-clean", "outout-clean"]
 
 [tasks.destory]
 depends = ["clean"]
@@ -62,17 +60,6 @@ run = "mix format"
 
 [tasks.mix-lint]
 run = ["mix credo --strict --mute-exit-status", "mix dialyzer"]
-
-[tasks.native-setup]
-run = ["mise run cargo-for ziputil fetch"]
-[tasks.native-format]
-run = ["mise run cargo-for ziputil fmt"]
-
-[tasks.native-lint]
-run = ["mise run cargo-for ziputil clippy"]
-
-[tasks.native-clean]
-run = ["mise run cargo-for ziputil clean", "rm -rf priv/native"]
 
 [tasks.front-setup]
 run = "mise run front-pnpm install"
@@ -100,6 +87,3 @@ run = [
   "rm -rf test/assets/output/*",
   "rm -rf _assets/_cache/*",
 ]
-
-[tasks.cargo-for]
-run = 'cd native/{{arg(name="mod_name")}} && cargo {{arg(name="cargo_args", var=true)}}'
