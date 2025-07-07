@@ -19,7 +19,7 @@ defmodule PolicrMiniBot.ImageCAPTCHA do
     input =
       %Input{
         namespace: "out",
-        ttl_secs: 30,
+        ttl_secs: 35,
         special_params: %Input.ImageParams{
           dynamic_digest: PolicrMini.opt_exists?("--disable-image-rewrite"),
           with_choices: true,

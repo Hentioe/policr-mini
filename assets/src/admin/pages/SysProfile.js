@@ -61,6 +61,7 @@ const modeOptions = [
   { value: 2, label: "算术验证" },
   { value: 3, label: "主动验证" },
   { value: 4, label: "网格验证（推荐）" },
+  { value: 5, label: "经典验证（传统验证码）" },
 ];
 const modeMapping = {
   image: 0,
@@ -68,6 +69,7 @@ const modeMapping = {
   arithmetic: 2,
   initiative: 3,
   grid: 4,
+  classic: 5,
 };
 
 const killingMethodOptions = [

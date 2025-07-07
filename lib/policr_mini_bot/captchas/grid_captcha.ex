@@ -24,7 +24,7 @@ defmodule PolicrMiniBot.GridCAPTCHA do
 
     input = %Input{
       namespace: "out",
-      ttl_secs: 5,
+      ttl_secs: 35,
       special_params: %Input.GridParams{
         cell_width: cell_width,
         cell_height: cell_height,

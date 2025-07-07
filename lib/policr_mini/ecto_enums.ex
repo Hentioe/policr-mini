@@ -11,7 +11,7 @@ defmodule PolicrMini.EctoEnums do
     supergroup: "supergroup",
     channel: "channel"
 
-  defenum VerificationMode, image: 0, custom: 1, arithmetic: 2, initiative: 3, grid: 4
+  defenum VerificationMode, image: 0, custom: 1, arithmetic: 2, initiative: 3, grid: 4, classic: 5
 
   defenum VerificationStatusEnum,
     waiting: 0,

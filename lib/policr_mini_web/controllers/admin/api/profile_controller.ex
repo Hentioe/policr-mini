@@ -47,7 +47,7 @@ defmodule PolicrMiniWeb.Admin.API.ProfileController do
   def upload_albums(conn, %{"archive" => %{content_type: content_type} = archive} = _params)
       when content_type == "application/zip" do
     with {:ok, _} <- check_sys_permissions(conn),
-         {:ok, archive_info} <- Capinde.upload(archive.path) |> IO.inspect() do
+         {:ok, archive_info} <- Capinde.upload(archive.path) do
       render(conn, "archive_info.json", %{archive_info: archive_info})
     end
   end

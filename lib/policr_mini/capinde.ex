@@ -116,7 +116,21 @@ defmodule PolicrMini.Capinde do
       field :choices_count, integer()
     end
 
-    @type special_params :: GridParams.t()
+    typedstruct module: ClassicParams do
+      @derive JSON.Encoder
+
+      field :type, String.t(), default: "classic"
+      field :length, integer()
+      field :width, integer()
+      field :height, integer()
+      field :dark_mode, boolean()
+      field :complexity, integer()
+      field :compression, integer()
+      field :with_choices, boolean()
+      field :choices_count, integer()
+    end
+
+    @type special_params :: GridParams.t() | ImageParams.t() | ClassicParams.t()
 
     typedstruct do
       field :namespace, String.t(), enforce: true
@@ -176,7 +190,24 @@ defmodule PolicrMini.Capinde do
       end
     end
 
-    @type special_payload :: GridPayload.t() | ImagePayload.t()
+    defmodule ClassicPayload do
+      @moduledoc false
+
+      typedstruct do
+        field :type, String.t(), default: "classic"
+        field :text, String.t(), enforce: true
+        field :choices, [String.t(), ...], default: []
+      end
+
+      def from(%{"text" => text, "choices" => choices}) do
+        %__MODULE__{
+          text: text,
+          choices: choices
+        }
+      end
+    end
+
+    @type special_payload :: GridPayload.t() | ImagePayload.t() | ClassicPayload.t()
 
     typedstruct do
       field :file_name, String.t(), enforce: true
@@ -185,13 +216,9 @@ defmodule PolicrMini.Capinde do
       field :unique_id, String.t(), enforce: true
     end
 
-    defp from_special_payload(%{"type" => "grid"} = payload) do
-      GridPayload.from(payload)
-    end
-
-    defp from_special_payload(%{"type" => "image"} = payload) do
-      ImagePayload.from(payload)
-    end
+    defp from_special_payload(%{"type" => "grid"} = payload), do: GridPayload.from(payload)
+    defp from_special_payload(%{"type" => "image"} = payload), do: ImagePayload.from(payload)
+    defp from_special_payload(%{"type" => "classic"} = payload), do: ClassicPayload.from(payload)
 
     def from(%{
           "file_name" => file_name,

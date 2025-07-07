@@ -3,6 +3,8 @@ defmodule PolicrMiniBot.Captcha do
   验证内容生成模块。
   """
 
+  require Logger
+
   alias PolicrMini.Chats.Scheme
   alias Telegex.Type.{InlineKeyboardButton, InlineKeyboardMarkup}
 
@@ -11,10 +13,19 @@ defmodule PolicrMiniBot.Captcha do
     CustomCaptcha,
     ArithmeticCaptcha,
     FallbackCaptcha,
-    GridCAPTCHA
+    GridCAPTCHA,
+    ClassicCAPTCHA
   }
 
-  require Logger
+  @captcha_mapping [
+    image: ImageCAPTCHA,
+    custom: CustomCaptcha,
+    arithmetic: ArithmeticCaptcha,
+    grid: GridCAPTCHA,
+    classic: ClassicCAPTCHA,
+    # 当前的备用验证就是主动验证
+    initiative: FallbackCaptcha
+  ]
 
   defmodule Data do
     @moduledoc """
@@ -94,15 +105,6 @@ defmodule PolicrMiniBot.Captcha do
 
     %InlineKeyboardMarkup{inline_keyboard: inline_keyboard}
   end
-
-  @captcha_mapping [
-    image: ImageCAPTCHA,
-    custom: CustomCaptcha,
-    arithmetic: ArithmeticCaptcha,
-    grid: GridCAPTCHA,
-    # 当前的备用验证就是主动验证
-    initiative: FallbackCaptcha
-  ]
 
   def make(captcha_name, chat_id, scheme) do
     module = @captcha_mapping[captcha_name]
