@@ -133,10 +133,10 @@ defmodule PolicrMiniWeb.Router do
   scope "/", PolicrMiniWeb do
     pipe_through :browser
 
+    # 此 API 被 admin 依赖
     get "/own_photo", PageController, :own_photo
+    # 此 API 是否存在依赖未知
     get "/uploaded/:name", PageController, :uploaded
-
-    get "/*path", PageController, :index
   end
 
   # Enables the Swoosh mailbox preview in development.

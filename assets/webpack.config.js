@@ -28,7 +28,6 @@ module.exports = (_env, options) => {
       minimizer,
     },
     entry: {
-      user: glob.sync("./vendor/**/*.js").concat(["./src/user.js"]),
       admin: glob.sync("./vendor/**/*.js").concat(["./src/admin.js"]),
     },
     output: {
