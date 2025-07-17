@@ -43,6 +43,12 @@ defmodule PolicrMiniWeb.Router do
     post "/sponsorship_histories", SponsorshipHistoryController, :add
   end
 
+  scope "/api/v1", PolicrMiniWeb.API.V1 do
+    pipe_through :api
+
+    get "/totals", IndexController, :totals
+  end
+
   scope "/console/api", PolicrMiniWeb.Console.API do
     pipe_through [:console_api]
 
