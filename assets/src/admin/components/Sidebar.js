@@ -302,16 +302,6 @@ export default () => {
                 page: "sponsorship",
               })}
             />
-
-            <NavItem
-              title="第三方实例"
-              href="/admin/sys/third_parties"
-              selected={isSysLink({
-                path: location.pathname,
-                page: "third_parties",
-              })}
-              ended={true}
-            />
           </>
         ) : undefined}
       </MenuBox>

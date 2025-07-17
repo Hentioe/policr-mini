@@ -9,7 +9,6 @@ import SysManagementsPage from "./pages/SysManagements";
 import SysTasksPage from "./pages/SysTasks";
 import SysTerminalPage from "./pages/SysTerminal";
 import SysTermsPage from "./pages/SysTerms";
-import SysThirdPartiesPage from "./pages/SysThirdParties";
 import SysSponsorshipPage from "./pages/SysSponsorship";
 import SysProfilePage from "./pages/SysProfile";
 
@@ -25,7 +24,6 @@ export {
   SysTasksPage,
   SysTerminalPage,
   SysTermsPage,
-  SysThirdPartiesPage,
   SysSponsorshipPage,
   SysProfilePage,
 };

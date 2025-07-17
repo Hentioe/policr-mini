@@ -37,7 +37,6 @@ defmodule PolicrMiniWeb.Router do
     pipe_through :api
 
     get "/index", IndexController, :index
-    get "/third_parties", ThirdPartyController, :index
     get "/terms", TermController, :index
     get "/sponsorship_histories", SponsorshipHistoryController, :index
     post "/sponsorship_histories", SponsorshipHistoryController, :add
@@ -83,11 +82,6 @@ defmodule PolicrMiniWeb.Router do
     put "/permissions/chats/:chat_id/sync", PermissionController, :sync
 
     put "/verifications/:id/kill", VerificationController, :kill
-
-    get "/third_parties", ThirdPartyController, :index
-    post "/third_parties", ThirdPartyController, :add
-    put "/third_parties/:id", ThirdPartyController, :update
-    delete "/third_parties/:id", ThirdPartyController, :delete
 
     get "/tasks", TaskController, :index
     put "/tasks/reset_stats", TaskController, :reset_stats

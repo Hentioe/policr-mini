@@ -27,7 +27,6 @@ import {
   SysManagementsPage,
   SysTasksPage,
   SysTerminalPage,
-  SysThirdPartiesPage,
   SysTermsPage,
   SysSponsorshipPage,
 } from "./admin/pages";
@@ -119,10 +118,6 @@ const App = () => {
                     <Route
                       path="/admin/sys/terminal"
                       element={<SysTerminalPage />}
-                    />
-                    <Route
-                      path="/admin/sys/third_parties"
-                      element={<SysThirdPartiesPage />}
                     />
                     <Route
                       path="/admin/sys/sponsorship"
