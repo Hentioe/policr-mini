@@ -28,13 +28,12 @@ services:
       TELEGRAM_LOCAL_MODE: true
 
   capinde:
-    image: ${POLICR_MINI_CAPINDE_IMAGE:-hentioe/capinde:0.1.0-beta}
+    image: ${POLICR_MINI_CAPINDE_IMAGE:-hentioe/capinde:0.1.0}
     ports:
       - 8080:8080
     environment:
       CAPINDE_HOST: 0.0.0.0
-      CAPINDE_NAMESPACE_BASE: /namespace
-      CAPINDE_ALBUMS_BASE: /_albums
+      CAPINDE_WORKING_MODE: localized
     volumes:
-      - ./shared_assets:/namespace/out
-      - ./_assets/_albums:/_albums
+      - ./shared_assets:/home/capinde/namespace/out
+      - ./albums:/home/capinde/albums

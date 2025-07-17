@@ -1,20 +1,23 @@
-defmodule PolicrMini.CapindeTest do
+defmodule CapindeTest do
   use ExUnit.Case
 
-  import PolicrMini.Capinde
-  alias PolicrMini.Capinde.{Input, Generated}
+  import Capinde
+
+  alias Capinde.Generation.Input
+  alias Capinde.Payload.Generated
 
   test "generate/1 with grid" do
     input = %Input{
       namespace: "out",
       ttl_secs: 5,
+      with_choices: true,
+      choices_count: 9,
       special_params: %Input.GridParams{
+        layout: "3x3",
         cell_width: 180,
         cell_height: 120,
         watermark_font_family: "Open Sans",
         right_count: 3,
-        with_choices: true,
-        choices_count: 9,
         unordered_right_parts: true
       }
     }
@@ -35,10 +38,10 @@ defmodule PolicrMini.CapindeTest do
     input = %Input{
       namespace: "out",
       ttl_secs: 5,
+      with_choices: true,
+      choices_count: 5,
       special_params: %Input.ImageParams{
-        dynamic_digest: true,
-        with_choices: true,
-        choices_count: 5
+        dynamic_digest: true
       }
     }
 
@@ -54,14 +57,14 @@ defmodule PolicrMini.CapindeTest do
     input = %Input{
       namespace: "out",
       ttl_secs: 5,
+      with_choices: true,
+      choices_count: 9,
       special_params: %Input.ClassicParams{
         length: 5,
         width: 160,
         height: 60,
         dark_mode: false,
-        complexity: 10,
-        with_choices: true,
-        choices_count: 9
+        complexity: 10
       }
     }
 

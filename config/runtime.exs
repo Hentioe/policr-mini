@@ -148,7 +148,7 @@ if config_env() == :prod do
         """)
 
   # 配置 Capinde
-  config :policr_mini, PolicrMini.Capinde,
+  config :policr_mini, Capinde,
     base_url:
       System.get_env("POLICR_MINI_CAPINDE_BASE_URL") ||
         raise("""

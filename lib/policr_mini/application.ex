@@ -9,8 +9,10 @@ defmodule PolicrMini.Application do
 
   @impl true
   def start(_type, _args) do
+    {:ok, _} = Capinde.Application.start(:normal, [])
     # 输出 banner 消息
     print_banner()
+    print_capinde_server_info()
     # 输出构建时/运行时信息
     print_buildtime_runtime_info()
     # 初始化 Mnesia 表结构。
@@ -33,8 +35,6 @@ defmodule PolicrMini.Application do
         PolicrMini.InfluxConn,
         # Start the Finch
         {Finch, name: PolicrMini.Finch},
-        # Start Finch instance for Capinde
-        {Finch, name: PolicrMini.Capinde},
         # Start the Cacher
         PolicrMini.Cache,
         # Start the Counter
@@ -80,6 +80,18 @@ defmodule PolicrMini.Application do
       banner = File.read!(banner_path)
 
       IO.write("#{banner}\n")
+    end
+  end
+
+  defp print_capinde_server_info do
+    case Capinde.server_info() do
+      {:ok, info} ->
+        Logger.info(
+          "CAPINDE: [version: #{info.version}, started at: #{info.started_at}, working mode: #{info.working_mode}]"
+        )
+
+      {:error, reason} ->
+        Logger.error("Failed to get Capinde server info: #{inspect(reason)}")
     end
   end
 end

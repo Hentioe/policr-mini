@@ -5,8 +5,7 @@ defmodule PolicrMiniBot.GridCAPTCHA do
 
   use PolicrMiniBot.Captcha
 
-  alias PolicrMini.Capinde
-  alias PolicrMini.Capinde.Input
+  alias Capinde.Generation.Input
 
   defmodule Error do
     defexception [:message]
@@ -25,13 +24,15 @@ defmodule PolicrMiniBot.GridCAPTCHA do
     input = %Input{
       namespace: "out",
       ttl_secs: 35,
+      use_index: true,
+      with_choices: true,
+      choices_count: @choices_count,
       special_params: %Input.GridParams{
+        layout: "3x3",
         cell_width: cell_width,
         cell_height: cell_height,
         watermark_font_family: watermark_font_family,
         right_count: @right_count,
-        with_choices: true,
-        choices_count: @choices_count,
         unordered_right_parts: true
       }
     }
@@ -41,16 +42,11 @@ defmodule PolicrMiniBot.GridCAPTCHA do
         subject_name = generated.special_payload.subject["zh-hans"]
         candidates = Enum.map(generated.special_payload.choices, &Enum.join/1)
 
-        correct_index =
-          Enum.find_index(generated.special_payload.choices, fn choice ->
-            choice == generated.special_payload.right_parts
-          end) + 1
-
         %Captcha.Data{
           question: "选出所有「#{subject_name}」的图片编号",
           photo: Path.join("shared_assets", generated.file_name),
           candidates: Enum.chunk_every(candidates, 3),
-          correct_indices: [correct_index]
+          correct_indices: [generated.right_index + 1]
         }
 
       {:error, %{message: message}} ->

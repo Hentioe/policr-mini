@@ -54,7 +54,7 @@ config :telegex,
 config :policr_mini, PolicrMiniWeb, root_url: "http://0.0.0.0:4000/"
 
 # 配置 Capinde
-config :policr_mini, PolicrMini.Capinde, base_url: "http://localhost:8080"
+config :policr_mini, Capinde, base_url: "http://localhost:8080"
 
 # 任务调度配置
 config :policr_mini, PolicrMiniBot.Scheduler,

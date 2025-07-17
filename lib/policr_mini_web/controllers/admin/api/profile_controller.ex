@@ -7,7 +7,7 @@ defmodule PolicrMiniWeb.Admin.API.ProfileController do
 
   import PolicrMiniWeb.Helper
 
-  alias PolicrMini.{Capinde, DefaultsServer}
+  alias PolicrMini.DefaultsServer
 
   require Logger
 

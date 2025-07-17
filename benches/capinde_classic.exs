@@ -1,5 +1,5 @@
-alias PolicrMini.Capinde
-alias PolicrMini.Capinde.Input
+alias Capinde
+alias Capinde.Input
 
 input = %Input{
   namespace: "out",

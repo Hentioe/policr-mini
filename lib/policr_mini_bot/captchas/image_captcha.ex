@@ -5,8 +5,7 @@ defmodule PolicrMiniBot.ImageCAPTCHA do
 
   use PolicrMiniBot.Captcha
 
-  alias PolicrMini.Capinde
-  alias PolicrMini.Capinde.Input
+  alias Capinde.Generation.Input
 
   defmodule Error do
     defexception [:message]
@@ -20,10 +19,10 @@ defmodule PolicrMiniBot.ImageCAPTCHA do
       %Input{
         namespace: "out",
         ttl_secs: 35,
+        with_choices: true,
+        choices_count: choices_count,
         special_params: %Input.ImageParams{
-          dynamic_digest: PolicrMini.opt_exists?("--disable-image-rewrite"),
-          with_choices: true,
-          choices_count: choices_count
+          dynamic_digest: PolicrMini.opt_exists?("--disable-image-rewrite")
         }
       }
 
@@ -33,14 +32,11 @@ defmodule PolicrMiniBot.ImageCAPTCHA do
         candidates =
           Enum.map(generated.special_payload.choices, fn choice -> [choice["zh-hans"]] end)
 
-        # 为 right_indexes 中的每一项自增一
-        right_indexes = Enum.map(generated.special_payload.right_indexes, fn i -> i + 1 end)
-
         %Captcha.Data{
           question: "图片中的事物是？",
           photo: Path.join("shared_assets", generated.file_name),
           candidates: candidates,
-          correct_indices: right_indexes
+          correct_indices: [generated.right_index + 1]
         }
 
       {:error, %{message: message}} ->

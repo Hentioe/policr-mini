@@ -5,8 +5,7 @@ defmodule PolicrMiniBot.ClassicCAPTCHA do
 
   use PolicrMiniBot.Captcha
 
-  alias PolicrMini.Capinde
-  alias PolicrMini.Capinde.Input
+  alias Capinde.Generation.Input
 
   defmodule Error do
     defexception [:message]
@@ -17,29 +16,24 @@ defmodule PolicrMiniBot.ClassicCAPTCHA do
     input = %Input{
       namespace: "out",
       ttl_secs: 35,
+      with_choices: true,
+      choices_count: 9,
       special_params: %Input.ClassicParams{
         length: 5,
         width: 320,
         height: 120,
         dark_mode: false,
-        complexity: 10,
-        with_choices: true,
-        choices_count: 9
+        complexity: 10
       }
     }
 
     case Capinde.generate(input) do
       {:ok, generated} ->
-        correct_index =
-          Enum.find_index(generated.special_payload.choices, fn choice ->
-            choice == generated.special_payload.text
-          end)
-
         %Captcha.Data{
           question: "请选择验证码图片中的文字",
           photo: Path.join("shared_assets", generated.file_name),
           candidates: Enum.chunk_every(generated.special_payload.choices, 3),
-          correct_indices: [correct_index + 1]
+          correct_indices: [generated.right_index + 1]
         }
 
       {:error, %{message: message}} ->
