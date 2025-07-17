@@ -31,7 +31,7 @@ depends = ["mix-format", "dprint-fmt"]
 [tasks.lint]
 depends = ["mix-lint", "front-lint"]
 
-[tasks.check]
+[tasks.prepare]
 depends = ["format", "lint"]
 
 [tasks.test]
