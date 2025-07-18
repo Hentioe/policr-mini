@@ -1,5 +1,5 @@
 [tools]
-erlang = "28.0.1"
+erlang = "28.0.2"
 elixir = "1.18.4-otp-28"
 "npm:pnpm" = "10"
 "cargo:dprint" = "latest"
