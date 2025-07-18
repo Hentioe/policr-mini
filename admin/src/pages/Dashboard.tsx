@@ -5,6 +5,7 @@ import { JSX, onMount } from "solid-js";
 import { createStore } from "solid-js/store";
 import { getTotals } from "../api";
 import { PageBase } from "../layouts";
+import { setPage } from "../state/global";
 import { setTitle } from "../state/meta";
 
 export default () => {
@@ -22,6 +23,7 @@ export default () => {
 
   onMount(() => {
     setTitle("仪表盘");
+    setPage("dashboard");
   });
 
   return (

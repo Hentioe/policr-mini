@@ -4,7 +4,7 @@ type State = {
   title?: string;
 };
 
-const baseTitle = "Mini Admin";
+const baseTitle = "Mini Admin V2";
 
 const [store, setStore] = createStore<State>({
   title: baseTitle,
