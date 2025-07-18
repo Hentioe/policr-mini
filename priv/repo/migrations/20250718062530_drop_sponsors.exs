@@ -1,7 +1,12 @@
 defmodule PolicrMini.Repo.Migrations.DropSponsors do
   use PolicrMini.Migration
 
-  def change do
+  def up do
+    drop table(:sponsors)
+  end
+
+  def down do
+    # Copy from 20210626222802_create_sponsors.exs
     create table(:sponsors) do
       add :title, :string, comment: "称谓"
       add :avatar, :string, comment: "头像"
@@ -13,7 +18,5 @@ defmodule PolicrMini.Repo.Migrations.DropSponsors do
 
       timestamps()
     end
-
-    create unique_index(:sponsors, [:uuid])
   end
 end

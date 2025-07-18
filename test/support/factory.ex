@@ -74,51 +74,10 @@ defmodule PolicrMini.Factory do
     }
   end
 
-  def build(:third_party) do
-    %PolicrMini.Instances.ThirdParty{
-      name: "开发实例",
-      bot_username: "policr_mini_dev_bot",
-      homepage: "https://mini-dev.gramlabs.org",
-      running_days: 1,
-      version: "0.0.1-rc.0",
-      is_forked: false
-    }
-  end
-
   def build(:term) do
     %PolicrMini.Instances.Term{
       id: 1_234_567_890,
       content: "服务条款内容。"
-    }
-  end
-
-  def build(:sponsor) do
-    %PolicrMini.Instances.Sponsor{
-      title: "喵小姐",
-      avatar: "/uploaded/meow.jpg",
-      homepage: "https://meow.com",
-      introduction: "欢迎来我的主页逛逛",
-      contact: "@miss_meow",
-      uuid: "xxxx-xxxx-xxxx-xxxx"
-    }
-  end
-
-  def build(:sponsorship_history) do
-    %PolicrMini.Instances.SponsorshipHistory{
-      expected_to: "请作者喝一杯无糖可乐",
-      amount: 15,
-      has_reached: false,
-      reached_at: DateTime.truncate(DateTime.utc_now(), :second),
-      hidden: false
-    }
-  end
-
-  def build(:sponsorship_address) do
-    %PolicrMini.Instances.SponsorshipAddress{
-      name: "USDT (TRC20)",
-      description: "如美元般稳定的加密货币 USDT 的转账地址，仅限 TRC20 网络。",
-      text: "****************************",
-      image: "usdt-trc20-qrcode.jpg"
     }
   end
 
