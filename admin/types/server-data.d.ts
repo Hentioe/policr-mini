@@ -16,4 +16,10 @@ declare namespace ServerData {
   type Profile = {
     username: string;
   };
+
+  type Totals = {
+    all: number;
+    approved: number;
+    timedOut: number;
+  };
 }

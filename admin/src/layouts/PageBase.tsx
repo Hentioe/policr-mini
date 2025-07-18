@@ -2,7 +2,7 @@ import { JSX } from "solid-js";
 
 export default (props: { children: JSX.Element }) => {
   return (
-    <main>
+    <main class="py-[1rem]">
       {props.children}
     </main>
   );

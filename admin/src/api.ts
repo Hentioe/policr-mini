@@ -13,6 +13,11 @@ type PayloadType<T> = Promise<ApiResponse<T>>;
 export async function getProfile(): PayloadType<ServerData.Profile> {
   return strictify(await api.get("/profile"));
 }
+
+export async function getTotals(): Promise<ServerData.Totals> {
+  return strictify(await axios.get("/api/v1/totals"));
+}
+
 async function strictify<T extends Record<string, unknown> | readonly Record<string, unknown>[]>(
   resp: AxiosResponse<T>,
 ) {
