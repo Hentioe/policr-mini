@@ -11,6 +11,7 @@
   },
   "dependencies": {
     "@ark-ui/solid": "^5.16.1",
+    "@iconify-icon/solid": "^3.0.0",
     "@solidjs/meta": "^0.29.4",
     "@solidjs/router": "^0.15.3",
     "@tanstack/solid-query": "^5.81.5",
