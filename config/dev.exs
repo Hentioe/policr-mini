@@ -40,6 +40,11 @@ config :policr_mini, PolicrMiniWeb.Endpoint,
     pnpm: [
       "run",
       "watch",
+      cd: Path.expand("../admin", __DIR__)
+    ],
+    pnpm: [
+      "run",
+      "watch",
       cd: Path.expand("../assets", __DIR__)
     ],
     pnpm: [

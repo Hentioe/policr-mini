@@ -18,6 +18,15 @@ defmodule PolicrMiniWeb.Router do
     plug :put_layout, {PolicrMiniWeb.LayoutView, :admin}
   end
 
+  pipeline :admin_v2 do
+    # plug PolicrMiniWeb.TokenAuthentication, from: :admin
+  end
+
+  pipeline :admin_v2_api do
+    plug :accepts, ["json"]
+    # plug PolicrMiniWeb.TokenAuthentication, from: :admin_api
+  end
+
   pipeline :console do
     plug PolicrMiniWeb.TokenAuthentication, from: :console
     plug :put_layout, {PolicrMiniWeb.LayoutView, :console}
@@ -50,6 +59,12 @@ defmodule PolicrMiniWeb.Router do
     pipe_through [:console_api]
 
     get "/:chat_id/stats", StatsController, :query
+  end
+
+  scope "/admin/v2/api", PolicrMiniWeb.AdminV2.API do
+    pipe_through [:admin_v2_api]
+
+    get "/profile", ProfileController, :index
   end
 
   scope "/admin/api", PolicrMiniWeb.Admin.API do
@@ -94,6 +109,12 @@ defmodule PolicrMiniWeb.Router do
     delete "/profile/temp_albums", ProfileController, :delete_uploaded
     post "/profile/temp_albums", ProfileController, :upload_albums
     put "/profile/albums", ProfileController, :deploy_albums
+  end
+
+  scope "/admin/v2", PolicrMiniWeb.AdminV2 do
+    pipe_through [:browser, :admin_v2]
+
+    get "/*path", PageController, :home
   end
 
   scope "/admin", PolicrMiniWeb.Admin do

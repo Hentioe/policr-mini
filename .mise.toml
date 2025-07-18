@@ -8,6 +8,7 @@ elixir = "1.18.4-otp-28"
 run = [
   "mise run env-deps up -d --wait",
   "mix deps.get",
+  "mise run admin-setup",
   "mise run assets-setup",
   "mise run front-setup",
   "mix ecto.setup",
@@ -35,9 +36,7 @@ depends = ["mix-lint", "front-lint"]
 depends = ["format", "lint"]
 
 [tasks.test]
-run = [
-  "mix test",
-]
+run = ["mix test"]
 
 [tasks.clean]
 depends = ["mix-clean", "front-clean", "outout-clean"]
@@ -73,6 +72,18 @@ run = ["rm -rf webapps/node_modules", "rm -rf priv/static/assets"]
 [tasks.front-pnpm]
 run = "pnpm --prefix webapps"
 
+[tasks.admin-setup]
+run = "mise run admin-pnpm install"
+
+[tasks.admin-lint]
+run = "mise run admin-pnpm run lint"
+
+[tasks.admin-clean]
+run = ["rm -rf admin/node_modules"]
+
+[tasks.admin-pnpm]
+run = "pnpm --prefix admin"
+
 [tasks.assets-setup]
 run = "pnpm install --prefix assets"
 
@@ -83,7 +94,4 @@ run = "dprint fmt"
 run = "mise run env-deps stop"
 
 [tasks.outout-clean]
-run = [
-  "rm -rf test/assets/output/*",
-  "rm -rf _assets/_cache/*",
-]
+run = ["rm -rf test/assets/output/*", "rm -rf _assets/_cache/*"]

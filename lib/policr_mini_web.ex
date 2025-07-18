@@ -42,6 +42,14 @@ defmodule PolicrMiniWeb do
     end
   end
 
+  def admin_v2_view do
+    quote do
+      use PolicrMiniWeb, :view
+
+      import PolicrMiniWeb.AdminV2.ViewHelper
+    end
+  end
+
   def live_view do
     quote do
       use Phoenix.LiveView,
