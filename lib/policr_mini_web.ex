@@ -138,6 +138,7 @@ defmodule PolicrMiniWeb do
   ## 可选参数
   - `has_end_slash`: 链接结尾处是否包含斜杠。默认为 `true`。
   """
+  # todo: 将 `has_end_slash` 重命名为 `includes_end_slash?`。
   @spec root_url(root_url_opts) :: String.t() | nil
   def root_url(opts \\ []) do
     root_url = Application.get_env(:policr_mini, PolicrMiniWeb)[:root_url]
