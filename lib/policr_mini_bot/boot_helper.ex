@@ -79,7 +79,7 @@ defmodule PolicrMiniBot.BootHelper do
           [
             %BotCommand{
               command: "sponsorship",
-              description: "赞助此项目（辅助提交赞助表单）"
+              description: "赞助此项目"
             }
           ]
       else

@@ -38,8 +38,6 @@ defmodule PolicrMiniWeb.Router do
 
     get "/index", IndexController, :index
     get "/terms", TermController, :index
-    get "/sponsorship_histories", SponsorshipHistoryController, :index
-    post "/sponsorship_histories", SponsorshipHistoryController, :add
   end
 
   scope "/api/v1", PolicrMiniWeb.API.V1 do
@@ -90,17 +88,6 @@ defmodule PolicrMiniWeb.Router do
     put "/terms", TermController, :add_or_update
     delete "/terms", TermController, :delete
     post "/terms/preview", TermController, :preview
-
-    get "/sponsorship_histories", SponsorshipHistoryController, :index
-    post "/sponsorship_histories", SponsorshipHistoryController, :add
-    put "/sponsorship_histories/:id", SponsorshipHistoryController, :update
-    delete "/sponsorship_histories/:id", SponsorshipHistoryController, :delete
-    put "/sponsorship_histories/:id/hidden", SponsorshipHistoryController, :hidden
-
-    get "/sponsorship_addresses", SponsorshipAddressController, :index
-    post "/sponsorship_addresses", SponsorshipAddressController, :add
-    put "/sponsorship_addresses/:id", SponsorshipAddressController, :update
-    delete "/sponsorship_addresses/:id", SponsorshipAddressController, :delete
 
     get "/profile", ProfileController, :index
     put "/profile/scheme", ProfileController, :update_scheme

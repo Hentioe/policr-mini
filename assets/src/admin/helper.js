@@ -93,9 +93,7 @@ const sysPages = [
   "managements",
   "tasks",
   "terms",
-  "terminal",
-  "third_parties",
-  "sponsorship",
+  "terminal"
 ];
 
 function isSysLink({ path, page }) {

@@ -60,7 +60,6 @@ defmodule PolicrMiniWeb.Admin.API.ProfileView do
   def render("album.json", %{album: album}) do
     %{
       id: album.id,
-      parents: album.parents,
       name: album.name
     }
   end

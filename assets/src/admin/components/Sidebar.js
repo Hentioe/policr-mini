@@ -292,18 +292,6 @@ export default () => {
           href="/admin/sys/terminal"
           selected={isSysLink({ path: location.pathname, page: "terminal" })}
         /> */}
-        {!__GLOBAL__.botInfo.isThirdParty ? (
-          <>
-            <NavItem
-              title="赞助记录"
-              href="/admin/sys/sponsorship"
-              selected={isSysLink({
-                path: location.pathname,
-                page: "sponsorship",
-              })}
-            />
-          </>
-        ) : undefined}
       </MenuBox>
     </nav>
   );

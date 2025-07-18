@@ -28,7 +28,6 @@ import {
   SysTasksPage,
   SysTerminalPage,
   SysTermsPage,
-  SysSponsorshipPage,
 } from "./admin/pages";
 
 import Reducers from "./admin/reducers";
@@ -118,10 +117,6 @@ const App = () => {
                     <Route
                       path="/admin/sys/terminal"
                       element={<SysTerminalPage />}
-                    />
-                    <Route
-                      path="/admin/sys/sponsorship"
-                      element={<SysSponsorshipPage />}
                     />
                   </Routes>
                 </div>
