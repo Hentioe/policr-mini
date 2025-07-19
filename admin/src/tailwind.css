@@ -1,4 +1,7 @@
 @import "tailwindcss";
 
-/* @theme {}
-@layer components {} */
+@theme {
+  --shadow-strong: rgba(0, 0, 0, 0.07) 0px 0px 2px 2px;
+  --shadow-strong-light: 0 2px 8px 1px rgba(64, 60, 67, 0.24);
+}
+/* @layer components {} */

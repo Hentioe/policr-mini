@@ -22,4 +22,11 @@ declare namespace ServerData {
     approved: number;
     timedOut: number;
   };
+
+  type Chat = {
+    id: number;
+    title: string;
+    username: string;
+    createdAt: string;
+  };
 }
