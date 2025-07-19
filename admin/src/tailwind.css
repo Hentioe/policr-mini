@@ -8,4 +8,8 @@
   .card-edge {
     @apply border border-zinc-100 shadow rounded-xl overflow-hidden;
   }
+
+  .input-edge {
+    @apply outline-2 outline-zinc-200/80 rounded-lg;
+  }
 }

@@ -3,12 +3,11 @@
 }
 
 [data-scope="select"][data-part="control"] {
-  @apply w-full h-[2.5rem] flex items-center shadow rounded-lg border
-    border-zinc-200;
+  @apply w-full h-[2.5rem] input-edge flex items-center;
 }
 
 [data-scope="select"][data-part="control"][data-state="open"] {
-  @apply outline-2 outline-blue-400;
+  @apply outline-blue-400;
 }
 
 [data-scope="select"][data-part="trigger"] {
