@@ -1,23 +1,23 @@
 import { Icon } from "@iconify-icon/solid";
 import { useQuery } from "@tanstack/solid-query";
 import classNames from "classnames";
-import { JSX, onMount } from "solid-js";
+import { createEffect, JSX, onMount } from "solid-js";
 import { createStore } from "solid-js/store";
-import { getTotals } from "../api";
+import { getStats } from "../api";
 import { PageBase } from "../layouts";
 import { setPage } from "../state/global";
 import { setTitle } from "../state/meta";
 
 export default () => {
-  const [totals, setTotals] = createStore<ServerData.Totals>({ all: 0, approved: 0, timedOut: 0 });
-  const profileQuery = useQuery(() => ({
-    queryKey: ["totals"],
-    queryFn: () => getTotals(),
+  const [stats, setStats] = createStore<ServerData.Stats>({ verification: { total: 0, approved: 0, rejected: 0 } });
+  const statsQuery = useQuery(() => ({
+    queryKey: ["stats"],
+    queryFn: () => getStats(),
   }));
 
-  onMount(async () => {
-    if (profileQuery.data) {
-      setTotals(profileQuery.data);
+  createEffect(() => {
+    if (statsQuery.data?.success) {
+      setStats(statsQuery.data.payload);
     }
   });
 
@@ -34,27 +34,47 @@ export default () => {
         <Range hasDot>最近 30 天</Range>
         <Range>全部</Range>
       </div>
-      <div class="mt-[1rem] grid grid-cols-3 gap-[1rem]">
-        <StatsCard title="验证总数" total={totals.all} background="darkturquoise" />
-        <StatsCard title="验证通过" total={totals.approved} background="darkseagreen" />
-        <StatsCard title="验证失败" total={totals.timedOut} background="darkred" />
+      <div class="mt-[1rem] grid grid-cols-3 gap-[1rem] py-[1rem] border-y border-zinc-200">
+        <StatsItem
+          title="验证总数"
+          value={stats.verification.total}
+          icon="lsicon:thumb-up-outline"
+          color="darkturquoise"
+        />
+        <StatsItem
+          title="验证通过"
+          value={stats.verification.approved}
+          icon="material-symbols:check"
+          color="darkseagreen"
+          hasDivider
+        />
+        <StatsItem title="验证失败" value={stats.verification.rejected} icon="mdi:cancel" color="darkred" />
       </div>
     </PageBase>
   );
 };
 
-const StatsCard = (props: { title: string; total: number; background: string }) => {
+const StatsItem = (props: { title: string; value: number; icon: string; color: string; hasDivider?: boolean }) => {
   return (
     <div
-      class="shadow rounded-lg bg-blue-400 text-zinc-100 text-center py-[2rem]"
-      style={{ background: props.background }}
+      class={classNames(
+        ["flex justify-center items-center gap-[1rem] px-[1rem]"],
+        {
+          "border-x-[1px] border-zinc-200": props.hasDivider,
+        },
+      )}
     >
-      <h2 class="text-lg font-bold">
-        {props.title}
-      </h2>
-      <p class="mt-[1rem] text-3xl font-medium">
-        {props.total}
-      </p>
+      <div class="rounded-full bg-zinc-100 h-[3rem] w-[3rem] flex justify-center items-center">
+        <Icon icon={props.icon} class="w-[2rem] h-[2rem] text-[2rem]" style={{ color: props.color }} />
+      </div>
+      <div>
+        <h2 class="font-medium">
+          {props.title}
+        </h2>
+        <p class="mt-[1rem] text-xl font-bold">
+          {props.value}
+        </p>
+      </div>
     </div>
   );
 };

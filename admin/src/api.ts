@@ -14,8 +14,8 @@ export async function getProfile(): PayloadType<ServerData.Profile> {
   return strictify(await api.get("/profile"));
 }
 
-export async function getTotals(): Promise<ServerData.Totals> {
-  return strictify(await axios.get("/api/v1/totals"));
+export async function getStats(): PayloadType<ServerData.Stats> {
+  return strictify(await api.get("/stats"));
 }
 
 async function strictify<T extends Record<string, unknown> | readonly Record<string, unknown>[]>(

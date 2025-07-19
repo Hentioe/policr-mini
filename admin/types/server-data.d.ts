@@ -17,10 +17,12 @@ declare namespace ServerData {
     username: string;
   };
 
-  type Totals = {
-    all: number;
-    approved: number;
-    timedOut: number;
+  type Stats = {
+    verification: {
+      total: number;
+      approved: number;
+      rejected: number;
+    };
   };
 
   type Chat = {
