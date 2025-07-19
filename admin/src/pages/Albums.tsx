@@ -41,7 +41,7 @@ export default () => {
         </Manifest>
       </div>
       <div class="mt-[2rem]">
-        <div class="w-full bg-zinc-100 rounded-2xl shadow py-[4rem] text-center">
+        <div class="w-full bg-zinc-100 card-edge py-[4rem] text-center">
           <div class="w-fit mx-auto bg-blue-500 rounded shadow-strong px-[2.5rem] py-[1rem] text-white">
             <button class="flex items-center cursor-pointer">
               选择文件
@@ -57,7 +57,7 @@ export default () => {
 
 const Manifest = (props: { title: string; icon: string | IconifyIcon; children: JSX.Element }) => {
   return (
-    <div class="w-[26rem] bg-zinc-100 rounded-2xl shadow overflow-hidden flex flex-col">
+    <div class="w-[26rem] card-edge bg-zinc-100 flex flex-col">
       <h3 class="text-xl font-bold text-center py-[1rem] border-b border-zinc-300/80">
         {props.title}
         <Icon inline icon={props.icon} class="w-[1.25rem] ml-[0.5rem]" />

@@ -25,7 +25,7 @@ export default () => {
 
 const Task = (props: { title: string; period: string; nextRun: string }) => {
   return (
-    <div class="bg-zinc-100 shadow border border-zinc-100 rounded-lg overflow-hidden">
+    <div class="bg-zinc-100 card-edge">
       <h3 class="text-xl font-medium text-center py-[0.5rem] border-b border-zinc-300/80">{props.title}</h3>
       <div>
         <TaskField name="执行周期" value={props.period} />

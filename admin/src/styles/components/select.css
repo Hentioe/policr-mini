@@ -3,7 +3,7 @@
 }
 
 [data-scope="select"][data-part="control"] {
-  @apply w-full h-[2.5rem] flex items-center shadow rounded border
+  @apply w-full h-[2.5rem] flex items-center shadow rounded-lg border
     border-zinc-200;
 }
 
@@ -21,7 +21,7 @@
 }
 
 [data-scope="select"][data-part="content"] {
-  @apply w-full shadow border border-zinc-200 rounded z-10 py-[0.5rem];
+  @apply w-full shadow border border-zinc-200 rounded-xl z-10 py-[0.5rem];
 }
 
 [data-scope="select"][data-part="content"][data-state="open"] {

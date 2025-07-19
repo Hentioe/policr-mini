@@ -19,7 +19,7 @@ export default () => {
 
   return (
     <PageBase>
-      <div class="w-9/12 mx-auto flex items-center border border-zinc-200 shadow hover:shadow-strong-light rounded-full">
+      <div class="w-9/12 my-[1rem] mx-auto flex items-center border border-zinc-200 shadow hover:shadow-strong-light rounded-full">
         <Icon icon="material-symbols:search" class="w-[4rem] text-[2rem] text-zinc-400" />
         <input
           placeholder="输入群标题、群描述中的关键字"
@@ -27,7 +27,7 @@ export default () => {
           class="flex-1 h-[3.25rem] outline-0 tracking-wider"
         />
       </div>
-      <div class="mt-[2rem] rounded-xl shadow-strong overflow-hidden">
+      <div class="rounded-xl shadow border border-zinc-100 overflow-hidden">
         <table class="w-full">
           <thead class="bg-gray-100 tracking-wide">
             <tr class="*:px-[1rem] *:py-[1rem] *:text-left *:text-gray-700">

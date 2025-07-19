@@ -47,7 +47,7 @@ const InputOption = (
       <input
         placeholder={props.placeholder}
         type={props.type || "text"}
-        class="w-full h-[2.5rem] px-[1rem] outline-0 border border-zinc-200 shadow rounded focus:outline-2 outline-blue-400"
+        class="w-full h-[2.5rem] px-[1rem] outline-0 border border-zinc-200 shadow rounded-lg focus:outline-2 outline-blue-400"
       />
     </OptionRoot>
   );

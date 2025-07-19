@@ -7,7 +7,7 @@ export default () => {
   const { page } = destructure(globalState);
 
   return (
-    <nav class="bg-zinc-100 w-[8rem] mr-[1rem] rounded-[2rem] py-[2rem] shadow border border-zinc-200">
+    <nav class="mt-[4.5rem] bg-zinc-100 w-[8rem] h-fit mr-[1rem] rounded-[2rem] py-[2rem] shadow border border-zinc-200">
       <div class="flex flex-col">
         <NavLink href="/admin/v2" text="仪表盘" icon="ant-design:dashboard-outlined" active={page() === "dashboard"} />
         <NavLink
