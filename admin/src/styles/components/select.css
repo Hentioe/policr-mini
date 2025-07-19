@@ -1,0 +1,76 @@
+[data-scope="select"][data-part="root"] {
+  @apply w-full;
+}
+
+[data-scope="select"][data-part="control"] {
+  @apply w-full h-[2.5rem] flex items-center shadow rounded border
+    border-zinc-200;
+}
+
+[data-scope="select"][data-part="control"][data-state="open"] {
+  @apply outline-2 outline-blue-400;
+}
+
+[data-scope="select"][data-part="trigger"] {
+  @apply w-full flex justify-between py-[0.5rem] px-[1rem];
+}
+
+[data-scope="select"][data-part="positioner"] {
+  width: var(--reference-width);
+  @apply bg-white;
+}
+
+[data-scope="select"][data-part="content"] {
+  @apply w-full shadow border border-zinc-200 rounded z-10 py-[0.5rem];
+}
+
+[data-scope="select"][data-part="content"][data-state="open"] {
+  animation: fadeIn 0.25s ease-out;
+}
+
+[data-scope="select"][data-part="content"][data-state="closed"] {
+  animation: fadeOut 0.2s ease-in;
+}
+
+[data-scope="select"][data-part="item-group-label"] {
+  font-weight: bold;
+}
+
+[data-scope="select"][data-part="item"] {
+  @apply flex justify-between cursor-pointer px-[1rem] py-[0.5rem]
+    transition-colors;
+}
+
+[data-scope="select"][data-part="item"][data-highlighted] {
+  @apply bg-blue-300 text-zinc-100;
+}
+
+[data-scope="select"][data-part="item"][data-disabled] {
+  color: silver;
+}
+
+[data-scope="select"][data-part="item"][data-state="checked"] {
+  @apply bg-blue-500 text-zinc-50;
+}
+
+@keyframes fadeIn {
+  from {
+    opacity: 0;
+    transform: translateY(-10px);
+  }
+  to {
+    opacity: 1;
+    transform: translateY(0);
+  }
+}
+
+@keyframes fadeOut {
+  from {
+    opacity: 1;
+    transform: translateY(0);
+  }
+  to {
+    opacity: 0;
+    transform: translateY(-10px);
+  }
+}

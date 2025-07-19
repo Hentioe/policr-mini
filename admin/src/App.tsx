@@ -7,7 +7,7 @@ import { metaState } from "./state";
 export default () => {
   return (
     <MetaProvider>
-      <Title>{metaState.title}</Title>
+      <Title>{metaState.pageTitle}</Title>
       <div class="w-[68rem] mx-auto flex">
         <SideBar />
         <div class="flex-1">
