@@ -22,6 +22,10 @@ export async function getCustomize(): PayloadType<ServerData.Customize> {
   return strictify(await api.get("/customize"));
 }
 
+export async function getManagement(): PayloadType<ServerData.Management> {
+  return strictify(await api.get("/management"));
+}
+
 async function strictify<T extends Record<string, unknown> | readonly Record<string, unknown>[]>(
   resp: AxiosResponse<T>,
 ) {

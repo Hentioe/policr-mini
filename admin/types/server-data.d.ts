@@ -46,10 +46,20 @@ declare namespace ServerData {
 
   type MessageKind = "joined" | "left";
 
+  type Management = {
+    chats: Chat[];
+    page: number;
+    pageSize: number;
+    chatsTotal: number;
+  };
+
   type Chat = {
     id: number;
     title: string;
     username: string;
+    description: string;
+    isTakeOver: boolean;
+    left: boolean;
     createdAt: string;
   };
 }

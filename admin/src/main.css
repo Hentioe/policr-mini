@@ -4,3 +4,11 @@
 #app {
   @apply min-h-screen;
 }
+
+.card-edge {
+  @apply tw-card-edge;
+}
+
+.input-edge {
+  @apply tw-input-edge focus:tw-input-edge-highlight;
+}

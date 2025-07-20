@@ -18,10 +18,6 @@
 
 @utility tw-card-edge {
   @layer base {
-    @apply border border-zinc-100 shadow rounded-xl overflow-hidden;
+    @apply outline outline-zinc-100 shadow rounded-xl overflow-hidden;
   }
-}
-
-.input-edge {
-  @apply tw-input-edge focus:tw-input-edge-highlight;
 }
