@@ -6,7 +6,7 @@ export default (props: { children: JSX.Element; variant?: string; size?: string;
   return (
     <button
       class={classNames([
-        "px-2 py-1 rounded-lg border transition-colors cursor-pointer flex items-center",
+        "px-2 py-1 rounded-lg border transition-colors cursor-pointer select-none flex items-center",
         {
           "text-[0.85rem]": props.size === "sm",
           "text-base": !props.size || props.size === "md",

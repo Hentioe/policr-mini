@@ -16,11 +16,11 @@
 
 [data-scope="select"][data-part="positioner"] {
   width: var(--reference-width);
-  @apply bg-white;
 }
 
 [data-scope="select"][data-part="content"] {
-  @apply w-full shadow border border-zinc-200 rounded-xl z-10 py-[0.5rem];
+  @apply w-full shadow border border-zinc-200 rounded-xl z-10 py-[0.5rem]
+    backdrop-blur-md;
 }
 
 [data-scope="select"][data-part="content"][data-state="open"] {

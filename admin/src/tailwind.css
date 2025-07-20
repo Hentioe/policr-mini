@@ -17,7 +17,10 @@
 }
 
 @utility tw-card-edge {
-  @layer base {
-    @apply outline outline-zinc-100 shadow rounded-xl overflow-hidden;
-  }
+  border-style: solid;
+  border-width: 1px;
+  border-color: theme(--color-zinc-100);
+  box-shadow: theme(--shadow);
+  border-radius: theme(--radius-xl);
+  overflow: hidden;
 }

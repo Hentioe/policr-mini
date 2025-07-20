@@ -42,7 +42,8 @@ export default () => {
           class="flex-1 h-[3.25rem] outline-0 tracking-wider"
         />
       </div>
-      <div class="my-[1rem] p-[1rem] bg-blue-100/40 text-gray-600 rounded-xl flex justify-between items-center border-l-4 border-l-blue-400 card-edge">
+      {/* 数据位置/总数和刷新按钮 */}
+      <div class="my-[1rem] p-[1rem] bg-blue-100/40 text-gray-600 rounded-xl flex justify-between items-center card-edge border-l-4! border-l-blue-400!">
         <p>
           显示第 {(currentPage() - 1) * pageSize() + 1} - {currentPage() * pageSize()} 条记录，共 {chatsTotal()} 条
         </p>
@@ -52,12 +53,12 @@ export default () => {
           </ActionButton>
         </div>
       </div>
-      <table class="w-full card-edge shadow-strong">
+      <table class="w-full outline outline-zinc-100 shadow rounded overflow-hidden">
         <thead class="tracking-wide">
-          <tr class="*:px-[1rem] *:py-[1rem] *:bg-gray-100 *:text-left *:text-gray-700">
-            <th class="w-4/12">群详情</th>
-            <th class="w-3/12 text-center!">群链接</th>
-            <th class="w-3/12 text-center!">加入时间</th>
+          <tr class="*:px-[1rem] *:py-[1rem] *:bg-gray-100 *:border-zinc-300/70 *:text-left *:text-gray-700">
+            <th class="w-4/12 border-r-1">群详情</th>
+            <th class="w-3/12 border-r-1">群链接</th>
+            <th class="w-3/12 border-r-1 text-center!">加入时间</th>
             <th class="w-2/12 text-right!">操作</th>
           </tr>
         </thead>
@@ -66,18 +67,18 @@ export default () => {
             {(chat) => (
               <tr class="*:px-[1rem] *:py-[0.5rem] *:text-left *:text-gray-700 hover:bg-blue-50 hover:translate-x-1 transition-all">
                 <td>
-                  <p class="font-bold tracking-wide line-clamp-1">
+                  <p class="font-medium tracking-wide line-clamp-1">
                     {chat.title}
                   </p>
                   <p class="mt-1 text-sm text-gray-600 tracking-wider line-clamp-1">
                     {chat.description || "无描述"}
                   </p>
                 </td>
-                <td class="text-center!">
+                <td>
                   <ChatLink username={chat.username} />
                 </td>
                 <td class="text-center!">
-                  <span class="text-gray-600 bg-zinc-100 px-2 py-1 rounded-lg">
+                  <span class="text-gray-600 bg-zinc-50 px-2 py-1 rounded-lg">
                     {format(chat.createdAt, "yyyy-MM-dd HH:mm:ss")}
                   </span>
                 </td>
@@ -133,7 +134,7 @@ const PageButton = (props: { children: JSX.Element; current?: boolean }) => {
   return (
     <a
       class={classNames([
-        "px-4 py-2 bg-white card-edge shadow-strong cursor-pointer",
+        "px-4 py-2 bg-white card-edge cursor-pointer",
         {
           "bg-blue-600! text-zinc-50": props.current,
         },
