@@ -12,3 +12,8 @@
 .input-edge {
   @apply tw-input-edge focus:tw-input-edge-highlight;
 }
+
+.dragover {
+  /* 拖拽区域高亮 */
+  @apply outline-dashed outline-2 outline-blue-500 translate-y-[-4px];
+}

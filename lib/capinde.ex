@@ -38,7 +38,7 @@ defmodule Capinde do
     headers = [{"Content-Type", content_type}, {"Content-Length", to_string(content_length)}]
 
     Finch.build("POST", "#{endpoint()}/provider/upload", headers, {:stream, body_stream})
-    |> Finch.request(__MODULE__)
+    |> Finch.request(__MODULE__.Finch)
     |> handle_response(&ArchiveInfo.from/1)
   end
 

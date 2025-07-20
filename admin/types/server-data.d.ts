@@ -68,10 +68,12 @@ declare namespace ServerData {
       manifest: Manifest;
       imagesTotal: number;
     };
-    uploaded?: {
-      manifest: Manifest;
-      imagesTotal: number;
-    };
+    uploaded?: ArchiveInfo;
+  };
+
+  type ArchiveInfo = {
+    manifest: Manifest;
+    imagesTotal: number;
   };
 
   type Manifest = {
