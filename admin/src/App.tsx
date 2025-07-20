@@ -1,7 +1,7 @@
 import { MetaProvider, Title } from "@solidjs/meta";
 import { Route, Router } from "@solidjs/router";
 import { SideBar, TitleBar } from "./layouts";
-import { AlbumsPage, CustomizePage, DashboardPage, ManagementPage, TasksPage, TermsPage } from "./pages";
+import { AssetsPage, CustomizePage, DashboardPage, ManagementPage, TasksPage, TermsPage } from "./pages";
 import { metaState } from "./state";
 
 export default () => {
@@ -16,7 +16,7 @@ export default () => {
             <Route path="/" component={DashboardPage} />
             <Route path="/customize" component={CustomizePage} />
             <Route path="/management" component={ManagementPage} />
-            <Route path="/albums" component={AlbumsPage} />
+            <Route path="/assets" component={AssetsPage} />
             <Route path="/tasks" component={TasksPage} />
             <Route path="/terms" component={TermsPage} />
           </Router>

@@ -1,1 +1,1 @@
-type Page = "dashboard" | "customize" | "management" | "albums" | "tasks" | "terms";
+type Page = "dashboard" | "customize" | "management" | "assets" | "tasks" | "terms";

@@ -39,7 +39,7 @@ defmodule Capinde do
 
     Finch.build("POST", "#{endpoint()}/provider/upload", headers, {:stream, body_stream})
     |> Finch.request(__MODULE__)
-    |> handle_resp(&ArchiveInfo.from/1)
+    |> handle_response(&ArchiveInfo.from/1)
   end
 
   def delete_uploaded do
@@ -56,26 +56,31 @@ defmodule Capinde do
     method
     |> Finch.build("#{endpoint()}#{path}", [@content_type_header], JSON.encode!(body))
     |> Finch.request(__MODULE__.Finch)
-    |> handle_resp(cast_fun)
+    |> handle_response(cast_fun)
   end
 
-  defp handle_resp({:ok, resp}, cast_fun) when resp.status == 200 do
+  defp handle_response({:ok, resp}, cast_fun) when resp.status == 200 do
     body = JSON.decode!(resp.body)
 
-    if cast_fun do
-      {:ok, cast_fun.(body)}
-    else
-      {:ok, body}
+    cond do
+      body["code"] ->
+        {:error, %Error{code: body["code"], message: body["message"]}}
+
+      cast_fun ->
+        {:ok, cast_fun.(body)}
+
+      true ->
+        {:ok, body}
     end
   end
 
-  defp handle_resp({:ok, resp}, _) do
+  defp handle_response({:ok, resp}, _) do
     %{"message" => message} = JSON.decode!(resp.body)
 
     {:error, %Error{message: message}}
   end
 
-  defp handle_resp({:error, reason}, _) do
+  defp handle_response({:error, reason}, _) do
     {:error, reason}
   end
 

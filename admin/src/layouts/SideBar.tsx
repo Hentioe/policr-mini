@@ -17,7 +17,7 @@ export default () => {
           active={page() === "customize"}
         />
         <NavLink href="/admin/v2/management" text="批量管理" icon="mdi:users-group" active={page() === "management"} />
-        <NavLink href="/admin/v2/albums" text="验证资源" icon="grommet-icons:resources" active={page() === "albums"} />
+        <NavLink href="/admin/v2/assets" text="验证资源" icon="grommet-icons:resources" active={page() === "assets"} />
         <NavLink href="/admin/v2/tasks" text="系统任务" icon="fa-solid:tasks" active={page() === "tasks"} />
         <NavLink href="/admin/v2/terms" text="服务条款" icon="solar:document-broken" active={page() === "terms"} />
       </div>

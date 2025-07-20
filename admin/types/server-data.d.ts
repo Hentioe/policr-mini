@@ -62,4 +62,28 @@ declare namespace ServerData {
     left: boolean;
     createdAt: string;
   };
+
+  type Assets = {
+    deployed?: {
+      manifest: Manifest;
+      imagesTotal: number;
+    };
+    uploaded?: {
+      manifest: Manifest;
+      imagesTotal: number;
+    };
+  };
+
+  type Manifest = {
+    version: string;
+    datetime: string;
+    includeFormats: string[];
+    albums: Album[];
+    conflicts: string[][];
+  };
+
+  type Album = {
+    id: string;
+    name: object;
+  };
 }

@@ -26,6 +26,10 @@ export async function getManagement(): PayloadType<ServerData.Management> {
   return strictify(await api.get("/management"));
 }
 
+export async function getAssets(): PayloadType<ServerData.Assets> {
+  return strictify(await api.get("/assets"));
+}
+
 async function strictify<T extends Record<string, unknown> | readonly Record<string, unknown>[]>(
   resp: AxiosResponse<T>,
 ) {
