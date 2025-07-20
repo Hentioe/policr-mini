@@ -1,15 +1,41 @@
 import { createListCollection, Select } from "@ark-ui/solid/select";
 import { Icon } from "@iconify-icon/solid";
-import { Index } from "solid-js";
+import { createEffect, createMemo, createSignal, Index } from "solid-js";
 import { Portal } from "solid-js/web";
 
-export default (props: { placeholder?: string; open?: boolean }) => {
-  const collection = createListCollection({ items: ["React", "Solid", "Vue", "Svelte"] });
+export default (
+  props: {
+    placeholder?: string;
+    open?: boolean;
+    onChange?: (item: SelectItem) => void;
+    items: SelectItem[];
+    default?: string;
+  },
+) => {
+  const [value, setValue] = createSignal<string[]>([]);
+  const collection = createMemo(() => createListCollection<SelectItem>({ items: props.items }));
+
+  createEffect(() => {
+    if (value().length === 0 && props.default) {
+      setValue([props.default]);
+    }
+  });
+
+  const handleChange = (item: SelectItem) => {
+    setValue([item.value]);
+    props.onChange?.(item);
+  };
+
   return (
-    <Select.Root collection={collection} open={props.open}>
+    <Select.Root
+      value={value()}
+      collection={collection()}
+      onValueChange={(e) => handleChange(e.items[0])}
+      open={props.open}
+    >
       <Select.Control>
         <Select.Trigger>
-          <Select.ValueText placeholder={props.placeholder || "选择一个值"} />
+          <Select.ValueText placeholder={props.placeholder} />
           <Select.Indicator>
             <Icon icon="lucide:chevrons-up-down" class="text-zinc-300 w-[1rem]" />
           </Select.Indicator>
@@ -19,10 +45,10 @@ export default (props: { placeholder?: string; open?: boolean }) => {
         <Select.Positioner>
           <Select.Content>
             <Select.ItemGroup>
-              <Index each={collection.items}>
+              <Index each={collection().items}>
                 {(item) => (
                   <Select.Item item={item()}>
-                    <Select.ItemText>{item()}</Select.ItemText>
+                    <Select.ItemText>{item().label}</Select.ItemText>
                     <Select.ItemIndicator>
                       <Icon icon="material-symbols:check" />
                     </Select.ItemIndicator>

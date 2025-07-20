@@ -18,6 +18,10 @@ export async function getStats(): PayloadType<ServerData.Stats> {
   return strictify(await api.get("/stats"));
 }
 
+export async function getCustomize(): PayloadType<ServerData.Customize> {
+  return strictify(await api.get("/customize"));
+}
+
 async function strictify<T extends Record<string, unknown> | readonly Record<string, unknown>[]>(
   resp: AxiosResponse<T>,
 ) {

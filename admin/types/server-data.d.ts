@@ -25,6 +25,27 @@ declare namespace ServerData {
     };
   };
 
+  type Customize = {
+    scheme: Scheme;
+  };
+
+  type Scheme = {
+    type: string;
+    typeItems: SelectItem[];
+    timeout: number;
+    killStrategy: string;
+    fallbackKillStrategy: string;
+    killStrategyItems: SelectItem[];
+    mentionText: string;
+    mentionTextItems: SelectItem[];
+    imageChoicesCount: number;
+    imageChoicesCountItems: SelectItem[];
+    cleanupMessages: MessageKind[];
+    delayUnbanSecs: number;
+  };
+
+  type MessageKind = "joined" | "left";
+
   type Chat = {
     id: number;
     title: string;
