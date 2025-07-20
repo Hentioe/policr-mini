@@ -4,12 +4,24 @@
   --shadow-strong: rgba(0, 0, 0, 0.07) 0px 0px 2px 2px;
   --shadow-strong-light: 0 2px 8px 1px rgba(64, 60, 67, 0.24);
 }
-@layer utilities {
-  .card-edge {
+
+@utility tw-input-edge {
+  outline-style: solid;
+  outline-width: 2px;
+  outline-color: theme(--color-zinc-200/80);
+  border-radius: theme(--radius-lg);
+}
+
+@utility tw-input-edge-highlight {
+  outline-color: theme(--color-blue-400);
+}
+
+@utility tw-card-edge {
+  @layer base {
     @apply border border-zinc-100 shadow rounded-xl overflow-hidden;
   }
+}
 
-  .input-edge {
-    @apply outline-2 outline-zinc-200/80 rounded-lg;
-  }
+.input-edge {
+  @apply tw-input-edge focus:tw-input-edge-highlight;
 }
