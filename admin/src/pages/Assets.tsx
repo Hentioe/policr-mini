@@ -131,7 +131,7 @@ export default () => {
       <div class="mt-[2rem]">
         <div
           ref={setDropAreaEl}
-          class="w-full bg-zinc-100 card-edge pt-[4rem] pb-[1rem] text-center transition-transform"
+          class="w-full bg-zinc-50 card-edge pt-[4rem] pb-[1rem] text-center transition-transform"
         >
           <button
             class="mx-auto bg-blue-500 px-[2.5rem] py-[1rem] text-white rounded shadow-strong flex items-center cursor-pointer"
@@ -218,7 +218,7 @@ const ManifestFields = (props: { manifest: ServerData.Manifest; imagesCount: num
 
 const Manifest = (props: { title: string; icon: string | IconifyIcon; children: JSX.Element }) => {
   return (
-    <div class="w-[26rem] card-edge bg-zinc-100 flex flex-col">
+    <div class="w-[26rem] card-edge bg-zinc-50 flex flex-col">
       <h3 class="text-xl font-bold text-center py-[1rem] border-b border-zinc-300/80">
         {props.title}
         <Icon inline icon={props.icon} class="w-[1.25rem] ml-[0.5rem]" />
@@ -230,7 +230,7 @@ const Manifest = (props: { title: string; icon: string | IconifyIcon; children: 
 
 const ManifestField = (props: { name: string; value: string | number }) => {
   return (
-    <div class="py-[1rem] hover:bg-zinc-200">
+    <div class="py-[1rem] hover:bg-zinc-200/60">
       <p class="text-center text-lg font-medium">{props.name}</p>
       <p class="text-center mt-[0.25rem] text-zinc-500 tracking-wide">{props.value}</p>
     </div>
