@@ -1,0 +1,14 @@
+[data-scope="toast"] {
+  &[data-type="success"] {
+    @apply bg-green-400 text-green-50;
+  }
+  &[data-part="root"] {
+    @apply w-fit rounded shadow-lg px-[1.5rem] py-[0.5rem];
+  }
+  &[data-part="title"] {
+    @apply text-center font-bold tracking-wide;
+  }
+  &[data-part="description"] {
+    @apply mt-[0.5rem] text-center text-gray-50 tracking-wider;
+  }
+}

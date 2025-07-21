@@ -14,6 +14,21 @@ export async function getProfile(): PayloadType<ServerData.Profile> {
   return strictify(await client.get("/profile"));
 }
 
+export async function updateDefaultScheme(scheme: InputData.Scheme): PayloadType<ServerData.Scheme> {
+  return strictify(
+    await client.put("/schemes/default", {
+      type: scheme.type,
+      timeout: scheme.timeout,
+      kill_strategy: scheme.killStrategy,
+      fallback_kill_strategy: scheme.fallbackKillStrategy,
+      mention_text: scheme.mentionText,
+      image_choices_count: scheme.imageChoicesCount,
+      cleanup_messages: scheme.cleanupMessages,
+      delay_unban_secs: scheme.delayUnbanSecs,
+    }),
+  );
+}
+
 export async function getStats(): PayloadType<ServerData.Stats> {
   return strictify(await client.get("/stats"));
 }

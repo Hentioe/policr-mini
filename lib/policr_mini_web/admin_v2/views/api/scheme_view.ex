@@ -18,6 +18,10 @@ defmodule PolicrMiniWeb.AdminV2.API.SchemeView do
     }
   end
 
+  def render("show.json", %{scheme: scheme}) do
+    success(render_one(scheme, __MODULE__, "scheme.json"))
+  end
+
   defp type_items do
     [
       build_select_item("grid", "网格验证"),

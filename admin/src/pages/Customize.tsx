@@ -1,8 +1,9 @@
+import { createToaster, Toast, Toaster } from "@ark-ui/solid";
 import { Icon } from "@iconify-icon/solid";
 import { useQuery } from "@tanstack/solid-query";
 import { createEffect, createSignal, JSX, onMount } from "solid-js";
-import { getCustomize } from "../api";
-import { Select } from "../components";
+import { getCustomize, updateDefaultScheme } from "../api";
+import { ActionButton, SingleSelect } from "../components";
 import { PageBase } from "../layouts";
 import { setPage } from "../state/global";
 import { setTitle } from "../state/meta";
@@ -10,6 +11,20 @@ import { setTitle } from "../state/meta";
 type Scheme = ServerData.Scheme;
 
 export default () => {
+  const customizeQuery = useQuery(() => ({
+    queryKey: ["customize"],
+    queryFn: getCustomize,
+    // 禁止自动刷新
+    refetchOnWindowFocus: false,
+    refetchIntervalInBackground: false,
+  }));
+
+  const toaster = createToaster({
+    placement: "bottom",
+    overlap: true,
+    gap: 24,
+  });
+
   const [type, setType] = createSignal<Scheme["type"] | undefined>(undefined);
   const [typeItems, setTypeItems] = createSignal<Scheme["typeItems"]>([]);
   const [timeout, setTimeout] = createSignal<Scheme["timeout"] | undefined>(undefined);
@@ -24,11 +39,9 @@ export default () => {
   const [imageChoicesCountItems, setImageChoicesCountItems] = createSignal<Scheme["imageChoicesCountItems"]>([]);
   const [cleanupMessage, setCleanupMessages] = createSignal<Scheme["cleanupMessages"]>([]);
   const [delayUnbanSecs, setDelayUnbanSecs] = createSignal<Scheme["delayUnbanSecs"] | undefined>(undefined);
-
-  const customizeQuery = useQuery(() => ({
-    queryKey: ["customize"],
-    queryFn: getCustomize,
-  }));
+  const [prevScheme, setPrevScheme] = createSignal<Scheme | undefined>(undefined);
+  const [isChanged, setIsChanged] = createSignal(false);
+  const [isSaving, setIsSaving] = createSignal(false);
 
   const handleTypeChange = (item: SelectItem) => setType(item.value);
   const handleKillStrategyChange = (item: SelectItem) => setKillStrategy(item.value);
@@ -61,8 +74,50 @@ export default () => {
       setImageChoicesCountItems(scheme.imageChoicesCountItems);
       setCleanupMessages(scheme.cleanupMessages);
       setDelayUnbanSecs(scheme.delayUnbanSecs);
+      setPrevScheme(scheme);
     }
   });
+
+  createEffect(() => {
+    const prev = prevScheme();
+    if (prev) {
+      const isChanged = prev.type !== type()
+        || prev.timeout !== timeout()
+        || prev.killStrategy !== killStrategy()
+        || prev.fallbackKillStrategy !== fallbackKillStrategy()
+        || prev.mentionText !== mentionText()
+        || prev.imageChoicesCount !== imageChoicesCount()
+        || prev.cleanupMessages.join(",") !== cleanupMessage().join(",")
+        || prev.delayUnbanSecs !== delayUnbanSecs()
+        || prev.timeout !== timeout();
+
+      setIsChanged(isChanged);
+    }
+  });
+
+  const handleSave = async () => {
+    setIsSaving(true);
+    const resp = await updateDefaultScheme({
+      type: type(),
+      timeout: timeout(),
+      killStrategy: killStrategy(),
+      fallbackKillStrategy: fallbackKillStrategy(),
+      mentionText: mentionText(),
+      imageChoicesCount: imageChoicesCount(),
+      cleanupMessages: cleanupMessage(),
+      delayUnbanSecs: delayUnbanSecs(),
+    });
+
+    setIsSaving(false);
+    if (resp.success) {
+      setPrevScheme(resp.payload);
+      toaster.success({
+        title: "保存成功",
+        description: "全局配置已更新",
+        duration: 2500,
+      });
+    }
+  };
 
   onMount(() => {
     setTitle("全局调整");
@@ -101,14 +156,14 @@ export default () => {
             placeholder="输入数值（秒）"
             type="number"
             value={timeout()}
-            onChange={setTimeout}
+            onInput={(v) => setTimeout(Number(v))}
           />
           <InputField
             lable="解封延时"
             placeholder="输入数值（秒）"
             type="number"
             value={delayUnbanSecs()}
-            onChange={setDelayUnbanSecs}
+            onInput={(v) => setDelayUnbanSecs(Number(v))}
           />
         </FieldGroup>
         <FieldGroup title="显示配置" icon="streamline-plump-color:eye-optic">
@@ -144,6 +199,26 @@ export default () => {
           </FieldRoot>
         </FieldGroup>
       </div>
+      <div class="mt-[1rem]">
+        <ActionButton
+          onClick={handleSave}
+          loading={isSaving()}
+          disabled={!isChanged()}
+          variant="info"
+          size="lg"
+          fullWidth
+        >
+          保存更改
+        </ActionButton>
+      </div>
+      <Toaster toaster={toaster}>
+        {(toast) => (
+          <Toast.Root>
+            <Toast.Title>{toast().title}</Toast.Title>
+            <Toast.Description>{toast().description}</Toast.Description>
+          </Toast.Root>
+        )}
+      </Toaster>
     </PageBase>
   );
 };
@@ -173,7 +248,12 @@ const SelectField = (
 ) => {
   return (
     <FieldRoot lable={props.lable}>
-      <Select placeholder={props.placeholder} items={props.items} onChange={props.onChange} default={props.default} />
+      <SingleSelect
+        placeholder={props.placeholder}
+        items={props.items}
+        onChange={props.onChange}
+        default={props.default}
+      />
     </FieldRoot>
   );
 };
@@ -184,7 +264,7 @@ const InputField = (
     placeholder: string;
     type?: JSX.InputHTMLAttributes<HTMLInputElement>["type"];
     value?: string | number;
-    onChange?: (value: string) => void;
+    onInput?: (value: string) => void;
   },
 ) => {
   return (
@@ -194,7 +274,7 @@ const InputField = (
         type={props.type || "text"}
         class="w-full h-[2.5rem] px-[1rem] input-edge"
         value={props.value}
-        onChange={(e) => props.onChange?.(e.currentTarget.value)}
+        onInput={(e) => props.onInput?.(e.currentTarget.value)}
       />
     </FieldRoot>
   );

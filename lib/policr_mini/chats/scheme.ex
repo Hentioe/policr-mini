@@ -88,4 +88,36 @@ defmodule PolicrMini.Chats.Scheme do
   def default_param(field_name) do
     default_params()[field_name]
   end
+
+  # 转换到新参数
+  def cast_from_new_params(params) do
+    params =
+      Map.put(
+        params,
+        "cleanup_messages",
+        cast_cleanup_messages_from_new_params(params["cleanup_messages"] || [])
+      )
+
+    Enum.into(params, %{}, fn {key, value} ->
+      new_key =
+        case key do
+          "type" -> "verification_mode"
+          "timeout" -> "seconds"
+          "kill_strategy" -> "wrong_killing_method"
+          "fallback_kill_strategy" -> "timeout_killing_method"
+          "image_choices_count" -> "image_answers_count"
+          "cleanup_messages" -> "service_message_cleanup"
+          _ -> key
+        end
+
+      {new_key, value}
+    end)
+  end
+
+  def cast_cleanup_messages_from_new_params(message_cleanup) when is_list(message_cleanup) do
+    Enum.map(message_cleanup, fn
+      "left" -> "lefted"
+      other -> other
+    end)
+  end
 end

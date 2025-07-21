@@ -70,6 +70,8 @@ defmodule PolicrMiniWeb.Router do
     get "/management", ManagementController, :index
     get "/assets", PageController, :assets
     post "/provider/upload", ProviderController, :upload
+
+    put "/schemes/default", SchemeController, :update_default
   end
 
   scope "/admin/api", PolicrMiniWeb.Admin.API do

@@ -48,7 +48,7 @@ export default () => {
           显示第 {(currentPage() - 1) * pageSize() + 1} - {currentPage() * pageSize()} 条记录，共 {chatsTotal()} 条
         </p>
         <div>
-          <ActionButton icon="material-symbols:refresh">
+          <ActionButton icon="material-symbols:refresh" outline>
             刷新
           </ActionButton>
         </div>
@@ -84,10 +84,10 @@ export default () => {
                 </td>
                 <td class="text-right!">
                   <ActionButtonList>
-                    <ActionButton size="sm" variant="info">
+                    <ActionButton size="sm" variant="info" outline>
                       同步
                     </ActionButton>
-                    <ActionButton size="sm" variant="danger">
+                    <ActionButton size="sm" variant="danger" outline>
                       退出
                     </ActionButton>
                   </ActionButtonList>
