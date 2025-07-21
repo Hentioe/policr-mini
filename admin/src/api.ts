@@ -37,8 +37,8 @@ export async function getCustomize(): PayloadType<ServerData.Customize> {
   return strictify(await client.get("/customize"));
 }
 
-export async function getManagement(): PayloadType<ServerData.Management> {
-  return strictify(await client.get("/management"));
+export async function getManagement(params: { page: number }): PayloadType<ServerData.Management> {
+  return strictify(await client.get(`/management?page=${params.page}`));
 }
 
 export async function getAssets(): PayloadType<ServerData.Assets> {

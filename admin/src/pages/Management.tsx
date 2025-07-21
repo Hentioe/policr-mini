@@ -1,4 +1,5 @@
 import { Icon } from "@iconify-icon/solid";
+import { useSearchParams } from "@solidjs/router";
 import { useQuery } from "@tanstack/solid-query";
 import classNames from "classnames";
 import { format } from "date-fns";
@@ -10,20 +11,24 @@ import { setPage } from "../state/global";
 import { setTitle } from "../state/meta";
 
 export default () => {
-  const [currentPage, setCurrentPage] = createSignal(1);
+  // eslint-disable-next-line @typescript-eslint/no-unused-vars
+  const [searchParams, _setSearchParams] = useSearchParams();
+  const [pageNum, setPageNum] = createSignal(1);
   const [pageSize, setPageSize] = createSignal(10);
-  const [chatsTotal, setChatsTotal] = createSignal(0);
+  const [total, setTotal] = createSignal(0);
+  const [pageNums, setPageNums] = createSignal<number[]>([]);
   const managementQuery = useQuery(() => ({
-    queryKey: ["management"],
-    queryFn: getManagement,
+    queryKey: ["management", searchParams.page || 1],
+    queryFn: () => getManagement({ page: searchParams.page ? parseInt(searchParams.page as string) : 1 }),
   }));
 
   createEffect(() => {
     if (managementQuery.data?.success) {
       const data = managementQuery.data.payload;
-      setCurrentPage(data.page);
-      setPageSize(data.pageSize);
-      setChatsTotal(data.chatsTotal);
+      setPageNum(data.chats.page);
+      setPageSize(data.chats.pageSize);
+      setTotal(data.chats.total);
+      setPageNums(getPaginationPages(data.chats.page, data.chats.pageSize, data.chats.total));
     }
   });
 
@@ -45,7 +50,7 @@ export default () => {
       {/* 数据位置/总数和刷新按钮 */}
       <div class="my-[1rem] p-[1rem] bg-blue-100/40 text-gray-600 rounded-xl flex justify-between items-center card-edge border-l-4! border-l-blue-400!">
         <p>
-          显示第 {(currentPage() - 1) * pageSize() + 1} - {currentPage() * pageSize()} 条记录，共 {chatsTotal()} 条
+          显示第 {(pageNum() - 1) * pageSize() + 1} - {pageNum() * pageSize()} 条记录，共 {total()} 条
         </p>
         <div>
           <ActionButton icon="material-symbols:refresh" outline>
@@ -63,7 +68,7 @@ export default () => {
           </tr>
         </thead>
         <tbody class="bg-blue-500 *:bg-white *:not-last:border-b *:border-gray-200">
-          <For each={managementQuery.data?.success && managementQuery.data.payload.chats || []}>
+          <For each={managementQuery.data?.success && managementQuery.data.payload.chats.items || []}>
             {(chat) => (
               <tr class="*:px-[1rem] *:py-[0.5rem] *:text-left *:text-gray-700 hover:bg-blue-50 hover:translate-x-1 transition-all">
                 <td>
@@ -98,21 +103,52 @@ export default () => {
         </tbody>
       </table>
       <div class="mt-[2rem] flex justify-between gap-[0.5rem]">
-        <PageButton>
+        <PageButton num={pageNum() - 1}>
           上一页
         </PageButton>
         <div class="flex gap-[0.5rem]">
-          <PageButton current>1</PageButton>
-          <PageButton>2</PageButton>
-          <PageButton>3</PageButton>
-          <PageButton>4</PageButton>
-          <PageButton>5</PageButton>
+          <For each={pageNums()}>
+            {(num) => (
+              <PageButton current={num === pageNum()} num={num}>
+                {num}
+              </PageButton>
+            )}
+          </For>
         </div>
-        <PageButton>
+        <PageButton num={pageNum() + 1} maxNum={total() ? Math.ceil(total() / pageSize()) : undefined}>
           下一页
         </PageButton>
       </div>
     </PageBase>
+  );
+};
+
+const PageButton = (props: { children: JSX.Element; current?: boolean; num: number; maxNum?: number }) => {
+  const isInvalid = () => {
+    return props.num < 1 || props.num > (props.maxNum || Infinity);
+  };
+
+  const handleClick = (e: MouseEvent) => {
+    if (isInvalid()) {
+      e.preventDefault();
+      return;
+    }
+  };
+
+  return (
+    <a
+      href={`?page=${props.num}`}
+      onClick={handleClick}
+      class={classNames([
+        "px-4 py-2 bg-white card-edge cursor-pointer select-none",
+        {
+          "bg-blue-600! text-zinc-50": props.current,
+          "cursor-not-allowed! opacity-50": isInvalid(),
+        },
+      ])}
+    >
+      {props.children}
+    </a>
   );
 };
 
@@ -130,21 +166,6 @@ const ChatLink = (props: { username?: string }) => {
   );
 };
 
-const PageButton = (props: { children: JSX.Element; current?: boolean }) => {
-  return (
-    <a
-      class={classNames([
-        "px-4 py-2 bg-white card-edge cursor-pointer",
-        {
-          "bg-blue-600! text-zinc-50": props.current,
-        },
-      ])}
-    >
-      {props.children}
-    </a>
-  );
-};
-
 const ActionButtonList = (props: { children: JSX.Element }) => {
   return (
     <div class="flex gap-[0.5rem] justify-end">
@@ -152,3 +173,26 @@ const ActionButtonList = (props: { children: JSX.Element }) => {
     </div>
   );
 };
+
+function getPaginationPages(page: number, pageSize: number, total: number): number[] {
+  const totalPages = Math.ceil(total / pageSize);
+
+  if (totalPages <= 5) {
+    return Array.from({ length: totalPages }, (_, i) => i + 1);
+  }
+
+  let start = Math.max(1, page - 2);
+  let end = Math.min(totalPages, page + 2);
+
+  // 当前面不足2个时，向后补充
+  if (start === 1) {
+    end = Math.min(totalPages, start + 4);
+  }
+
+  // 当后面不足2个时，向前补充
+  if (end === totalPages) {
+    start = Math.max(1, end - 4);
+  }
+
+  return Array.from({ length: end - start + 1 }, (_, i) => start + i);
+}

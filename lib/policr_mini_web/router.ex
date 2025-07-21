@@ -67,7 +67,7 @@ defmodule PolicrMiniWeb.Router do
     get "/profile", ProfileController, :index
     get "/stats", StatsController, :index
     get "/customize", CustomizeController, :index
-    get "/management", ManagementController, :index
+    get "/management", PageController, :management
     get "/assets", PageController, :assets
     post "/provider/upload", ProviderController, :upload
 

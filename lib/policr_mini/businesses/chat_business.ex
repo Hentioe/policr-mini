@@ -43,6 +43,7 @@ defmodule PolicrMini.ChatBusiness do
   - `offset`: 偏移位置。默认值为 `0`。
   - `order_by`: 排序方式。默认值为 `[desc: :inserted_at]`（按插入时间降序）。
   """
+  @deprecated "Use PolicrMini.Uses.list_chats/1 instead."
   @spec find_list2(find_list_cont) :: [Chat.t()]
   def find_list2(cont \\ []) when is_list(cont) do
     cont = preprocess_find_list_cont(cont)

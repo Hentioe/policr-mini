@@ -13,6 +13,13 @@ declare namespace ServerData {
     payload: T;
   };
 
+  type Paginated<T> = {
+    page: number;
+    pageSize: number;
+    items: T[];
+    total: number;
+  };
+
   type Profile = {
     username: string;
   };
@@ -47,10 +54,7 @@ declare namespace ServerData {
   type MessageKind = "joined" | "left";
 
   type Management = {
-    chats: Chat[];
-    page: number;
-    pageSize: number;
-    chatsTotal: number;
+    chats: Paginated<Chat>;
   };
 
   type Chat = {
