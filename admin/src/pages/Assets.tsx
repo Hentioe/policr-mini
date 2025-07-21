@@ -1,12 +1,13 @@
 import { Icon, IconifyIcon } from "@iconify-icon/solid";
 import { useQuery } from "@tanstack/solid-query";
-import classNames from "classnames";
 import { format } from "date-fns";
 import { createSignal, JSX, Match, onMount, Switch } from "solid-js";
-import { getAssets, uploadAlbums } from "../api";
+import { deleteUploadedAlbums, deployUploadedAlbums, getAssets, uploadAlbums } from "../api";
+import { ActionButton } from "../components";
 import { PageBase } from "../layouts";
 import { setPage } from "../state/global";
 import { setTitle } from "../state/meta";
+import { toaster } from "../utils";
 
 type Assets = ServerData.Assets;
 
@@ -14,6 +15,8 @@ export default () => {
   const [fileEl, setFileEl] = createSignal<HTMLInputElement | null>(null);
   const [dropAreaEl, setDropAreaEl] = createSignal<HTMLDivElement | null>(null);
   const [selectedFile, setSelectedFile] = createSignal<File | null>(null);
+  const [isDeleting, setIsDeleting] = createSignal<boolean>(false);
+  const [isDeploying, setIsDeploying] = createSignal<boolean>(false);
   const [uploadProgress, setUploadProgress] = createSignal<number>(0);
   const [uploadError, setUploadError] = createSignal<string | null>(null);
 
@@ -21,6 +24,34 @@ export default () => {
     queryKey: ["assets"],
     queryFn: getAssets,
   }));
+
+  const handleDeleteUploaded = async () => {
+    setIsDeleting(true);
+    const resp = await deleteUploadedAlbums();
+    setIsDeleting(false);
+    if (resp.success) {
+      toaster.success({ title: "删除成功", description: "已删除上传的资源" });
+      query.refetch();
+    } else {
+      toaster.error({ title: "删除失败", description: resp.message });
+    }
+  };
+
+  const handleDeployUploaded = async () => {
+    setIsDeploying(true);
+    const resp = await deployUploadedAlbums();
+    setIsDeploying(false);
+    if (resp.success) {
+      toaster.success({ title: "部署成功", description: "已部署上传的资源" });
+      query.refetch();
+    } else {
+      toaster.error({ title: "部署失败", description: resp.message });
+    }
+  };
+
+  const handleClearDeployed = async () => {
+    toaster.error({ title: "功能未实现", description: "尚未实现对已部署资源的清空" });
+  };
 
   const openFileSelector = () => {
     const input = fileEl();
@@ -89,9 +120,9 @@ export default () => {
                 imagesCount={(query.data?.payload as Assets).deployed!.imagesTotal}
               />
               <ManifestActionList>
-                <ManifestAction level="danger">
-                  删除
-                </ManifestAction>
+                <ActionButton onClick={handleClearDeployed} size="lg" variant="danger" icon="tdesign:clear-filled">
+                  清空
+                </ActionButton>
               </ManifestActionList>
             </Match>
             <Match when={true}>
@@ -112,12 +143,24 @@ export default () => {
                 imagesCount={(query.data?.payload as Assets).uploaded!.imagesTotal}
               />
               <ManifestActionList>
-                <ManifestAction level="ok">
+                <ActionButton
+                  onClick={handleDeployUploaded}
+                  loading={isDeploying()}
+                  size="lg"
+                  variant="success"
+                  icon="flowbite:cloud-arrow-up-solid"
+                >
                   部署
-                </ManifestAction>
-                <ManifestAction level="danger">
+                </ActionButton>
+                <ActionButton
+                  onClick={handleDeleteUploaded}
+                  loading={isDeleting()}
+                  size="lg"
+                  variant="danger"
+                  icon="ic:baseline-delete"
+                >
                   删除
-                </ManifestAction>
+                </ActionButton>
               </ManifestActionList>
             </Match>
             <Match when={true}>
@@ -234,22 +277,6 @@ const ManifestField = (props: { name: string; value: string | number }) => {
       <p class="text-center text-lg font-medium">{props.name}</p>
       <p class="text-center mt-[0.25rem] text-zinc-500 tracking-wide">{props.value}</p>
     </div>
-  );
-};
-
-const ManifestAction = (props: { children: JSX.Element; level: "ok" | "normal" | "warning" | "danger" }) => {
-  return (
-    <button
-      class={classNames([
-        "text-zinc-50 px-[1.5rem] py-[0.5rem] rounded-lg cursor-pointer transition-colors",
-        { "bg-green-500 hover:bg-green-600": props.level === "ok" },
-        { "bg-blue-500 hover:bg-blue-600": props.level === "normal" },
-        { "bg-yellow-500 hover:bg-yellow-600": props.level === "warning" },
-        { "bg-red-500 hover:bg-red-600": props.level === "danger" },
-      ])}
-    >
-      {props.children}
-    </button>
   );
 };
 

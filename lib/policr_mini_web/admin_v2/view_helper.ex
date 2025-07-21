@@ -6,6 +6,12 @@ defmodule PolicrMiniWeb.AdminV2.ViewHelper do
     }
   end
 
+  def success do
+    %{
+      success: true
+    }
+  end
+
   def failure(message) do
     %{
       success: false,

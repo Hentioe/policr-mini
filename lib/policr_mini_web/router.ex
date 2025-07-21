@@ -69,9 +69,12 @@ defmodule PolicrMiniWeb.Router do
     get "/customize", CustomizeController, :index
     get "/management", PageController, :management
     get "/assets", PageController, :assets
-    post "/provider/upload", ProviderController, :upload
 
     put "/schemes/default", SchemeController, :update_default
+
+    post "/provider/upload", ProviderController, :upload
+    delete "/provider/uploaded", ProviderController, :delete
+    put "/provider/deploy", ProviderController, :deploy
 
     put "/chats/:id/sync", ChatController, :sync
     put "/chats/:id/leave", ChatController, :leave

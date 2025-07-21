@@ -2,7 +2,7 @@ import { Icon } from "@iconify-icon/solid";
 import classNames from "classnames";
 import { JSX, Match, Switch } from "solid-js";
 
-type Variant = "info" | "danger";
+type Variant = "info" | "danger" | "success";
 type Props = {
   children: JSX.Element;
   variant?: Variant;
@@ -16,7 +16,7 @@ type Props = {
 };
 
 export default (props: Props) => {
-  const renderStyle = () => {
+  const colorStyle = () => {
     // 允许变化
     const allowChange = !props.disabled && !props.loading;
     if (props.outline) {
@@ -33,6 +33,13 @@ export default (props: Props) => {
             "text-red-500 border-red-200 bg-red-100/70",
             {
               "hover:bg-red-200/80": allowChange,
+            },
+          ]);
+        case "success":
+          return classNames([
+            "text-green-500 border-green-200 bg-green-100/70",
+            {
+              "hover:bg-green-200/80": allowChange,
             },
           ]);
         default:
@@ -59,7 +66,36 @@ export default (props: Props) => {
               "hover:bg-red-400": allowChange,
             },
           ]);
+        case "success":
+          return classNames([
+            "text-white bg-green-500",
+            {
+              "hover:bg-green-400": allowChange,
+            },
+          ]);
       }
+    }
+  };
+
+  const textSizeStyle = () => {
+    switch (props.size) {
+      case "sm":
+        return "text-[0.85rem]";
+      case "lg":
+        return "text-[1.25rem]";
+      default:
+        return "text-base"; // 默认大小
+    }
+  };
+
+  const padingStyle = () => {
+    switch (props.size) {
+      case "sm":
+        return "px-2 py-1";
+      case "lg":
+        return "px-[1.5rem] py-[0.5rem]";
+      default:
+        return "px-3 py-2"; // 默认大小
     }
   };
 
@@ -74,6 +110,15 @@ export default (props: Props) => {
     }
   };
 
+  const iconMarginStyle = () => {
+    switch (props.size) {
+      case "lg":
+        return "mr-2";
+      default:
+        return "mr-1"; // 默认大小
+    }
+  };
+
   const handleClick = () => {
     if (props.onClick && !props.disabled && !props.loading) {
       props.onClick();
@@ -84,14 +129,15 @@ export default (props: Props) => {
     <button
       onClick={handleClick}
       class={classNames([
-        "px-2 py-1 rounded-lg border transition-colors cursor-pointer select-none flex items-center",
-        renderStyle(),
+        "rounded-lg transition-colors cursor-pointer select-none flex items-center",
+        textSizeStyle(),
+        padingStyle(),
+        colorStyle(),
         {
-          "cursor-not-allowed! opacity-50": props.disabled || props.loading,
-          "w-full justify-center": props.fullWidth,
-          "text-[0.85rem]": props.size === "sm",
-          "text-base": !props.size || props.size === "md",
-          "text-lg h-[2.5rem] px-4": props.size === "lg",
+          "cursor-not-allowed! opacity-50": props.disabled || props.loading, // 禁用状态
+          "w-full justify-center": props.fullWidth, // 全宽按钮
+          "border": props.outline, // 轮廓按钮包含边框
+          "shadow-sm": !props.outline, // 非轮廓按钮包含阴影
         },
       ])}
     >
@@ -101,7 +147,7 @@ export default (props: Props) => {
             <Match when={props.icon}>
               <div
                 class={classNames([
-                  "mr-1",
+                  iconMarginStyle(),
                   iconSizeStyle(),
                 ])}
               >
@@ -118,10 +164,7 @@ export default (props: Props) => {
           {props.icon && (
             <Icon
               icon={props.icon}
-              class={classNames([
-                "mr-1",
-                iconSizeStyle(),
-              ])}
+              class={classNames([iconMarginStyle(), iconSizeStyle()])}
             />
           )}
           {props.children}

@@ -78,6 +78,14 @@ export async function uploadAlbums(
   );
 }
 
+export async function deleteUploadedAlbums(): PayloadType<void> {
+  return strictify(await client.delete("/provider/uploaded"));
+}
+
+export async function deployUploadedAlbums(): PayloadType<void> {
+  return strictify(await client.put("/provider/deploy"));
+}
+
 async function strictify<T extends Record<string, unknown> | readonly Record<string, unknown>[]>(
   resp: AxiosResponse<T>,
 ) {
