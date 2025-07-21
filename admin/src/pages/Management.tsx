@@ -3,7 +3,7 @@ import { useSearchParams } from "@solidjs/router";
 import { useQuery } from "@tanstack/solid-query";
 import classNames from "classnames";
 import { format } from "date-fns";
-import { createEffect, createSignal, For, JSX, onMount } from "solid-js";
+import { createEffect, createSignal, For, JSX, onMount, Show } from "solid-js";
 import { getManagement } from "../api";
 import { ActionButton } from "../components";
 import { PageBase } from "../layouts";
@@ -12,17 +12,33 @@ import { setTitle } from "../state/meta";
 import { toaster } from "../utils";
 
 export default () => {
-  // eslint-disable-next-line @typescript-eslint/no-unused-vars
-  const [searchParams, _setSearchParams] = useSearchParams();
+  const [searchParams, setSearchParams] = useSearchParams<{ page?: string; keywords?: string }>();
   const [pageNum, setPageNum] = createSignal(1);
   const [pageSize, setPageSize] = createSignal(10);
   const [total, setTotal] = createSignal(0);
   const [pageNums, setPageNums] = createSignal<number[]>([]);
+  const [editingKeywords, setEditingKeywords] = createSignal(searchParams.keywords || "");
   const [isRefreshing, setIsRefreshing] = createSignal(false);
   const managementQuery = useQuery(() => ({
-    queryKey: ["management", searchParams.page || 1],
-    queryFn: () => getManagement({ page: searchParams.page ? parseInt(searchParams.page as string) : 1 }),
+    queryKey: ["management", searchParams.page || 1, searchParams.keywords || ""],
+    queryFn: () => getManagement({ page: searchParams.page, keywords: searchParams.keywords }),
   }));
+
+  const handleKeywordsInput = (e: InputEvent) => {
+    const input = e.currentTarget as HTMLInputElement;
+    setEditingKeywords(input.value);
+  };
+
+  const handleKeywordsKeyDown = (e: KeyboardEvent) => {
+    if (e.key === "Enter") {
+      const keywords = editingKeywords().trim();
+      if (keywords !== "") {
+        setSearchParams({ keywords, page: 1 });
+      } else {
+        setSearchParams({ keywords: undefined, page: 1 });
+      }
+    }
+  };
 
   const handleRefresh = async () => {
     setIsRefreshing(true);
@@ -52,6 +68,43 @@ export default () => {
     setPage("management");
   });
 
+  const PageButton = (props: { children: JSX.Element; current?: boolean; num: number; maxNum?: number }) => {
+    const isInvalid = () => {
+      return props.num < 1 || props.num > (props.maxNum || Infinity);
+    };
+
+    const handleClick = (e: MouseEvent) => {
+      if (isInvalid()) {
+        e.preventDefault();
+        return;
+      }
+    };
+
+    const href = () => {
+      if (searchParams.keywords) {
+        return `?page=${props.num}&keywords=${searchParams.keywords}`;
+      } else {
+        return `?page=${props.num}`;
+      }
+    };
+
+    return (
+      <a
+        href={href()}
+        onClick={handleClick}
+        class={classNames([
+          "px-4 py-2 bg-white card-edge cursor-pointer select-none",
+          {
+            "bg-blue-600! text-zinc-50": props.current,
+            "cursor-not-allowed! opacity-50": isInvalid(),
+          },
+        ])}
+      >
+        {props.children}
+      </a>
+    );
+  };
+
   return (
     <PageBase>
       <div class="w-9/12 my-[1rem] mx-auto flex items-center border border-zinc-200 shadow hover:shadow-strong-light rounded-full hover:translate-y-[-2px] transition-all">
@@ -60,12 +113,18 @@ export default () => {
           placeholder="输入群标题、群描述中的关键字"
           type="text"
           class="flex-1 h-[3.25rem] outline-0 tracking-wider"
+          value={editingKeywords()}
+          onInput={handleKeywordsInput}
+          onKeyDown={handleKeywordsKeyDown}
         />
       </div>
       {/* 数据位置/总数和刷新按钮 */}
       <div class="my-[1rem] p-[1rem] bg-blue-100/40 text-gray-600 rounded-xl flex justify-between items-center card-edge border-l-4! border-l-blue-400!">
         <p>
-          显示第 {(pageNum() - 1) * pageSize() + 1} - {pageNum() * pageSize()} 条记录，共 {total()} 条
+          显示第 {(pageNum() - 1) * pageSize() + 1} - {pageNum() * pageSize()} 条记录，共 {total()} 条。
+          <Show when={searchParams.keywords}>
+            （“<span class="bg-zinc-50 rounded-lg px-2">{searchParams.keywords}</span>” 的搜索结果）
+          </Show>
         </p>
         <div>
           <ActionButton onClick={handleRefresh} loading={isRefreshing()} icon="material-symbols:refresh" outline>
@@ -135,35 +194,6 @@ export default () => {
         </PageButton>
       </div>
     </PageBase>
-  );
-};
-
-const PageButton = (props: { children: JSX.Element; current?: boolean; num: number; maxNum?: number }) => {
-  const isInvalid = () => {
-    return props.num < 1 || props.num > (props.maxNum || Infinity);
-  };
-
-  const handleClick = (e: MouseEvent) => {
-    if (isInvalid()) {
-      e.preventDefault();
-      return;
-    }
-  };
-
-  return (
-    <a
-      href={`?page=${props.num}`}
-      onClick={handleClick}
-      class={classNames([
-        "px-4 py-2 bg-white card-edge cursor-pointer select-none",
-        {
-          "bg-blue-600! text-zinc-50": props.current,
-          "cursor-not-allowed! opacity-50": isInvalid(),
-        },
-      ])}
-    >
-      {props.children}
-    </a>
   );
 };
 

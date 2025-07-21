@@ -37,8 +37,16 @@ export async function getCustomize(): PayloadType<ServerData.Customize> {
   return strictify(await client.get("/customize"));
 }
 
-export async function getManagement(params: { page: number }): PayloadType<ServerData.Management> {
-  return strictify(await client.get(`/management?page=${params.page}`));
+export async function getManagement(
+  params: { page?: number | string; keywords?: string },
+): PayloadType<ServerData.Management> {
+  const searchParams = new URLSearchParams();
+  searchParams.append("page", (params.page || 1).toString());
+  if (params.keywords) {
+    searchParams.append("keywords", params.keywords);
+  }
+
+  return strictify(await client.get(`/management?${searchParams.toString()}`));
 }
 
 export async function getAssets(): PayloadType<ServerData.Assets> {

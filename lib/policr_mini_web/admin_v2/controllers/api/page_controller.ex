@@ -33,8 +33,18 @@ defmodule PolicrMiniWeb.AdminV2.API.PageController do
         order_by: [desc: :inserted_at]
       ]
 
-    chats = Uses.list_chats(conds)
-    total = Uses.count_chats()
+    {total, chats} =
+      if keywords = params["keywords"] do
+        {condition, chats} = Uses.search_chats(keywords, conds)
+        total = Uses.count_chats(condition)
+
+        {total, chats}
+      else
+        chats = Uses.list_chats(conds)
+        total = Uses.count_chats()
+
+        {total, chats}
+      end
 
     render(conn, "management.json",
       chats: %Paginated{
