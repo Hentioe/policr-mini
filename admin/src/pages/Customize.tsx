@@ -1,4 +1,3 @@
-import { createToaster, Toast, Toaster } from "@ark-ui/solid";
 import { Icon } from "@iconify-icon/solid";
 import { useQuery } from "@tanstack/solid-query";
 import { createEffect, createSignal, JSX, onMount } from "solid-js";
@@ -7,6 +6,7 @@ import { ActionButton, SingleSelect } from "../components";
 import { PageBase } from "../layouts";
 import { setPage } from "../state/global";
 import { setTitle } from "../state/meta";
+import { toaster } from "../utils";
 
 type Scheme = ServerData.Scheme;
 
@@ -18,12 +18,6 @@ export default () => {
     refetchOnWindowFocus: false,
     refetchIntervalInBackground: false,
   }));
-
-  const toaster = createToaster({
-    placement: "bottom",
-    overlap: true,
-    gap: 24,
-  });
 
   const [type, setType] = createSignal<Scheme["type"] | undefined>(undefined);
   const [typeItems, setTypeItems] = createSignal<Scheme["typeItems"]>([]);
@@ -211,14 +205,6 @@ export default () => {
           保存更改
         </ActionButton>
       </div>
-      <Toaster toaster={toaster}>
-        {(toast) => (
-          <Toast.Root>
-            <Toast.Title>{toast().title}</Toast.Title>
-            <Toast.Description>{toast().description}</Toast.Description>
-          </Toast.Root>
-        )}
-      </Toaster>
     </PageBase>
   );
 };

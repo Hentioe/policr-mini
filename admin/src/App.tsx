@@ -1,8 +1,10 @@
+import { Toast, Toaster } from "@ark-ui/solid";
 import { MetaProvider, Title } from "@solidjs/meta";
 import { Route, Router } from "@solidjs/router";
 import { SideBar, TitleBar } from "./layouts";
 import { AssetsPage, CustomizePage, DashboardPage, ManagementPage, TasksPage, TermsPage } from "./pages";
 import { metaState } from "./state";
+import { toaster } from "./utils";
 
 export default () => {
   return (
@@ -22,6 +24,14 @@ export default () => {
           </Router>
         </div>
       </div>
+      <Toaster toaster={toaster}>
+        {(toast) => (
+          <Toast.Root>
+            <Toast.Title>{toast().title}</Toast.Title>
+            <Toast.Description>{toast().description}</Toast.Description>
+          </Toast.Root>
+        )}
+      </Toaster>
     </MetaProvider>
   );
 };
