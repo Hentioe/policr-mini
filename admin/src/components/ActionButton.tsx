@@ -63,6 +63,17 @@ export default (props: Props) => {
     }
   };
 
+  const iconSizeStyle = () => {
+    switch (props.size) {
+      case "sm":
+        return "text-[1rem] w-[1rem] h-[1rem]";
+      case "lg":
+        return "text-[1.5rem] w-[1.5rem]";
+      default:
+        return "text-[1.25rem] w-[1.25rem] h-[1.25rem]"; // 默认大小
+    }
+  };
+
   const handleClick = () => {
     if (props.onClick && !props.disabled && !props.loading) {
       props.onClick();
@@ -86,7 +97,22 @@ export default (props: Props) => {
     >
       <Switch>
         <Match when={props.loading}>
-          <Loading />
+          <Switch>
+            <Match when={props.icon}>
+              <div
+                class={classNames([
+                  "mr-1",
+                  iconSizeStyle(),
+                ])}
+              >
+                <Loading outline={props.outline} size={props.size} />
+              </div>
+              {props.children}
+            </Match>
+            <Match when={true}>
+              <Loading outline={props.outline} size={props.size} />
+            </Match>
+          </Switch>
         </Match>
         <Match when={true}>
           {props.icon && (
@@ -94,8 +120,7 @@ export default (props: Props) => {
               icon={props.icon}
               class={classNames([
                 "mr-1",
-                { "text-[1.25rem] w-[1.25rem]": !props.size || props.size === "md" },
-                { "text-[1.5rem] w-[1.5rem]": props.size === "lg" },
+                iconSizeStyle(),
               ])}
             />
           )}
@@ -106,12 +131,23 @@ export default (props: Props) => {
   );
 };
 
-const Loading = () => {
+const Loading = (props: { outline?: boolean; size?: string }) => {
+  const sizeToRem = () => {
+    switch (props.size) {
+      case "sm":
+        return "1rem";
+      case "lg":
+        return "1.5rem";
+      default:
+        return "1.25rem"; // 默认大小
+    }
+  };
+
   return (
-    <svg xmlns="http://www.w3.org/2000/svg" width={24} height={24} viewBox="0 0 24 24">
+    <svg xmlns="http://www.w3.org/2000/svg" width={sizeToRem()} height={sizeToRem()} viewBox="0 0 24 24">
       <path
         fill="none"
-        stroke="#fff"
+        stroke={props.outline ? "currentColor" : "#fff"}
         stroke-dasharray="16"
         stroke-dashoffset="16"
         stroke-linecap="round"

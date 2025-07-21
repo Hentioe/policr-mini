@@ -9,6 +9,7 @@ import { ActionButton } from "../components";
 import { PageBase } from "../layouts";
 import { setPage } from "../state/global";
 import { setTitle } from "../state/meta";
+import { toaster } from "../utils";
 
 export default () => {
   // eslint-disable-next-line @typescript-eslint/no-unused-vars
@@ -17,12 +18,26 @@ export default () => {
   const [pageSize, setPageSize] = createSignal(10);
   const [total, setTotal] = createSignal(0);
   const [pageNums, setPageNums] = createSignal<number[]>([]);
+  const [isRefreshing, setIsRefreshing] = createSignal(false);
   const managementQuery = useQuery(() => ({
     queryKey: ["management", searchParams.page || 1],
     queryFn: () => getManagement({ page: searchParams.page ? parseInt(searchParams.page as string) : 1 }),
   }));
 
+  const handleRefresh = async () => {
+    setIsRefreshing(true);
+    await managementQuery.refetch();
+    setIsRefreshing(false);
+    toaster.success({ title: "刷新成功", description: `第 ${pageNum()} 页数据已刷新` });
+  };
+
   createEffect(() => {
+    if (managementQuery.isLoading) {
+      setIsRefreshing(true);
+    } else {
+      setIsRefreshing(false);
+    }
+
     if (managementQuery.data?.success) {
       const data = managementQuery.data.payload;
       setPageNum(data.chats.page);
@@ -53,7 +68,7 @@ export default () => {
           显示第 {(pageNum() - 1) * pageSize() + 1} - {pageNum() * pageSize()} 条记录，共 {total()} 条
         </p>
         <div>
-          <ActionButton icon="material-symbols:refresh" outline>
+          <ActionButton onClick={handleRefresh} loading={isRefreshing()} icon="material-symbols:refresh" outline>
             刷新
           </ActionButton>
         </div>

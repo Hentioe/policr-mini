@@ -1,18 +1,19 @@
 [data-scope="toast"] {
   &[data-type="success"] {
-    @apply bg-green-500 text-green-50;
+    @apply w-fit text-green-50;
   }
   &[data-part="root"] {
-    @apply min-w-[12rem] px-[1.5rem] py-[0.5rem] rounded
-      shadow-xl; /* 基础样式 */
+    @apply min-w-[14rem] rounded shadow-xl overflow-hidden; /* 基础样式 */
     @apply transition-transform; /* 动画样式 */
     translate: var(--x) var(--y);
   }
   &[data-part="title"] {
-    @apply text-center font-bold tracking-wide;
+    @apply bg-green-500 px-[1.5rem] py-[0.5rem] text-center font-bold
+      tracking-wide;
   }
   &[data-part="description"] {
-    @apply mt-[0.5rem] text-center text-gray-50 tracking-wider;
+    @apply bg-green-400 px-[1.5rem] py-[0.5rem] text-center text-gray-50
+      tracking-wider;
   }
 }
 
