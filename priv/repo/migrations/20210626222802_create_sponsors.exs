@@ -1,4 +1,4 @@
-defmodule PolicrMini.Repo.Migrations.DropSponsors do
+defmodule PolicrMini.Repo.Migrations.CreateSponsors do
   use PolicrMini.Migration
 
   def change do
