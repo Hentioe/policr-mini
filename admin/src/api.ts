@@ -49,6 +49,14 @@ export async function getManagement(
   return strictify(await client.get(`/management?${searchParams.toString()}`));
 }
 
+export async function syncChat(chatId: number): PayloadType<ServerData.Chat> {
+  return strictify(await client.put(`/chats/${chatId}/sync`));
+}
+
+export async function leaveChat(chatId: number): PayloadType<ServerData.Chat> {
+  return strictify(await client.put(`/chats/${chatId}/leave`));
+}
+
 export async function getAssets(): PayloadType<ServerData.Assets> {
   return strictify(await client.get("/assets"));
 }

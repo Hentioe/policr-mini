@@ -72,6 +72,9 @@ defmodule PolicrMiniWeb.Router do
     post "/provider/upload", ProviderController, :upload
 
     put "/schemes/default", SchemeController, :update_default
+
+    put "/chats/:id/sync", ChatController, :sync
+    put "/chats/:id/leave", ChatController, :leave
   end
 
   scope "/admin/api", PolicrMiniWeb.Admin.API do

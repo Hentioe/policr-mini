@@ -1,19 +1,36 @@
 [data-scope="toast"] {
-  &[data-type="success"] {
-    @apply w-fit text-green-50;
-  }
   &[data-part="root"] {
-    @apply min-w-[14rem] rounded shadow-xl overflow-hidden; /* 基础样式 */
+    @apply min-w-[16rem] rounded shadow-xl overflow-hidden; /* 基础样式 */
     @apply transition-transform; /* 动画样式 */
     translate: var(--x) var(--y);
   }
-  &[data-part="title"] {
-    @apply bg-green-500 px-[1.5rem] py-[0.5rem] text-center font-bold
-      tracking-wide;
+
+  [data-part="title"] {
+    @apply w-full text-green-50 px-[1.5rem] py-[0.5rem] text-center text-sm
+      font-bold tracking-wide;
   }
-  &[data-part="description"] {
-    @apply bg-green-400 px-[1.5rem] py-[0.5rem] text-center text-gray-50
+  [data-part="description"] {
+    @apply w-full text-green-50 px-[1.5rem] py-[1rem] text-center text-sm
       tracking-wider;
+  }
+
+  &[data-type="success"] {
+    [data-part="title"] {
+      @apply bg-green-500;
+    }
+    [data-part="description"] {
+      @apply bg-green-400;
+    }
+  }
+
+  &[data-type="error"] {
+    @apply w-fit text-red-50;
+    [data-part="title"] {
+      @apply bg-red-500;
+    }
+    [data-part="description"] {
+      @apply bg-red-400;
+    }
   }
 }
 

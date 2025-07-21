@@ -4,7 +4,7 @@ import { useQuery } from "@tanstack/solid-query";
 import classNames from "classnames";
 import { format } from "date-fns";
 import { createEffect, createSignal, For, JSX, onMount, Show } from "solid-js";
-import { getManagement } from "../api";
+import { getManagement, leaveChat, syncChat } from "../api";
 import { ActionButton } from "../components";
 import { PageBase } from "../layouts";
 import { setPage } from "../state/global";
@@ -19,6 +19,8 @@ export default () => {
   const [pageNums, setPageNums] = createSignal<number[]>([]);
   const [editingKeywords, setEditingKeywords] = createSignal(searchParams.keywords || "");
   const [isRefreshing, setIsRefreshing] = createSignal(false);
+  const [syncingChats, setSyncingChats] = createSignal<number[]>([]);
+  const [leavingChats, setLeavingChats] = createSignal<number[]>([]);
   const managementQuery = useQuery(() => ({
     queryKey: ["management", searchParams.page || 1, searchParams.keywords || ""],
     queryFn: () => getManagement({ page: searchParams.page, keywords: searchParams.keywords }),
@@ -45,6 +47,42 @@ export default () => {
     await managementQuery.refetch();
     setIsRefreshing(false);
     toaster.success({ title: "刷新成功", description: `第 ${pageNum()} 页数据已刷新` });
+  };
+
+  const handleSyncChat = async (chat: ServerData.Chat) => {
+    setSyncingChats((prev) => [...prev, chat.id]);
+    const resp = await syncChat(chat.id);
+    setSyncingChats((prev) => prev.filter(id => id !== chat.id));
+    if (resp.success) {
+      toaster.success({ title: "同步成功", description: `群 ${resp.payload.title} 完成同步` });
+      managementQuery.refetch();
+    } else {
+      let title = "同步失败";
+      if (chat.title) {
+        title = `群 ${chat.title} ` + title;
+      } else {
+        title = `群 ${chat.id} ` + title;
+      }
+      toaster.error({ title: title, description: resp.message });
+    }
+  };
+
+  const handleLeaveChat = async (chat: ServerData.Chat) => {
+    setLeavingChats((prev) => [...prev, chat.id]);
+    const resp = await leaveChat(chat.id);
+    setLeavingChats((prev) => prev.filter(id => id !== chat.id));
+    if (resp.success) {
+      toaster.success({ title: "退出成功", description: `群 ${resp.payload.title} 完成退出` });
+      managementQuery.refetch();
+    } else {
+      let title = "退出失败";
+      if (chat.title) {
+        title = `群 ${chat.title} ` + title;
+      } else {
+        title = `群 ${chat.id} ` + title;
+      }
+      toaster.error({ title: title, description: resp.message });
+    }
   };
 
   createEffect(() => {
@@ -121,7 +159,7 @@ export default () => {
       {/* 数据位置/总数和刷新按钮 */}
       <div class="my-[1rem] p-[1rem] bg-blue-100/40 text-gray-600 rounded-xl flex justify-between items-center card-edge border-l-4! border-l-blue-400!">
         <p>
-          显示第 {(pageNum() - 1) * pageSize() + 1} - {pageNum() * pageSize()} 条记录，共 {total()} 条。
+          显示第 {(pageNum() - 1) * pageSize() + 1} - {pageNum() * pageSize()} 条记录，共 {total()} 条
           <Show when={searchParams.keywords}>
             （“<span class="bg-zinc-50 rounded-lg px-2">{searchParams.keywords}</span>” 的搜索结果）
           </Show>
@@ -144,12 +182,17 @@ export default () => {
         <tbody class="bg-blue-500 *:bg-white *:not-last:border-b *:border-gray-200">
           <For each={managementQuery.data?.success && managementQuery.data.payload.chats.items || []}>
             {(chat) => (
-              <tr class="*:px-[1rem] *:py-[0.5rem] *:text-left *:text-gray-700 hover:bg-blue-50 hover:translate-x-1 transition-all">
+              <tr
+                class={classNames([
+                  "*:px-[1rem] *:py-[0.5rem] *:text-left *:text-gray-700 hover:bg-blue-50 hover:translate-x-1 transition-all",
+                  { "*:text-zinc-400!": chat.left },
+                ])}
+              >
                 <td>
                   <p class="font-medium tracking-wide line-clamp-1">
                     {chat.title}
                   </p>
-                  <p class="mt-1 text-sm text-gray-600 tracking-wider line-clamp-1">
+                  <p class="mt-1 text-sm tracking-wider line-clamp-1">
                     {chat.description || "无描述"}
                   </p>
                 </td>
@@ -163,10 +206,22 @@ export default () => {
                 </td>
                 <td class="text-right!">
                   <ActionButtonList>
-                    <ActionButton size="sm" variant="info" outline>
+                    <ActionButton
+                      onClick={() => handleSyncChat(chat)}
+                      disabled={syncingChats().includes(chat.id)}
+                      size="sm"
+                      variant="info"
+                      outline
+                    >
                       同步
                     </ActionButton>
-                    <ActionButton size="sm" variant="danger" outline>
+                    <ActionButton
+                      onClick={() => handleLeaveChat(chat)}
+                      disabled={leavingChats().includes(chat.id)}
+                      size="sm"
+                      variant="danger"
+                      outline
+                    >
                       退出
                     </ActionButton>
                   </ActionButtonList>

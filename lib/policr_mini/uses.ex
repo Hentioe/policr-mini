@@ -18,20 +18,21 @@ defmodule PolicrMini.Uses do
     |> Repo.insert()
   end
 
-  def chat_seeds do
-    Enum.map(1..9999, fn i ->
-      %{
-        id: i,
-        title: "种子群 #{i}",
-        description: "这是一个种子群组：#{i}",
-        type: :supergroup,
-        is_take_over: rem(i, 2) == 0,
-        created_at: DateTime.utc_now(),
-        updated_at: DateTime.utc_now()
-      }
-    end)
-    |> Enum.map(&add_chat/1)
-  end
+  # def chat_seeds do
+  #   Enum.map(1..9999, fn i ->
+  #     %{
+  #       id: i,
+  #       title: "种子群 #{i}",
+  #       description: "这是一个种子群组：#{i}",
+  #       type: :supergroup,
+  #       is_take_over: rem(i, 2) == 0,
+  #       left: rem(i, 2) == 0,
+  #       created_at: DateTime.utc_now(),
+  #       updated_at: DateTime.utc_now()
+  #     }
+  #   end)
+  #   |> Enum.map(&add_chat/1)
+  # end
 
   # TODO：添加测试。
   @doc """

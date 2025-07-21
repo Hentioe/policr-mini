@@ -1,6 +1,10 @@
 defmodule PolicrMiniWeb.AdminV2.API.ChatView do
   use PolicrMiniWeb, :admin_v2_view
 
+  def render("show.json", %{chat: chat}) do
+    success(render_one(chat, __MODULE__, "chat.json"))
+  end
+
   def render("chat.json", %{chat: chat}) do
     %{
       id: chat.id,
