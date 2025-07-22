@@ -9,6 +9,7 @@ defmodule PolicrMini.Serveds do
   @doc """
   查找所有已接管群组。
   """
+  @deprecated "Use PolicrMini.Uses.find_taken_over_chats/0 instead"
   def find_takeovered_chats do
     from(c in Chat, where: c.is_take_over == true) |> Repo.all()
   end

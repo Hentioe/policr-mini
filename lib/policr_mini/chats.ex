@@ -250,9 +250,25 @@ defmodule PolicrMini.Chats do
   @doc """
   创建验证记录。
   """
+  @deprecated "Use PolicrMini.Chats.add_verification/1 instead"
   @spec create_verification(map) :: verification_change_result
   def create_verification(params) when is_map(params) do
     %Verification{} |> Verification.changeset(params) |> Repo.insert()
+  end
+
+  @doc """
+  创建一条验证记录。
+  """
+  def add_verification(params) when is_map(params) do
+    %Verification{} |> Verification.changeset(params) |> Repo.insert()
+  end
+
+  @doc """
+  获取最早一条验证记录的插入时间。
+  """
+  def first_verification_inserted_at do
+    from(v in Verification, select: min(v.inserted_at))
+    |> Repo.one()
   end
 
   @doc """
@@ -496,14 +512,14 @@ defmodule PolicrMini.Chats do
   end
 
   @doc """
-  获取指定时间区间内的验证列表，不包含正在进行的验证。
+  获取特定时间区间内的验证列表，不包含正在进行的验证。
   """
-  @spec time_range_verfs(integer, DateTime.t(), DateTime.t()) :: [Verification.t()]
-  def time_range_verfs(chat_id, dstart, dend) do
+  @spec range_verifications(integer, DateTime.t(), DateTime.t()) :: [Verification.t()]
+  def range_verifications(chat_id, start, stop) do
     from(v in Verification,
       where: v.chat_id == ^chat_id,
-      where: v.inserted_at >= ^dstart,
-      where: v.inserted_at <= ^dend,
+      where: v.inserted_at >= ^start,
+      where: v.inserted_at <= ^stop,
       where: v.status != :waiting
     )
     |> Repo.all()

@@ -28,6 +28,9 @@ defmodule PolicrMini.Chats.Verification do
     timestamps()
   end
 
+  def required_fields, do: @required_fields
+  def optional_fields, do: @optional_fields
+
   def changeset(%__MODULE__{} = verification, attrs) when is_map(attrs) do
     verification
     |> cast(attrs, @required_fields ++ @optional_fields)

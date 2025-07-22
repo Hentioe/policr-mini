@@ -110,6 +110,10 @@ export async function deleteTerm(): PayloadType<void> {
   return strictify(await client.delete("/term"));
 }
 
+export async function queryStats(range: string): PayloadType<ServerData.Stats> {
+  return strictify(await client.get(`/stats/query?range=${range}`));
+}
+
 async function strictify<T extends Record<string, unknown> | readonly Record<string, unknown>[]>(
   resp: AxiosResponse<T>,
 ) {

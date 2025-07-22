@@ -25,11 +25,17 @@ declare namespace ServerData {
   };
 
   type Stats = {
-    verification: {
-      total: number;
-      approved: number;
-      rejected: number;
-    };
+    start: string;
+    every: string;
+    points: StatsPoint[];
+  };
+
+  type StatsStatus = "approved" | "incorrect" | "timeout" | "other";
+
+  type StatsPoint = {
+    time: string;
+    status: StatsStatus;
+    count?: number;
   };
 
   type Customize = {

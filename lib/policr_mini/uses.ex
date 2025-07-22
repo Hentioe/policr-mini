@@ -57,6 +57,9 @@ defmodule PolicrMini.Uses do
     |> Repo.all()
   end
 
+  @doc """
+  基于简单关键字搜索群组列表。
+  """
   @spec search_chats(String.t(), list_chats_conds()) :: {any(), Chat.t()}
   def search_chats(keywords, conds \\ []) when is_binary(keywords) do
     fuzzy_keywords = "%" <> String.replace(keywords, ~r/\s+/, "%") <> "%"
@@ -81,6 +84,9 @@ defmodule PolicrMini.Uses do
     {condition, Repo.all(query)}
   end
 
+  @doc """
+  按照条件查询群组数量。
+  """
   @spec count_chats(condition :: any()) :: integer()
   def count_chats(condition \\ nil) do
     query =
@@ -96,5 +102,17 @@ defmodule PolicrMini.Uses do
       end
 
     Repo.one(query)
+  end
+
+  @doc """
+  查找所有已接管群组。
+  """
+  def find_taken_over_chats do
+    from(c in Chat, where: c.is_take_over == true) |> Repo.all()
+  end
+
+  @spec all_chats() :: [Chat.t()]
+  def all_chats do
+    from(c in Chat) |> Repo.all()
   end
 end

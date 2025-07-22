@@ -86,6 +86,8 @@ defmodule PolicrMiniWeb.Router do
     put "/term", TermController, :save
     delete "/term", TermController, :delete
     post "/term/preview", TermController, :preview
+
+    get "/stats/query", StatsController, :query
   end
 
   scope "/admin/api", PolicrMiniWeb.Admin.API do
