@@ -116,5 +116,11 @@ declare namespace ServerData {
     result?: T;
   };
 
+  type Term = {
+    content?: string;
+    createdAt?: Date;
+    updatedAt?: Date;
+  };
+
   type BeeStatus = "pending" | "running" | "done" | "raised" | "terminated" | "canceled";
 }

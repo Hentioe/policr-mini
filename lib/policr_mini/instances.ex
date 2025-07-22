@@ -23,7 +23,7 @@ defmodule PolicrMini.Instances do
 
   如果不存在将自动创建。
   """
-
+  @deprecated "Use `PolicrMini.Settings.upsert_term/1` instead."
   @spec fetch_term() :: term_written_returns
   def fetch_term do
     Repo.transaction(fn ->
@@ -43,6 +43,7 @@ defmodule PolicrMini.Instances do
   @doc """
   创建服务条款。
   """
+  @deprecated "Use `PolicrMini.Settings.upsert_term/1` instead."
   @spec create_term(params) :: term_written_returns
   def create_term(params) do
     %Term{} |> Term.changeset(params) |> Repo.insert()
@@ -51,6 +52,7 @@ defmodule PolicrMini.Instances do
   @doc """
   更新服务条款。
   """
+  @deprecated "Use `PolicrMini.Settings.upsert_term/1` instead."
   @spec update_term(Term.t(), map) :: term_written_returns
   def update_term(term, params) do
     term |> Term.changeset(params) |> Repo.update()
@@ -59,6 +61,7 @@ defmodule PolicrMini.Instances do
   @doc """
   删除服务条款。
   """
+  @deprecated "Use `PolicrMini.Settings.delete_term/0` instead."
   def delete_term(term) when is_struct(term, Term) do
     Repo.delete(term)
   end

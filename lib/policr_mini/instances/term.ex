@@ -1,7 +1,5 @@
 defmodule PolicrMini.Instances.Term do
-  @moduledoc """
-  服务条款模式。
-  """
+  @moduledoc false
 
   use PolicrMini.Schema
 
@@ -19,5 +17,23 @@ defmodule PolicrMini.Instances.Term do
     module
     |> cast(attrs, @required_fields ++ @optional_fields)
     |> validate_required(@required_fields)
+  end
+
+  def as_html_message(term) when is_struct(term, __MODULE__) do
+    """
+    <b>📜 机器人使用条款</b>
+
+    #{Telegex.Tools.safe_html(term.content)}
+
+    <i>若您不同意本条款，请点击「不同意」按钮让机器人自行离开。</i>
+    """
+  end
+
+  @spec default :: __MODULE__.t()
+  def default do
+    %__MODULE__{
+      id: 1,
+      content: nil
+    }
   end
 end

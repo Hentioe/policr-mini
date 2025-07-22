@@ -94,6 +94,22 @@ export async function deployUploadedAlbums(): PayloadType<void> {
   return strictify(await client.put("/provider/deploy"));
 }
 
+export async function getTerm(): PayloadType<ServerData.Term> {
+  return strictify(await client.get("/term"));
+}
+
+export async function saveTerm(content: string): PayloadType<ServerData.Term> {
+  return strictify(await client.put("/term", { content }));
+}
+
+export async function previewTerm(content: string): PayloadType<ServerData.Term> {
+  return strictify(await client.post("/term/preview", { content }));
+}
+
+export async function deleteTerm(): PayloadType<void> {
+  return strictify(await client.delete("/term"));
+}
+
 async function strictify<T extends Record<string, unknown> | readonly Record<string, unknown>[]>(
   resp: AxiosResponse<T>,
 ) {

@@ -81,6 +81,11 @@ defmodule PolicrMiniWeb.Router do
     put "/chats/:id/leave", ChatController, :leave
 
     post "/bees/reset_stats", BeeController, :reset_stats
+
+    get "/term", TermController, :show
+    put "/term", TermController, :save
+    delete "/term", TermController, :delete
+    post "/term/preview", TermController, :preview
   end
 
   scope "/admin/api", PolicrMiniWeb.Admin.API do
