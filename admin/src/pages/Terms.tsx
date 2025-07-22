@@ -16,6 +16,8 @@ export default () => {
   const query = useQuery(() => ({
     queryKey: ["term"],
     queryFn: getTerm,
+    refetchOnWindowFocus: false, // 避免未保存的内容被覆盖
+    refetchOnReconnect: false, // 同上
   }));
 
   const handleContentChange = (e: Event) => {
