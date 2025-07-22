@@ -61,6 +61,14 @@ export async function getAssets(): PayloadType<ServerData.Assets> {
   return strictify(await client.get("/assets"));
 }
 
+export async function getTasks(): PayloadType<ServerData.Tasks> {
+  return strictify(await client.get("/tasks"));
+}
+
+export async function resetStats(): PayloadType<ServerData.Bee<unknown>> {
+  return strictify(await client.post("/bees/reset_stats"));
+}
+
 export async function uploadAlbums(
   file: File,
   onUploadProgress: (progressEvent: AxiosProgressEvent) => void,

@@ -2,6 +2,7 @@ defmodule PolicrMiniWeb.AdminV2.API.PageController do
   use PolicrMiniWeb, :controller
 
   alias PolicrMini.{Uses, Paginated}
+  alias PolicrMiniBot.Runner
 
   def assets(conn, _params) do
     deployed =
@@ -54,5 +55,12 @@ defmodule PolicrMiniWeb.AdminV2.API.PageController do
         total: total
       }
     )
+  end
+
+  def tasks(conn, _params) do
+    jobs = Runner.jobs()
+    bees = Honeycomb.bees(:background)
+
+    render(conn, "tasks.json", jobs: jobs, bees: bees)
   end
 end

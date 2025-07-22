@@ -92,4 +92,29 @@ declare namespace ServerData {
     id: string;
     name: object;
   };
+
+  type Tasks = {
+    jobs: Job[];
+    bees: Bee<unknown>[];
+  };
+
+  type Job = {
+    id: string;
+    name: string;
+    period: string;
+    lastRunAt: Date;
+    nextRunAt: Date;
+  };
+
+  type Bee<T> = {
+    id: string;
+    status: string;
+    createdAt: Date;
+    expectedRunAt: Date;
+    workStartedAt?: Date;
+    workEndedAt?: Date;
+    result?: T;
+  };
+
+  type BeeStatus = "pending" | "running" | "done" | "raised" | "terminated" | "canceled";
 }

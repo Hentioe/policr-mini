@@ -69,6 +69,7 @@ defmodule PolicrMiniWeb.Router do
     get "/customize", CustomizeController, :index
     get "/management", PageController, :management
     get "/assets", PageController, :assets
+    get "/tasks", PageController, :tasks
 
     put "/schemes/default", SchemeController, :update_default
 
@@ -78,6 +79,8 @@ defmodule PolicrMiniWeb.Router do
 
     put "/chats/:id/sync", ChatController, :sync
     put "/chats/:id/leave", ChatController, :leave
+
+    post "/bees/reset_stats", BeeController, :reset_stats
   end
 
   scope "/admin/api", PolicrMiniWeb.Admin.API do

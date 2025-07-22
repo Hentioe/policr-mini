@@ -27,11 +27,11 @@ defmodule PolicrMiniBot.Runner do
 
     @spec put_texts(map) :: map
     def put_texts(%{name: :expired_check} = job) do
-      %{job | name_text: "过期验证检查", schedule_text: "每 5 分钟"}
+      %{job | name_text: "过期检查", schedule_text: "每 5 分钟"}
     end
 
     def put_texts(%{name: :working_check} = job) do
-      %{job | name_text: "工作状态检查", schedule_text: "每 4 小时"}
+      %{job | name_text: "状态检查", schedule_text: "每 4 小时"}
     end
 
     def put_texts(%{name: :left_check} = job) do
