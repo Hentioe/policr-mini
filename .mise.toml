@@ -9,6 +9,7 @@ run = [
   "mise run env-deps up -d --wait",
   "mix deps.get",
   "mise run admin-setup",
+  "mise run console-setup",
   "mise run assets-setup",
   "mise run front-setup",
   "mix ecto.setup",
@@ -30,7 +31,7 @@ run = "iex -S mix"
 depends = ["mix-format", "dprint-fmt"]
 
 [tasks.lint]
-depends = ["mix-lint", "front-lint"]
+depends = ["mix-lint", "admin-lint", "console-lint", "front-lint"]
 
 [tasks.prepare]
 depends = ["format", "lint"]
@@ -39,7 +40,7 @@ depends = ["format", "lint"]
 run = ["mix test"]
 
 [tasks.clean]
-depends = ["mix-clean", "front-clean", "outout-clean"]
+depends = ["mix-clean", "admin-clean", "console-clean", "front-clean", "output-clean"]
 
 [tasks.destory]
 depends = ["clean"]
@@ -84,6 +85,18 @@ run = ["rm -rf admin/node_modules"]
 [tasks.admin-pnpm]
 run = "pnpm --prefix admin"
 
+[tasks.console-setup]
+run = "mise run console-pnpm install"
+
+[tasks.console-lint]
+run = "mise run console-pnpm run lint"
+
+[tasks.console-clean]
+run = ["rm -rf console/node_modules"]
+
+[tasks.console-pnpm]
+run = "pnpm --prefix console"
+
 [tasks.assets-setup]
 run = "pnpm install --prefix assets"
 
@@ -93,8 +106,8 @@ run = "dprint fmt"
 [tasks.bye]
 run = "mise run env-deps stop"
 
-[tasks.outout-clean]
+[tasks.output-clean]
 run = ["rm -rf test/assets/output/*", "rm -rf _assets/_cache/*"]
 
 [tasks.count]
-run = "cloc lib test config priv/repo priv/gettext priv/rel benches admin/src admin/types assets/src assets/styles webapps/src webapps/types"
+run = "cloc lib test config priv/repo priv/gettext priv/rel benches admin/src admin/types console/src console/types assets/src assets/styles webapps/src webapps/types"

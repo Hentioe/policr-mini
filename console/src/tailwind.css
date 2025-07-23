@@ -1,0 +1,16 @@
+@import "tailwindcss";
+
+@theme {
+  --color-foreground: var(--color-zinc-800);
+}
+
+@utility tw-input-edge {
+  outline-style: solid;
+  outline-width: 2px;
+  outline-color: theme(--color-zinc-100/40);
+  border-radius: theme(--radius-lg);
+}
+
+@utility tw-input-edge-highlight {
+  outline-color: theme(--color-blue-400);
+}

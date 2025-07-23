@@ -1,0 +1,29 @@
+@import "./tailwind.css";
+@import "./styles/components.css";
+
+/* #app {} */
+
+.input-edge {
+  @apply tw-input-edge focus:tw-input-edge-highlight;
+}
+
+.scrollbar {
+  &::-webkit-scrollbar {
+    width: 4px;
+  }
+
+  &::-webkit-scrollbar-track {
+    background: rgba(59, 130, 246, 0.1);
+    border-radius: 4px;
+  }
+
+  &::-webkit-scrollbar-thumb {
+    background: rgba(59, 130, 246, 0.4);
+    border-radius: 4px;
+    transition: background 0.3s ease;
+  }
+
+  &::-webkit-scrollbar-thumb:hover {
+    background: rgba(59, 130, 246, 0.6);
+  }
+}
