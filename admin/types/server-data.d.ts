@@ -20,6 +20,15 @@ declare namespace ServerData {
     total: number;
   };
 
+  type ServerInfo = {
+    server: {
+      version: string;
+    };
+    capinde: {
+      version: string;
+    };
+  };
+
   type Profile = {
     username: string;
   };

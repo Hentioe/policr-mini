@@ -10,6 +10,10 @@ export const client = axios.create({
 
 type PayloadType<T> = Promise<ApiResponse<T>>;
 
+export async function getServerInfo(): PayloadType<ServerData.ServerInfo> {
+  return strictify(await client.get(""));
+}
+
 export async function getProfile(): PayloadType<ServerData.Profile> {
   return strictify(await client.get("/profile"));
 }

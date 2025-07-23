@@ -14,6 +14,21 @@ defmodule PolicrMiniWeb.AdminV2.API.PageView do
 
   alias Capinde.Payload.DeployedInfo
 
+  def render("index.json", %{server: server, capinde: capinde})
+      when is_struct(capinde, Capinde.Payload.ServerInfo) do
+    success(%{
+      server: %{
+        version: server.version
+      },
+      capinde: %{
+        version: capinde.version,
+        working_mode: capinde.working_mode,
+        started_at: capinde.started_at,
+        verification_queue_length: capinde.verification_queue_length
+      }
+    })
+  end
+
   def render("assets.json", %{deployed: deployed, uploaded: uploaded}) do
     success(%{
       deployed: render_deployed_info(deployed),

@@ -7,6 +7,9 @@
 # General application configuration
 import Config
 
+# Configures the application version
+config :policr_mini, version: Mix.Project.config()[:version]
+
 config :policr_mini,
   ecto_repos: [PolicrMini.Repo],
   opts: []

@@ -4,6 +4,18 @@ defmodule PolicrMiniWeb.AdminV2.API.PageController do
   alias PolicrMini.{Uses, Paginated}
   alias PolicrMiniBot.Runner
 
+  action_fallback PolicrMiniWeb.AdminV2.API.FallbackController
+
+  def index(conn, _params) do
+    with {:ok, capinde} <- Capinde.server_info() do
+      server = %{
+        version: Application.get_env(:policr_mini, :version)
+      }
+
+      render(conn, "index.json", server: server, capinde: capinde)
+    end
+  end
+
   def assets(conn, _params) do
     deployed =
       case Capinde.deployed() do

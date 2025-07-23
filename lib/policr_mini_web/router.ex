@@ -64,6 +64,8 @@ defmodule PolicrMiniWeb.Router do
   scope "/admin/v2/api", PolicrMiniWeb.AdminV2.API do
     pipe_through [:admin_v2_api]
 
+    get "/", PageController, :index
+
     get "/profile", ProfileController, :index
     get "/stats", StatsController, :index
     get "/customize", CustomizeController, :index
