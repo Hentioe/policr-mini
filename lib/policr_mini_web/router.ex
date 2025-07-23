@@ -19,12 +19,12 @@ defmodule PolicrMiniWeb.Router do
   end
 
   pipeline :admin_v2 do
-    # plug PolicrMiniWeb.TokenAuthentication, from: :admin
+    plug PolicrMiniWeb.AdminV2.TokenAuth, from: :page
   end
 
   pipeline :admin_v2_api do
     plug :accepts, ["json"]
-    # plug PolicrMiniWeb.TokenAuthentication, from: :admin_api
+    plug PolicrMiniWeb.AdminV2.TokenAuth, from: :api
   end
 
   pipeline :console do

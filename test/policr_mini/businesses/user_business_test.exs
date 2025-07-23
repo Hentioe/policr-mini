@@ -2,6 +2,7 @@ defmodule PolicrMini.UserBusinessTest do
   use PolicrMini.DataCase
 
   alias PolicrMini.Factory
+  alias PolicrMini.Accounts
   alias PolicrMini.UserBusiness
 
   def build_params(attrs \\ []) do
@@ -69,7 +70,7 @@ defmodule PolicrMini.UserBusinessTest do
 
     assert user.token_ver == 0
 
-    assert UserBusiness.upgrade_token_ver(user.id)
+    assert Accounts.upgrade_token_ver(user.id)
 
     {:ok, user} = UserBusiness.get(user.id)
 

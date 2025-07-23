@@ -5,6 +5,8 @@ defmodule PolicrMiniBot.Helper do
   通过 `use PolicrMiniBot, plug: ...` 实现的插件会自动导入本模块的所有函数。
   """
 
+  alias PolicrMini.Accounts
+
   alias __MODULE__.{
     CheckRequiredPermissions
   }
@@ -563,6 +565,32 @@ defmodule PolicrMiniBot.Helper do
     case Honeycomb.gather_honey_sync(:smart_sender, :anon, run) do
       {:ok, _} = ok_r -> ok_r
       {:exception, %MatchError{term: other}} -> other
+    end
+  end
+
+  def sync_user_photo(user) when is_struct(user, PolicrMini.Schema.User) do
+    with {:ok, %{photos: photos}} <- Telegex.get_user_profile_photos(user.id),
+         {:ok, user} <- Accounts.update_user(user, %{photo_id: photo_id(photos, 320)}) do
+      {:ok, user}
+    else
+      e ->
+        e
+    end
+  end
+
+  @spec photo_id([Telegex.Type.PhotoSize.t()], non_neg_integer()) :: String.t() | nil
+  def photo_id([], _size), do: nil
+
+  def photo_id([first_photo_sizes | _], expected_size) when is_integer(expected_size) do
+    filter = fn size ->
+      size.width == expected_size and size.height == expected_size
+    end
+
+    if size = Enum.find(first_photo_sizes, filter) do
+      size.file_id
+    else
+      # 没有找到 `size` 尺寸的图片
+      nil
     end
   end
 end
