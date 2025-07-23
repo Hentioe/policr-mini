@@ -4,12 +4,14 @@ import { useQuery } from "@tanstack/solid-query";
 import classNames from "classnames";
 import { format } from "date-fns";
 import { createEffect, createSignal, For, JSX, onMount, Show } from "solid-js";
-import { getManagement, leaveChat, syncChat } from "../api";
-import { ActionButton } from "../components";
-import { PageBase } from "../layouts";
-import { setPage } from "../state/global";
-import { setTitle } from "../state/meta";
-import { toaster } from "../utils";
+import { getManagement, leaveChat, syncChat } from "../../api";
+import { ActionButton } from "../../components";
+import { PageBase } from "../../layouts";
+import { setPage } from "../../state/global";
+import { setTitle } from "../../state/meta";
+import { toaster } from "../../utils";
+import ChatLink from "./ChatLink";
+import { getPaginationPages } from "./helper";
 
 export default () => {
   const [searchParams, setSearchParams] = useSearchParams<{ page?: string; keywords?: string }>();
@@ -145,7 +147,7 @@ export default () => {
 
   return (
     <PageBase>
-      <div class="w-9/12 my-[1rem] mx-auto flex items-center border border-zinc-200 shadow hover:shadow-strong-light rounded-full hover:translate-y-[-2px] transition-all">
+      <div class="w-9/12 my-[1rem] mx-auto flex items-center bg-white/40 border border-line shadow hover:shadow-strong-light rounded-full hover:translate-y-[-2px] transition-all">
         <Icon icon="fluent-color:search-sparkle-16" class="w-[4rem] text-[2rem] text-zinc-400" />
         <input
           placeholder="输入群标题、群描述中的关键字"
@@ -205,7 +207,7 @@ export default () => {
                   </span>
                 </td>
                 <td class="text-right!">
-                  <ActionButtonList>
+                  <div class="flex gap-[0.5rem] justify-end">
                     <ActionButton
                       onClick={() => handleSyncChat(chat)}
                       disabled={syncingChats().includes(chat.id)}
@@ -224,7 +226,7 @@ export default () => {
                     >
                       退出
                     </ActionButton>
-                  </ActionButtonList>
+                  </div>
                 </td>
               </tr>
             )}
@@ -251,48 +253,3 @@ export default () => {
     </PageBase>
   );
 };
-
-const ChatLink = (props: { username?: string }) => {
-  return (
-    <>
-      {props.username
-        ? (
-          <a href={`https://t.me/${props.username}`} class="text-zinc-600 hover:underline" target="_blank">
-            @{props.username}
-          </a>
-        )
-        : <span>无</span>}
-    </>
-  );
-};
-
-const ActionButtonList = (props: { children: JSX.Element }) => {
-  return (
-    <div class="flex gap-[0.5rem] justify-end">
-      {props.children}
-    </div>
-  );
-};
-
-function getPaginationPages(page: number, pageSize: number, total: number): number[] {
-  const totalPages = Math.ceil(total / pageSize);
-
-  if (totalPages <= 5) {
-    return Array.from({ length: totalPages }, (_, i) => i + 1);
-  }
-
-  let start = Math.max(1, page - 2);
-  let end = Math.min(totalPages, page + 2);
-
-  // 当前面不足2个时，向后补充
-  if (start === 1) {
-    end = Math.min(totalPages, start + 4);
-  }
-
-  // 当后面不足2个时，向前补充
-  if (end === totalPages) {
-    start = Math.max(1, end - 4);
-  }
-
-  return Array.from({ length: end - start + 1 }, (_, i) => start + i);
-}

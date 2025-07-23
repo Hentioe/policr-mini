@@ -22,16 +22,8 @@ defmodule PolicrMiniWeb.AdminV2.API.StatsView do
   defp render_point(point) when is_struct(point, MinimizedPoint) do
     %{
       time: point.time,
-      status: migrate_status(point.status),
+      status: point.status,
       count: point.count
     }
-  end
-
-  defp migrate_status(status) do
-    case status do
-      :passed -> :approved
-      :wronged -> :incorrect
-      other -> other
-    end
   end
 end

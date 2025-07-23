@@ -50,8 +50,8 @@ defmodule PolicrMini.Stats do
       field :timestamp, DateTime.t(), enforce: true
     end
 
-    @type verf_status :: :passed | :rejected | :timeout | :other
-    @type verf_source :: :joined | :join_request
+    @type status :: :approved | :incorrect | :timeout | :other
+    @type source :: :joined | :join_request
   end
 
   defmodule GenResult do
@@ -90,7 +90,9 @@ defmodule PolicrMini.Stats do
     end
   end
 
-  # 写入一个验证数据点。
+  @doc """
+  写入一个验证数据点。
+  """
   def write(v) when is_struct(v, Verification) do
     status =
       case v.status do

@@ -147,7 +147,7 @@ export default () => {
         <Range hasDot active={searchParams.range === "30d"} range="30d">最近 30 天</Range>
         <Range active={searchParams.range === "all"} range="all">全部</Range>
       </div>
-      <div class="mt-[1rem] grid grid-cols-3 gap-[1rem] py-[1rem] border-y border-zinc-200">
+      <div class="mt-[1rem] grid grid-cols-3 gap-[1rem] py-[1rem] border-y border-line">
         <StatsItem
           title="验证总数"
           value={totals().passes + totals().fails}
@@ -163,11 +163,11 @@ export default () => {
         />
         <StatsItem title="验证失败" value={totals().fails} icon="mdi:cancel" color="darkred" />
       </div>
-      <div class="mt-[1rem] h-[40rem]">
+      <div class="mt-[1rem] h-[40rem] bg-card rounded-2xl">
         <Show when={!empty()}>
           <SolidApexCharts
             width="95%"
-            height="80%"
+            height="95%"
             type="area"
             options={options()}
             series={series()}

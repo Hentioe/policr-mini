@@ -7,7 +7,7 @@ export default () => {
   const { page } = destructure(globalState);
 
   return (
-    <nav class="mt-[4.5rem] bg-zinc-100 w-[8rem] h-fit mr-[1rem] rounded-[2rem] py-[2rem] shadow border border-zinc-200">
+    <nav class="pt-title-bar-height bg-white/20 w-[8rem] h-full mr-[1rem] border-r border-line">
       <div class="flex flex-col">
         <NavLink href="/admin/v2" text="仪表盘" icon="ant-design:dashboard-outlined" active={page() === "dashboard"} />
         <NavLink
@@ -29,7 +29,7 @@ const NavLink = (props: { href: string; text: string; icon: string | IconifyIcon
   return (
     <a
       class={classNames([
-        "py-[0.25rem] px-[0.5rem] h-[5rem] text-zinc-600 hover:bg-blue-300 hover:text-zinc-200 transition-colors flex flex-col justify-center",
+        "py-[0.25rem] px-[0.5rem] h-[5rem] text-zinc-600 hover:bg-blue-300 hover:text-zinc-100 hover:translate-x-[0.25rem] hover:shadow transition-all flex flex-col justify-center",
         { "bg-blue-400! text-zinc-100!": props.active },
       ])}
       href={props.href}

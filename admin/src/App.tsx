@@ -2,6 +2,7 @@ import { Toast, Toaster } from "@ark-ui/solid";
 import { MetaProvider, Title } from "@solidjs/meta";
 import { Route, Router } from "@solidjs/router";
 import { QueryClient, QueryClientProvider } from "@tanstack/solid-query";
+import { mainBg } from "./assets";
 import { SideBar, TitleBar } from "./layouts";
 import { AssetsPage, CustomizePage, DashboardPage, ManagementPage, TasksPage, TermsPage } from "./pages";
 import { metaState } from "./state";
@@ -20,9 +21,17 @@ export default () => {
     <QueryClientProvider client={client}>
       <MetaProvider>
         <Title>{metaState.pageTitle}</Title>
-        <div class="w-[68rem] mx-auto flex">
+        <div
+          class="w-app-x h-full max-h-full mx-auto flex rounded-[2rem] shadow border border-zinc-200 overflow-hidden full-bg"
+          style={{
+            "background": `url("${mainBg}")`,
+            "background-repeat": "no-repeat",
+            "background-position": "center center",
+            "background-size": "cover",
+          }}
+        >
           <SideBar />
-          <div class="flex-1">
+          <div class="flex-1 flex flex-col">
             <TitleBar />
             <Router base="/admin/v2">
               <Route path="/" component={DashboardPage} />

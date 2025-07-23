@@ -1,12 +1,12 @@
 import { useQuery } from "@tanstack/solid-query";
 import classNames from "classnames";
 import { createEffect, createSignal, Match, onMount, Switch } from "solid-js";
-import { deleteTerm, getTerm, previewTerm, saveTerm } from "../api";
-import { ActionButton } from "../components";
-import { PageBase } from "../layouts";
-import { setPage } from "../state/global";
-import { setTitle } from "../state/meta";
-import { toaster } from "../utils";
+import { deleteTerm, getTerm, previewTerm, saveTerm } from "../../api";
+import { ActionButton } from "../../components";
+import { PageBase } from "../../layouts";
+import { setPage } from "../../state/global";
+import { setTitle } from "../../state/meta";
+import { toaster } from "../../utils";
 
 export default () => {
   const [editingContent, setEditingContent] = createSignal("");
@@ -77,7 +77,7 @@ export default () => {
         value={editingContent()}
         onChange={handleContentChange}
         placeholder="请输入用户条款内容..."
-        class="w-full h-[34rem] card-edge focus:outline-2 focus:outline-blue-400 p-[1rem]"
+        class="w-full h-[34rem] bg-card card-edge focus:outline-2 focus:outline-blue-400 p-[1rem]"
       >
         {query.data?.success && query.data.payload.content}
       </textarea>
@@ -111,9 +111,9 @@ export default () => {
       </div>
       <div
         class={classNames([
-          "mt-[1rem] py-[1rem] text-sm text-gray-500 tracking-wider transition-colors card-edge",
-          { "bg-blue-200": editingContent() !== "" },
-          { "bg-red-200": editingContent() === "" },
+          "mt-[1rem] py-[1rem] text-sm text-gray-600 tracking-wider transition-colors card-edge",
+          { "bg-blue-200/60": editingContent() !== "" },
+          { "bg-red-200/60": editingContent() === "" },
         ])}
       >
         <Switch>

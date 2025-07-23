@@ -2,7 +2,7 @@
 @import "./styles/components.css";
 
 #app {
-  @apply min-h-screen;
+  @apply h-screen max-h-screen py-[1rem];
 }
 
 .card-edge {
@@ -16,4 +16,25 @@
 .dragover {
   /* 拖拽区域高亮 */
   @apply outline-dashed outline-2 outline-blue-500 translate-y-[-4px];
+}
+
+.scrollbar {
+  &::-webkit-scrollbar {
+    width: 8px;
+  }
+
+  &::-webkit-scrollbar-track {
+    background: rgba(59, 130, 246, 0.1);
+    border-radius: 4px;
+  }
+
+  &::-webkit-scrollbar-thumb {
+    background: rgba(59, 130, 246, 0.4);
+    border-radius: 4px;
+    transition: background 0.3s ease;
+  }
+
+  &::-webkit-scrollbar-thumb:hover {
+    background: rgba(59, 130, 246, 0.6);
+  }
 }

@@ -48,7 +48,7 @@ const STATUS_COLOR: { [key: string]: string } = {
 
 export default (props: Props) => {
   return (
-    <div class="bg-zinc-50 p-[2rem] card-edge">
+    <div class="p-[2rem] bg-card card-edge">
       <Icon icon={ICONS[props.id] || FALLBACK_ICON} class="h-[3rem] text-[3rem] mr-[0.5rem] text-gray-600" />
       <h3 class="text-[1.5rem] font-medium py-[0.5rem] border-b border-zinc-300/80">
         {NAMES[props.id] || props.id}

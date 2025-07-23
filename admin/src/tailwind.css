@@ -3,12 +3,17 @@
 @theme {
   --shadow-strong: rgba(0, 0, 0, 0.07) 0px 0px 2px 2px;
   --shadow-strong-light: 0 2px 8px 1px rgba(64, 60, 67, 0.24);
+  --spacing-title-bar-height: 4.5rem;
+  --spacing-app-x: 68rem;
+  --color-foreground: var(--color-zinc-800);
+  --color-line: hsla(0, 0%, 60%, 0.3);
+  --color-card: hsla(0, 0%, 100%, 0.4);
 }
 
 @utility tw-input-edge {
   outline-style: solid;
   outline-width: 2px;
-  outline-color: theme(--color-zinc-200/80);
+  outline-color: theme(--color-zinc-100/40);
   border-radius: theme(--radius-lg);
 }
 
@@ -19,7 +24,7 @@
 @utility tw-card-edge {
   border-style: solid;
   border-width: 1px;
-  border-color: theme(--color-zinc-100);
+  border-color: theme(--color-line);
   box-shadow: theme(--shadow);
   border-radius: theme(--radius-xl);
   overflow: hidden;

@@ -7,7 +7,7 @@ export default (props: { title: string; value: number; icon: string; color: stri
       class={classNames(
         ["flex justify-center items-center gap-[1rem] px-[1rem]"],
         {
-          "border-x-[1px] border-zinc-200": props.hasDivider,
+          "border-x-[1px] border-line": props.hasDivider,
         },
       )}
     >

@@ -19,8 +19,8 @@
 }
 
 [data-scope="select"][data-part="content"] {
-  @apply w-full shadow border border-zinc-200 rounded-xl z-10 py-[0.5rem]
-    backdrop-blur-md;
+  @apply w-full shadow border border-line rounded-xl z-10 py-[0.5rem]
+    bg-white/30 backdrop-blur-md;
 }
 
 [data-scope="select"][data-part="content"][data-state="open"] {

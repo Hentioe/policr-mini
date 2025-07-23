@@ -2,8 +2,8 @@ import { metaState } from "../state";
 
 export default () => {
   return (
-    <header class="h-[3.5rem] border-b border-zinc-300/70 py-[0.5rem]">
-      <h1 class="text-3xl font-bold text-zinc-800 text-center tracking-wide">
+    <header class="h-title-bar-height border-b border-line flex justify-center items-center">
+      <h1 class="text-3xl font-bold text-zinc-700 text-center tracking-wide">
         {metaState.title}
       </h1>
     </header>
