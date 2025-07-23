@@ -9,14 +9,17 @@ import { toaster } from "../../utils";
 import Bee from "./Bee";
 import Job from "./Job";
 
+const REFETCH_INTERVAL = 3000; // 3 seconds
+
 export default () => {
   const [jobsCount, setJobsCount] = createSignal(0);
   const [beesCount, setBeesCount] = createSignal(0);
   const [creatingReset, setCreatingReset] = createSignal(false);
+  const [refetchInterval, setRefetchInterval] = createSignal<false | number>(REFETCH_INTERVAL);
   const query = useQuery(() => ({
     queryKey: ["tasks"],
     queryFn: getTasks,
-    refetchInterval: 3000,
+    refetchInterval: refetchInterval(),
   }));
 
   const handleResetStats = async () => {
@@ -38,6 +41,15 @@ export default () => {
     }
   });
 
+  // 其诶刷新状态
+  const handleToggleRefetch = () => {
+    if (refetchInterval()) {
+      setRefetchInterval(false);
+    } else {
+      setRefetchInterval(REFETCH_INTERVAL);
+    }
+  };
+
   onMount(() => {
     setTitle("系统任务");
     setPage("tasks");
@@ -50,7 +62,7 @@ export default () => {
         <p>
           有 {jobsCount()} 个定时任务，和 {beesCount()} 个后台任务
         </p>
-        <div>
+        <div class="flex gap-[0.5rem]">
           <ActionButton
             onClick={handleResetStats}
             loading={creatingReset()}
@@ -58,6 +70,15 @@ export default () => {
             outline
           >
             重置统计数据
+          </ActionButton>
+          <ActionButton
+            onClick={handleToggleRefetch}
+            icon={refetchInterval() ? "hugeicons:stop" : "uil:play"}
+            loading={query.isFetching}
+            variant="danger"
+            outline
+          >
+            {query.isFetching ? "正在刷新" : refetchInterval() ? "停止刷新" : "开始刷新"}
           </ActionButton>
         </div>
       </div>
