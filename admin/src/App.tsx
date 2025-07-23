@@ -2,11 +2,14 @@ import { Toast, Toaster } from "@ark-ui/solid";
 import { MetaProvider, Title } from "@solidjs/meta";
 import { Route, Router } from "@solidjs/router";
 import { QueryClient, QueryClientProvider } from "@tanstack/solid-query";
+import { createSignal, onMount } from "solid-js";
 import { mainBg } from "./assets";
+import { WindowToArrow } from "./components";
 import { SideBar, TitleBar } from "./layouts";
 import { AssetsPage, CustomizePage, DashboardPage, ManagementPage, TasksPage, TermsPage } from "./pages";
 import { metaState } from "./state";
 import { toaster } from "./utils";
+import { WindowDetector } from "./utils";
 
 const client = new QueryClient({
   defaultOptions: {
@@ -17,6 +20,21 @@ const client = new QueryClient({
 });
 
 export default () => {
+  const [isTooNarrow, setIsTooNarrow] = createSignal(false);
+
+  const onNarrow = () => setIsTooNarrow(true);
+  const onWide = () => setIsTooNarrow(false);
+
+  const windowDetector = new WindowDetector({
+    cssVariable: "--spacing-app-x",
+    onNarrow: onNarrow,
+    onWide: onWide,
+  });
+
+  onMount(() => {
+    windowDetector.init();
+  });
+
   return (
     <QueryClientProvider client={client}>
       <MetaProvider>
@@ -43,6 +61,7 @@ export default () => {
             </Router>
           </div>
         </div>
+        <WindowToArrow open={isTooNarrow()} />
         <Toaster toaster={toaster}>
           {(toast) => (
             <Toast.Root>

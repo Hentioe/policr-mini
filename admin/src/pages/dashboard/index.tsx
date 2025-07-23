@@ -52,7 +52,6 @@ export default () => {
       setMaxCount(findMaxCount(payload.points));
       const times: string[] = [];
       const categorizedPoints = findFirstCategorizedPoints(payload.points);
-      console.log(categorizedPoints);
       if (categorizedPoints.length > 0) {
         setEmpty(false);
         categorizedPoints.forEach((p: ServerData.StatsPoint) => {
