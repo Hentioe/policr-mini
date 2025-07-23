@@ -8,27 +8,6 @@ defmodule PolicrMiniWeb.Helper do
   @type perm :: PermissionBusiness.permission()
 
   @doc """
-  检查当前连接中的用户是否具备系统权限。
-
-  如果用户是机器人的拥有者，将返回完整的权限列表（读/写）。
-  """
-  @spec check_sys_permissions(Plug.Conn.t(), [perm]) :: {:error, map} | {:ok, [perm]}
-  def check_sys_permissions(%Plug.Conn{} = conn, requires \\ []) do
-    %{assigns: %{user: %{id: user_id}}} = conn
-    requires = if Enum.member?(requires, :readable), do: requires, else: [:readable] ++ requires
-
-    # 如果当前用户是机器人拥有者，赋予 `:readable` 和 `:writable` 权限。
-    perms =
-      if user_id == owner_id() do
-        [:readable, :writable]
-      else
-        []
-      end
-
-    match_permissions(perms, requires)
-  end
-
-  @doc """
   检查当前连接中的用户是否具备目标群组的权限。
 
   如果用户是机器人的拥有者，至少会存在一个 `:readable` 权限。

@@ -4,7 +4,6 @@ defmodule PolicrMiniWeb.Admin.API.ChatController do
   alias PolicrMini.{
     Instances,
     Chats,
-    ChatBusiness,
     PermissionBusiness
   }
 
@@ -186,93 +185,6 @@ defmodule PolicrMiniWeb.Admin.API.ChatController do
         operations: operations,
         writable: Enum.member?(perms, :writable)
       })
-    end
-  end
-
-  defp gen_find_list_options(params) do
-    to_atom = fn str, default ->
-      if str == nil do
-        default
-      else
-        try do
-          String.to_existing_atom(str)
-        rescue
-          _ -> default
-        end
-      end
-    end
-
-    to_integer = fn str, default ->
-      if str == nil do
-        default
-      else
-        try do
-          String.to_integer(str)
-        rescue
-          _ -> default
-        end
-      end
-    end
-
-    [
-      limit: to_integer.(params["limit"], 35),
-      offset: to_integer.(params["offset"], 0),
-      order_by: [
-        {to_atom.(params["order_direction"], :desc), to_atom.(params["order_by"], :inserted_at)}
-      ]
-    ]
-  end
-
-  def search(conn, %{"keywords" => keywords} = params) do
-    options = gen_find_list_options(params)
-
-    with {:ok, _} <- check_sys_permissions(conn) do
-      chats = ChatBusiness.search(keywords, options)
-      render(conn, "search.json", %{chats: chats})
-    end
-  end
-
-  def sync(conn, %{"id" => chat_id}) do
-    with {:ok, _} <- check_sys_permissions(conn),
-         {:ok, chat} <- synchronize_chat(chat_id) do
-      render(conn, "sync.json", %{chat: chat})
-    end
-  end
-
-  def list(conn, params) do
-    options = gen_find_list_options(params)
-
-    with {:ok, _} <- check_sys_permissions(conn) do
-      chats = ChatBusiness.find_list2(options)
-      render(conn, "list.json", %{chats: chats})
-    end
-  end
-
-  def leave(conn, %{"id" => id} = _params) do
-    with {:ok, _} <- check_sys_permissions(conn, [:writable]),
-         {:ok, chat} <- Chat.get(id),
-         {:ok, ok} <- leave_chat(id) do
-      render(conn, "leave.json", %{ok: ok, chat: chat})
-    end
-  end
-
-  @spec leave_chat(integer | binary) :: {:ok, boolean} | {:error, map}
-  defp leave_chat(chat_id) do
-    case Telegex.leave_chat(chat_id) do
-      {:ok, ok} ->
-        {:ok, ok}
-
-      {:error, %{reason: _reason}} ->
-        %{description: "please try again"}
-
-      {:error, %{description: <<"Bad Request: " <> reason>>}} ->
-        {:error, %{description: reason}}
-
-      {:error, %{description: <<"Forbidden: " <> reason>>}} ->
-        {:error, %{description: reason}}
-
-      {:error, %{description: description}} ->
-        {:error, %{description: description}}
     end
   end
 end

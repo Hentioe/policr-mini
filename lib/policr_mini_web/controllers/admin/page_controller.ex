@@ -2,15 +2,10 @@ defmodule PolicrMiniWeb.Admin.PageController do
   use PolicrMiniWeb, :controller
 
   def index(%{assigns: %{user: user}} = conn, _params) do
-    owner_id = Application.get_env(:policr_mini, PolicrMiniBot)[:owner_id]
-
-    %{is_third_party: is_third_party, name: name} = PolicrMiniBot.info()
-
     fullname = PolicrMiniBot.Helper.fullname(user)
 
     global = %{
-      user_info: %{is_owner: owner_id == user.id, fullname: fullname},
-      bot_info: %{is_third_party: is_third_party, name: name}
+      user_info: %{fullname: fullname}
     }
 
     render(conn, "index.html", global: global)

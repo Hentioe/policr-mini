@@ -119,19 +119,7 @@ defmodule PolicrMiniWeb.Router do
 
     put "/verifications/:id/kill", VerificationController, :kill
 
-    get "/tasks", TaskController, :index
-    put "/tasks/reset_stats", TaskController, :reset_stats
-
-    get "/terms", TermController, :index
-    put "/terms", TermController, :add_or_update
-    delete "/terms", TermController, :delete
-    post "/terms/preview", TermController, :preview
-
     get "/profile", ProfileController, :index
-    put "/profile/scheme", ProfileController, :update_scheme
-    delete "/profile/temp_albums", ProfileController, :delete_uploaded
-    post "/profile/temp_albums", ProfileController, :upload_albums
-    put "/profile/albums", ProfileController, :deploy_albums
   end
 
   scope "/admin/v2", PolicrMiniWeb.AdminV2 do

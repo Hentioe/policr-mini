@@ -23,11 +23,6 @@ import {
   PermissionsPage,
   PropertiesPage,
   CustomPage,
-  SysProfilePage,
-  SysManagementsPage,
-  SysTasksPage,
-  SysTerminalPage,
-  SysTermsPage,
 } from "./admin/pages";
 
 import Reducers from "./admin/reducers";
@@ -103,20 +98,6 @@ const App = () => {
                     <Route
                       path="/admin/chats/:id/custom"
                       element={<CustomPage />}
-                    />
-                    <Route
-                      path="/admin/sys/managements"
-                      element={<SysManagementsPage />}
-                    />
-                    <Route
-                      path="/admin/sys/profile"
-                      element={<SysProfilePage />}
-                    />
-                    <Route path="/admin/sys/tasks" element={<SysTasksPage />} />
-                    <Route path="/admin/sys/terms" element={<SysTermsPage />} />
-                    <Route
-                      path="/admin/sys/terminal"
-                      element={<SysTerminalPage />}
                     />
                   </Routes>
                 </div>

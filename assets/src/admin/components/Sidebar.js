@@ -66,36 +66,6 @@ const MenuBox = ({
   );
 };
 
-const ArrowDownIcon = () => (
-  <svg
-    xmlns="http://www.w3.org/2000/svg"
-    tw="h-3"
-    viewBox="0 0 20 20"
-    fill="currentColor"
-  >
-    <path
-      fillRule="evenodd"
-      d="M14.707 12.293a1 1 0 010 1.414l-4 4a1 1 0 01-1.414 0l-4-4a1 1 0 111.414-1.414L9 14.586V3a1 1 0 012 0v11.586l2.293-2.293a1 1 0 011.414 0z"
-      clipRule="evenodd"
-    />
-  </svg>
-);
-
-const ArrowUpIcon = () => (
-  <svg
-    xmlns="http://www.w3.org/2000/svg"
-    tw="h-3"
-    viewBox="0 0 20 20"
-    fill="currentColor"
-  >
-    <path
-      fillRule="evenodd"
-      d="M5.293 7.707a1 1 0 010-1.414l4-4a1 1 0 011.414 0l4 4a1 1 0 01-1.414 1.414L11 5.414V17a1 1 0 11-2 0V5.414L6.707 7.707a1 1 0 01-1.414 0z"
-      clipRule="evenodd"
-    />
-  </svg>
-);
-
 const changeTakeover = async ({ chatId, isTakeOver }) => {
   const endpoint = `/admin/api/chats/${chatId}/takeover?value=${isTakeOver}`;
   return fetch(endpoint, {
@@ -116,9 +86,6 @@ export default () => {
   const [isOnOwnerMenu, setIsOnOwnerMenu] = useState(
     isSysLink({ path: location.pathname })
   );
-
-  const [passedRate, setPassedRate] = useState(["--", 0]);
-  const [notPassedRate, setNotPassedRate] = useState(["--", 0]);
 
   const handleTakeOverChange = useCallback(
     (checked) => {
@@ -200,11 +167,6 @@ export default () => {
           href={`/admin/chats/${chatsState.selected}/scheme`}
           selected={isSelect("scheme", location.pathname)}
         />
-        {/* <NavItem
-          title="消息模板"
-          href={`/admin/chats/${chatsState.selected}/template`}
-          selected={isSelect("template", location.pathname)}
-        /> */}
         <NavItem
           title="验证记录"
           href={`/admin/chats/${chatsState.selected}/verifications`}
@@ -220,11 +182,6 @@ export default () => {
           href={`/admin/chats/${chatsState.selected}/permissions`}
           selected={isSelect("permissions", location.pathname)}
         />
-        {/* <NavItem
-          title="机器人属性"
-          href={`/admin/chats/${chatsState.selected}/properties`}
-          selected={isSelect("properties", location.pathname)}
-        /> */}
         <NavItem
           title="自定义"
           href={`/admin/chats/${chatsState.selected}/custom`}
@@ -259,39 +216,6 @@ export default () => {
             <span>检查中…</span>
           </div>
         ) : null}
-      </MenuBox>
-
-      <MenuBox
-        visibility={__GLOBAL__.userInfo.isOwner}
-        title="系统菜单"
-        miniTitle="系统"
-      >
-        <NavItem
-          title="批量管理"
-          href="/admin/sys/managements"
-          selected={isSysLink({ path: location.pathname, page: "managements" })}
-        />
-        <NavItem
-          title="全局属性"
-          href="/admin/sys/profile"
-          selected={isSysLink({ path: location.pathname, page: "profile" })}
-        />
-        <NavItem
-          title="系统任务"
-          href="/admin/sys/tasks"
-          selected={isSysLink({ path: location.pathname, page: "tasks" })}
-        />
-        <NavItem
-          title="服务条款"
-          href="/admin/sys/terms"
-          selected={isSysLink({ path: location.pathname, page: "terms" })}
-          ended={__GLOBAL__.botInfo.isThirdParty}
-        />
-        {/* <NavItem
-          title="模拟终端"
-          href="/admin/sys/terminal"
-          selected={isSysLink({ path: location.pathname, page: "terminal" })}
-        /> */}
       </MenuBox>
     </nav>
   );
