@@ -1,14 +1,14 @@
 import { createStore } from "solid-js/store";
 
 type State = {
-  title?: string;
+  title: string | null;
   pageTitle?: string;
 };
 
 const baseTitle = "Mini Console (Mini Apps)";
 
 const [store, setStore] = createStore<State>({
-  title: baseTitle,
+  title: null,
 });
 
 export function setTitle(title: string) {

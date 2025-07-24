@@ -5,13 +5,13 @@ import { setTitle } from "../../state/meta";
 
 export default () => {
   onMount(() => {
-    setCurrentPage("example");
-    setTitle("示例");
+    setCurrentPage("customize");
+    setTitle("自定义");
   });
 
   return (
     <PageBase>
-      <p>示例页面。</p>
+      <p>自定义页面。</p>
     </PageBase>
   );
 };

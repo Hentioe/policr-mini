@@ -25,4 +25,8 @@ defmodule PolicrMini.Schema.User do
     |> cast(attrs, @required_fields ++ @optional_fields)
     |> validate_required(@required_fields)
   end
+
+  def full_name(user) when is_struct(user, __MODULE__) do
+    PolicrMiniBot.Helper.fullname(user)
+  end
 end

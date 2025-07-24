@@ -139,6 +139,14 @@ defmodule PolicrMiniWeb.Router do
     get "/*path", PageController, :home
   end
 
+  scope "/console/v2/api", PolicrMiniWeb.ConsoleV2.API do
+    pipe_through [:console_v2_api]
+
+    get "/users/me", UserController, :me
+
+    get "/chats", ChatController, :index
+  end
+
   scope "/console/v2", PolicrMiniWeb.ConsoleV2 do
     pipe_through [:browser, :console_v2]
 

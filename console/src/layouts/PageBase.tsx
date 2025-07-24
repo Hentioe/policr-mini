@@ -2,7 +2,7 @@ import { JSX } from "solid-js";
 
 export default (props: { children: JSX.Element }) => {
   return (
-    <main class="py-[1rem] px-[1rem] text-foreground overflow-y-auto scrollbar">
+    <main class="pt-main-top pb-main-bottom min-h-screen bg-white px-edge text-foreground overflow-y-auto">
       {props.children}
     </main>
   );

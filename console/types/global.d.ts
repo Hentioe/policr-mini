@@ -1,1 +1,1 @@
-type Page = "dashboard" | "customize" | "verifications" | "operations" | "management";
+type Page = "stats" | "control" | "customize" | "histories" | "example";

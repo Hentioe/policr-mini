@@ -2,6 +2,13 @@
 
 @theme {
   --color-foreground: var(--color-zinc-800);
+  --spacing-edge: 1rem;
+  --spacing-drawer: 14rem;
+  --spacing-drawer-neg: calc(var(--spacing-drawer) * -1);
+  --spacing-header: 4rem;
+  --spacing-navigation: 4rem;
+  --spacing-main-top: calc(var(--spacing-header) + var(--spacing-edge));
+  --spacing-main-bottom: calc(var(--spacing-navigation) + var(--spacing-edge));
 }
 
 @utility tw-input-edge {

@@ -1,7 +1,51 @@
 @import "./tailwind.css";
 @import "./styles/components.css";
 
-/* #app {} */
+body {
+  &::-webkit-scrollbar {
+    width: 4px;
+  }
+
+  &::-webkit-scrollbar-track {
+    background: rgba(59, 130, 246, 0.1);
+    border-radius: 4px;
+  }
+
+  &::-webkit-scrollbar-thumb {
+    background: rgba(59, 130, 246, 0.4);
+    border-radius: 4px;
+    transition: background 0.3s ease;
+  }
+
+  &::-webkit-scrollbar-thumb:hover {
+    background: rgba(59, 130, 246, 0.6);
+  }
+}
+
+#drawer {
+  @apply fixed top-0 bottom-0 w-drawer bg-zinc-50 transition-all;
+  z-index: 999;
+
+  &.open {
+    @apply left-0;
+    box-shadow: 2px 0 10px rgba(0, 0, 0, 0.2);
+  }
+
+  &.close {
+    @apply left-drawer-neg;
+  }
+}
+
+#overlay {
+  &.close {
+    @apply opacity-0;
+    z-index: -1;
+  }
+
+  &.open {
+    @apply opacity-100;
+  }
+}
 
 .input-edge {
   @apply tw-input-edge focus:tw-input-edge-highlight;

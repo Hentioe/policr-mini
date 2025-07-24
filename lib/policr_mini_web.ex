@@ -54,7 +54,7 @@ defmodule PolicrMiniWeb do
     quote do
       use PolicrMiniWeb, :view
 
-      # import PolicrMiniWeb.ConsoleV2.ViewHelper
+      import PolicrMiniWeb.ConsoleV2.ViewHelper
     end
   end
 

@@ -13,6 +13,13 @@ declare namespace ServerData {
     payload: T;
   };
 
+  type User = {
+    id: number;
+    username: string;
+    fullName: string;
+    photoId: string;
+  };
+
   type Paginated<T> = {
     page: number;
     pageSize: number;
@@ -69,7 +76,8 @@ declare namespace ServerData {
     title: string;
     username: string;
     description: string;
-    isTakeOver: boolean;
+    bigPhotoId: string;
+    takenOver: boolean;
     left: boolean;
     createdAt: string;
   };
