@@ -3,6 +3,7 @@
 @theme {
   --color-foreground: var(--color-zinc-800);
   --spacing-edge: 1rem;
+  --spacing-edge-neg: calc(var(--spacing-edge) * -1);
   --spacing-drawer: 14rem;
   --spacing-drawer-neg: calc(var(--spacing-drawer) * -1);
   --spacing-header: 4rem;

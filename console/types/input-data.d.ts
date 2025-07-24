@@ -10,5 +10,5 @@ declare namespace InputData {
     delayUnbanSecs?: number;
   };
 
-  type StatsRange = "today" | "7d" | "30d" | "60d";
+  type StatsRange = "today" | "7d" | "28d" | "90d";
 }

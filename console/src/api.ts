@@ -22,6 +22,10 @@ export async function getChats(): PayloadType<ServerData.Chat[]> {
   return strictify(await client.get("/chats"));
 }
 
+export async function queryStats(range: string): PayloadType<ServerData.Stats> {
+  return strictify(await client.get(`/stats/query?range=${range}`));
+}
+
 async function strictify<T extends Record<string, unknown> | readonly Record<string, unknown>[]>(
   resp: AxiosResponse<T>,
 ) {
