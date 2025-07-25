@@ -30,6 +30,10 @@ export async function getScheme(chatId: number): PayloadType<ServerData.Scheme> 
   return strictify(await client.get(`/schemes/${chatId}`));
 }
 
+export async function getCustoms(chatId: number): PayloadType<ServerData.CustomItem[]> {
+  return strictify(await client.get(`/chats/${chatId}/customs`));
+}
+
 async function strictify<T extends Record<string, unknown> | readonly Record<string, unknown>[]>(
   resp: AxiosResponse<T>,
 ) {

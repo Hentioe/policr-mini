@@ -1,0 +1,38 @@
+[data-scope="checkbox"][data-part="root"] {
+  cursor: pointer;
+  display: flex;
+  align-items: center;
+  gap: 0.5rem;
+  width: fit-content;
+
+  &[data-disabled] {
+    opacity: 0.5;
+  }
+}
+
+[data-scope="checkbox"][data-part="group"] {
+  display: flex;
+  gap: 0.5rem;
+}
+
+[data-scope="checkbox"][data-part="control"] {
+  border: 1px solid;
+  border-radius: 2px;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  width: 1rem;
+  height: 1rem;
+  color: rgb(197, 197, 197);
+}
+
+[data-scope="checkbox"][data-part="indicator"] {
+  &[data-state="checked"] {
+    color: rgb(252, 166, 74);
+  }
+  &:not([hidden]) {
+    display: flex;
+    align-items: center;
+    justify-content: center;
+  }
+}

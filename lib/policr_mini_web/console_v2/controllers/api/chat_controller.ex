@@ -2,6 +2,7 @@ defmodule PolicrMiniWeb.ConsoleV2.API.ChatController do
   use PolicrMiniWeb, :controller
 
   alias PolicrMini.Instances.Chat
+  alias PolicrMini.Chats.CustomKit
 
   action_fallback PolicrMiniWeb.ConsoleV2.API.FallbackController
 
@@ -21,5 +22,44 @@ defmodule PolicrMiniWeb.ConsoleV2.API.ChatController do
       end
 
     render(conn, "index.json", chats: chats)
+  end
+
+  def customs(conn, _params) do
+    # todo: 将示例数据改为实际查询
+    customs = [
+      %CustomKit{
+        id: 1,
+        chat_id: 1,
+        title: "以下哪个城市不属于德国？",
+        answers: ["+巴黎", "-柏林", "-慕尼黑", "-法兰克福"],
+        attachment: "photo/xxx"
+      },
+      %CustomKit{
+        id: 2,
+        chat_id: 2,
+        title: "哪个元素在元素周期表中是惰性气体？",
+        answers: ["+氖", "-氧", "-氮", "-氢"]
+      },
+      %CustomKit{
+        id: 3,
+        chat_id: 3,
+        title: "莎士比亚的四大悲剧不包括以下哪一部？",
+        answers: ["+仲夏夜之梦", "-哈姆雷特", "-奥赛罗", "-李尔王"]
+      },
+      %CustomKit{
+        id: 4,
+        chat_id: 4,
+        title: "以下哪项是计算机的中央处理器（CPU）的主要功能？",
+        answers: ["+执行指令", "-存储数据", "-显示图像", "-打印文档"]
+      },
+      %CustomKit{
+        id: 5,
+        chat_id: 5,
+        title: "光合作用的主要产物是什么？",
+        answers: ["+葡萄糖和氧气", "-二氧化碳和水", "-氮气和氢气", "-淀粉和水"]
+      }
+    ]
+
+    render(conn, "customs.json", customs: customs)
   end
 end

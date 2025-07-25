@@ -11,42 +11,43 @@ type Props = {
   fullWidth?: boolean;
   disabled?: boolean;
   outline?: boolean;
+  translucent?: boolean;
   loading?: boolean;
   onClick?: () => void;
 };
 
 export default (props: Props) => {
-  const colorStyle = () => {
-    // 允许变化
-    const allowChange = !props.disabled && !props.loading;
+  const allowChange = () => !props.disabled && !props.loading;
+
+  const translucentStyle = () => {
     if (props.outline) {
       switch (props.variant) {
         case "info":
           return classNames([
             "text-blue-500 border-blue-200 bg-blue-100/70",
             {
-              "hover:bg-blue-200/80": allowChange,
+              "hover:bg-blue-200/80": allowChange(),
             },
           ]);
         case "danger":
           return classNames([
             "text-red-500 border-red-200 bg-red-100/70",
             {
-              "hover:bg-red-200/80": allowChange,
+              "hover:bg-red-200/80": allowChange(),
             },
           ]);
         case "success":
           return classNames([
             "text-green-500 border-green-200 bg-green-100/70",
             {
-              "hover:bg-green-200/80": allowChange,
+              "hover:bg-green-200/80": allowChange(),
             },
           ]);
         default:
           return classNames([
             "text-zinc-500 border-zinc-200 bg-zinc-100/70",
             {
-              "hover:bg-zinc-200/80": allowChange,
+              "hover:bg-zinc-200/80": allowChange(),
             },
           ]);
       }
@@ -56,21 +57,64 @@ export default (props: Props) => {
           return classNames([
             "text-white bg-blue-500",
             {
-              "hover:bg-blue-400": allowChange,
+              "hover:bg-blue-400": allowChange(),
             },
           ]);
         case "danger":
           return classNames([
             "text-white bg-red-500",
             {
-              "hover:bg-red-400": allowChange,
+              "hover:bg-red-400": allowChange(),
             },
           ]);
         case "success":
           return classNames([
             "text-white bg-green-500",
             {
-              "hover:bg-green-400": allowChange,
+              "hover:bg-green-400": allowChange(),
+            },
+          ]);
+      }
+    }
+  };
+
+  const colorStyle = () => {
+    if (props.translucent) {
+      return translucentStyle();
+    }
+
+    if (props.outline) {
+      switch (props.variant) {
+        case "info":
+          return classNames([
+            "text-blue-500 border-blue-200 bg-blue-150",
+            {
+              "hover:bg-blue-100": allowChange(),
+            },
+          ]);
+
+        default:
+          return classNames([
+            "text-zinc-500 border-zinc-200 bg-zinc-150",
+            {
+              "hover:bg-zinc-100": allowChange(),
+            },
+          ]);
+      }
+    } else {
+      switch (props.variant) {
+        case "info":
+          return classNames([
+            "text-white bg-blue-500",
+            {
+              "hover:bg-blue-400": allowChange(),
+            },
+          ]);
+        case "danger":
+          return classNames([
+            "text-white bg-red-500",
+            {
+              "hover:bg-red-400": allowChange(),
             },
           ]);
       }
@@ -122,11 +166,11 @@ export default (props: Props) => {
   const heightStyle = () => {
     switch (props.size) {
       case "sm":
-        return "h-[1rem]";
+        return "h-[1.25rem]";
       case "lg":
         return "h-button-lg";
       default:
-        return "h-[1.25rem]"; // 默认大小
+        return "h-[1.75rem]"; // 默认大小
     }
   };
 
@@ -140,7 +184,7 @@ export default (props: Props) => {
     <button
       onClick={handleClick}
       class={classNames([
-        "rounded-lg transition-colors cursor-pointer select-none flex items-center",
+        "rounded-lg shadow-sm transition-colors cursor-pointer select-none flex items-center",
         heightStyle(),
         textSizeStyle(),
         padingStyle(),
@@ -149,7 +193,6 @@ export default (props: Props) => {
           "cursor-not-allowed! saturate-0": props.disabled || props.loading, // 禁用状态
           "w-full justify-center": props.fullWidth, // 全宽按钮
           "border": props.outline, // 轮廓按钮包含边框
-          "shadow-sm": !props.outline, // 非轮廓按钮包含阴影
         },
       ])}
     >

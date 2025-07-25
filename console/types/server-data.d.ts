@@ -77,4 +77,16 @@ declare namespace ServerData {
     left: boolean;
     createdAt: string;
   };
+
+  type CustomItem = {
+    id: number;
+    title: string;
+    answers: CustomItemAnswer[];
+    attachment?: string;
+  };
+
+  type CustomItemAnswer = {
+    text: string;
+    correct: boolean;
+  };
 }
