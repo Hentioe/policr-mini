@@ -91,11 +91,11 @@ export default (props: Props) => {
   const padingStyle = () => {
     switch (props.size) {
       case "sm":
-        return "px-2 py-1";
+        return "px-2";
       case "lg":
-        return "px-[1.5rem] py-[0.5rem]";
+        return "px-[1.5rem]";
       default:
-        return "px-3 py-2"; // 默认大小
+        return "px-3"; // 默认大小
     }
   };
 
@@ -119,6 +119,17 @@ export default (props: Props) => {
     }
   };
 
+  const heightStyle = () => {
+    switch (props.size) {
+      case "sm":
+        return "h-[1rem]";
+      case "lg":
+        return "h-button-lg";
+      default:
+        return "h-[1.25rem]"; // 默认大小
+    }
+  };
+
   const handleClick = () => {
     if (props.onClick && !props.disabled && !props.loading) {
       props.onClick();
@@ -130,11 +141,12 @@ export default (props: Props) => {
       onClick={handleClick}
       class={classNames([
         "rounded-lg transition-colors cursor-pointer select-none flex items-center",
+        heightStyle(),
         textSizeStyle(),
         padingStyle(),
         colorStyle(),
         {
-          "cursor-not-allowed! opacity-50": props.disabled || props.loading, // 禁用状态
+          "cursor-not-allowed! saturate-0": props.disabled || props.loading, // 禁用状态
           "w-full justify-center": props.fullWidth, // 全宽按钮
           "border": props.outline, // 轮廓按钮包含边框
           "shadow-sm": !props.outline, // 非轮廓按钮包含阴影

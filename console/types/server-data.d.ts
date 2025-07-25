@@ -50,10 +50,6 @@ declare namespace ServerData {
     count?: number;
   };
 
-  type Customize = {
-    scheme: Scheme;
-  };
-
   type Scheme = {
     type: string;
     typeItems: SelectItem[];

@@ -147,6 +147,8 @@ defmodule PolicrMiniWeb.Router do
     get "/chats", ChatController, :index
 
     get "/stats/query", StatsController, :query
+
+    get "/schemes/:chat_id", SchemeController, :show
   end
 
   scope "/console/v2", PolicrMiniWeb.ConsoleV2 do

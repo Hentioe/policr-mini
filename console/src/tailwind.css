@@ -10,6 +10,7 @@
   --spacing-navigation: 4rem;
   --spacing-main-top: calc(var(--spacing-header) + var(--spacing-edge));
   --spacing-main-bottom: calc(var(--spacing-navigation) + var(--spacing-edge));
+  --spacing-button-lg: 2.5rem;
 }
 
 @utility tw-input-edge {
