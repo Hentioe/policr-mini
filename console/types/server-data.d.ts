@@ -89,4 +89,36 @@ declare namespace ServerData {
     text: string;
     correct: boolean;
   };
+
+  type Verification = {
+    id: number;
+    userId: number;
+    userFullName: string;
+    status: VerificationStatus;
+    source: string;
+    durationSecs: number;
+    insertedAt: string;
+    updatedAt: string;
+  };
+
+  type VerificationStatus =
+    | "pending"
+    | "approved"
+    | "incorrect"
+    | "timeout"
+    | "expired"
+    | "manual_kick"
+    | "manual_ban";
+
+  type Operation = {
+    id: number;
+    action: OperationAction;
+    role: OperationRole;
+    verification: Verification;
+    insertedAt: string;
+    updatedAt: string;
+  };
+
+  type OperationAction = "ban" | "kick" | "unban" | "verify";
+  type OperationRole = "system" | "admin";
 }

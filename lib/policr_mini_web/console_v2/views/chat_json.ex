@@ -2,7 +2,7 @@ defmodule PolicrMiniWeb.ConsoleV2.API.ChatView do
   use PolicrMiniWeb, :console_v2_view
 
   alias PolicrMini.Instances.Chat
-  alias PolicrMiniWeb.ConsoleV2.API.CustomView
+  alias PolicrMiniWeb.ConsoleV2.API.{CustomView, VerificationView, OperationView}
 
   def render("index.json", %{chats: chats}) when is_list(chats) do
     success(render_many(chats, __MODULE__, "chat.json"))
@@ -23,5 +23,13 @@ defmodule PolicrMiniWeb.ConsoleV2.API.ChatView do
 
   def render("customs.json", %{customs: customs}) when is_list(customs) do
     success(render_many(customs, CustomView, "custom.json"))
+  end
+
+  def render("verifications.json", %{verifications: verifications}) when is_list(verifications) do
+    success(render_many(verifications, VerificationView, "verification.json"))
+  end
+
+  def render("operations.json", %{operations: operations}) when is_list(operations) do
+    success(render_many(operations, OperationView, "operation.json"))
   end
 end

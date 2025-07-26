@@ -146,6 +146,8 @@ defmodule PolicrMiniWeb.Router do
 
     get "/chats", ChatController, :index
     get "/chats/:id/customs", ChatController, :customs
+    get "/chats/:id/verifications", ChatController, :verifications
+    get "/chats/:id/operations", ChatController, :operations
 
     get "/stats/query", StatsController, :query
 

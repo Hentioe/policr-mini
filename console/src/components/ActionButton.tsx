@@ -93,6 +93,22 @@ export default (props: Props) => {
             },
           ]);
 
+        case "danger":
+          return classNames([
+            "text-red-500 border-red-200 bg-red-150",
+            {
+              "hover:bg-red-100": allowChange(),
+            },
+          ]);
+
+        case "success":
+          return classNames([
+            "text-green-500 border-green-200 bg-green-150",
+            {
+              "hover:bg-green-100": allowChange(),
+            },
+          ]);
+
         default:
           return classNames([
             "text-zinc-500 border-zinc-200 bg-zinc-150",
@@ -184,7 +200,7 @@ export default (props: Props) => {
     <button
       onClick={handleClick}
       class={classNames([
-        "rounded-lg shadow-sm transition-colors cursor-pointer select-none flex items-center",
+        "rounded-lg shadow-xs transition-colors cursor-pointer select-none flex items-center",
         heightStyle(),
         textSizeStyle(),
         padingStyle(),

@@ -23,7 +23,7 @@ defmodule PolicrMini.EctoEnums do
     manual_ban: 6
 
   defenum KillingMethodEnum, ban: 0, kick: 1
-  defenum OperationActionEnum, kick: 0, ban: 1
+  defenum OperationActionEnum, kick: 0, ban: 1, unban: 2, verify: 3
   defenum OperationRoleEnum, system: 0, admin: 1
   defenum StatVerificationStatus, passed: 0, timeout: 1, wronged: 2, other: 3
   defenum MentionText, user_id: 0, full_name: 1, mosaic_full_name: 2

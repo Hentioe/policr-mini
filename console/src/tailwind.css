@@ -4,6 +4,8 @@
   --color-foreground: var(--color-zinc-800);
   --color-zinc-150: oklch(0.944 0.003 286.348);
   --color-blue-150: oklch(0.907 0.046 254.857);
+  --color-red-150: oklch(0.911 0.047 18.026);
+  --color-green-150: oklch(0.944 0.064 156.369);
   --spacing-edge: 1rem;
   --spacing-edge-neg: calc(var(--spacing-edge) * -1);
   --spacing-drawer: 14rem;

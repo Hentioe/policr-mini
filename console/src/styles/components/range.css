@@ -1,0 +1,8 @@
+.range {
+  &:not(:last-child)::after {
+    /* 添加一个点 */
+    content: "•";
+    margin: 0 0.25rem;
+    color: var(--color-zinc-300);
+  }
+}

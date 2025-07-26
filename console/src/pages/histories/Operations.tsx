@@ -1,0 +1,84 @@
+import { useQuery } from "@tanstack/solid-query";
+import { format } from "date-fns";
+import { For, Show } from "solid-js";
+import { getOperations } from "../../api";
+import { Record } from "./Record";
+
+type Operation = ServerData.Operation;
+
+export default (props: { chatId: number | null; range: string }) => {
+  const query = useQuery(() => ({
+    queryKey: ["operations", props.chatId, props.range],
+    queryFn: () => getOperations(props.chatId!),
+    enabled: !!props.chatId,
+  }));
+
+  return (
+    <div>
+      <Show when={query.data?.success}>
+        <For each={query.data?.success && query.data.payload}>
+          {(ope) => (
+            <Record.Root
+              user={ope.verification.userFullName}
+              badge={renderActionBadge(ope)}
+              time={format(ope.insertedAt, "yyyy-MM-dd HH:mm:ss")}
+              bottoms={[renderRoleBadge(ope)]}
+            />
+          )}
+        </For>
+      </Show>
+    </div>
+  );
+};
+
+function renderActionBadge(ope: Operation) {
+  const badgeType = () => {
+    switch (ope.action) {
+      case "kick":
+        return "warning";
+      case "ban":
+        return "error";
+      case "unban":
+        return "success";
+      case "verify":
+        return "warning";
+    }
+  };
+
+  const badgeText = () => {
+    switch (ope.action) {
+      case "kick":
+        return "踢出";
+      case "ban":
+        return "封禁";
+      case "unban":
+        return "解禁";
+      case "verify":
+        return "重新验证";
+    }
+  };
+
+  return <Record.Badge type={badgeType()} text={badgeText()} />;
+}
+
+function renderRoleBadge(ope: Operation) {
+  const badgeType = () => {
+    switch (ope.role) {
+      case "system":
+        return "success";
+      case "admin":
+        return "info";
+    }
+  };
+
+  const badgeText = () => {
+    switch (ope.role) {
+      case "system":
+        return "系统";
+      case "admin":
+        return "管理员";
+    }
+  };
+
+  return <Record.Badge type={badgeType()} text={badgeText()} />;
+}

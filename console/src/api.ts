@@ -34,6 +34,14 @@ export async function getCustoms(chatId: number): PayloadType<ServerData.CustomI
   return strictify(await client.get(`/chats/${chatId}/customs`));
 }
 
+export async function getVerifications(chatId: number): PayloadType<ServerData.Verification[]> {
+  return strictify(await client.get(`/chats/${chatId}/verifications`));
+}
+
+export async function getOperations(chatId: number): PayloadType<ServerData.Operation[]> {
+  return strictify(await client.get(`/chats/${chatId}/operations`));
+}
+
 async function strictify<T extends Record<string, unknown> | readonly Record<string, unknown>[]>(
   resp: AxiosResponse<T>,
 ) {

@@ -3,6 +3,7 @@ defmodule PolicrMiniWeb.ConsoleV2.API.ChatController do
 
   alias PolicrMini.Instances.Chat
   alias PolicrMini.Chats.CustomKit
+  alias PolicrMini.Chats.Verification
 
   action_fallback PolicrMiniWeb.ConsoleV2.API.FallbackController
 
@@ -61,5 +62,49 @@ defmodule PolicrMiniWeb.ConsoleV2.API.ChatController do
     ]
 
     render(conn, "customs.json", customs: customs)
+  end
+
+  defp random_verification(index) do
+    %Verification{
+      id: index,
+      target_user_id: index,
+      seconds: Enum.random(30..120),
+      status:
+        Enum.random([
+          :waiting,
+          :passed,
+          :timeout,
+          :wronged,
+          :expired,
+          :manual_kick,
+          :manual_ban
+        ]),
+      source: Enum.random([:joined, :join_request]),
+      target_user_name: "用户#{index}",
+      inserted_at: ~N[2023-10-01 12:00:00],
+      updated_at: ~N[2023-10-01 12:00:00]
+    }
+  end
+
+  def verifications(conn, _params) do
+    verifications = Enum.map(1..15, &random_verification/1)
+
+    render(conn, "verifications.json", verifications: verifications)
+  end
+
+  def operations(conn, _params) do
+    operations =
+      Enum.map(1..15, fn i ->
+        %PolicrMini.Chats.Operation{
+          id: i,
+          action: Enum.random([:ban, :kick, :unban, :verify]),
+          role: Enum.random([:system, :admin]),
+          verification: random_verification(i),
+          inserted_at: ~N[2023-10-01 12:00:00],
+          updated_at: ~N[2023-10-01 12:00:00]
+        }
+      end)
+
+    render(conn, "operations.json", operations: operations)
   end
 end
