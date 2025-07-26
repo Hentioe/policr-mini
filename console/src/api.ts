@@ -49,7 +49,7 @@ export async function queryStats(chatId: number, range: InputData.StatsRange): P
 }
 
 export async function getScheme(chatId: number): PayloadType<ServerData.Scheme> {
-  return strictify(await client.get(`/schemes/${chatId}`));
+  return strictify(await client.get(`/chats/${chatId}/scheme`));
 }
 
 export async function getCustoms(chatId: number): PayloadType<ServerData.CustomItem[]> {
@@ -62,6 +62,21 @@ export async function getVerifications(chatId: number): PayloadType<ServerData.V
 
 export async function getOperations(chatId: number): PayloadType<ServerData.Operation[]> {
   return strictify(await client.get(`/chats/${chatId}/operations`));
+}
+
+export async function updateScheme(id: number, scheme: InputData.Scheme): PayloadType<ServerData.Scheme> {
+  return strictify(
+    await client.put(`/schemes/${id}`, {
+      type: scheme.type,
+      timeout: scheme.timeout,
+      kill_strategy: scheme.killStrategy,
+      fallback_kill_strategy: scheme.fallbackKillStrategy,
+      mention_text: scheme.mentionText,
+      image_choices_count: scheme.imageChoicesCount,
+      cleanup_messages: scheme.cleanupMessages,
+      delay_unban_secs: scheme.delayUnbanSecs,
+    }),
+  );
 }
 
 async function strictify<T extends Record<string, unknown> | readonly Record<string, unknown>[]>(

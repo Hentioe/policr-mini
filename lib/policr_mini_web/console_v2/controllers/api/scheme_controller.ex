@@ -1,12 +1,16 @@
 defmodule PolicrMiniWeb.ConsoleV2.API.SchemeController do
   use PolicrMiniWeb, :controller
 
-  alias PolicrMini.DefaultsServer
+  alias PolicrMini.Chats
+  alias PolicrMini.Chats.Scheme
 
-  def show(conn, _params) do
-    # todo: 换成真实群组的方案数据
-    scheme = DefaultsServer.get_scheme()
+  def update(conn, %{"id" => id} = params) do
+    # 接收新版本参数并转换到旧版本
+    params = Scheme.cast_from_new_params(params)
 
-    render(conn, "show.json", scheme: scheme)
+    with {:ok, scheme} <- Chats.load_scheme(id),
+         {:ok, scheme} <- Chats.update_scheme(scheme, params) do
+      render(conn, "show.json", scheme: scheme)
+    end
   end
 end

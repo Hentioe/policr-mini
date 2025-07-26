@@ -1,6 +1,6 @@
 import { createListCollection, Select } from "@ark-ui/solid/select";
 import { Icon } from "@iconify-icon/solid";
-import { createEffect, createMemo, createSignal, Index } from "solid-js";
+import { createMemo, Index } from "solid-js";
 import { Portal } from "solid-js/web";
 
 export default (
@@ -12,23 +12,22 @@ export default (
     default?: string;
   },
 ) => {
-  const [value, setValue] = createSignal<string[]>([]);
-  const collection = createMemo(() => createListCollection<SelectItem>({ items: props.items }));
-
-  createEffect(() => {
-    if (value().length === 0 && props.default) {
-      setValue([props.default]);
-    }
-  });
+  const collection = createMemo(() =>
+    createListCollection<SelectItem>({
+      items: props.items,
+      itemToValue: (item) => item.value,
+      itemToString: (item) => item.label,
+    })
+  );
+  const defaultValue = createMemo(() => props.default ? [props.default] : []);
 
   const handleChange = (item: SelectItem) => {
-    setValue([item.value]);
     props.onChange?.(item);
   };
 
   return (
     <Select.Root
-      value={value()}
+      value={defaultValue()}
       collection={collection()}
       onValueChange={(e) => handleChange(e.items[0])}
       open={props.open}

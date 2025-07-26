@@ -1,7 +1,7 @@
 defmodule PolicrMiniWeb.ConsoleV2.API.ChatController do
   use PolicrMiniWeb, :controller
 
-  alias PolicrMini.{Instances, Stats}
+  alias PolicrMini.{Chats, Instances, Stats}
   alias PolicrMini.Chats.CustomKit
   alias PolicrMini.Chats.Verification
 
@@ -19,7 +19,7 @@ defmodule PolicrMiniWeb.ConsoleV2.API.ChatController do
   def stats(conn, %{"id" => chat_id} = params) do
     with {:ok, params} <- Tarams.cast(params, @stats_schema),
          {:ok, stats} <- Stats.query(range_to_opts(chat_id, params)) do
-      render(conn, "stats.json", %{stats: stats})
+      render(conn, "stats.json", stats: stats)
     end
   end
 
@@ -40,6 +40,17 @@ defmodule PolicrMiniWeb.ConsoleV2.API.ChatController do
       end
 
     Keyword.put(opts, :chat_id, chat_id)
+  end
+
+  def scheme(conn, %{"id" => chat_id}) do
+    scheme =
+      if scheme = Chats.get_scheme_by_chat_id(chat_id) do
+        scheme
+      else
+        Chats.upsert_scheme!(chat_id, %{})
+      end
+
+    render(conn, "scheme.json", scheme: scheme)
   end
 
   def customs(conn, _params) do

@@ -50,18 +50,19 @@ declare namespace ServerData {
   };
 
   type Scheme = {
-    type: string;
+    id: number;
+    type: string | null;
     typeItems: SelectItem[];
-    timeout: number;
-    killStrategy: string;
-    fallbackKillStrategy: string;
+    timeout: number | null;
+    killStrategy: string | null;
+    fallbackKillStrategy: string | null;
     killStrategyItems: SelectItem[];
-    mentionText: string;
+    mentionText: string | null;
     mentionTextItems: SelectItem[];
-    imageChoicesCount: number;
+    imageChoicesCount: string | null;
     imageChoicesCountItems: SelectItem[];
     cleanupMessages: MessageKind[];
-    delayUnbanSecs: number;
+    delayUnbanSecs: number | null;
   };
 
   type MessageKind = "joined" | "left";

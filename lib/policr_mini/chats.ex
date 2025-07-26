@@ -40,6 +40,7 @@ defmodule PolicrMini.Chats do
     scheme |> Scheme.changeset(params) |> Repo.update()
   end
 
+  @deprecated "Use get_scheme_by_chat_id/1 instead"
   @spec find_scheme(integer | binary) :: Scheme.t() | nil
   def find_scheme(chat_id) when is_integer(chat_id) or is_binary(chat_id) do
     from(s in Scheme, where: s.chat_id == ^chat_id, limit: 1) |> Repo.one()
@@ -58,10 +59,44 @@ defmodule PolicrMini.Chats do
     end
   end
 
-  # TODO: `find_or_init_scheme!/1` 需要测试。
+  @deprecated "Use upsert_scheme/2 instead"
   @spec find_or_init_scheme!(integer | binary) :: Scheme.t()
   def find_or_init_scheme!(chat_id) do
     case find_or_init_scheme(chat_id) do
+      {:ok, scheme} -> scheme
+      {:error, e} -> raise e
+    end
+  end
+
+  def load_scheme(id) when is_integer(id) or is_binary(id) do
+    case Repo.get(Scheme, id) do
+      nil -> {:error, :not_found}
+      scheme -> {:ok, scheme}
+    end
+  end
+
+  def get_scheme_by_chat_id(id) when is_integer(id) or is_binary(id) do
+    from(s in Scheme, where: s.chat_id == ^id, limit: 1) |> Repo.one()
+  end
+
+  def upsert_scheme(chat_id, params) when is_integer(chat_id) do
+    updated_at = DateTime.utc_now()
+    set = Enum.into(params, updated_at: updated_at)
+
+    %Scheme{chat_id: chat_id}
+    |> Scheme.changeset(params)
+    |> Repo.insert(
+      on_conflict: [set: set],
+      conflict_target: :chat_id
+    )
+  end
+
+  def upsert_scheme(chat_id, params) when is_binary(chat_id) do
+    upsert_scheme(String.to_integer(chat_id), params)
+  end
+
+  def upsert_scheme!(chat_id, params) do
+    case upsert_scheme(chat_id, params) do
       {:ok, scheme} -> scheme
       {:error, e} -> raise e
     end
@@ -87,22 +122,6 @@ defmodule PolicrMini.Chats do
           migrate_scheme(scheme)
       end
     end)
-  end
-
-  # TODO: 添加测试
-  def upsert_scheme(chat_id, params) when is_integer(chat_id) do
-    set = Enum.into(params, [])
-
-    %Scheme{chat_id: chat_id}
-    |> Scheme.changeset(params)
-    |> Repo.insert(
-      on_conflict: [set: set],
-      conflict_target: :chat_id
-    )
-  end
-
-  def upsert_scheme(chat_id, params) when is_binary(chat_id) do
-    upsert_scheme(String.to_integer(chat_id), params)
   end
 
   @doc """

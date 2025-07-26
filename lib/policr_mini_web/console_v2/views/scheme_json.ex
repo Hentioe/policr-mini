@@ -1,12 +1,15 @@
 defmodule PolicrMiniWeb.ConsoleV2.API.SchemeView do
   use PolicrMiniWeb, :console_v2_view
 
+  alias PolicrMini.Chats.Scheme
+
   def render("show.json", %{scheme: scheme}) do
     success(render_one(scheme, __MODULE__, "scheme.json"))
   end
 
-  def render("scheme.json", %{scheme: scheme}) do
+  def render("scheme.json", %{scheme: scheme}) when is_struct(scheme, Scheme) do
     %{
+      id: scheme.id,
       type: scheme.verification_mode,
       type_items: type_items(),
       timeout: scheme.seconds,
@@ -59,6 +62,8 @@ defmodule PolicrMiniWeb.ConsoleV2.API.SchemeView do
       build_select_item("system", "系统默认")
     ]
   end
+
+  def fix_cleanup_messages(nil), do: []
 
   def fix_cleanup_messages(message_cleanup) when is_list(message_cleanup) do
     Enum.map(message_cleanup, fn
