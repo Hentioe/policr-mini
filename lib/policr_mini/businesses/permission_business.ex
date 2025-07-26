@@ -45,6 +45,7 @@ defmodule PolicrMini.PermissionBusiness do
     end
   end
 
+  @deprecated "Use PolicrMini.Chats.add_permission/1 instead"
   def create(params) do
     %Permission{} |> Permission.changeset(params) |> Repo.insert()
   end

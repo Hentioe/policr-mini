@@ -145,11 +145,10 @@ defmodule PolicrMiniWeb.Router do
     get "/users/me", UserController, :me
 
     get "/chats", ChatController, :index
+    get "/chats/:id/stats", ChatController, :stats
     get "/chats/:id/customs", ChatController, :customs
     get "/chats/:id/verifications", ChatController, :verifications
     get "/chats/:id/operations", ChatController, :operations
-
-    get "/stats/query", StatsController, :query
 
     get "/schemes/:chat_id", SchemeController, :show
   end

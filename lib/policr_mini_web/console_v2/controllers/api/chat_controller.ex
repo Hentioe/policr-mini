@@ -1,28 +1,45 @@
 defmodule PolicrMiniWeb.ConsoleV2.API.ChatController do
   use PolicrMiniWeb, :controller
 
-  alias PolicrMini.Instances.Chat
+  alias PolicrMini.{Instances, Stats}
   alias PolicrMini.Chats.CustomKit
   alias PolicrMini.Chats.Verification
 
   action_fallback PolicrMiniWeb.ConsoleV2.API.FallbackController
 
-  def index(conn, _params) do
-    # 迭代生成 10 个群组
-    chats =
-      for i <- 1..10 do
-        %Chat{
-          id: i,
-          title: "群组#{i}",
-          username: "my_chat#{i}",
-          description: "群组#{i}的描述",
-          is_take_over: i == 1,
-          left: rem(i, 2) == 0,
-          inserted_at: ~N[2023-10-01 12:00:00]
-        }
+  def index(%{assigns: %{user: user}} = conn, _params) do
+    chats = Instances.find_user_chats(user.id)
+    render(conn, "index.json", chats: chats)
+  end
+
+  @stats_schema %{
+    range: [type: :string, in: ~w(today 7d 28d 90d), default: "7d"]
+  }
+
+  def stats(conn, %{"id" => chat_id} = params) do
+    with {:ok, params} <- Tarams.cast(params, @stats_schema),
+         {:ok, stats} <- Stats.query(range_to_opts(chat_id, params)) do
+      render(conn, "stats.json", %{stats: stats})
+    end
+  end
+
+  defp range_to_opts(chat_id, %{range: range}) do
+    opts =
+      case range do
+        "today" ->
+          [start: "-1d", every: "4h"]
+
+        "7d" ->
+          [start: "-7d", every: "1d"]
+
+        "28d" ->
+          [start: "-28d", every: "4d"]
+
+        "90d" ->
+          [start: "-90d", every: "30d"]
       end
 
-    render(conn, "index.json", chats: chats)
+    Keyword.put(opts, :chat_id, chat_id)
   end
 
   def customs(conn, _params) do

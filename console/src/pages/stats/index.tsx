@@ -1,7 +1,9 @@
+import { destructure } from "@solid-primitives/destructure";
 import { useQuery } from "@tanstack/solid-query";
 import { createSignal, onMount } from "solid-js";
 import { queryStats } from "../../api";
 import { PageBase } from "../../layouts";
+import { globalState } from "../../state";
 import { setCurrentPage } from "../../state/global";
 import { setTitle } from "../../state/meta";
 import AreaChart from "./AreaChart";
@@ -11,11 +13,13 @@ import TotalsView from "./TotalsView";
 const DEFAULT_RANGE = "7d";
 
 export default () => {
+  const { currentChatId } = destructure(globalState);
   const [range, setRange] = createSignal<InputData.StatsRange>(DEFAULT_RANGE);
 
   const query = useQuery(() => ({
-    queryKey: ["stats", range()],
-    queryFn: () => queryStats(range()),
+    queryKey: ["stats", currentChatId(), range()],
+    queryFn: () => queryStats(currentChatId()!, range()),
+    enabled: currentChatId() != null,
   }));
 
   const handleRangeChange = (newRange: InputData.StatsRange) => {

@@ -524,4 +524,8 @@ defmodule PolicrMini.Chats do
     )
     |> Repo.all()
   end
+
+  def add_permission(params) do
+    %Permission{} |> Permission.changeset(params) |> Repo.insert()
+  end
 end
