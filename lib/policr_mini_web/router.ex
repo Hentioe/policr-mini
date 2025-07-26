@@ -28,12 +28,12 @@ defmodule PolicrMiniWeb.Router do
   end
 
   pipeline :console_v2 do
-    # plug PolicrMiniWeb.ConsoleV2.TMAAuth, from: :page
+    plug PolicrMiniWeb.ConsoleV2.TMAAuth, from: :page
   end
 
   pipeline :console_v2_api do
     plug :accepts, ["json"]
-    # plug PolicrMiniWeb.ConsoleV2.TMAAuth, from: :api
+    plug PolicrMiniWeb.ConsoleV2.TMAAuth, from: :api
   end
 
   pipeline :console do
@@ -157,6 +157,7 @@ defmodule PolicrMiniWeb.Router do
   scope "/console/v2", PolicrMiniWeb.ConsoleV2 do
     pipe_through [:browser, :console_v2]
 
+    get "/user_photo", PageController, :user_photo
     get "/*path", PageController, :home
   end
 

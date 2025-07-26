@@ -17,7 +17,6 @@ declare namespace ServerData {
     id: number;
     username: string;
     fullName: string;
-    photoId: string;
   };
 
   type Paginated<T> = {

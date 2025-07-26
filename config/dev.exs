@@ -16,13 +16,16 @@ config :policr_mini, PolicrMini.Repo,
   pool_size: 10,
   migration_timestamps: [type: :utc_datetime]
 
-# 配置 InfluxDB 连接
+# Configure InfluxDB connection
 config :policr_mini, PolicrMini.InfluxConn,
   auth: [method: :token, token: "__token__"],
   bucket: "policr_mini_dev",
   org: "policr_mini",
   host: "localhost",
   version: :v2
+
+# Config fallback TMA user ID
+config :policr_mini, PolicrMiniWeb.ConsoleV2.TMAAuth, fallback_tma_user_id: 111_111_111
 
 # For development, we disable any cache and enable
 # debugging and code reloading.

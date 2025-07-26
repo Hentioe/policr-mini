@@ -1,5 +1,8 @@
+import { retrieveRawInitData } from "@telegram-apps/sdk";
 import axios, { AxiosResponse } from "axios";
 import camelcaseKeys from "camelcase-keys";
+
+type PayloadType<T> = Promise<ApiResponse<T>>;
 
 const BASE_URL = "/console/v2/api";
 
@@ -8,7 +11,26 @@ export const client = axios.create({
   validateStatus: () => true, // 将所有响应状态码视为有效
 });
 
-type PayloadType<T> = Promise<ApiResponse<T>>;
+client.interceptors.request.use((config) => {
+  const authorization = tmaAuthorization();
+  if (authorization) {
+    config.headers.Authorization = authorization;
+  }
+
+  return config;
+});
+
+function tmaAuthorization(): string | undefined {
+  try {
+    return `tma ${retrieveRawInitData()}`;
+  } catch (error) {
+    if (error instanceof Error && error.name === "LaunchParamsRetrieveError") {
+      return undefined;
+    } else {
+      throw error;
+    }
+  }
+}
 
 export async function getServerInfo(): PayloadType<ServerData.ServerInfo> {
   return strictify(await client.get(""));

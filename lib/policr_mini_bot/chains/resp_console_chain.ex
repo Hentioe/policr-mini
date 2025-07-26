@@ -135,7 +135,7 @@ defmodule PolicrMiniBot.RespConsoleChain do
 
   defp _check_user_photo(user, true) do
     with {:ok, %{photos: photos}} <- Telegex.get_user_profile_photos(user.id),
-         {:ok, user} <- UserBusiness.update(user, %{photo_id: user_photo_id(photos)}) do
+         {:ok, user} <- UserBusiness.update(user, %{photo: user_photo_id(photos)}) do
       {:ok, user}
     else
       e ->

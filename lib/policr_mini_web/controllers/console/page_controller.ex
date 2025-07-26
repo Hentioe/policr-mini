@@ -18,10 +18,10 @@ defmodule PolicrMiniWeb.Console.PageController do
   end
 
   def photo(%{assigns: %{user: user}} = conn, _params) do
-    if user.photo_id == nil || user.photo_id == "unset" do
+    if user.photo == nil || user.photo == "unset" do
       Phoenix.Controller.redirect(conn, to: "/images/avatar-100x100.jpg")
     else
-      Phoenix.Controller.redirect(conn, to: TgAssetsFetcher.get_photo(user.photo_id))
+      Phoenix.Controller.redirect(conn, to: TgAssetsFetcher.get_photo(user.photo))
     end
   end
 

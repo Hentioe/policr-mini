@@ -570,7 +570,7 @@ defmodule PolicrMiniBot.Helper do
 
   def sync_user_photo(user) when is_struct(user, PolicrMini.Schema.User) do
     with {:ok, %{photos: photos}} <- Telegex.get_user_profile_photos(user.id),
-         {:ok, user} <- Accounts.update_user(user, %{photo_id: photo_id(photos, 320)}) do
+         {:ok, user} <- Accounts.update_user(user, %{photo: photo_id(photos, 320)}) do
       {:ok, user}
     else
       e ->
@@ -587,7 +587,7 @@ defmodule PolicrMiniBot.Helper do
     end
 
     if size = Enum.find(first_photo_sizes, filter) do
-      size.file_id
+      "id/#{size.file_id}"
     else
       # 没有找到 `size` 尺寸的图片
       nil

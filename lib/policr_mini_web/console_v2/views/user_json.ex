@@ -11,8 +11,7 @@ defmodule PolicrMiniWeb.ConsoleV2.API.UserView do
     %{
       id: user.id,
       username: user.username,
-      full_name: User.full_name(user),
-      photo_id: user.photo_id
+      full_name: User.full_name(user)
     }
   end
 end

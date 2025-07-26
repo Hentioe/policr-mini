@@ -54,6 +54,7 @@ defmodule PolicrMini.MixProject do
       {:credo, "~> 1.7.12", only: [:dev, :test], runtime: false},
       {:benchee, "~> 1.0", only: :dev},
       {:telegex, git: "https://github.com/Hentioe/telegex.git", branch: "v1.6"},
+      {:telegram_miniapp_validation, "~> 0.1.0"},
       {:phoenix, "~> 1.6.16"},
       {:phoenix_ecto, "~> 4.4"},
       {:postgrex, "~> 0.17"},
