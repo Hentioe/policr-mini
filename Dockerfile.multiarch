@@ -1,6 +1,5 @@
-# Use build-base as the build base
-FROM gramoss/mini-build-base:20250628 AS build-base
-ARG TARGETARCH
+# Use the Elixir image as the build base
+FROM hentioe/elixir:1.18.4-otp-28-nojit-alpine AS build-base
 WORKDIR /src
 ENV MIX_ENV=prod
 RUN set -xe \
@@ -8,9 +7,9 @@ RUN set -xe \
     # Avoid QEMU/arm64 build failed. \
     export ERL_FLAGS="+JMsingle true"; \
     fi \
-    && xbps-install -Sy git
+    && apk add --no-cache git
 
-# Compile the backend code
+# Compile the Elixir code
 FROM build-base AS compile
 COPY . /src/
 RUN set -xe \
@@ -39,10 +38,15 @@ RUN set -xe \
     && mix phx.digest \
     && mix release
 
-# Use the run base image to package
-FROM gramoss/mini-run-base:20250628
+# Use the Alpine base image for the final package
+FROM alpine:3.22
 ARG APP_HOME=/home/policr_mini
+ENV LANG=C.UTF-8 \
+    PATH="$APP_HOME/bin:$PATH"
 WORKDIR $APP_HOME
 COPY --from=release /src/_build/prod/rel/policr_mini $APP_HOME
-ENV PATH="$APP_HOME/bin:$PATH"
+RUN set -xe \
+    && apk add --no-cache --virtual .policr_mini-rundeps \
+    ncurses \
+    libstdc++
 ENTRYPOINT [ "policr_mini", "start" ]

@@ -1,8 +1,7 @@
 /_build/
 /deps/
-/assets/node_modules/
-/webapps/node_modules/
+/admin/node_modules/
+/console/node_modules/
 /priv/static/
-/priv/native/
 /rust-toolchain
 /.mise.toml
