@@ -5,7 +5,7 @@ defmodule PolicrMini.Chats do
 
   import Ecto.Query, only: [from: 2, dynamic: 2]
 
-  alias Ecto.Changeset
+  alias Ecto.{Changeset, Queryable}
   alias PolicrMini.Repo
   alias PolicrMini.Chats.{Scheme, Operation, CustomKit, Verification}
   alias PolicrMini.Chats.CustomKit
@@ -191,6 +191,7 @@ defmodule PolicrMini.Chats do
   - `order_by`: 排序方式。默认值为 `[desc: :inserted_at]`。
   - `preload`: 预加载的引用数据。
   """
+  @deprecated "Use list_operations/1 instead"
   @spec find_operations(find_operations_cont) :: [Operation.t()]
   def find_operations(cont \\ []) do
     filter_chat_id =
@@ -222,6 +223,46 @@ defmodule PolicrMini.Chats do
     )
     |> Repo.all()
     |> Repo.preload(preload)
+  end
+
+  @type list_operations :: [
+          chat_id: integer() | binary(),
+          stop: DateTime.t(),
+          limit: integer(),
+          offset: integer()
+        ]
+  @doc """
+  列出指定条件的操作记录。
+
+  ## 可选项
+    - `chat_id`: 群组的 ID。
+    - `stop`: 结束时间，类型为 `DateTime.t()`。
+    - `limit`: 数量限制，默认值为 `25`。
+    - `offset`: 偏移量，默认值为 `0`。
+  """
+  def list_operations(conds \\ []) do
+    chat_id_cond =
+      if chat_id = Keyword.get(conds, :chat_id) do
+        dynamic([o], o.chat_id == ^chat_id)
+      else
+        true
+      end
+
+    stop_cond =
+      if stop = Keyword.get(conds, :stop) do
+        dynamic([o], o.inserted_at >= ^stop)
+      else
+        true
+      end
+
+    from(o in Operation,
+      preload: [:verification],
+      where: ^chat_id_cond,
+      where: ^stop_cond,
+      limit: ^Keyword.get(conds, :limit, 25),
+      offset: ^Keyword.get(conds, :offset, 0)
+    )
+    |> Repo.all()
   end
 
   # TODO: 添加测试
@@ -465,6 +506,7 @@ defmodule PolicrMini.Chats do
   - `offset`: 偏移量。默认值为 `0`。
   - `order_by`: 排序方式，默认值为 `[desc: :inserted_at]`。
   """
+  @deprecated "Use list_verifications/1 instead"
   @spec find_verifications(find_verifications_cont) :: [Verification.t()]
   def find_verifications(cont \\ []) do
     filter_chat_id =
@@ -499,6 +541,62 @@ defmodule PolicrMini.Chats do
       order_by: ^order_by
     )
     |> Repo.all()
+  end
+
+  @type list_verifications_conds :: [
+          chat_id: integer() | binary(),
+          stop: DateTime.t(),
+          limit: integer(),
+          offset: integer()
+        ]
+  @doc """
+  列出指定条件的验证记录。
+
+  ## 可选项
+    - `chat_id`: 群组的 ID。
+    - `stop`: 结束时间，类型为 `DateTime.t()`。
+    - `limit`: 数量限制，默认值为 `25`。
+    - `offset`: 偏移量，默认值为 `0`。
+  """
+  @spec list_verifications(list_verifications_conds()) :: [Verification.t()]
+  def list_verifications(conds \\ []) do
+    chat_id_cond =
+      if chat_id = Keyword.get(conds, :chat_id) do
+        dynamic([v], v.chat_id == ^chat_id)
+      else
+        true
+      end
+
+    stop_cond =
+      if stop = Keyword.get(conds, :stop) do
+        dynamic([v], v.inserted_at >= ^stop)
+      else
+        true
+      end
+
+    from(v in Verification,
+      where: ^chat_id_cond,
+      where: ^stop_cond,
+      limit: ^Keyword.get(conds, :limit, 25),
+      offset: ^Keyword.get(conds, :offset, 0)
+    )
+    |> Repo.all()
+  end
+
+  @spec count_verifications(query :: Queryable.t()) :: integer()
+  def count_verifications(query \\ nil) do
+    query =
+      if query do
+        from(c in Verification, where: ^query, select: count(c.id))
+      else
+        from(c in "pg_stat_user_tables",
+          where: c.relname == "verifications",
+          # 插入的行数 - 删除的行数
+          select: fragment("N_TUP_INS - N_TUP_DEL AS COUNT")
+        )
+      end
+
+    Repo.one(query)
   end
 
   @doc """

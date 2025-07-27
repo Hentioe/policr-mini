@@ -22,6 +22,9 @@ defmodule PolicrMini.Chats.Operation do
     timestamps()
   end
 
+  def required_fields, do: @required_fields
+  def optional_fields, do: @optional_fields
+
   def changeset(%__MODULE__{} = operation, attrs) when is_map(attrs) do
     operation
     |> cast(attrs, @required_fields ++ @optional_fields)

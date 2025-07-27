@@ -10,8 +10,8 @@ type Verification = ServerData.Verification;
 export default (props: { chatId: number | null; range: string }) => {
   const query = useQuery(() => ({
     queryKey: ["verifications", props.chatId, props.range],
-    queryFn: () => getVerifications(props.chatId!),
-    enabled: !!props.chatId,
+    queryFn: () => getVerifications(props.chatId!, props.range),
+    enabled: props.chatId != null,
   }));
 
   const BanOrUnbanButton = (props: { v: Verification }) => {

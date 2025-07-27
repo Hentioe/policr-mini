@@ -1,11 +1,13 @@
 alias PolicrMini.Repo
 alias PolicrMini.{Accounts, Uses, Chats}
-alias PolicrMini.Seeds.Support.{FakeChatGenerator, FakeCustomGenerator}
+alias PolicrMini.Seeds.Support.{FakeChatGenerator, FakeCustomGenerator, FakeVerificationGenerator}
 
 # 在生成前清空数据
 Repo.delete_all(PolicrMini.Schema.Permission)
 Repo.delete_all(PolicrMini.Schema.User)
 Repo.delete_all(PolicrMini.Chats.CustomKit)
+Repo.delete_all(PolicrMini.Chats.Operation)
+Repo.delete_all(PolicrMini.Chats.Verification)
 Repo.delete_all(PolicrMini.Instances.Chat)
 
 # 创建基础用户
@@ -32,4 +34,5 @@ for i <- 1..10 do
     })
 
   FakeCustomGenerator.generate_all(chat.id)
+  FakeVerificationGenerator.generate_all_with_operations(chat.id, user, 3600 * 24 * 30)
 end

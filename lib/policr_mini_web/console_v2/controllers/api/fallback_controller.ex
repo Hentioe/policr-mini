@@ -19,6 +19,12 @@ defmodule PolicrMiniWeb.ConsoleV2.API.FallbackController do
     |> render("error.json", %{message: "无效的范围参数"})
   end
 
+  def call(conn, {:error, %{limit: [<<"must be less than or equal to " <> limit>>]}}) do
+    conn
+    |> put_view(PolicrMiniWeb.ConsoleV2.API.ErrorView)
+    |> render("error.json", %{message: "页面大小不可超过 #{limit}"})
+  end
+
   def call(conn, {:error, :not_found}) do
     conn
     |> put_view(PolicrMiniWeb.ConsoleV2.API.ErrorView)

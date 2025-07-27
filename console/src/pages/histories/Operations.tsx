@@ -9,8 +9,8 @@ type Operation = ServerData.Operation;
 export default (props: { chatId: number | null; range: string }) => {
   const query = useQuery(() => ({
     queryKey: ["operations", props.chatId, props.range],
-    queryFn: () => getOperations(props.chatId!),
-    enabled: !!props.chatId,
+    queryFn: () => getOperations(props.chatId!, props.range),
+    enabled: props.chatId != null,
   }));
 
   return (

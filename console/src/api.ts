@@ -89,12 +89,12 @@ export async function updateCustom(id: number, custom: InputData.Custom) {
   );
 }
 
-export async function getVerifications(chatId: number): PayloadType<ServerData.Verification[]> {
-  return strictify(await client.get(`/chats/${chatId}/verifications`));
+export async function getVerifications(chatId: number, range: string): PayloadType<ServerData.Verification[]> {
+  return strictify(await client.get(`/chats/${chatId}/verifications?range=${range}`));
 }
 
-export async function getOperations(chatId: number): PayloadType<ServerData.Operation[]> {
-  return strictify(await client.get(`/chats/${chatId}/operations`));
+export async function getOperations(chatId: number, range: string): PayloadType<ServerData.Operation[]> {
+  return strictify(await client.get(`/chats/${chatId}/operations?range=${range}`));
 }
 
 export async function updateScheme(id: number, scheme: InputData.Scheme): PayloadType<ServerData.Scheme> {

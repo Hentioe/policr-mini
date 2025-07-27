@@ -2,7 +2,6 @@ defmodule PolicrMiniWeb.ConsoleV2.API.ChatController do
   use PolicrMiniWeb, :controller
 
   alias PolicrMini.{Chats, Instances, Stats}
-  alias PolicrMini.Chats.Verification
 
   action_fallback PolicrMiniWeb.ConsoleV2.API.FallbackController
 
@@ -17,12 +16,12 @@ defmodule PolicrMiniWeb.ConsoleV2.API.ChatController do
 
   def stats(conn, %{"id" => chat_id} = params) do
     with {:ok, params} <- Tarams.cast(params, @stats_schema),
-         {:ok, stats} <- Stats.query(range_to_opts(chat_id, params)) do
+         {:ok, stats} <- Stats.query(stats_conds(chat_id, params)) do
       render(conn, "stats.json", stats: stats)
     end
   end
 
-  defp range_to_opts(chat_id, %{range: range}) do
+  defp stats_conds(chat_id, %{range: range}) do
     opts =
       case range do
         "today" ->
@@ -58,47 +57,75 @@ defmodule PolicrMiniWeb.ConsoleV2.API.ChatController do
     render(conn, "customs.json", customs: customs)
   end
 
-  defp random_verification(index) do
-    %Verification{
-      id: index,
-      target_user_id: index,
-      seconds: Enum.random(30..120),
-      status:
-        Enum.random([
-          :waiting,
-          :passed,
-          :timeout,
-          :wronged,
-          :expired,
-          :manual_kick,
-          :manual_ban
-        ]),
-      source: Enum.random([:joined, :join_request]),
-      target_user_name: "用户#{index}",
-      inserted_at: ~N[2023-10-01 12:00:00],
-      updated_at: ~N[2023-10-01 12:00:00]
-    }
+  @verifications_schema %{
+    offset: [type: :integer, default: 0],
+    limit: [type: :integer, default: 120, number: [max: 120]],
+    range: [type: :string, in: ~w(today 7d 30d), default: "7d"]
+  }
+
+  def verifications(conn, %{"id" => chat_id} = params) do
+    with {:ok, params} <- Tarams.cast(params, @verifications_schema) do
+      verifications = Chats.list_verifications(verifications_conds(chat_id, params))
+      render(conn, "verifications.json", verifications: verifications)
+    end
   end
 
-  def verifications(conn, _params) do
-    verifications = Enum.map(1..15, &random_verification/1)
+  defp verifications_conds(chat_id, %{range: range} = params) do
+    now = DateTime.utc_now()
 
-    render(conn, "verifications.json", verifications: verifications)
+    stop =
+      case range do
+        "today" ->
+          DateTime.add(now, -1, :day)
+
+        "7d" ->
+          DateTime.add(now, -7, :day)
+
+        "30d" ->
+          DateTime.add(now, -30, :day)
+      end
+
+    [
+      chat_id: chat_id,
+      stop: stop,
+      limit: params[:limit],
+      offset: params[:offset]
+    ]
   end
 
-  def operations(conn, _params) do
-    operations =
-      Enum.map(1..15, fn i ->
-        %PolicrMini.Chats.Operation{
-          id: i,
-          action: Enum.random([:ban, :kick, :unban, :verify]),
-          role: Enum.random([:system, :admin]),
-          verification: random_verification(i),
-          inserted_at: ~N[2023-10-01 12:00:00],
-          updated_at: ~N[2023-10-01 12:00:00]
-        }
-      end)
+  @operations_schema %{
+    offset: [type: :integer, default: 0],
+    limit: [type: :integer, default: 120, number: [max: 120]],
+    range: [type: :string, in: ~w(today 7d 30d), default: "7d"]
+  }
 
-    render(conn, "operations.json", operations: operations)
+  def operations(conn, %{"id" => chat_id} = params) do
+    with {:ok, params} <- Tarams.cast(params, @operations_schema) do
+      operations = Chats.list_operations(operations_conds(chat_id, params))
+      render(conn, "operations.json", operations: operations)
+    end
+  end
+
+  defp operations_conds(chat_id, %{range: range} = params) do
+    now = DateTime.utc_now()
+
+    stop =
+      case range do
+        "today" ->
+          DateTime.add(now, -1, :day)
+
+        "7d" ->
+          DateTime.add(now, -7, :day)
+
+        "30d" ->
+          DateTime.add(now, -30, :day)
+      end
+
+    [
+      chat_id: chat_id,
+      stop: stop,
+      limit: params[:limit],
+      offset: params[:offset]
+    ]
   end
 end
