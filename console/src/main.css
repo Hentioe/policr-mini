@@ -38,12 +38,12 @@ body {
 
 #overlay {
   &.close {
-    @apply opacity-0;
+    @apply opacity-0 backdrop-blur-none;
     z-index: -1;
   }
 
   &.open {
-    @apply opacity-100;
+    @apply opacity-100 backdrop-blur-sm;
     z-index: 999;
   }
 }
