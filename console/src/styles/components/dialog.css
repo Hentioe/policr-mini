@@ -37,16 +37,17 @@
 
 [data-scope="dialog"][data-part="content"] {
   background-color: white;
-  border-radius: 6px;
+  border-radius: theme(--radius-lg);
   box-shadow:
     rgb(14 18 22 / 35%) 0px 10px 38px -10px,
     rgb(14 18 22 / 20%) 0px 10px 20px -15px;
   width: 100%;
-  max-width: 450px;
-  max-height: 85vh;
+  max-height: 55vh;
   padding: theme(--spacing-edge);
   position: relative;
   outline: none;
+  /* 超出最大高度时，滚动 */
+  overflow-y: auto;
 }
 
 [data-scope="dialog"][data-part="content"][data-state="open"] {
