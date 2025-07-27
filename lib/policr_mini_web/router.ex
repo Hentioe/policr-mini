@@ -188,6 +188,7 @@ defmodule PolicrMiniWeb.Router do
     # get "/own_photo", PageController, :own_photo
     # 此 API 是否存在依赖未知
     # get "/uploaded/:name", PageController, :uploaded
+    get "/", PageController, :index
   end
 
   # Enables the Swoosh mailbox preview in development.
