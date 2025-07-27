@@ -59,7 +59,7 @@ if config_env() == :prod do
   # to check this value into version control, so we use an environment
   # variable instead.
   secret_key_base =
-    System.get_env("POLICR_MINI_SERVER_SECRET_KEY_BASE") ||
+    System.get_env("POLICR_MINI_WEB_SECRET_KEY_BASE") ||
       raise """
       environment variable SECRET_KEY_BASE is missing.
       You can generate one by calling: mix phx.gen.secret
@@ -72,7 +72,7 @@ if config_env() == :prod do
       # See the documentation on https://hexdocs.pm/plug_cowboy/Plug.Cowboy.html
       # for details about using IPv6 vs IPv4 and loopback vs public addresses.
       ip: {0, 0, 0, 0, 0, 0, 0, 0},
-      port: String.to_integer(System.get_env("POLICR_MINI_SERVER_PORT") || "4000")
+      port: String.to_integer(System.get_env("POLICR_MINI_WEB_PORT") || "4000")
     ],
     secret_key_base: secret_key_base
 
@@ -131,8 +131,6 @@ if config_env() == :prod do
           environment variable `POLICR_MINI_BOT_OWNER_ID` is missing.
           """)
       ),
-    # 机器人名称（用于显示）
-    name: System.get_env("POLICR_MINI_BOT_NAME"),
     # 解封方法
     unban_method: unban_method
 
@@ -147,9 +145,9 @@ if config_env() == :prod do
   # 配置根链接
   config :policr_mini, PolicrMiniWeb,
     root_url:
-      System.get_env("POLICR_MINI_SERVER_ROOT_URL") ||
+      System.get_env("POLICR_MINI_WEB_URL_BASE") ||
         raise("""
-        environment variable `POLICR_MINI_SERVER_ROOT_URL` is missing.
+        environment variable `POLICR_MINI_WEB_URL_BASE` is missing.
         """)
 
   # 配置 Capinde

@@ -1,0 +1,80 @@
+services:
+  db:
+    image: postgres:16
+    environment:
+      POSTGRES_PASSWORD: ${POLICR_MINI_DATABASE_PASSWORD}
+      POSTGRES_DB: policr_mini_prod
+    volumes:
+      - ./_data:/var/lib/postgresql/data
+      - ./dumps:/dumps
+    restart: always
+
+  tsdb:
+    image: influxdb:2.7
+    environment:
+      DOCKER_INFLUXDB_INIT_MODE: setup
+      DOCKER_INFLUXDB_INIT_USERNAME: admin
+      DOCKER_INFLUXDB_INIT_PASSWORD: ${POLICR_MINI_INFLUX_PASSWORD}
+      DOCKER_INFLUXDB_INIT_ORG: policr_mini
+      DOCKER_INFLUXDB_INIT_BUCKET: policr_mini_prod
+      DOCKER_INFLUXDB_INIT_ADMIN_TOKEN: ${POLICR_MINI_INFLUX_TOKEN}
+    restart: always
+
+  bot-api:
+    image: gramoss/telegram-bot-api:7.5
+    environment:
+      TELEGRAM_API_ID: ${TELEGRAM_API_ID}
+      TELEGRAM_API_HASH: ${TELEGRAM_API_HASH}
+      TELEGRAM_LOCAL_MODE: true
+    restart: always
+
+  capinde:
+    image: hentioe/capinde:0.1.1
+    ports:
+      - 8080:8080
+    environment:
+      CAPINDE_HOST: 0.0.0.0
+      CAPINDE_WORKING_MODE: localized
+    volumes:
+      - ./shared_assets:/home/capinde/namespace/out
+      - ./albums:/home/capinde/albums
+    healthcheck:
+      test: ["CMD", "capinde", "--healthcheck"]
+      start_period: 3s
+      interval: 60s
+      timeout: 1s
+      retries: 3
+
+  server:
+    image: gramoss/policr-mini:nightly
+    ports:
+      - ${POLICR_MINI_WEB_PORT}:${POLICR_MINI_WEB_PORT}
+    environment:
+      POLICR_MINI_DATABASE_URL: "ecto://postgres:${POLICR_MINI_DATABASE_PASSWORD}@db/policr_mini_prod"
+      POLICR_MINI_DATABASE_POOL_SIZE: ${POLICR_MINI_DATABASE_POOL_SIZE}
+      POLICR_MINI_INFLUX_TOKEN: ${POLICR_MINI_INFLUX_TOKEN}
+      POLICR_MINI_INFLUX_HOST: tsdb
+      POLICR_MINI_WEB_PORT: ${POLICR_MINI_WEB_PORT}
+      POLICR_MINI_WEB_SECRET_KEY_BASE: ${POLICR_MINI_WEB_SECRET_KEY_BASE}
+      POLICR_MINI_WEB_URL_BASE: ${POLICR_MINI_WEB_URL_BASE}
+      POLICR_MINI_BOT_TOKEN: ${POLICR_MINI_BOT_TOKEN}
+      POLICR_MINI_BOT_OWNER_ID: ${POLICR_MINI_BOT_OWNER_ID}
+      POLICR_MINI_BOT_WORK_MODE: ${POLICR_MINI_BOT_WORK_MODE}
+      POLICR_MINI_BOT_API_BASE_URL: ${POLICR_MINI_BOT_API_BASE_URL}
+      POLICR_MINI_BOT_WEBHOOK_URL: ${POLICR_MINI_BOT_WEBHOOK_URL}
+      POLICR_MINI_BOT_WEBHOOK_SERVER_PORT: ${POLICR_MINI_BOT_WEBHOOK_SERVER_PORT}
+      POLICR_MINI_BOT_AUTO_GEN_COMMANDS: ${POLICR_MINI_BOT_AUTO_GEN_COMMANDS}
+      POLICR_MINI_UNBAN_METHOD: ${POLICR_MINI_UNBAN_METHOD}
+      POLICR_MINI_OPTS: ${POLICR_MINI_OPTS}
+    volumes:
+      - ./_assets:/_assets
+    restart: always
+    depends_on:
+      capinde:
+        condition: service_healthy
+      db:
+        condition: service_started
+      bot-api:
+        condition: service_started
+      tsdb:
+        condition: service_started

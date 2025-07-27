@@ -28,7 +28,7 @@ services:
       TELEGRAM_LOCAL_MODE: true
 
   capinde:
-    image: ${POLICR_MINI_CAPINDE_IMAGE:-hentioe/capinde:0.1.0}
+    image: ${POLICR_MINI_CAPINDE_IMAGE:-hentioe/capinde:0.1.1}
     ports:
       - 8080:8080
     environment:
