@@ -49,17 +49,17 @@ config :policr_mini, PolicrMiniWeb.Endpoint,
       "run",
       "watch",
       cd: Path.expand("../console", __DIR__)
-    ],
-    pnpm: [
-      "run",
-      "watch",
-      cd: Path.expand("../assets", __DIR__)
-    ],
-    pnpm: [
-      "run",
-      "watch",
-      cd: Path.expand("../webapps", __DIR__)
     ]
+    # pnpm: [
+    #   "run",
+    #   "watch",
+    #   cd: Path.expand("../assets", __DIR__)
+    # ],
+    # pnpm: [
+    #   "run",
+    #   "watch",
+    #   cd: Path.expand("../webapps", __DIR__)
+    # ]
   ]
 
 # ## SSL Support

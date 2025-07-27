@@ -23,10 +23,14 @@ WORKDIR /src
 COPY --from=compile /src/ /src/
 RUN set -xe \
     && npm install --location=global pnpm@10 \
-    && pnpm --prefix assets install \
-    && pnpm --prefix assets run deploy \
-    && pnpm --prefix webapps install \
-    && pnpm --prefix webapps build
+    # && pnpm --prefix assets install \
+    # && pnpm --prefix assets run deploy \
+    # && pnpm --prefix webapps install \
+    # && pnpm --prefix webapps build \
+    && pnpm --prefix admin install \
+    && pnpm --prefix admin run build \
+    && pnpm --prefix console install \
+    && pnpm --prefix console run build
 
 # Release the application
 FROM compile AS release

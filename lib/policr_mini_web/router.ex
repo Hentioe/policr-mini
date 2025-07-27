@@ -13,10 +13,10 @@ defmodule PolicrMiniWeb.Router do
     plug :accepts, ["json"]
   end
 
-  pipeline :admin do
-    plug PolicrMiniWeb.TokenAuthentication, from: :admin
-    plug :put_layout, {PolicrMiniWeb.LayoutView, :admin}
-  end
+  # pipeline :admin do
+  #   plug PolicrMiniWeb.TokenAuthentication, from: :admin
+  #   plug :put_layout, {PolicrMiniWeb.LayoutView, :admin}
+  # end
 
   pipeline :admin_v2 do
     plug PolicrMiniWeb.AdminV2.TokenAuth, from: :page
@@ -36,39 +36,40 @@ defmodule PolicrMiniWeb.Router do
     plug PolicrMiniWeb.ConsoleV2.TMAAuth, from: :api
   end
 
-  pipeline :console do
-    plug PolicrMiniWeb.TokenAuthentication, from: :console
-    plug :put_layout, {PolicrMiniWeb.LayoutView, :console}
-  end
+  # pipeline :console do
+  #   plug PolicrMiniWeb.TokenAuthentication, from: :console
+  #   plug :put_layout, {PolicrMiniWeb.LayoutView, :console}
+  # end
 
-  pipeline :console_api do
-    plug :accepts, ["json"]
-    plug PolicrMiniWeb.TokenAuthentication, from: :console_api
-  end
+  # pipeline :console_api do
+  #   plug :accepts, ["json"]
+  #   plug PolicrMiniWeb.TokenAuthentication, from: :console_api
+  # end
 
-  pipeline :admin_api do
-    plug :accepts, ["json"]
-    plug PolicrMiniWeb.TokenAuthentication, from: :admin_api
-  end
+  # pipeline :admin_api do
+  #   plug :accepts, ["json"]
+  #   plug PolicrMiniWeb.TokenAuthentication, from: :admin_api
+  # end
 
-  scope "/api", PolicrMiniWeb.API do
-    pipe_through :api
+  # scope "/api", PolicrMiniWeb.API do
+  #   pipe_through :api
 
-    get "/index", IndexController, :index
-    get "/terms", TermController, :index
-  end
+  #   get "/index", IndexController, :index
+  #   get "/terms", TermController, :index
+  # end
 
   scope "/api/v1", PolicrMiniWeb.API.V1 do
+    # 此系列 API 被官网（外部）依赖
     pipe_through :api
 
     get "/totals", IndexController, :totals
   end
 
-  scope "/console/api", PolicrMiniWeb.Console.API do
-    pipe_through [:console_api]
+  # scope "/console/api", PolicrMiniWeb.Console.API do
+  #   pipe_through [:console_api]
 
-    get "/:chat_id/stats", StatsController, :query
-  end
+  #   get "/:chat_id/stats", StatsController, :query
+  # end
 
   scope "/admin/v2/api", PolicrMiniWeb.AdminV2.API do
     pipe_through [:admin_v2_api]
@@ -101,37 +102,37 @@ defmodule PolicrMiniWeb.Router do
     get "/stats/query", StatsController, :query
   end
 
-  scope "/admin/api", PolicrMiniWeb.Admin.API do
-    pipe_through [:admin_api]
+  # scope "/admin/api", PolicrMiniWeb.Admin.API do
+  #   pipe_through [:admin_api]
 
-    get "/chats", ChatController, :index
-    get "/chats/:id/photo", ChatController, :photo
-    get "/chats/:id/customs", ChatController, :customs
-    get "/chats/:id/scheme", ChatController, :scheme
-    put "/chats/:id/leave", ChatController, :leave
-    put "/chats/:id/sync", ChatController, :sync
-    put "/chats/:chat_id/scheme", ChatController, :update_scheme
-    put "/chats/:chat_id/takeover", ChatController, :change_takeover
-    get "/chats/:chat_id/permissions", ChatController, :permissions
-    get "/chats/:chat_id/verifications", ChatController, :verifications
-    get "/chats/:chat_id/operations", ChatController, :operations
-    get "/chats/list", ChatController, :list
-    get "/chats/search", ChatController, :search
+  #   get "/chats", ChatController, :index
+  #   get "/chats/:id/photo", ChatController, :photo
+  #   get "/chats/:id/customs", ChatController, :customs
+  #   get "/chats/:id/scheme", ChatController, :scheme
+  #   put "/chats/:id/leave", ChatController, :leave
+  #   put "/chats/:id/sync", ChatController, :sync
+  #   put "/chats/:chat_id/scheme", ChatController, :update_scheme
+  #   put "/chats/:chat_id/takeover", ChatController, :change_takeover
+  #   get "/chats/:chat_id/permissions", ChatController, :permissions
+  #   get "/chats/:chat_id/verifications", ChatController, :verifications
+  #   get "/chats/:chat_id/operations", ChatController, :operations
+  #   get "/chats/list", ChatController, :list
+  #   get "/chats/search", ChatController, :search
 
-    post "/customs", CustomKitController, :add
-    put "/customs/:id", CustomKitController, :update
-    delete "/customs/:id", CustomKitController, :delete
+  #   post "/customs", CustomKitController, :add
+  #   put "/customs/:id", CustomKitController, :update
+  #   delete "/customs/:id", CustomKitController, :delete
 
-    put "/permissions/:id/readable", PermissionController, :change_readable
-    put "/permissions/:id/writable", PermissionController, :change_writable
-    put "/permissions/:id/customized", PermissionController, :change_customized
-    delete "/permissions/:id/withdraw", PermissionController, :withdraw
-    put "/permissions/chats/:chat_id/sync", PermissionController, :sync
+  #   put "/permissions/:id/readable", PermissionController, :change_readable
+  #   put "/permissions/:id/writable", PermissionController, :change_writable
+  #   put "/permissions/:id/customized", PermissionController, :change_customized
+  #   delete "/permissions/:id/withdraw", PermissionController, :withdraw
+  #   put "/permissions/chats/:chat_id/sync", PermissionController, :sync
 
-    put "/verifications/:id/kill", VerificationController, :kill
+  #   put "/verifications/:id/kill", VerificationController, :kill
 
-    get "/profile", ProfileController, :index
-  end
+  #   get "/profile", ProfileController, :index
+  # end
 
   scope "/admin/v2", PolicrMiniWeb.AdminV2 do
     pipe_through [:browser, :admin_v2]
@@ -165,28 +166,28 @@ defmodule PolicrMiniWeb.Router do
     get "/*path", PageController, :home
   end
 
-  scope "/admin", PolicrMiniWeb.Admin do
-    pipe_through [:browser, :admin]
+  # scope "/admin", PolicrMiniWeb.Admin do
+  #   pipe_through [:browser, :admin]
 
-    get "/logout", PageController, :logout
-    get "/*path", PageController, :index
-  end
+  #   get "/logout", PageController, :logout
+  #   get "/*path", PageController, :index
+  # end
 
-  scope "/console", PolicrMiniWeb.Console do
-    pipe_through [:browser, :console]
+  # scope "/console", PolicrMiniWeb.Console do
+  #   pipe_through [:browser, :console]
 
-    get "/photo", PageController, :photo
-    get "/logout", PageController, :logout
-    get "/*path", PageController, :index
-  end
+  #   get "/photo", PageController, :photo
+  #   get "/logout", PageController, :logout
+  #   get "/*path", PageController, :index
+  # end
 
   scope "/", PolicrMiniWeb do
     pipe_through :browser
 
     # 此 API 被 admin 依赖
-    get "/own_photo", PageController, :own_photo
+    # get "/own_photo", PageController, :own_photo
     # 此 API 是否存在依赖未知
-    get "/uploaded/:name", PageController, :uploaded
+    # get "/uploaded/:name", PageController, :uploaded
   end
 
   # Enables the Swoosh mailbox preview in development.

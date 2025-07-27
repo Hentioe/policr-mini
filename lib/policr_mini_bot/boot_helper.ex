@@ -65,11 +65,15 @@ defmodule PolicrMiniBot.BootHelper do
       },
       %BotCommand{
         command: "login",
-        description: "登入后台"
+        description: "登入后台（已弃用）"
       },
       %BotCommand{
         command: "console",
-        description: "进入控制台"
+        description: "进入控制台（已弃用）"
+      },
+      %BotCommand{
+        command: "admin_v2",
+        description: "新版后台（仅供拥有者）"
       }
     ]
 
