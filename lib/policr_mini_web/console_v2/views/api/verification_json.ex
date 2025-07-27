@@ -1,13 +1,6 @@
 defmodule PolicrMiniWeb.ConsoleV2.API.VerificationView do
-  use PolicrMiniWeb, :console_v2_view
-
-  def render("index.json", %{verifications: verifications}) do
-    %{data: render_many(verifications, __MODULE__, "verification.json")}
-  end
-
-  def render("show.json", %{verification: verification}) do
-    %{data: render_one(verification, __MODULE__, "verification.json")}
-  end
+  use PolicrMiniWeb, :view
+  use PolicrMiniWeb.ConsoleV2.Helpers, :view
 
   def render("verification.json", %{verification: verification}) do
     %{

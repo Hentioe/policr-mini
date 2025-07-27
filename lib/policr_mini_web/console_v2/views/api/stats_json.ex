@@ -1,5 +1,6 @@
 defmodule PolicrMiniWeb.ConsoleV2.API.StatsView do
-  use PolicrMiniWeb, :console_v2_view
+  use PolicrMiniWeb, :view
+  use PolicrMiniWeb.ConsoleV2.Helpers, :view
 
   alias PolicrMini.Stats.{QueryResult, MinimizedPoint}
 

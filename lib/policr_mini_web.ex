@@ -50,14 +50,6 @@ defmodule PolicrMiniWeb do
     end
   end
 
-  def console_v2_view do
-    quote do
-      use PolicrMiniWeb, :view
-
-      import PolicrMiniWeb.ConsoleV2.ViewHelper
-    end
-  end
-
   def live_view do
     quote do
       use Phoenix.LiveView,
