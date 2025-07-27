@@ -22,7 +22,7 @@ const Badge = (props: { type: BadgeType; text: string }) => {
   );
 };
 
-const Root = (props: { user: string; badge: JSX.Element; time: string; bottoms: JSX.Element[] }) => {
+const Root = (props: { user: string; badge: JSX.Element; children: JSX.Element; bottoms: JSX.Element[] }) => {
   return (
     <div class="py-[0.85rem] border-b border-zinc-200 flex flex-col gap-[0.5rem]">
       {/* 用户名/徽章 */}
@@ -33,11 +33,8 @@ const Root = (props: { user: string; badge: JSX.Element; time: string; bottoms: 
         </p>
         {props.badge}
       </div>
-      {/* 时间等细节 */}
-      <div class="text-zinc-500 text-sm flex items-center">
-        <Icon icon="mdi:clock-outline" class="text-[1rem] w-[1rem] mr-[0.25rem]" />
-        {props.time}
-      </div>
+      {/* 细节内容 */}
+      {props.children}
       {/* 按钮或徽章列表 */}
       <Show when={props.bottoms.length > 0}>
         <div class="flex gap-[1rem]">
@@ -50,7 +47,26 @@ const Root = (props: { user: string; badge: JSX.Element; time: string; bottoms: 
   );
 };
 
+const Details = (props: { children: JSX.Element }) => {
+  return (
+    <div class="text-zinc-500 text-sm flex items-center gap-[0.5rem]">
+      {props.children}
+    </div>
+  );
+};
+
+const Detail = (props: { text: string; icon: string }) => {
+  return (
+    <p class="flex items-center gap-[0.25rem]">
+      <Icon icon={props.icon} />
+      {props.text}
+    </p>
+  );
+};
+
 export const Record = {
   Root,
   Badge,
+  Details,
+  Detail,
 };

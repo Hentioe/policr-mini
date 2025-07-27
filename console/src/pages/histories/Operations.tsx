@@ -21,9 +21,15 @@ export default (props: { chatId: number | null; range: string }) => {
             <Record.Root
               user={ope.verification.userFullName}
               badge={renderActionBadge(ope)}
-              time={format(ope.insertedAt, "yyyy-MM-dd HH:mm:ss")}
               bottoms={[renderRoleBadge(ope)]}
-            />
+            >
+              <Record.Details>
+                <Record.Detail
+                  text={format(ope.insertedAt, "yyyy-MM-dd HH:mm:ss")}
+                  icon="material-symbols:date-range-outline-sharp"
+                />
+              </Record.Details>
+            </Record.Root>
           )}
         </For>
       </Show>

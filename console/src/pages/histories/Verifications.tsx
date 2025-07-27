@@ -54,9 +54,16 @@ export default (props: { chatId: number | null; range: string }) => {
             <Record.Root
               user={v.userFullName}
               badge={renderBadge(v)}
-              time={format(v.insertedAt, "yyyy-MM-dd HH:mm:ss")}
               bottoms={[<BanOrUnbanButton v={v} />, <ReVerificationButton v={v} />]}
-            />
+            >
+              <Record.Details>
+                <Record.Detail
+                  text={format(v.insertedAt, "yyyy-MM-dd HH:mm:ss")}
+                  icon="material-symbols:date-range-outline-sharp"
+                />
+                <Record.Detail text={`${v.durationSecs}s`} icon="mingcute:time-duration-line" />
+              </Record.Details>
+            </Record.Root>
           )}
         </For>
       </Show>
