@@ -39,9 +39,14 @@ if config_env() == :prod do
 
   maybe_ipv6 = if System.get_env("ECTO_IPV6"), do: [:inet6], else: []
 
+  pool_size =
+    if size = System.get_env("POLICR_MINI_DATABASE_POOL_SIZE") do
+      size != "" && String.to_integer(size)
+    end
+
   config :policr_mini, PolicrMini.Repo,
     url: database_url,
-    pool_size: String.to_integer(System.get_env("POLICR_MINI_DATABASE_POOL_SIZE") || "10"),
+    pool_size: pool_size || 10,
     migration_timestamps: [type: :utc_datetime],
     socket_options: maybe_ipv6
 
@@ -101,7 +106,7 @@ if config_env() == :prod do
 
   unban_method =
     case System.get_env("POLICR_MINI_UNBAN_METHOD") do
-      "until_date" ->
+      default when default in ["until_date", ""] ->
         :until_date
 
       "api_call" ->
@@ -134,13 +139,17 @@ if config_env() == :prod do
     # 解封方法
     unban_method: unban_method
 
+  webhook_port =
+    if port = System.get_env("POLICR_MINI_BOT_WEBHOOK_SERVER_PORT") do
+      port != "" && String.to_integer(port)
+    end
+
   # 配置 Webhook
   config :policr_mini, PolicrMiniBot.UpdatesAngler,
     # Webhook URL
     webhook_url: System.get_env("POLICR_MINI_BOT_WEBHOOK_URL"),
     # Webhook 服务器端口
-    server_port:
-      String.to_integer(System.get_env("POLICR_MINI_BOT_WEBHOOK_SERVER_PORT") || "4001")
+    server_port: webhook_port || 4001
 
   # 配置根链接
   config :policr_mini, PolicrMiniWeb,
