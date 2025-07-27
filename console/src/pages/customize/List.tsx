@@ -18,13 +18,13 @@ const Root = (props: { items: ItemVlue[]; children: (item: ItemVlue) => JSX.Elem
         </Accordion.Root>
       </Match>
       <Match when={true}>
-        <p>您还没有添加任何自定义验证。</p>
+        <p class="mt-[1.5rem] text-zinc-600 text-center tracking-wide">您还没有添加任何自定义验证。</p>
       </Match>
     </Switch>
   );
 };
 
-const Item = (props: { item: ItemVlue }) => {
+const ItemRoot = (props: { item: ItemVlue; buttons: JSX.Element[] }) => {
   return (
     <Accordion.Item value={props.item.id.toString()}>
       <Accordion.ItemTrigger>
@@ -50,7 +50,11 @@ const Item = (props: { item: ItemVlue }) => {
               </>
             )}
           </For>
-          <Opes />
+          <div class="w-full flex justify-between">
+            <Index each={props.buttons}>
+              {(button) => <>{button()}</>}
+            </Index>
+          </div>
         </div>
       </Accordion.ItemContent>
     </Accordion.Item>
@@ -87,23 +91,33 @@ const Answer = (props: { correct: boolean; text: string }) => {
   );
 };
 
-const Opes = () => {
+type OpesProps = {
+  id: number;
+  onPreview: (id: number) => void;
+  onEdit: (id: number) => void;
+  onDelete: (id: number) => Promise<void>;
+};
+
+const Opes = (props: OpesProps) => {
   return (
     <div class="w-full flex justify-between">
-      <ActionButton variant="info" icon="mdi:eye" outline>
+      <ActionButton variant="info" icon="mdi:eye" outline onClick={() => props.onPreview(props.id)}>
         预览
       </ActionButton>
-      <ActionButton variant="info" icon="uil:edit">
+      <ActionButton variant="info" icon="uil:edit" onClick={() => props.onEdit(props.id)}>
         编辑
-      </ActionButton>
-      <ActionButton variant="danger" icon="lets-icons:del-alt-fill">
-        删除
       </ActionButton>
     </div>
   );
 };
 
+const Item = {
+  Root: ItemRoot,
+  Opes: Opes,
+};
+
 export default {
   Root,
   Item,
+  Opes,
 };

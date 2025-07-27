@@ -5,6 +5,7 @@ defmodule PolicrMini.Chats do
 
   import Ecto.Query, only: [from: 2, dynamic: 2]
 
+  alias Ecto.Changeset
   alias PolicrMini.Repo
   alias PolicrMini.Chats.{Scheme, Operation, CustomKit, Verification}
   alias PolicrMini.Chats.CustomKit
@@ -20,6 +21,14 @@ defmodule PolicrMini.Chats do
   @type verification_change_result :: {:ok, Verification.t()} | {:error, Ecto.Changeset.t()}
 
   @type stat_status :: :passed | :timeout | :wronged | :other
+
+  @spec load_scheme(integer() | binary()) :: {:ok, Scheme.t()} | {:error, :not_found}
+  def load_scheme(id) when is_integer(id) or is_binary(id) do
+    case Repo.get(Scheme, id) do
+      nil -> {:error, :not_found}
+      scheme -> {:ok, scheme}
+    end
+  end
 
   def create_scheme(params) do
     %Scheme{} |> Scheme.changeset(params) |> Repo.insert()
@@ -65,13 +74,6 @@ defmodule PolicrMini.Chats do
     case find_or_init_scheme(chat_id) do
       {:ok, scheme} -> scheme
       {:error, e} -> raise e
-    end
-  end
-
-  def load_scheme(id) when is_integer(id) or is_binary(id) do
-    case Repo.get(Scheme, id) do
-      nil -> {:error, :not_found}
-      scheme -> {:ok, scheme}
     end
   end
 
@@ -234,9 +236,9 @@ defmodule PolicrMini.Chats do
 
   @max_custom_kits_count 55
 
+  @deprecated "Use add_custom/1 instead"
   @spec create_custom_kit(map()) ::
           custom_kit_change_result | {:error, %{description: String.t()}}
-
   def create_custom_kit(params) do
     chat_id = params[:chat_id] || params["chat_id"]
 
@@ -247,11 +249,13 @@ defmodule PolicrMini.Chats do
     end
   end
 
+  @deprecated "Use update_custom/2 instead"
   @spec update_custom_kit(CustomKit.t(), map) :: custom_kit_change_result
   def update_custom_kit(%CustomKit{} = custom_kit, params) do
     custom_kit |> CustomKit.changeset(params) |> Repo.update()
   end
 
+  @deprecated "Use delete_custom/1 instead"
   def delete_custom_kit(%CustomKit{} = custom_kit) do
     custom_kit |> Repo.delete()
   end
@@ -264,6 +268,35 @@ defmodule PolicrMini.Chats do
   def random_custom_kit(chat_id) do
     from(c in CustomKit, where: c.chat_id == ^chat_id, order_by: fragment("RANDOM()"), limit: 1)
     |> Repo.one()
+  end
+
+  @spec load_custom(integer() | binary()) :: {:ok, CustomKit.t()} | {:error, :not_found}
+  def load_custom(id) when is_integer(id) or is_binary(id) do
+    case Repo.get(CustomKit, id) do
+      nil -> {:error, :not_found}
+      custom -> {:ok, custom}
+    end
+  end
+
+  @spec add_custom(map()) :: {:ok, CustomKit.t()} | {:error, Changeset.t() | :max_reached}
+  def add_custom(params) do
+    chat_id = params[:chat_id] || params["chat_id"]
+
+    if get_custom_kits_count(chat_id) >= @max_custom_kits_count do
+      {:error, :max_reached}
+    else
+      %CustomKit{} |> CustomKit.changeset(params) |> Repo.insert()
+    end
+  end
+
+  @spec update_custom(CustomKit.t(), map()) :: {:ok, CustomKit.t()} | {:error, Changeset.t()}
+  def update_custom(custom, params) when is_struct(custom, CustomKit) do
+    custom |> CustomKit.changeset(params) |> Repo.update()
+  end
+
+  @spec delete_custom(CustomKit.t()) :: {:ok, CustomKit.t()} | {:error, Changeset.t()}
+  def delete_custom(custom) when is_struct(custom, CustomKit) do
+    custom |> Repo.delete()
   end
 
   @doc """

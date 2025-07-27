@@ -11,4 +11,11 @@ declare namespace InputData {
   };
 
   type StatsRange = "today" | "7d" | "28d" | "90d";
+
+  type Custom = {
+    chatId?: number | null;
+    title: string;
+    answers: string[];
+    attachment: string | null;
+  };
 }

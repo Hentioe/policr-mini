@@ -3,6 +3,10 @@ defmodule PolicrMiniWeb.ConsoleV2.API.CustomView do
 
   alias PolicrMini.Chats.CustomKit
 
+  def render("show.json", %{custom: custom}) do
+    success(render("custom.json", %{custom: custom}))
+  end
+
   def render("custom.json", %{custom: custom}) when is_struct(custom, CustomKit) do
     %{
       id: custom.id,

@@ -3,7 +3,7 @@ import Checkbox from "../../components/Checkbox";
 
 const Root = (props: { children: JSX.Element }) => {
   return (
-    <div class="flex flex-col gap-[1rem]">
+    <div class="flex flex-col gap-[0.85rem]">
       {props.children}
     </div>
   );
@@ -12,7 +12,7 @@ const Root = (props: { children: JSX.Element }) => {
 const Field = (props: { label: string; children: JSX.Element }) => {
   return (
     <div class="flex items-center">
-      <span class="w-3/12 font-medium">{props.label}</span>
+      <span class="w-3/12">{props.label}</span>
       {props.children}
     </div>
   );
@@ -21,6 +21,7 @@ const Field = (props: { label: string; children: JSX.Element }) => {
 const Answer = (
   props: {
     label: string;
+    value: string;
     correct?: boolean;
     onInput?: (value: string) => void;
     onCorrectChange?: (isCorrect: boolean) => void;
@@ -28,9 +29,9 @@ const Answer = (
 ) => {
   return (
     <div class="flex items-center">
-      <span class="w-3/12 font-medium">{props.label}</span>
+      <span class="w-3/12">{props.label}</span>
       <div class="flex-1 flex justify-between gap-[1rem]">
-        <Input placeholder="输入答案值" onInput={props.onInput} />
+        <Input placeholder="输入答案值" onInput={props.onInput} value={props.value} />
         <Checkbox label="正确" checked={props.correct} onChange={props.onCorrectChange} />
       </div>
     </div>

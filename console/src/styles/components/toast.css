@@ -24,12 +24,20 @@
   }
 
   &[data-type="error"] {
-    @apply w-fit text-red-50;
     [data-part="title"] {
       @apply bg-red-500;
     }
     [data-part="description"] {
       @apply bg-red-400;
+    }
+  }
+
+  &[data-type="warning"] {
+    [data-part="title"] {
+      @apply bg-yellow-500;
+    }
+    [data-part="description"] {
+      @apply bg-yellow-400;
     }
   }
 }

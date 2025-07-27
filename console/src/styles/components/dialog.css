@@ -23,10 +23,9 @@
 }
 
 [data-scope="dialog"][data-part="title"] {
-  margin: 0px;
-  font-weight: 500;
-  color: rgb(26, 21, 35);
-  font-size: 17px;
+  color: theme(--color-zinc-800);
+  font-weight: theme(--font-weight-medium);
+  font-size: theme(--text-lg);
 }
 
 [data-scope="dialog"][data-part="description"] {
@@ -45,7 +44,7 @@
   width: 100%;
   max-width: 450px;
   max-height: 85vh;
-  padding: 24px;
+  padding: theme(--spacing-edge);
   position: relative;
   outline: none;
 }

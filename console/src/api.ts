@@ -56,6 +56,39 @@ export async function getCustoms(chatId: number): PayloadType<ServerData.CustomI
   return strictify(await client.get(`/chats/${chatId}/customs`));
 }
 
+export async function deleteCustom(id: number): PayloadType<ServerData.CustomItem> {
+  return strictify(await client.delete(`/customs/${id}`));
+}
+
+export async function saveCustom({ id, custom }: { id: number | null; custom: InputData.Custom }) {
+  if (id !== null) {
+    return updateCustom(id, custom);
+  } else {
+    return createCustom(custom);
+  }
+}
+
+export async function createCustom(custom: InputData.Custom) {
+  return strictify(
+    await client.post("/customs", {
+      chat_id: custom.chatId,
+      title: custom.title,
+      answers: custom.answers,
+      attachment: custom.attachment,
+    }),
+  );
+}
+
+export async function updateCustom(id: number, custom: InputData.Custom) {
+  return strictify(
+    await client.put(`/customs/${id}`, {
+      title: custom.title,
+      answers: custom.answers,
+      attachment: custom.attachment,
+    }),
+  );
+}
+
 export async function getVerifications(chatId: number): PayloadType<ServerData.Verification[]> {
   return strictify(await client.get(`/chats/${chatId}/verifications`));
 }
