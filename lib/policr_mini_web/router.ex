@@ -27,10 +27,6 @@ defmodule PolicrMiniWeb.Router do
     plug PolicrMiniWeb.AdminV2.TokenAuth, from: :api
   end
 
-  pipeline :console_v2 do
-    plug PolicrMiniWeb.ConsoleV2.TMAAuth, from: :page
-  end
-
   pipeline :console_v2_api do
     plug :accepts, ["json"]
     plug PolicrMiniWeb.ConsoleV2.TMAAuth, from: :api
@@ -160,7 +156,7 @@ defmodule PolicrMiniWeb.Router do
   end
 
   scope "/console/v2", PolicrMiniWeb.ConsoleV2 do
-    pipe_through [:browser, :console_v2]
+    pipe_through [:browser]
 
     get "/user_photo", PageController, :user_photo
     get "/*path", PageController, :home

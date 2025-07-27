@@ -30,6 +30,13 @@ defmodule PolicrMini.Accounts do
     )
   end
 
+  def upsert_user!(id, params) do
+    case upsert_user(id, params) do
+      {:ok, user} -> user
+      {:error, changeset} -> raise "Failed to upsert user: #{inspect(changeset)}"
+    end
+  end
+
   def update_user(user, params) do
     user
     |> User.changeset(params)

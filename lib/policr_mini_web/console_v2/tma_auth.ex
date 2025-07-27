@@ -65,10 +65,7 @@ defmodule PolicrMiniWeb.ConsoleV2.TMAAuth do
           token_ver: 0
         }
 
-        # todo: 处理 AMA 认证中的用户插入错误
-        {:ok, user} = Accounts.upsert_user(id, params)
-
-        user
+        Accounts.upsert_user!(id, params)
       end
 
     assign(conn, :user, user)

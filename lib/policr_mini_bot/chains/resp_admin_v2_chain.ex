@@ -93,7 +93,7 @@ defmodule PolicrMiniBot.RespAdminV2Chain do
   @spec create_token(Telegex.Type.User.t()) :: {:ok, String.t()} | {:error, :not_found}
   defp create_token(from) do
     load_user =
-      case Accounts.get_user(from.id) |> IO.inspect() do
+      case Accounts.get_user(from.id) do
         nil ->
           sync_user(from)
 
