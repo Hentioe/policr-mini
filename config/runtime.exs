@@ -76,6 +76,11 @@ if config_env() == :prod do
     ],
     secret_key_base: secret_key_base
 
+  # Configuring Plausible analytics integration.
+  config :policr_mini, PolicrMini.Plausible,
+    domain: System.get_env("POLICR_MINI_PLAUSIBLE_DOMAIN"),
+    script_src: System.get_env("POLICR_MINI_PLAUSIBLE_SCRIPT_SRC")
+
   # ## Configuring the mailer
   #
   # In production you need to configure the mailer to use a different adapter.

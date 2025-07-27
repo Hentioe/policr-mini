@@ -1,3 +1,7 @@
+<%= if PolicrMini.Plausible.integrated() do %>
+  <!-- Plausible -->
+  <script defer data-domain="<%= PolicrMini.Plausible.domain() %>" src="<%= PolicrMini.Plausible.script_src() %>"></script>
+<% end %>
 <div id="app"></div>
 <link
   rel="stylesheet"
