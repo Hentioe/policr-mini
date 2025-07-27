@@ -10,6 +10,7 @@ defmodule PolicrMini.PermissionBusiness do
   @doc """
   查找群组内指定用户的权限。
   """
+  @deprecated "Use PolicrMini.Uses.get_permission/2 instead"
   @spec find(integer, integer) :: Permission.t() | nil
   def find(chat_id, user_id)
       when (is_integer(chat_id) or is_binary(chat_id)) and is_integer(user_id) do

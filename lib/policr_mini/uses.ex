@@ -5,6 +5,7 @@ defmodule PolicrMini.Uses do
 
   alias PolicrMini.Repo
   alias PolicrMini.Instances.Chat
+  alias PolicrMini.Schema.Permission
 
   @type list_chats_conds :: [
           {:limit, integer},
@@ -17,22 +18,6 @@ defmodule PolicrMini.Uses do
     |> Chat.changeset(params)
     |> Repo.insert()
   end
-
-  # def chat_seeds do
-  #   Enum.map(1..9999, fn i ->
-  #     %{
-  #       id: i,
-  #       title: "种子群 #{i}",
-  #       description: "这是一个种子群组：#{i}",
-  #       type: :supergroup,
-  #       is_take_over: rem(i, 2) == 0,
-  #       left: rem(i, 2) == 0,
-  #       created_at: DateTime.utc_now(),
-  #       updated_at: DateTime.utc_now()
-  #     }
-  #   end)
-  #   |> Enum.map(&add_chat/1)
-  # end
 
   # TODO：添加测试。
   @doc """
@@ -114,5 +99,14 @@ defmodule PolicrMini.Uses do
   @spec all_chats() :: [Chat.t()]
   def all_chats do
     from(c in Chat) |> Repo.all()
+  end
+
+  @spec get_permission(integer() | binary(), integer() | binary()) :: Permission.t() | nil
+  def get_permission(chat_id, user_id) do
+    from(p in Permission,
+      where: p.chat_id == ^chat_id,
+      where: p.user_id == ^user_id
+    )
+    |> Repo.one()
   end
 end

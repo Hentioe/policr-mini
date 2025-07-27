@@ -2,6 +2,11 @@ defmodule PolicrMiniWeb.ConsoleV2.API.ChatController do
   use PolicrMiniWeb, :controller
 
   alias PolicrMini.{Chats, Instances, Stats}
+  alias PolicrMini.Instances.Chat
+
+  import Canary.Plugs
+
+  plug :authorize_resource, model: Chat, except: [:index]
 
   action_fallback PolicrMiniWeb.ConsoleV2.API.FallbackController
 

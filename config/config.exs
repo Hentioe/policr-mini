@@ -22,6 +22,11 @@ config :policr_mini, PolicrMiniWeb.Endpoint,
   pubsub_server: PolicrMini.PubSub,
   live_view: [signing_salt: "hy+GpqGC"]
 
+config :canary,
+  repo: PolicrMini.Repo,
+  current_user: :user,
+  unauthorized_handler: {PolicrMiniWeb.ConsoleV2.ControllerHelper, :resp_forbidden}
+
 # Configures the mailer
 #
 # By default it uses the "Local" adapter which stores the emails

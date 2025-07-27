@@ -73,6 +73,7 @@ defmodule PolicrMini.MixProject do
       {:gettext, "~> 0.18.2"},
       {:jason, "~> 1.4"},
       {:tarams, "~> 1.8"},
+      {:canary, "~> 1.2"},
       {:plug_cowboy, "~> 2.7"},
       {:remote_ip, "~> 1.2.0"},
       {:quantum, "~> 3.5"},

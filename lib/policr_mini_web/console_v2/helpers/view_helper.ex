@@ -1,4 +1,6 @@
 defmodule PolicrMiniWeb.ConsoleV2.ViewHelper do
+  @moduledoc false
+
   def success(payload) do
     %{
       success: true,

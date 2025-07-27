@@ -1,5 +1,4 @@
-alias PolicrMini.Chats.{Operation, Verification}
-alias PolicrMini.Schema.User
+alias PolicrMini.Chats.Operation
 
 defmodule PolicrMini.Seeds.Support.FakeOperationGenerator do
   def generate(chat_id, verification_id, stop_secs) when is_integer(stop_secs) do
