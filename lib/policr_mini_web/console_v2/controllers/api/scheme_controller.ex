@@ -4,6 +4,10 @@ defmodule PolicrMiniWeb.ConsoleV2.API.SchemeController do
   alias PolicrMini.Chats
   alias PolicrMini.Chats.Scheme
 
+  import Canary.Plugs
+
+  plug :authorize_resource, model: Scheme
+
   def update(conn, %{"id" => id} = params) do
     # 接收新版本参数并转换到旧版本
     params = Scheme.cast_from_new_params(params)

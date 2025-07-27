@@ -1,6 +1,12 @@
 defmodule PolicrMiniWeb.ConsoleV2.API.FallbackController do
   use Phoenix.Controller
 
+  def call(conn, {:write, false}) do
+    conn
+    |> put_view(PolicrMiniWeb.ConsoleV2.API.ErrorView)
+    |> render("error.json", %{message: "无权操作此资源"})
+  end
+
   def call(conn, {:error, %Capinde.Error{message: message}}) do
     conn
     |> put_view(PolicrMiniWeb.ConsoleV2.API.ErrorView)

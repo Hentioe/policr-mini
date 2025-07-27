@@ -3,14 +3,32 @@ defmodule Abilities do
 
   alias PolicrMini.Uses
   alias PolicrMini.Schema.User
-  alias PolicrMini.Instances.Chat
+
+  require Logger
+
+  defimpl Canada.Can, for: Plug.Conn do
+    alias Plug.Conn
+
+    # 用请求参数中的 chat_id 进行权限检查，通常用于手动调用 can? write(resource)
+    @impl true
+    def can?(%Conn{assigns: %{user: user}}, :write, %{"chat_id" => chat_id}) do
+      if permission = Uses.get_permission(chat_id, user.id) do
+        permission.writable || permission.owner
+      else
+        false
+      end
+    end
+  end
 
   defimpl Canada.Can, for: User do
-    # 对应 PolicrMiniWeb.ConsoleV2.API.ChatController 中的路由函数，需可读权限
-    @chat_accessible [:stats, :scheme, :customs, :verifications, :operations]
+    alias PolicrMini.Chats.Scheme
+    alias PolicrMini.Instances.Chat
+    alias PolicrMini.Chats.CustomKit
 
     @impl true
-    def can?(%User{id: user_id} , action, %Chat{id: chat_id}) when action in @chat_accessible do
+    def can?(%User{id: user_id}, action, %Chat{id: chat_id})
+        when action in [:stats, :scheme, :customs, :verifications, :operations] do
+      # 用户对群组的访问权限检查
       if permission = Uses.get_permission(chat_id, user_id) do
         permission.readable || permission.owner
       else
@@ -19,6 +37,30 @@ defmodule Abilities do
     end
 
     @impl true
-    def can?(%User{}, _action, _), do: false
+    def can?(%User{id: user_id}, action, %CustomKit{chat_id: chat_id})
+        when action in [:add, :update, :delete] do
+      # 用户对自定义条目写入操作的权限检查
+      if permission = Uses.get_permission(chat_id, user_id) do
+        permission.writable || permission.owner
+      else
+        false
+      end
+    end
+
+    def can?(%User{id: user_id}, action, %Scheme{chat_id: chat_id}) when action in [:update] do
+      # 用户对方案条目写入操作的权限检查
+      if permission = Uses.get_permission(chat_id, user_id) do
+        permission.writable || permission.owner
+      else
+        false
+      end
+    end
+
+    @impl true
+    def can?(%User{}, action, subject) do
+      Logger.warning("Unknown user action: #{inspect(action)} on subject: #{inspect(subject)}")
+
+      false
+    end
   end
 end
