@@ -12,7 +12,7 @@ const DEFAULT_PAGE: Page = "stats";
 
 const [store, setStore] = createStore<State>({
   currentPage: DEFAULT_PAGE,
-  drawerIsOpen: true,
+  drawerIsOpen: false,
   currentChatId: null,
   currentChatTitle: null,
   emptyChatList: null,

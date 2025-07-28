@@ -156,13 +156,16 @@ export default () => {
   return (
     <PageBase>
       <div class="bg-white">
-        <ActionButton onClick={() => setIsEditing(true)} variant="info" size="lg" outline fullWidth>
-          添加自定义验证
-        </ActionButton>
+        <div class="mb-[1rem]">
+          <ActionButton onClick={() => setIsEditing(true)} variant="info" size="lg" outline fullWidth>
+            添加自定义验证
+          </ActionButton>
+        </div>
         <List.Root items={query.data?.success && query.data.payload || []}>
-          {(item) => (
-            <List.Item.Root
-              item={item}
+          {(item, i) => (
+            <List.Item
+              data={item}
+              n={i + 1}
               buttons={[<DeleteButton id={item.id} />, <EditButton item={item} />, <PreviewButton />]}
             />
           )}

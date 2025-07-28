@@ -59,7 +59,8 @@ defmodule PolicrMini.Chats.CustomKit do
   @spec check_answers([String.t()]) :: :ok | {:error, :incorrect_format | :missing_corrent}
   defp check_answers(answers) when is_list(answers) do
     format_validity_fun = fn answer ->
-      !(String.starts_with?(answer, "-") || String.starts_with?(answer, "+"))
+      String.length(answer) <= 1 ||
+        !(String.starts_with?(answer, "-") || String.starts_with?(answer, "+"))
     end
 
     invalid_answers = Enum.filter(answers, format_validity_fun)

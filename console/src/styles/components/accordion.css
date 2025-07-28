@@ -21,7 +21,7 @@
       transition: all;
       transition-duration: 200ms;
       &[data-state="open"] {
-        rotate: 180deg;
+        rotate: -180deg;
       }
     }
   }

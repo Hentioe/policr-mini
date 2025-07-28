@@ -42,4 +42,10 @@ defmodule PolicrMiniWeb.ConsoleV2.API.FallbackController do
     |> put_view(PolicrMiniWeb.ConsoleV2.API.ErrorView)
     |> render("error.json", %{message: "缺少正确答案"})
   end
+
+  def call(conn, {:error, %Ecto.Changeset{errors: [answers: {"incorrect format", []}]}}) do
+    conn
+    |> put_view(PolicrMiniWeb.ConsoleV2.API.ErrorView)
+    |> render("error.json", %{message: "包含错误的答案格式"})
+  end
 end

@@ -1,11 +1,11 @@
 import { Accordion } from "@ark-ui/solid/accordion";
 import { Icon } from "@iconify-icon/solid";
+import classNames from "classnames";
 import { createMemo, For, Index, JSX, Match, Show, Switch } from "solid-js";
-import { ActionButton } from "../../components";
 
 type ItemVlue = ServerData.CustomItem;
 
-const Root = (props: { items: ItemVlue[]; children: (item: ItemVlue) => JSX.Element }) => {
+const Root = (props: { items: ItemVlue[]; children: (item: ItemVlue, i: number) => JSX.Element }) => {
   const defaultValue = createMemo(() => props.items.length > 0 ? props.items.map(item => item.id.toString()) : []);
 
   return (
@@ -13,7 +13,7 @@ const Root = (props: { items: ItemVlue[]; children: (item: ItemVlue) => JSX.Elem
       <Match when={props.items.length > 0}>
         <Accordion.Root multiple collapsible lazyMount defaultValue={defaultValue()}>
           <Index each={props.items}>
-            {(item) => <>{props.children(item())}</>}
+            {(item, i) => <>{props.children(item(), i)}</>}
           </Index>
         </Accordion.Root>
       </Match>
@@ -24,37 +24,40 @@ const Root = (props: { items: ItemVlue[]; children: (item: ItemVlue) => JSX.Elem
   );
 };
 
-const ItemRoot = (props: { item: ItemVlue; buttons: JSX.Element[] }) => {
+const Item = (props: { data: ItemVlue; n: number; buttons: JSX.Element[] }) => {
   return (
-    <Accordion.Item value={props.item.id.toString()}>
+    <Accordion.Item value={props.data.id.toString()}>
       <Accordion.ItemTrigger>
-        <p class="line-clamp-1 truncate">
-          {props.item.title}
-        </p>
+        <div class="flex items-center min-w-0">
+          <span class="w-[1.5rem] h-[1.5rem] mr-[0.5rem] flex items-center justify-center bg-blue-400 text-white rounded-full">
+            {props.n}
+          </span>
+          <p class="flex-1 line-clamp-1 truncate font-medium">
+            {props.data.title}
+          </p>
+        </div>
         <Accordion.ItemIndicator>
           <Icon icon="mingcute:down-line" />
         </Accordion.ItemIndicator>
       </Accordion.ItemTrigger>
       <Accordion.ItemContent>
-        <Show when={props.item.attachment}>
-          <Attachment value={props.item.attachment!} />
+        <Show when={props.data.attachment}>
+          <Attachment value={props.data.attachment!} />
         </Show>
-        <div class="flex flex-wrap gap-x-[1rem] gap-y-[0.5rem] py-[0.5rem]">
-          <For each={props.item.answers}>
+        <div class="grid grid-cols-2 gap-[0.5rem] py-[0.5rem]">
+          <For each={props.data.answers}>
             {(answer) => (
-              <>
-                <Answer
-                  text={answer.text}
-                  correct={answer.correct}
-                />
-              </>
+              <Answer
+                text={answer.text}
+                correct={answer.correct}
+              />
             )}
           </For>
-          <div class="w-full flex justify-between">
-            <Index each={props.buttons}>
-              {(button) => <>{button()}</>}
-            </Index>
-          </div>
+        </div>
+        <div class="w-full flex justify-between">
+          <Index each={props.buttons}>
+            {(button) => <>{button()}</>}
+          </Index>
         </div>
       </Accordion.ItemContent>
     </Accordion.Item>
@@ -84,40 +87,29 @@ const Attachment = (props: { value: string }) => {
 
 const Answer = (props: { correct: boolean; text: string }) => {
   return (
-    <div class="flex items-center gap-[0.5rem]">
-      <Icon icon={props.correct ? "flat-color-icons:ok" : "noto-v1:cross-mark"} />
-      <span>{props.text}</span>
+    <div
+      class={classNames([
+        "flex items-center gap-[0.5rem] px-[0.5rem] py-[0.25rem] border rounded-lg",
+        {
+          "bg-green-100 border-green-400": props.correct,
+          "bg-red-100 border-red-400": !props.correct,
+        },
+      ])}
+    >
+      <Switch>
+        <Match when={props.correct}>
+          <Icon icon="flat-color-icons:ok" />
+        </Match>
+        <Match when={!props.correct}>
+          <Icon icon="healthicons:no-24px" class="text-red-400" />
+        </Match>
+      </Switch>
+      <span class="line-clamp-1 break-all">{props.text}</span>
     </div>
   );
-};
-
-type OpesProps = {
-  id: number;
-  onPreview: (id: number) => void;
-  onEdit: (id: number) => void;
-  onDelete: (id: number) => Promise<void>;
-};
-
-const Opes = (props: OpesProps) => {
-  return (
-    <div class="w-full flex justify-between">
-      <ActionButton variant="info" icon="mdi:eye" outline onClick={() => props.onPreview(props.id)}>
-        预览
-      </ActionButton>
-      <ActionButton variant="info" icon="uil:edit" onClick={() => props.onEdit(props.id)}>
-        编辑
-      </ActionButton>
-    </div>
-  );
-};
-
-const Item = {
-  Root: ItemRoot,
-  Opes: Opes,
 };
 
 export default {
   Root,
   Item,
-  Opes,
 };
