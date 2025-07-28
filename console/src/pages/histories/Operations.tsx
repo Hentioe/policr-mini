@@ -1,17 +1,26 @@
 import { useQuery } from "@tanstack/solid-query";
 import { format } from "date-fns";
-import { For, Show } from "solid-js";
+import { createEffect, createSignal, For, Show } from "solid-js";
 import { getOperations } from "../../api";
 import { Record } from "./Record";
 
 type Operation = ServerData.Operation;
 
 export default (props: { chatId: number | null; range: string }) => {
+  const [maxReached, setMaxReached] = createSignal(false);
   const query = useQuery(() => ({
     queryKey: ["operations", props.chatId, props.range],
     queryFn: () => getOperations(props.chatId!, props.range),
     enabled: props.chatId != null,
   }));
+
+  createEffect(() => {
+    if (query.data?.success && query.data.payload.length >= 120) {
+      setMaxReached(true);
+    } else {
+      setMaxReached(false);
+    }
+  });
 
   return (
     <div>
@@ -32,6 +41,9 @@ export default (props: { chatId: number | null; range: string }) => {
             </Record.Root>
           )}
         </For>
+        <Show when={maxReached()}>
+          <p class="mt-[1rem] text-center text-gray-500 tracking-wide">已达到最大展示数量限制</p>
+        </Show>
       </Show>
     </div>
   );
