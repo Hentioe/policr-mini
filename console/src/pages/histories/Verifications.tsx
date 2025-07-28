@@ -3,12 +3,15 @@ import { format } from "date-fns";
 import { createEffect, createSignal, For, Match, Show, Switch } from "solid-js";
 import { getVerifications } from "../../api";
 import { ActionButton } from "../../components";
+import Loading from "../../components/Loading";
+import { toaster } from "../../utils";
 import { Record } from "./Record";
 
 type Verification = ServerData.Verification;
 
 export default (props: { chatId: number | null; range: string }) => {
   const [maxReached, setMaxReached] = createSignal(false);
+  const [isEmpty, setIsEmpty] = createSignal(false);
   const query = useQuery(() => ({
     queryKey: ["verifications", props.chatId, props.range],
     queryFn: () => getVerifications(props.chatId!, props.range),
@@ -16,7 +19,16 @@ export default (props: { chatId: number | null; range: string }) => {
   }));
 
   createEffect(() => {
-    if (query.data?.success && query.data.payload.length >= 120) {
+    if (!query.data) {
+      return;
+    }
+    if (query.data.success === false) {
+      toaster.error({ title: "验证记录加载失败", description: query.data?.message });
+      return;
+    }
+    if (query.data.payload.length === 0) {
+      setIsEmpty(true);
+    } else if (query.data.payload.length >= 120) {
       setMaxReached(true);
     } else {
       setMaxReached(false);
@@ -57,28 +69,36 @@ export default (props: { chatId: number | null; range: string }) => {
 
   return (
     <div>
-      <Show when={query.data?.success}>
-        <For each={query.data?.success && query.data.payload}>
-          {(v) => (
-            <Record.Root
-              user={v.userFullName}
-              badge={renderBadge(v)}
-              bottoms={[<BanOrUnbanButton v={v} />, <ReVerificationButton v={v} />]}
-            >
-              <Record.Details>
-                <Record.Detail
-                  text={format(v.insertedAt, "yyyy-MM-dd HH:mm:ss")}
-                  icon="material-symbols:date-range-outline-sharp"
-                />
-                <Record.Detail text={`${v.durationSecs}s`} icon="mingcute:time-duration-line" />
-              </Record.Details>
-            </Record.Root>
-          )}
-        </For>
-        <Show when={maxReached()}>
-          <p class="mt-[1rem] text-center text-gray-500 tracking-wide">已达到最大展示数量限制</p>
-        </Show>
-      </Show>
+      <Switch>
+        <Match when={query.isLoading}>
+          <MyLoading />
+        </Match>
+        <Match when={isEmpty()}>
+          <Empty />
+        </Match>
+        <Match when={true}>
+          <For each={query.data?.success && query.data.payload}>
+            {(v) => (
+              <Record.Root
+                user={v.userFullName}
+                badge={renderBadge(v)}
+                bottoms={[<BanOrUnbanButton v={v} />, <ReVerificationButton v={v} />]}
+              >
+                <Record.Details>
+                  <Record.Detail
+                    text={format(v.insertedAt, "yyyy-MM-dd HH:mm:ss")}
+                    icon="material-symbols:date-range-outline-sharp"
+                  />
+                  <Record.Detail text={`${v.durationSecs}s`} icon="mingcute:time-duration-line" />
+                </Record.Details>
+              </Record.Root>
+            )}
+          </For>
+          <Show when={maxReached()}>
+            <p class="mt-[1rem] text-center text-gray-500 tracking-wide">已达到最大展示数量限制</p>
+          </Show>
+        </Match>
+      </Switch>
     </div>
   );
 };
@@ -124,3 +144,19 @@ function renderBadge(v: ServerData.Verification) {
 
   return <Record.Badge type={badgeType()} text={badgeText()} />;
 }
+
+const MyLoading = () => {
+  return (
+    <div class="flex items-center justify-center mt-[2rem]">
+      <Loading size="xl" color="skyblue" />
+    </div>
+  );
+};
+
+const Empty = () => {
+  return (
+    <div class="mt-[2rem]">
+      <p class="text-center text-zinc-600 tracking-wide">没有找到相关的验证记录</p>
+    </div>
+  );
+};

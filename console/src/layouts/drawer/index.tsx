@@ -1,7 +1,7 @@
 import { destructure } from "@solid-primitives/destructure";
 import { useQuery } from "@tanstack/solid-query";
 import classNames from "classnames";
-import { createEffect, For } from "solid-js";
+import { createEffect } from "solid-js";
 import { getChats, getMe } from "../../api";
 import { globalState } from "../../state";
 import { setCurrentChat, setEmptyChatList, toggleDrawer } from "../../state/global";
@@ -51,16 +51,14 @@ export default () => {
       {/* 用户信息 */}
       <User data={meQuery.data?.success ? meQuery.data?.payload : undefined} />
       {/* 群列表 */}
-      <Chat.List>
-        <For each={chatsQuery.data?.success ? chatsQuery.data.payload : []}>
-          {(chat) => (
-            <Chat.Item
-              chat={chat}
-              current={currentChatId() === chat.id}
-              onClick={handleChatChange}
-            />
-          )}
-        </For>
+      <Chat.List isLoading={chatsQuery.isLoading} each={chatsQuery.data?.success ? chatsQuery.data.payload : []}>
+        {(chat) => (
+          <Chat.Item
+            data={chat}
+            current={currentChatId() === chat.id}
+            onClick={handleChatChange}
+          />
+        )}
       </Chat.List>
     </nav>
   );

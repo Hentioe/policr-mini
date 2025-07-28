@@ -1,6 +1,7 @@
 import { ApexOptions } from "apexcharts";
 import { SolidApexCharts } from "solid-apexcharts";
 import { createEffect, createSignal, JSX, Match, Switch } from "solid-js";
+import Loading from "../../components/Loading";
 import { calculateTotals, findFirstCategorizedPoints, findMaxCount, statusCount } from "./helper";
 
 const COLORS = {
@@ -109,10 +110,10 @@ export default (props: { range: InputData.StatsRange; stats: ServerData.Stats | 
         <Match when={empty()}>
           <Switch>
             <Match when={loading()}>
-              <p class="text-center">加载中……</p>
+              <MyLoading />
             </Match>
             <Match when={empty()}>
-              <p class="text-center">暂无数据</p>
+              <Empty />
             </Match>
           </Switch>
         </Match>
@@ -132,4 +133,16 @@ export default (props: { range: InputData.StatsRange; stats: ServerData.Stats | 
 
 const Root = (props: { children: JSX.Element }) => {
   return <div class="mx-edge-neg mt-[1rem] h-[24rem] bg-card rounded-2xl">{props.children}</div>;
+};
+
+const MyLoading = () => {
+  return (
+    <div class="flex items-center justify-center mt-[2rem]">
+      <Loading size="xl" color="skyblue" />
+    </div>
+  );
+};
+
+const Empty = () => {
+  return <p class="mt-[2rem] text-center text-zinc-600 text-lg">暂无数据</p>;
 };

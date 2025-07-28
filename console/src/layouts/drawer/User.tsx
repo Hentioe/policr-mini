@@ -1,11 +1,11 @@
 import { Show } from "solid-js";
+import Loading from "../../components/Loading";
 
 {/* todo: 颜色不断运动的彩色背景 */}
-
 export default (props: { data?: ServerData.User }) => {
   return (
     <div class="p-[1rem] h-[12.5rem] bg-white/40 backdrop-blur-md">
-      <Show when={props.data} fallback={<Loading />}>
+      <Show when={props.data} fallback={<MyLoading />}>
         <div class="w-full py-[1rem] bg-zinc-300 rounded-xl shadow flex flex-col items-center gap-[0.5rem]">
           <img
             width={320}
@@ -23,10 +23,10 @@ export default (props: { data?: ServerData.User }) => {
   );
 };
 
-const Loading = () => {
+const MyLoading = () => {
   return (
-    <div class="h-full flex justify-center items-center">
-      <p>加载中……</p>
+    <div class="flex items-center justify-center h-full">
+      <Loading size="xl" color="lightcoral" />
     </div>
   );
 };
