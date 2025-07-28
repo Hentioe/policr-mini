@@ -4,7 +4,7 @@ type State = {
   currentPage: Page;
   currentChatId: number | null;
   currentChatTitle: string | null;
-  emptyChatList?: boolean;
+  emptyChatList: boolean | null;
   drawerIsOpen: boolean;
 };
 
@@ -15,6 +15,7 @@ const [store, setStore] = createStore<State>({
   drawerIsOpen: false,
   currentChatId: null,
   currentChatTitle: null,
+  emptyChatList: null,
 });
 
 export function setCurrentPage(page: Page) {
