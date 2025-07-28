@@ -206,7 +206,7 @@ export default (props: Props) => {
         padingStyle(),
         colorStyle(),
         {
-          "cursor-not-allowed! saturate-0": props.disabled || props.loading, // 禁用状态
+          "cursor-not-allowed! brightness-125": props.disabled || props.loading, // 禁用状态
           "w-full justify-center": props.fullWidth, // 全宽按钮
           "border": props.outline, // 轮廓按钮包含边框
         },

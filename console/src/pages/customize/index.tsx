@@ -156,7 +156,7 @@ export default () => {
   return (
     <PageBase>
       <div class="bg-white">
-        <ActionButton onClick={() => setIsEditing(true)} variant="info" outline fullWidth>
+        <ActionButton onClick={() => setIsEditing(true)} variant="info" size="lg" outline fullWidth>
           添加自定义验证
         </ActionButton>
         <List.Root items={query.data?.success && query.data.payload || []}>
