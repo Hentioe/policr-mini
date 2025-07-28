@@ -1,0 +1,46 @@
+name: Publish
+
+on:
+  push:
+    branches: ["upgrade"]
+    # tags: ["v*"]
+
+permissions:
+  contents: read
+
+jobs:
+  publish-docker:
+    name: Publish Docker image
+    environment: production
+    runs-on: ubuntu-latest
+    # needs: build-test
+    steps:
+      - name: Checkout sources
+        uses: actions/checkout@v4
+        with:
+          fetch-depth: 0
+      - name: Docker meta
+        id: meta
+        uses: docker/metadata-action@v5
+        with:
+          images: |
+            gramoss/policr-mini
+          tags: |
+            type=raw,value=nightly,enable=${{ github.ref == 'refs/heads/upgrade' }}
+      - name: Set up QEMU
+        uses: docker/setup-qemu-action@v3
+      - name: Set up Docker Buildx
+        uses: docker/setup-buildx-action@v3
+      - name: Login to Docker Hub
+        uses: docker/login-action@v3
+        with:
+          username: ${{ vars.DOCKERHUB_USERNAME }}
+          password: ${{ secrets.DOCKERHUB_PASSWORD }}
+      - name: Build and push
+        uses: docker/build-push-action@v6
+        with:
+          context: .
+          platforms: linux/amd64,linux/arm64
+          push: ${{ github.event_name != 'pull_request' }}
+          tags: ${{ steps.meta.outputs.tags }}
+          labels: ${{ steps.meta.outputs.labels }}
