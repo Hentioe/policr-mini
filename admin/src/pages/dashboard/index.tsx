@@ -8,9 +8,10 @@ import { PageBase } from "../../layouts";
 import { setPage } from "../../state/global";
 import { setTitle } from "../../state/meta";
 import { toaster } from "../../utils";
+import EmptyPrompt from "./EmptyPrompt";
 import { calculateTotals, findFirstCategorizedPoints, findMaxCount, Totals } from "./helper";
 import Range from "./Range";
-import StatsItem from "./StatsItem";
+import StatsTotal from "./StatsTotal";
 
 type Point = ServerData.StatsPoint;
 type Status = ServerData.StatsStatus;
@@ -147,23 +148,23 @@ export default () => {
         <Range active={searchParams.range === "all"} range="all">全部</Range>
       </div>
       <div class="mt-[1rem] grid grid-cols-3 gap-[1rem] py-[1rem] border-y border-line">
-        <StatsItem
+        <StatsTotal
           title="验证总数"
           value={totals().passes + totals().fails}
           icon="lsicon:thumb-up-outline"
           color="darkturquoise"
         />
-        <StatsItem
-          title="验证通过"
+        <StatsTotal
+          title="已通过"
           value={totals().passes}
           icon="material-symbols:check"
           color="darkseagreen"
           hasDivider
         />
-        <StatsItem title="验证失败" value={totals().fails} icon="mdi:cancel" color="darkred" />
+        <StatsTotal title="被禁止" value={totals().fails} icon="mdi:cancel" color="darkred" />
       </div>
       <div class="mt-[1rem] h-[40rem] bg-card rounded-2xl">
-        <Show when={!empty()}>
+        <Show when={!empty()} fallback={<EmptyPrompt />}>
           <SolidApexCharts
             width="95%"
             height="95%"
