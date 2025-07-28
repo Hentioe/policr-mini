@@ -1,6 +1,7 @@
 import { retrieveRawInitData } from "@telegram-apps/sdk";
 import axios, { AxiosResponse } from "axios";
 import camelcaseKeys from "camelcase-keys";
+import { toaster } from "./utils";
 
 type PayloadType<T> = Promise<ApiResponse<T>>;
 
@@ -11,6 +12,7 @@ export const client = axios.create({
   validateStatus: () => true, // 将所有响应状态码视为有效
 });
 
+// 添加 TMA 认证
 client.interceptors.request.use((config) => {
   const authorization = tmaAuthorization();
   if (authorization) {
@@ -18,6 +20,32 @@ client.interceptors.request.use((config) => {
   }
 
   return config;
+});
+
+// 处理 403 错误
+client.interceptors.response.use((response) => {
+  if (response.status === 403) {
+    let body = response.data;
+    // 如果 body 是一个 json 字符串
+    if (typeof body === "string") {
+      try {
+        body = JSON.parse(body);
+        // eslint-disable-next-line @typescript-eslint/no-unused-vars
+      } catch (_e) {
+        // 如果解析失败，保持原样
+      }
+    } else {
+      body = "服务端响应了一个错误。";
+    }
+
+    if ("success" in body && body.success === false) {
+      toaster.error({ title: "被禁止", description: "您没有访问或操作此资源的权限。" });
+    } else {
+      toaster.error({ title: "403 Forbidden", description: body });
+    }
+  }
+
+  return response;
 });
 
 function tmaAuthorization(): string | undefined {

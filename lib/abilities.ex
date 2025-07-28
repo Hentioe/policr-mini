@@ -25,10 +25,10 @@ defmodule Abilities do
     alias PolicrMini.Instances.Chat
     alias PolicrMini.Chats.CustomKit
 
+    # 用户对群组的访问权限检查
     @impl true
     def can?(%User{id: user_id}, action, %Chat{id: chat_id})
         when action in [:stats, :scheme, :customs, :verifications, :operations] do
-      # 用户对群组的访问权限检查
       if permission = Uses.get_permission(chat_id, user_id) do
         permission.readable || permission.owner
       else
@@ -36,10 +36,10 @@ defmodule Abilities do
       end
     end
 
+    # 用户对自定义条目写入操作的权限检查
     @impl true
     def can?(%User{id: user_id}, action, %CustomKit{chat_id: chat_id})
         when action in [:add, :update, :delete] do
-      # 用户对自定义条目写入操作的权限检查
       if permission = Uses.get_permission(chat_id, user_id) do
         permission.writable || permission.owner
       else
