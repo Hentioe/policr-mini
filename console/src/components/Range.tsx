@@ -3,12 +3,12 @@
 import classNames from "classnames";
 import { Index, JSX } from "solid-js";
 
-type Item = {
-  value: string;
+type Item<T> = {
+  value: T;
   label: string;
 };
 
-const List = (props: { items: Item[]; children: (range: Item) => JSX.Element }) => {
+const List = <T,>(props: { items: Item<T>[]; children: (range: Item<T>) => JSX.Element }) => {
   return (
     <div class="flex justify-center">
       <Index each={props.items}>
@@ -18,12 +18,12 @@ const List = (props: { items: Item[]; children: (range: Item) => JSX.Element }) 
   );
 };
 
-const Item = (
+const Item = <T,>(
   props: {
-    value: string;
+    value: T;
     label: string;
     active?: boolean;
-    onClick?: (value: string) => void;
+    onClick?: (value: T) => void;
   },
 ) => {
   const handleClick = () => {

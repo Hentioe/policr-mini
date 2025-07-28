@@ -44,7 +44,9 @@ const Item = (props: { title: string; value: number; icon: string; color: string
     >
       <div>
         <div class="flex items-center gap-[0.5rem]">
-          <Icon icon={props.icon} class="w-[1.5rem] h-[1.5rem] text-[1.5rem]" style={{ color: props.color }} />
+          <div class="bg-zinc-100 h-[2.2rem] w-[2.25rem] rounded-full flex justify-center items-center">
+            <Icon icon={props.icon} class="w-[1.5rem] h-[1.5rem] text-[1.5rem]" style={{ color: props.color }} />
+          </div>
           <h2 class="font-medium">
             {props.title}
           </h2>
