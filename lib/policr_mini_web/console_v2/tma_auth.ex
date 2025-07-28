@@ -61,11 +61,14 @@ defmodule PolicrMiniWeb.ConsoleV2.TMAAuth do
           last_name: user_info["last_name"],
           # todo: 添加 language_code 字段
           # language_code: user_info["language_code"],
-          photo: user_info["photo_url"],
           token_ver: 0
         }
 
-        Accounts.upsert_user!(id, params)
+        user = Accounts.upsert_user!(id, params)
+        # todo: 处理头像同步的错误
+        PolicrMiniBot.Helper.sync_user_photo(user)
+
+        user
       end
 
     assign(conn, :user, user)

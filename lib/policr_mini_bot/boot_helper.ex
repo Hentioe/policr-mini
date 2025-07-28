@@ -61,7 +61,7 @@ defmodule PolicrMiniBot.BootHelper do
       },
       %BotCommand{
         command: "sync",
-        description: "同步群数据"
+        description: "同步资料（支持群和用户）"
       },
       %BotCommand{
         command: "login",

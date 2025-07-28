@@ -65,9 +65,9 @@ defmodule PolicrMiniBot.RespSyncChain do
               false
             end
 
-          ttitle = commands_text("同步成功")
-          tupdate_chat = "✔️ " <> commands_text("已更新群组资料。")
-          tupdate_admins = "✔️ " <> commands_text("已更新管理员权限。")
+          ttitle = commands_text("✅ 同步成功")
+          tupdate_chat = "‧ " <> commands_text("已更新群组资料。")
+          tupdate_admins = "‧ " <> commands_text("已更新管理员权限。")
 
           ttakeover =
             if has_takeover_permissions do
@@ -78,7 +78,7 @@ defmodule PolicrMiniBot.RespSyncChain do
                   commands_text("因为本机器人具备权限，已接管新成员验证。")
                 end
 
-              "✔️ " <> text
+              "‧ " <> text
             else
               text =
                 if is_taken_over do

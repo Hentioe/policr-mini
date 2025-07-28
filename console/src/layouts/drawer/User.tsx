@@ -1,6 +1,6 @@
 import { Show } from "solid-js";
 
-{/* todo: 颜色不断运动的彩色背景 */ }
+{/* todo: 颜色不断运动的彩色背景 */}
 
 export default (props: { data?: ServerData.User }) => {
   return (

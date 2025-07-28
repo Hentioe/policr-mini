@@ -18,6 +18,8 @@ defmodule PolicrMiniBot.ChainHandler do
     PolicrMiniBot.RespStartChain,
     # 响应 `/ping` 命令。
     PolicrMiniBot.RespPingChain,
+    # 响应 `/sync` 命令（私聊）。
+    PolicrMiniBot.RespSyncPrivateChain,
     # 响应 `/sync` 命令。
     PolicrMiniBot.RespSyncChain,
     # 响应 `/login` 命令。
