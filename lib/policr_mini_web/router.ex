@@ -158,7 +158,7 @@ defmodule PolicrMiniWeb.Router do
   scope "/console/v2", PolicrMiniWeb.ConsoleV2 do
     pipe_through [:browser]
 
-    get "/user_photo", PageController, :user_photo
+    get "/:id/photo", PageController, :photo
     get "/*path", PageController, :home
   end
 

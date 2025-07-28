@@ -49,7 +49,7 @@ export default () => {
       ])}
     >
       {/* 用户信息 */}
-      <User user={meQuery.data?.success && meQuery.data?.payload} />
+      <User data={meQuery.data?.success ? meQuery.data?.payload : undefined} />
       {/* 群列表 */}
       <Chat.List>
         <For each={chatsQuery.data?.success ? chatsQuery.data.payload : []}>
