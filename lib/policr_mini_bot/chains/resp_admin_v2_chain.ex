@@ -27,25 +27,22 @@ defmodule PolicrMiniBot.RespAdminV2Chain do
       已为您创建一个临时登录链接，有效期 <code>#{max_hours}</code> 小时。点击「进入后台」按钮将打开浏览器访问后台，此链接在有效期内可多次访问。
 
       <i>🤫 <b>请勿将此链接分享于他人，除非您正在短暂的分享控制权。若怀疑泄漏，请立即吊销</b></i>
+
       <i>⚠️ 请注意：<u>当前的后台仅支持桌面浏览器</u>，请尽量使用电脑而不是手机浏览器访问。</i>
       """
 
       reply_markup = make_markup(token)
-
-      case send_text(chat_id, text, reply_markup: reply_markup, parse_mode: "HTML") do
-        {:ok, _} ->
-          {:ok, context}
-
-        {:error, reason} ->
-          Logger.error("Command response failed: #{inspect(command: "/login", reason: reason)}")
-
-          {:stop, context}
-      end
+      send_text(chat_id, text, reply_markup: reply_markup, parse_mode: "HTML", logging: true)
     else
-      {:error, :not_found} ->
-        text = "未找到和您相关的管理员记录。"
+      {:error, reason} ->
+        Logger.error("Failed to handle /admin_v2 command: #{inspect(reason: reason)}")
 
-        send_text(chat_id, text, parse_mode: "HTML", logging: true)
+        send_text(chat_id, "发送错误，请联系开发者。", parse_mode: "HTML", logging: true)
+
+        {:ok, context}
+
+      {:owner, false} ->
+        send_text(chat_id, "您不是机器人拥有者，无法使用此命令。", parse_mode: "HTML", logging: true)
 
         {:ok, context}
     end
@@ -90,7 +87,7 @@ defmodule PolicrMiniBot.RespAdminV2Chain do
     }
   end
 
-  @spec create_token(Telegex.Type.User.t()) :: {:ok, String.t()} | {:error, :not_found}
+  @spec create_token(Telegex.Type.User.t()) :: {:ok, String.t()} | {:error, any()}
   defp create_token(from) do
     load_user =
       case Accounts.get_user(from.id) do
@@ -130,7 +127,10 @@ defmodule PolicrMiniBot.RespAdminV2Chain do
          {:ok, user} <- PolicrMiniBot.Helper.sync_user_photo(user) do
       {:ok, user}
     else
-      err -> err
+      {:error, reason} = err ->
+        Logger.error("Failed to sync user: #{inspect(reason: reason, user: from)}")
+
+        err
     end
   end
 end
