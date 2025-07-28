@@ -17,7 +17,7 @@ const Item = (props: { current?: boolean; data: ServerData.Chat; onClick?: (chat
         },
       ])}
     >
-      <img src="/images/telegram-128x128.webp" width={128} height={128} class="w-[3rem]" />
+      <img src={`/console/v2/${props.data.id}/photo`} width={128} height={128} class="w-[3rem] h-[3rem] rounded-full" />
       <div class="ml-[0.5rem] flex-1 min-w-0 flex flex-col justify-between">
         <p class="font-semibold truncate text-clip">{props.data.title}</p>
         <p class="text-sm tracking-wide line-clamp-1 truncate">{props.data.description}</p>

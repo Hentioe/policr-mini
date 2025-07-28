@@ -13,6 +13,10 @@ defmodule PolicrMini.Uses do
           {:order_by, [{:asc | :desc, atom | [atom]}]}
         ]
 
+  def get_chat(id) when is_integer(id) or is_binary(id) do
+    Repo.get(Chat, id)
+  end
+
   def add_chat(params) do
     %Chat{}
     |> Chat.changeset(params)
