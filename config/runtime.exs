@@ -106,7 +106,7 @@ if config_env() == :prod do
 
   unban_method =
     case System.get_env("POLICR_MINI_UNBAN_METHOD") do
-      default when default in ["until_date", ""] ->
+      default when default in ["until_date", "", nil] ->
         :until_date
 
       "api_call" ->
