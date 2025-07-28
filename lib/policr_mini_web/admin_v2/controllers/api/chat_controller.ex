@@ -1,9 +1,9 @@
 defmodule PolicrMiniWeb.AdminV2.API.ChatController do
   use PolicrMiniWeb, :controller
 
-  action_fallback PolicrMiniWeb.AdminV2.API.FallbackController
-
   alias PolicrMini.Instances.Chat
+
+  action_fallback PolicrMiniWeb.AdminV2.API.FallbackController
 
   defdelegate synchronize_chat(chat_id), to: PolicrMiniBot.RespSyncChain
 

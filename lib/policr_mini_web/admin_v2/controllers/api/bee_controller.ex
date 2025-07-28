@@ -3,7 +3,7 @@ defmodule PolicrMiniWeb.AdminV2.API.BeeController do
 
   alias PolicrMini.Stats
 
-  action_fallback PolicrMiniWeb.API.FallbackController
+  action_fallback PolicrMiniWeb.AdminV2.API.FallbackController
 
   def reset_stats(conn, _params) do
     run = &Stats.reset_all_stats/0

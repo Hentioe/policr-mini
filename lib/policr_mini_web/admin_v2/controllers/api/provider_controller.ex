@@ -1,9 +1,9 @@
 defmodule PolicrMiniWeb.AdminV2.API.ProviderController do
   use PolicrMiniWeb, :controller
 
-  action_fallback PolicrMiniWeb.AdminV2.API.FallbackController
-
   import PolicrMiniWeb.AdminV2.ViewHelper
+
+  action_fallback PolicrMiniWeb.AdminV2.API.FallbackController
 
   def upload(conn, %{"archive" => %{content_type: content_type} = archive} = _params)
       when content_type == "application/zip" do
