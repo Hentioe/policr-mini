@@ -10,6 +10,7 @@
   --spacing-edge-neg: calc(var(--spacing-edge) * -1);
   --spacing-drawer: 18rem;
   --spacing-drawer-neg: calc(var(--spacing-drawer) * -1);
+  --spacing-user-prompt: calc(var(--spacing-drawer) - 4rem);
   --spacing-header: 4rem;
   --spacing-navigation: 4rem;
   --spacing-main-top: calc(var(--spacing-header) + var(--spacing-edge));

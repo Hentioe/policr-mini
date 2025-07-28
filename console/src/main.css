@@ -72,3 +72,20 @@ body {
     background: rgba(59, 130, 246, 0.6);
   }
 }
+
+.user-bg {
+  background: linear-gradient(-45deg, #ff0000, #ff4d4d, #ff9900, #ffff00);
+  background-size: 400% 400%;
+  animation: gradient 10s ease-in-out infinite;
+}
+@keyframes gradient {
+  0% {
+    background-position: 0% 50%;
+  }
+  50% {
+    background-position: 100% 50%;
+  }
+  100% {
+    background-position: 0% 50%;
+  }
+}
