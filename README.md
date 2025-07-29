@@ -2,55 +2,31 @@
 
 [加入群组](https://t.me/policr_community) | [更新频道](https://t.me/policr_changelog) | [自行部署](https://github.com/Hentioe/policr-mini/wiki/%E8%87%AA%E8%A1%8C%E9%83%A8%E7%BD%B2%EF%BC%88%E6%9E%84%E5%BB%BA%E7%AC%AC%E4%B8%89%E6%96%B9%E5%AE%9E%E4%BE%8B%EF%BC%89) | [注册实例](https://github.com/Hentioe/policr-mini/issues/115) | [赞助项目](https://mini.gramlabs.org/sponsorship)
 
-[![status-badge](https://arm-ci.hentioe.dev/api/badges/1/status.svg)](https://arm-ci.hentioe.dev/repos/1)
+[![.github/workflows/publish.yml](https://github.com/hentioe/policr-mini/actions/workflows/publish.yml/badge.svg?branch=main)](https://github.com/hentioe/policr-mini/actions/workflows/publish.yml)
 [![GitHub issues](https://img.shields.io/github/issues/Hentioe/policr-mini)](https://github.com/Hentioe/policr-mini/issues)
 ![Languages top](https://img.shields.io/github/languages/top/Hentioe/policr-mini)
-![GitHub](https://img.shields.io/github/license/Hentioe/policr-mini)
+![License](https://img.shields.io/github/license/Hentioe/policr-mini)
 
-一个不断完善和改进的验证/审核机器人。
+一个不断改进核心的验证/审核机器人。
 
 ## 介绍
 
-本项目是作为 Policr 机器人的替代品而诞生，最小化的实现了核心功能。
+本项目是围绕验证功能为主的 Telegram 机器人兼 web 应用，旨在为 Telegram 群组管理提供更便捷的体验。主要功能包括：
 
-## 当前动态
+- 提供自定义验证和各种不同的验证类型
+- 支持公开群、私有群、兼容已启用/未启用 Approve new members（审核新成员）等群设置
+- 为机器人拥有者（运营者）设计的全功能 web 后台
+- 为管理员（用户）设计的 Mini Apps 控制台
 
-### 阶段计划（开发中）
-
-- [x] 新的 Web 控制台：兼容移动、桌面双端访问，精美而强大。
-  - [x] 仪表盘页面
-    - [x] 今日验证次数（包括各个主要状态的次数和总次数）
-    - [x] 验证次数统计的折线图（包括各个主要状态的次数）
-  - [ ] 当前方案页面
-  - [ ] 定制验证页面
-  - [ ] 欢迎消息页面
-  - [ ] 验证历史页面
-  - [ ] 操作历史页面
-  - [ ] 控制权限页面
-  - [ ] 时区设置
-- [ ] 多选验证支持：支持连续选择多个答案，主动或自动提交验证。
-- [x] 统计功能重构
-  - [x] 写入各种验证状态的结果数据点
-  - [x] 支持查询最近一周的验证次数统计
-  - [x] 支持更大范围的验证统计
+_最初时本项目是作为 Policr 机器人的最小化替代品而诞生，当前已成为独立且重量级的验证机器人。_
 
 ### 新的变化
 
 从我们的博客文章了解最近的更新：
 
+- [2025-07-30](https://blog.hentioe.dev/posts/policr-mini-updates-2025-07-30.html)
 - [2024-04-05](https://blog.gramlabs.org/posts/policr-mini-updates-2024-04-05.html)
 - [2024-01-01](https://blog.gramlabs.org/posts/policr-mini-updates-2024-01-01.html)
-
-## 当前状态
-
-**目前本项目已稳定运行 3 年。**
-
-由于精力所限，目前还处于开发阶段，但足够可用。将本项目的官方实例 [@policr_mini_bot](https://t.me/policr_mini_bot) 邀请入群即可使用。
-
-当前官方机器人仍在测试，这期间只提供少量途径修改机器人的部分设置。事实上正因为是测试，另一部分设置是动态变化的（因为要充分测试）。
-如果你想要一个足够稳定的版本，请关注本项目的更新频道或等待第一个正式版本的发布。
-
-请注意，即使项目仍在测试，也不表示其官方实例会是绝对开放的。在您决定使用本项目的官方实例之前，请仔细阅读[服务条款](https://mini.gramlabs.org/terms)，否则请考虑第三方实例或[自行部署](https://github.com/Hentioe/policr-mini/wiki/%E8%87%AA%E8%A1%8C%E9%83%A8%E7%BD%B2%EF%BC%88%E6%9E%84%E5%BB%BA%E7%AC%AC%E4%B8%89%E6%96%B9%E5%AE%9E%E4%BE%8B%EF%BC%89)。
 
 ## 技术介绍
 
@@ -65,4 +41,4 @@
 
 ## 未来计划
 
-本项目自称处于「开发阶段」是因为与设想中的功能完成度和质量（指代码质量、稳定性、性能等）仍有差异，所以它还需要很长一段时间来完善自身。这期间也会继续探索新的模式和方案，不断前进。
+本项目仍在积极维护，包括完成度和质量优化，它还需要较长的一段时间来完善自身。这期间也会继续探索新的模式和方案，不断演进。
