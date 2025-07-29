@@ -21,7 +21,7 @@ export default [
     "plugin:solid/recommended",
   ),
   {
-    files: ["src/**/.ts", "src/**/*.js", "src/**/.tsx", "src/**/*.jsx", "types/**/*.d.ts"],
+    files: ["src/**/.ts", "src/**/*.js", "src/**/.tsx", "src/**/*.jsx"],
     plugins: {
       "@typescript-eslint": typescriptEslint,
     },
