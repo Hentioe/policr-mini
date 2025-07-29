@@ -21,7 +21,7 @@ services:
     restart: always
 
   bot-api:
-    image: gramoss/telegram-bot-api:7.5
+    image: gramoss/telegram-bot-api:9.1
     environment:
       TELEGRAM_API_ID: ${TELEGRAM_API_ID}
       TELEGRAM_API_HASH: ${TELEGRAM_API_HASH}

@@ -19,7 +19,7 @@ services:
       DOCKER_INFLUXDB_INIT_ADMIN_TOKEN: __token__
 
   bot-api:
-    image: gramoss/telegram-bot-api:7.2
+    image: gramoss/telegram-bot-api:9.1
     ports:
       - 8081:80
     environment:
