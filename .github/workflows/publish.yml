@@ -2,7 +2,7 @@ name: Publish
 
 on:
   push:
-    branches: ["upgrade"]
+    branches: ["main"]
     # tags: ["v*"]
 
 permissions:
@@ -26,7 +26,7 @@ jobs:
           images: |
             gramoss/policr-mini
           tags: |
-            type=raw,value=weekly,enable=${{ github.ref == 'refs/heads/upgrade' }}
+            type=raw,value=weekly,enable=${{ github.ref == format('refs/heads/{0}', github.event.repository.default_branch) }}
       - name: Set up QEMU
         uses: docker/setup-qemu-action@v3
       - name: Set up Docker Buildx
