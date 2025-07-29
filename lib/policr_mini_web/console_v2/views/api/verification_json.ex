@@ -2,6 +2,10 @@ defmodule PolicrMiniWeb.ConsoleV2.API.VerificationView do
   use PolicrMiniWeb, :view
   use PolicrMiniWeb.ConsoleV2.Helpers, :view
 
+  def render("show.json", %{verification: verification}) do
+    success(render_one(verification, __MODULE__, "verification.json"))
+  end
+
   def render("verification.json", %{verification: verification}) do
     %{
       id: verification.id,

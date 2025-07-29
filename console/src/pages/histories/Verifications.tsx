@@ -1,7 +1,8 @@
 import { useQuery } from "@tanstack/solid-query";
 import { format } from "date-fns";
 import { createEffect, createSignal, For, Match, Show, Switch } from "solid-js";
-import { getVerifications } from "../../api";
+import { createStore } from "solid-js/store";
+import { getVerifications, killFromVerification } from "../../api";
 import { ActionButton } from "../../components";
 import Loading from "../../components/Loading";
 import { toaster } from "../../utils";
@@ -12,11 +13,48 @@ type Verification = ServerData.Verification;
 export default (props: { chatId: number | null; range: string }) => {
   const [maxReached, setMaxReached] = createSignal(false);
   const [isEmpty, setIsEmpty] = createSignal(false);
+  const [executing, setExecuting] = createStore<{ killing: number[]; banning: number[]; unbanning: number[] }>({
+    killing: [],
+    banning: [],
+    unbanning: [],
+  });
   const query = useQuery(() => ({
     queryKey: ["verifications", props.chatId, props.range],
     queryFn: () => getVerifications(props.chatId!, props.range),
     enabled: props.chatId != null,
   }));
+
+  const handleKill = async (id: number, action: InputData.VerificationKillAction) => {
+    let actionText;
+    switch (action) {
+      case "manual_ban":
+        actionText = "封禁";
+        setExecuting("banning", prev => [...prev, id]);
+        break;
+      case "manual_kick":
+        actionText = "踢出";
+        setExecuting("killing", prev => [...prev, id]);
+        break;
+      case "unban":
+        actionText = "解禁";
+        setExecuting("unbanning", prev => [...prev, id]);
+        break;
+    }
+    const resp = await killFromVerification(id, action);
+    setExecuting("killing", prev => prev.filter(i => i !== id));
+    setExecuting("banning", prev => prev.filter(i => i !== id));
+    setExecuting("unbanning", prev => prev.filter(i => i !== id));
+    if (resp.success) {
+      toaster.success({ title: "操作成功", description: `已${actionText}用户` });
+    } else {
+      toaster.error({ title: "操作失败", description: resp.message });
+    }
+  };
+
+  // eslint-disable-next-line @typescript-eslint/no-unused-vars
+  const handleReVerification = async (_id: number) => {
+    toaster.error({ title: "功能尚未实现", description: "请关注后续更新。" });
+  };
 
   createEffect(() => {
     if (!query.data) {
@@ -55,18 +93,49 @@ export default (props: { chatId: number | null; range: string }) => {
     return (
       <Switch>
         <Match when={isBanned()}>
-          <ActionButton icon="fluent:lock-open-24-regular" variant="success" size="sm" outline>解禁</ActionButton>
+          <ActionButton
+            onClick={() => handleKill(props.v.id, "unban")}
+            loading={executing.unbanning.includes(props.v.id)}
+            icon="fluent:lock-open-24-regular"
+            variant="success"
+            size="sm"
+            outline
+          >
+            解禁
+          </ActionButton>
         </Match>
         <Match when={true}>
-          <ActionButton icon="mdi:ban" variant="danger" size="sm" outline>封禁</ActionButton>
+          <ActionButton
+            onClick={() => handleKill(props.v.id, "manual_ban")}
+            loading={executing.banning.includes(props.v.id)}
+            icon="mdi:ban"
+            variant="danger"
+            size="sm"
+            outline
+          >
+            封禁
+          </ActionButton>
+          <ActionButton
+            onClick={() => handleKill(props.v.id, "manual_kick")}
+            loading={executing.killing.includes(props.v.id)}
+            icon="cuida:user-remove-outline"
+            variant="warning"
+            size="sm"
+            outline
+          >
+            踢出
+          </ActionButton>
         </Match>
       </Switch>
     );
   };
 
-  // eslint-disable-next-line @typescript-eslint/no-unused-vars
-  const ReVerificationButton = (_props: { v: Verification }) => {
-    return <ActionButton icon="uis:redo" variant="info" size="sm" outline>重新验证</ActionButton>;
+  const ReVerificationButton = (props: { v: Verification }) => {
+    return (
+      <ActionButton onClick={() => handleReVerification(props.v.id)} icon="uis:redo" variant="info" size="sm" outline>
+        重新验证
+      </ActionButton>
+    );
   };
 
   return (
@@ -84,7 +153,7 @@ export default (props: { chatId: number | null; range: string }) => {
               <Record.Root
                 user={v.userFullName}
                 badge={renderBadge(v)}
-                bottoms={[<BanOrUnbanButton v={v} />, <ReVerificationButton v={v} />]}
+                bottoms={[<ReVerificationButton v={v} />, <BanOrUnbanButton v={v} />]}
               >
                 <Record.Details>
                   <Record.Detail

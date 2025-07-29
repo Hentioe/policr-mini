@@ -18,4 +18,6 @@ declare namespace InputData {
     answers: string[];
     attachment: string | null;
   };
+
+  type VerificationKillAction = "manual_ban" | "manual_kick" | "unban";
 }

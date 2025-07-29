@@ -140,6 +140,17 @@ export async function updateScheme(id: number, scheme: InputData.Scheme): Payloa
   );
 }
 
+export async function killFromVerification(
+  id: number,
+  action: InputData.VerificationKillAction,
+): PayloadType<ServerData.Verification> {
+  return strictify(
+    await client.put(`/verifications/${id}/kill`, {
+      action,
+    }),
+  );
+}
+
 async function strictify<T extends Record<string, unknown> | readonly Record<string, unknown>[]>(
   resp: AxiosResponse<T>,
 ) {

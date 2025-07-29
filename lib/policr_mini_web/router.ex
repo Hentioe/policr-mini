@@ -149,6 +149,7 @@ defmodule PolicrMiniWeb.Router do
     get "/chats/:id/operations", ChatController, :operations
 
     put "/schemes/:id", SchemeController, :update
+    put "/verifications/:id/kill", VerificationController, :kill
 
     post "/customs", CustomController, :add
     put "/customs/:id", CustomController, :update

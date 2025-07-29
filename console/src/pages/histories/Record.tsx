@@ -37,7 +37,7 @@ const Root = (props: { user: string; badge: JSX.Element; children: JSX.Element; 
       {props.children}
       {/* 按钮或徽章列表 */}
       <Show when={props.bottoms.length > 0}>
-        <div class="flex gap-[1rem]">
+        <div class="flex gap-[0.75rem]">
           <Index each={props.bottoms}>
             {(button) => <>{button()}</>}
           </Index>

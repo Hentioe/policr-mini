@@ -21,9 +21,10 @@ defmodule Abilities do
   end
 
   defimpl Canada.Can, for: User do
-    alias PolicrMini.Chats.Scheme
     alias PolicrMini.Instances.Chat
+    alias PolicrMini.Chats.Scheme
     alias PolicrMini.Chats.CustomKit
+    alias PolicrMini.Chats.Verification
 
     # 用户对群组的访问权限检查
     @impl true
@@ -49,6 +50,16 @@ defmodule Abilities do
 
     def can?(%User{id: user_id}, action, %Scheme{chat_id: chat_id}) when action in [:update] do
       # 用户对方案条目写入操作的权限检查
+      if permission = Uses.get_permission(chat_id, user_id) do
+        permission.writable || permission.owner
+      else
+        false
+      end
+    end
+
+    def can?(%User{id: user_id}, action, %Verification{chat_id: chat_id})
+        when action in [:kill] do
+      # 用户对验证条目写入操作的权限检查
       if permission = Uses.get_permission(chat_id, user_id) do
         permission.writable || permission.owner
       else

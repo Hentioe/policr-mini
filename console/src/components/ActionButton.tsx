@@ -2,7 +2,7 @@ import { Icon } from "@iconify-icon/solid";
 import classNames from "classnames";
 import { JSX, Match, Switch } from "solid-js";
 
-type Variant = "info" | "danger" | "success";
+type Variant = "info" | "warning" | "danger" | "success";
 type Props = {
   children: JSX.Element;
   variant?: Variant;
@@ -87,31 +87,35 @@ export default (props: Props) => {
       switch (props.variant) {
         case "info":
           return classNames([
-            "text-blue-500 border-blue-200 bg-blue-150",
+            "text-blue-600 border-blue-200 bg-blue-150",
             {
               "hover:bg-blue-100": allowChange(),
             },
           ]);
-
+        case "warning":
+          return classNames([
+            "text-yellow-600 border-yellow-200 bg-yellow-150",
+            {
+              "hover:bg-yellow-100": allowChange(),
+            },
+          ]);
         case "danger":
           return classNames([
-            "text-red-500 border-red-200 bg-red-150",
+            "text-red-600 border-red-200 bg-red-150",
             {
               "hover:bg-red-100": allowChange(),
             },
           ]);
-
         case "success":
           return classNames([
-            "text-green-500 border-green-200 bg-green-150",
+            "text-green-600 border-green-200 bg-green-150",
             {
               "hover:bg-green-100": allowChange(),
             },
           ]);
-
         default:
           return classNames([
-            "text-zinc-500 border-zinc-200 bg-zinc-150",
+            "text-zinc-600 border-zinc-200 bg-zinc-150",
             {
               "hover:bg-zinc-100": allowChange(),
             },
