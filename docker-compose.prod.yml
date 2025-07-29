@@ -68,7 +68,7 @@ services:
       POLICR_MINI_UNBAN_METHOD: ${POLICR_MINI_UNBAN_METHOD}
       POLICR_MINI_OPTS: ${POLICR_MINI_OPTS}
     volumes:
-      - ./_assets:/_assets
+      - ./shared_assets:/home/policr_mini/shared_assets
     restart: always
     depends_on:
       capinde:
