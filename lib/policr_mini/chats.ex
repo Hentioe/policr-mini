@@ -260,7 +260,8 @@ defmodule PolicrMini.Chats do
       where: ^chat_id_cond,
       where: ^stop_cond,
       limit: ^Keyword.get(conds, :limit, 25),
-      offset: ^Keyword.get(conds, :offset, 0)
+      offset: ^Keyword.get(conds, :offset, 0),
+      order_by: [desc: o.inserted_at]
     )
     |> Repo.all()
   end
@@ -578,7 +579,8 @@ defmodule PolicrMini.Chats do
       where: ^chat_id_cond,
       where: ^stop_cond,
       limit: ^Keyword.get(conds, :limit, 25),
-      offset: ^Keyword.get(conds, :offset, 0)
+      offset: ^Keyword.get(conds, :offset, 0),
+      order_by: [desc: v.inserted_at]
     )
     |> Repo.all()
   end
