@@ -213,11 +213,11 @@ defmodule PolicrMiniBot.HandleSelfJoinedChain do
       inline_keyboard: [
         [
           %InlineKeyboardButton{
-            text: commands_text("最近更新"),
-            url: "https://blog.gramlabs.org/posts/policr-mini-updates-2024-01-01.html"
+            text: commands_text("📜 最近更新"),
+            url: "https://blog.hentioe.dev/posts/policr-mini-updates-2025-07-30.html"
           },
           %InlineKeyboardButton{
-            text: commands_text("订阅更新"),
+            text: commands_text("🔔 订阅更新"),
             url: "https://t.me/policr_changelog"
           }
         ],
