@@ -11,4 +11,5 @@ declare namespace InputData {
   };
 
   type StatsRange = "today" | "7d" | "30d" | "all";
+  type ResetStatsRange = "last_30d" | "all";
 }

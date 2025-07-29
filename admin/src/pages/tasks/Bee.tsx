@@ -17,11 +17,13 @@ type Props = {
 const DATA_FORMAT = "yyyy-MM-dd HH:mm:ss";
 
 const NAMES: { [key: string]: string } = {
-  "reset_all_stats": "重置统计",
+  "reset_all": "重置统计",
+  "reset_last_30d": "重置最近 30 天统计",
 };
 
 const ICONS: { [key: string]: string } = {
-  "reset_all_stats": "streamline-plump-color:eraser",
+  "reset_all": "streamline-plump-color:eraser",
+  "reset_last_30d": "streamline-plump-color:eraser",
 };
 
 const FALLBACK_ICON = "twemoji:construction-worker";

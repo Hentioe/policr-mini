@@ -5,11 +5,24 @@ defmodule PolicrMiniWeb.AdminV2.API.BeeController do
 
   action_fallback PolicrMiniWeb.AdminV2.API.FallbackController
 
-  def reset_stats(conn, _params) do
-    run = &Stats.reset_all_stats/0
+  @reset_stats %{
+    range: [type: :string, in: ~w(last_30d all), default: "30d"]
+  }
 
-    with {:ok, bee} <- Honeycomb.gather_honey(:background, "reset_all_stats", run) do
+  def reset_stats(conn, params) do
+    with {:ok, params} <- Tarams.cast(params, @reset_stats),
+         {:ok, bee} <- create_bee(params[:range]) do
       render(conn, "show.json", bee: bee)
     end
+  end
+
+  defp create_bee(range) do
+    run =
+      case range do
+        "last_30d" -> fn -> Stats.reset_task(30) end
+        "all" -> fn -> Stats.reset_task(365 * 99) end
+      end
+
+    Honeycomb.gather_honey(:background, "reset_#{range}", run)
   end
 end

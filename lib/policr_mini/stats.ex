@@ -237,15 +237,15 @@ defmodule PolicrMini.Stats do
     regen_recent_days(chat_id, 30)
   end
 
-  def reset_all_stats do
+  def reset_task(days) when is_integer(days) do
     chats = Uses.all_chats()
 
     results =
       for chat <- chats do
         # 清空此群组的所有统计数据
         :ok = clear_all(chat.id)
-        # 重新生成最近 99 年的数据
-        regen_recent_days(chat.id, 365 * 99)
+        # 重新生成特定天数以内的数据
+        regen_recent_days(chat.id, days)
       end
 
     result = Enum.reduce(results, %GenResult{}, &GenResult.merge/2)

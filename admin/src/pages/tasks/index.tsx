@@ -24,7 +24,7 @@ export default () => {
 
   const handleResetStats = async () => {
     setCreatingReset(true);
-    const resp = await resetStats();
+    const resp = await resetStats("last_30d");
     setCreatingReset(false);
     if (resp.success) {
       toaster.success({ title: "重置任务创建成功", description: "请留意后台任务执行情况" });
