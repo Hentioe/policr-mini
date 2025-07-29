@@ -69,8 +69,8 @@ export async function getTasks(): PayloadType<ServerData.Tasks> {
   return strictify(await client.get("/tasks"));
 }
 
-export async function resetStats(): PayloadType<ServerData.Bee<unknown>> {
-  return strictify(await client.post("/bees/reset_stats"));
+export async function resetStats(range: InputData.ResetStatsRange): PayloadType<ServerData.Bee<unknown>> {
+  return strictify(await client.post(`/bees/reset_stats`, { range }));
 }
 
 export async function uploadAlbums(
