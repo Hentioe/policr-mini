@@ -2,15 +2,25 @@ import { Accordion } from "@ark-ui/solid/accordion";
 import { Icon } from "@iconify-icon/solid";
 import classNames from "classnames";
 import { createMemo, For, Index, JSX, Match, Show, Switch } from "solid-js";
+import Loading from "../../components/Loading";
 
 type ItemVlue = ServerData.CustomItem;
 
-const Root = (props: { items: ItemVlue[]; children: (item: ItemVlue, i: number) => JSX.Element }) => {
-  const defaultValue = createMemo(() => props.items.length > 0 ? props.items.map(item => item.id.toString()) : []);
+const Root = (props: { items?: ItemVlue[] | false; children: (item: ItemVlue, i: number) => JSX.Element }) => {
+  const defaultValue = createMemo(() => {
+    if (props.items) {
+      return props.items.length > 0 ? props.items.map(item => item.id.toString()) : [];
+    }
+  });
 
   return (
     <Switch>
-      <Match when={props.items.length > 0}>
+      <Match when={!props.items}>
+        <div class="mt-[1.5rem] flex justify-center">
+          <Loading size="lg" color="skyblue" />
+        </div>
+      </Match>
+      <Match when={(props.items as ItemVlue[]).length > 0}>
         <Accordion.Root multiple collapsible lazyMount defaultValue={defaultValue()}>
           <Index each={props.items}>
             {(item, i) => <>{props.children(item(), i)}</>}

@@ -161,7 +161,7 @@ export default () => {
             添加自定义验证
           </ActionButton>
         </div>
-        <List.Root items={query.data?.success && query.data.payload || []}>
+        <List.Root items={query.data?.success && query.data.payload}>
           {(item, i) => (
             <List.Item
               data={item}
