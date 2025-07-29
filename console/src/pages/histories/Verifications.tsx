@@ -29,8 +29,10 @@ export default (props: { chatId: number | null; range: string }) => {
     if (query.data.payload.length === 0) {
       setIsEmpty(true);
     } else if (query.data.payload.length >= 120) {
+      setIsEmpty(false);
       setMaxReached(true);
     } else {
+      setIsEmpty(false);
       setMaxReached(false);
     }
   });
