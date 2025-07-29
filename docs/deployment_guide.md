@@ -149,7 +149,7 @@ services:
       # POLICR_MINI_BOT_API_BASE_URL: ${POLICR_MINI_BOT_API_BASE_URL}
       # POLICR_MINI_BOT_WEBHOOK_URL: ${POLICR_MINI_BOT_WEBHOOK_URL}
       # POLICR_MINI_BOT_WEBHOOK_SERVER_PORT: ${POLICR_MINI_BOT_WEBHOOK_SERVER_PORT}
-      POLICR_MINI_BOT_AUTO_GEN_COMMANDS: ${POLICR_MINI_BOT_AUTO_GEN_COMMANDS}
+      # POLICR_MINI_BOT_AUTO_GEN_COMMANDS: ${POLICR_MINI_BOT_AUTO_GEN_COMMANDS}
       # POLICR_MINI_PLAUSIBLE_DOMAIN: ${POLICR_MINI_PLAUSIBLE_DOMAIN}
       # POLICR_MINI_PLAUSIBLE_SCRIPT_SRC: ${POLICR_MINI_PLAUSIBLE_SCRIPT_SRC}
       # POLICR_MINI_UNBAN_METHOD: ${POLICR_MINI_UNBAN_METHOD}
@@ -177,6 +177,7 @@ POLICR_MINI_INFLUX_TOKEN=
 POLICR_MINI_WEB_PORT=
 POLICR_MINI_WEB_SECRET_KEY_BASE=
 POLICR_MINI_WEB_URL_BASE=
+POLICR_MINI_BOT_TOKEN=
 POLICR_MINI_BOT_OWNER_ID=
 ```
 
@@ -198,7 +199,17 @@ POLICR_MINI_BOT_OWNER_ID=
 - `POLICR_MINI_DATABASE_POOL_SIZE`: 可选，数据库连接池的大小。简单来说，越小的池服务器消耗越低，但不适合并发高的实例。越大的池，服务器资源消耗越高，但是能应付更大的并发连接。对于仅仅部署用来服务自己的群的实例，将此值设置到尽可能小即可（可小于 `10`）。
 - `POLICR_MINI_BOT_AUTO_GEN_COMMANDS`: 可选，是否自动生成机器人的命令。将此值设置为 `true` 的话，每次启动时将自动生成或更新机器人的命令列表，不需要人工通过 BotFather 设置。有时候，您或许想隐藏某些命令或全部命令，则可以将此值设置为 `false`（当前默认为 `false`）。
 
-_还有一些其它的可选配置，将在独立的小章节中介绍。_
+_还有一些其它的可选配置，部分将在独立的小章节中介绍。_
+
+### 部署的服务
+
+虽然配置可以轻易生成，但你可能对其中的一些选项感到疑惑。本小章节将对它们做简单介绍。基于以上 Docker Compose 模板，我们部署了 5 个服务，它们共同支撑了 Policr Mini 项目的运行。分别是：
+
+- `db`: PostgreSQL 数据库服务，存储机器人、群和用户的几乎所有项目数据。
+- `tsdb`: InfluxDB 数据库服务，存储统计数据。这里的 ts 是 Time Series（时间序列）的缩写，它表示“时序”数据库。
+- `bot-api`: 本地的 Telegram Bot API 服务，用于优化机器人的响应速度。它可以让机器人连接本地 API 服务而非荷兰的服务器。这是可选的。
+- `capinde`: 验证生成服务。本项目所有基于图片的验证生成都是通过它来完成的。它是将 Policr Mini 的图片合成代码剥离后的独立开源产品。
+- `server`: Policr Mini 的核心服务，提供 Mini Apps 控制台、web 后台和机器人服务。
 
 ### Webhook 模式
 
@@ -249,7 +260,6 @@ _注意：如果 Webhook 服务直接暴露，可能会成为易于攻击的“�
 
    capinde:
      image: hentioe/capinde:0.1.1
-@@ -59,7 +59,7 @@ services:
        POLICR_MINI_BOT_TOKEN: ${POLICR_MINI_BOT_TOKEN}
        POLICR_MINI_BOT_OWNER_ID: ${POLICR_MINI_BOT_OWNER_ID}
        # POLICR_MINI_BOT_WORK_MODE: ${POLICR_MINI_BOT_WORK_MODE}
@@ -257,7 +267,7 @@ _注意：如果 Webhook 服务直接暴露，可能会成为易于攻击的“�
 +      POLICR_MINI_BOT_API_BASE_URL: ${POLICR_MINI_BOT_API_BASE_URL}
        # POLICR_MINI_BOT_WEBHOOK_URL: ${POLICR_MINI_BOT_WEBHOOK_URL}
        # POLICR_MINI_BOT_WEBHOOK_SERVER_PORT: ${POLICR_MINI_BOT_WEBHOOK_SERVER_PORT}
-       POLICR_MINI_BOT_AUTO_GEN_COMMANDS: ${POLICR_MINI_BOT_AUTO_GEN_COMMANDS}
+       # POLICR_MINI_BOT_AUTO_GEN_COMMANDS: ${POLICR_MINI_BOT_AUTO_GEN_COMMANDS}
 @@ -75,7 +75,7 @@ services:
          condition: service_healthy
        db:
@@ -286,6 +296,9 @@ _部署本地 Bot API 时，你应该先找出机器人的数据中心位置，�
 ### 部署特定版本
 
 本教程提供的 `docker-compose.yml` 模板中的 `server` -> `image` 是以本项目代码构建而成的镜像，值 `gramoss/policr-mini:weekly` 表示 `gramoss` 帐号下的 `policr-mini` 镜像，标签是 `weekly`。此处的镜像是由 GitHub Actions 服务器自动构建和推送的。
+
+> [!NOTE]
+> 这里的 `gramoss` 的含义是 GramLabs Open Source Software 的缩写，表示 GramLabs 开源软件。
 
 受文档的更新频率所限，上述配置中的镜像可能总是 `weekly` 标签。此标签的镜像始终构建于最新的 `main` 分支代码之上，它可能不太稳定但功能上是最新的。您也可以将此标签修改为具体日期，如 `20241010` 表示构建于 `2024-10-10` 当天的镜像。若您想确保自己总是知道部署和升级的是什么版本时建议使用日期标签。从[此页面](https://hub.docker.com/r/gramoss/policr-mini/tags)可以看到最新构建的基于日期的镜像版本，通常在更新频道发布更新说明时也会附带镜像的日期标签。
 
@@ -331,6 +344,29 @@ docker compose logs server -f
 _提示：如果您以 `webhook` 模式启动，日志会输出 `[info] Bot (@your_bot_username) is working (webhook)`。_
 
 _如果日志输出没有问题，请 Ctrl + C 结束日志查看。它是安全的，不会导致容器停止。_
+
+部署完成后，会多出一些目录。新的文件树如下：
+
+```bash
+.
+├── albums
+├── _data
+├── docker-compose.yml
+├── dumps
+├── .env
+└── shared_assets
+
+5 directories, 2 files
+```
+
+它们的用途如下：
+
+- `albums`: 存储部署的验证资源。内部是一个个图集文件夹。
+- `_data`: PostgreSQL 数据库的数据目录。
+- `dumps`: 存储数据库备份文件（升级或迁移时使用）。
+- `shared_assets`: 验证生成器 Capinde 和机器人两个服务共享的目录，一个在其中生成验证图片另一个读取并发送。
+
+其中 `_data` 目录的数据是非常重要的，**任何时候请谨慎对待**。
 
 ## 反向代理
 
