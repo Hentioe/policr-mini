@@ -3,7 +3,7 @@ name: Publish
 on:
   push:
     branches: ["main"]
-    # tags: ["v*"]
+    tags: ["*"]
 
 permissions:
   contents: read
@@ -27,6 +27,7 @@ jobs:
             gramoss/policr-mini
           tags: |
             type=raw,value=weekly,enable=${{ github.ref == format('refs/heads/{0}', github.event.repository.default_branch) }}
+            type=match,pattern=\d{8},group=0,enable=${{ startsWith(github.ref, 'refs/tags/') }}
       - name: Set up QEMU
         uses: docker/setup-qemu-action@v3
       - name: Set up Docker Buildx
