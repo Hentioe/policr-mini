@@ -8,8 +8,17 @@ defmodule PolicrMiniWeb.AdminV2.API.PageController do
 
   def index(conn, _params) do
     with {:ok, capinde} <- Capinde.server_info() do
+      version = Version.parse!(Application.get_env(:policr_mini, :version))
+
+      version =
+        if Enum.empty?(version.pre) do
+          to_string(version.patch)
+        else
+          to_string(version.patch) <> "-" <> Enum.join(version.pre, ".")
+        end
+
       server = %{
-        version: Application.get_env(:policr_mini, :version)
+        version: version
       }
 
       render(conn, "index.json", server: server, capinde: capinde)
