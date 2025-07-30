@@ -110,4 +110,4 @@ run = "mise run env-deps stop"
 run = ["rm -rf test/assets/output/*", "rm -rf _assets/_cache/*"]
 
 [tasks.count]
-run = "cloc lib test config priv/repo priv/gettext priv/rel benches admin/src admin/types console/src console/types assets/src assets/styles webapps/src webapps/types"
+run = "cloc lib test config priv/repo priv/gettext priv/rel benches admin/src console/src assets/src assets/styles webapps/src webapps/types"
