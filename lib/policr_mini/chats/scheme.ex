@@ -95,7 +95,7 @@ defmodule PolicrMini.Chats.Scheme do
       Map.put(
         params,
         "cleanup_messages",
-        cast_cleanup_messages_from_new_params(params["cleanup_messages"] || [])
+        cast_cleanup_messages_from_new_params(params["cleanup_messages"])
       )
 
     Enum.into(params, %{}, fn {key, value} ->
@@ -113,6 +113,8 @@ defmodule PolicrMini.Chats.Scheme do
       {new_key, value}
     end)
   end
+
+  def cast_cleanup_messages_from_new_params(nil), do: nil
 
   def cast_cleanup_messages_from_new_params(message_cleanup) when is_list(message_cleanup) do
     Enum.map(message_cleanup, fn

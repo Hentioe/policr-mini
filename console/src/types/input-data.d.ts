@@ -6,7 +6,7 @@ declare namespace InputData {
     fallbackKillStrategy: string | null;
     mentionText: string | null;
     imageChoicesCount: string | null;
-    cleanupMessages: MessageKind[];
+    cleanupMessages: MessageKind[] | null;
     delayUnbanSecs: number | null;
   };
 

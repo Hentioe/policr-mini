@@ -61,7 +61,7 @@ declare namespace ServerData {
     mentionTextItems: SelectItem[];
     imageChoicesCount: string | null;
     imageChoicesCountItems: SelectItem[];
-    cleanupMessages: MessageKind[];
+    cleanupMessages: MessageKind[] | null;
     delayUnbanSecs: number | null;
   };
 

@@ -1,7 +1,7 @@
 import { destructure } from "@solid-primitives/destructure";
 import { useQuery } from "@tanstack/solid-query";
 import classNames from "classnames";
-import { createEffect, createSignal, onMount } from "solid-js";
+import { createEffect, createSignal, Match, onMount, Switch } from "solid-js";
 import { getScheme, updateScheme } from "../../api";
 import { ActionButton } from "../../components";
 import { PageBase } from "../../layouts";
@@ -38,7 +38,7 @@ export default () => {
   const [mentionTextItems, setMentionTextItems] = createSignal<Scheme["mentionTextItems"]>([]);
   const [imageChoicesCount, setImageChoicesCount] = createSignal<Scheme["imageChoicesCount"]>(null);
   const [imageChoicesCountItems, setImageChoicesCountItems] = createSignal<Scheme["imageChoicesCountItems"]>([]);
-  const [cleanupMessage, setCleanupMessages] = createSignal<Scheme["cleanupMessages"]>([]);
+  const [cleanupMessages, setCleanupMessages] = createSignal<Scheme["cleanupMessages"]>(null);
   const [delayUnbanSecs, setDelayUnbanSecs] = createSignal<Scheme["delayUnbanSecs"]>(null);
   const [prevScheme, setPrevScheme] = createSignal<Scheme | null>(null);
   const [isChanged, setIsChanged] = createSignal(false);
@@ -52,12 +52,33 @@ export default () => {
 
   const handleCleanupMessagesChange = (kind: ServerData.MessageKind, checked: boolean) => {
     setCleanupMessages((prev) => {
-      if (checked) {
-        return [...prev, kind];
+      if (prev !== null) {
+        if (checked) {
+          return [...prev, kind];
+        } else {
+          return prev.filter((item) => item !== kind);
+        }
       } else {
-        return prev.filter((item) => item !== kind);
+        if (checked) {
+          return [kind];
+        } else {
+          return null;
+        }
       }
     });
+  };
+
+  const handleCleanupMessagesDefaultChange = (checked: boolean) => {
+    if (checked) {
+      setCleanupMessages(null);
+    } else {
+      const current = cleanupMessages();
+      if (current !== null) {
+        setCleanupMessages(current);
+      } else {
+        setCleanupMessages([]);
+      }
+    }
   };
 
   createEffect(() => {
@@ -82,14 +103,26 @@ export default () => {
 
   createEffect(() => {
     const prev = prevScheme();
+
     if (prev) {
+      const cleanupMessagesIsChange = () => {
+        const current = cleanupMessages();
+        if (prev.cleanupMessages === null && current === null) {
+          return false;
+        } else if (prev.cleanupMessages !== null && current !== null) {
+          return prev.cleanupMessages.join(",") !== current.join(",");
+        } else {
+          return true;
+        }
+      };
+
       const isChanged = prev.type !== type()
         || prev.timeout !== timeout()
         || prev.killStrategy !== killStrategy()
         || prev.fallbackKillStrategy !== fallbackKillStrategy()
         || prev.mentionText !== mentionText()
         || prev.imageChoicesCount !== imageChoicesCount()
-        || prev.cleanupMessages.join(",") !== cleanupMessage().join(",")
+        || cleanupMessagesIsChange()
         || prev.delayUnbanSecs !== delayUnbanSecs()
         || prev.timeout !== timeout();
 
@@ -119,7 +152,7 @@ export default () => {
       fallbackKillStrategy: systemToNull(fallbackKillStrategy()),
       mentionText: systemToNull(mentionText()),
       imageChoicesCount: systemToNull(imageChoicesCount()),
-      cleanupMessages: cleanupMessage(),
+      cleanupMessages: cleanupMessages(),
       delayUnbanSecs: delayUnbanSecs(),
     });
 
@@ -208,16 +241,32 @@ export default () => {
         <FieldGroup title="其它" icon="twemoji:hammer-and-wrench">
           <FieldRoot label="消息清理">
             <div class="flex gap-[1rem]">
-              <Checkbox
-                label="加入群组"
-                default={cleanupMessage().includes("joined")}
-                onChange={(checked) => handleCleanupMessagesChange("joined", checked)}
-              />
-              <Checkbox
-                label="退出群组"
-                default={cleanupMessage().includes("left")}
-                onChange={(checked) => handleCleanupMessagesChange("left", checked)}
-              />
+              <Switch>
+                <Match when={cleanupMessages() === null}>
+                  <Checkbox
+                    label="系统默认"
+                    default={true}
+                    onChange={handleCleanupMessagesDefaultChange}
+                  />
+                </Match>
+                <Match when={true}>
+                  <Checkbox
+                    label="加入群组"
+                    default={(cleanupMessages() || []).includes("joined")}
+                    onChange={(checked) => handleCleanupMessagesChange("joined", checked)}
+                  />
+                  <Checkbox
+                    label="退出群组"
+                    default={(cleanupMessages() || []).includes("left")}
+                    onChange={(checked) => handleCleanupMessagesChange("left", checked)}
+                  />
+                  <Checkbox
+                    label="系统默认"
+                    default={cleanupMessages() === null}
+                    onChange={handleCleanupMessagesDefaultChange}
+                  />
+                </Match>
+              </Switch>
             </div>
           </FieldRoot>
         </FieldGroup>

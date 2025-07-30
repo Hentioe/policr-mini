@@ -64,7 +64,7 @@ defmodule PolicrMiniWeb.ConsoleV2.API.SchemeView do
     ]
   end
 
-  def fix_cleanup_messages(nil), do: []
+  def fix_cleanup_messages(nil), do: nil
 
   def fix_cleanup_messages(message_cleanup) when is_list(message_cleanup) do
     Enum.map(message_cleanup, fn
