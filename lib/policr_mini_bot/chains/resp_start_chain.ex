@@ -22,17 +22,17 @@ defmodule PolicrMiniBot.RespStartChain do
   @type tgerr :: Telegex.Type.error()
   @type tgmsg :: Telegex.Type.Message.t()
 
-  # 重写匹配规则，消息文本以 `/start` 开始的私聊消息即匹配。
+  # 重写匹配规则，消息文本以 `/start` 开始的私聊消息即匹配
   @impl true
   def match?(%{text: text, chat: %{type: "private"}}, _context) when text != nil do
     String.starts_with?(text, @command)
   end
 
-  # 其余皆忽略。
+  # 其余皆忽略
   @impl true
   def match?(_message, _context), do: false
 
-  # 处理携带参数。
+  # 转发携带参数
   @impl true
   def handle(%{text: <<@command <> " " <> args_text::binary>>} = message, context) do
     args_text
@@ -43,23 +43,21 @@ defmodule PolicrMiniBot.RespStartChain do
     {:stop, context}
   end
 
-  # 处理空参数。
+  # 处理空参数
   @impl true
   def handle(%{chat: chat} = _message, context) do
-    theader = commands_text("我是一个专注于新成员验证的机器人。")
-    tdesc = commands_text("我具有稳定的服务，便于操作的网页后台。不断增强与优化的核心功能，并保持长期维护。同时我是开源的，可自由复制部署的。")
-
-    tfooter =
-      commands_text("访问 %{here_link} 更加了解一下我吧～",
-        here_link: ~s|<a href="https://github.com/Hentioe/policr-mini">这里</a>|
-      )
-
     text = """
-    #{theader}
+    👋 你好，旅行者。我是一个以验证功能为主的机器人。主要功能包括：
 
-    #{tdesc}
+    ‧ 提供自定义验证（定制验证）和其它各种验证类型
+    ‧ 支持公开群、私有群、管理员全匿名群
+    ‧ 兼容已启用/未启用 Approve new members（审核新成员）等多种模式
+    ‧ 为机器人拥有者（运营者）设计的全功能 web 后台
+    ‧ 为管理员（用户）设计的 Mini Apps 控制台
 
-    #{tfooter}
+    我具有稳定的服务，不断增强与优化的核心功能，并保持长期维护。同时我是开源的，可自由复制部署的。
+
+    访问<a href="https://github.com/Hentioe/policr-mini">这里</a>深入了解一下我吧～
     """
 
     markup = %InlineKeyboardMarkup{
@@ -88,7 +86,7 @@ defmodule PolicrMiniBot.RespStartChain do
     {:done, context}
   end
 
-  # 处理 v1 版本的验证参数。
+  # 处理 v1 版本的验证参数
   def handle_args(["verification", "v1", target_chat_id], %{chat: %{id: from_user_id}} = _message) do
     target_chat_id = String.to_integer(target_chat_id)
 
@@ -125,7 +123,7 @@ defmodule PolicrMiniBot.RespStartChain do
     end
   end
 
-  # 响应未知参数。
+  # 响应未知参数
   def handle_args(_, message) do
     %{chat: %{id: chat_id}} = message
 

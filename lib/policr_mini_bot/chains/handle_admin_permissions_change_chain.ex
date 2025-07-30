@@ -116,7 +116,7 @@ defmodule PolicrMiniBot.HandleAdminPermissionsChangeChain do
     with {:ok, chat} <- Chat.get(chat_id),
          {:ok, _} <- Syncing.sync_for_chat_permissions(chat) do
       theader =
-        commands_text("检测到群成员 %{mention} 的管理权限变化，已自动同步至后台权限中。",
+        commands_text("检测到群成员 %{mention} 的管理权限变化，已自动同步至控制台权限中。",
           mention: mention(user, anonymization: false, parse_mode: "HTML")
         )
 
@@ -145,7 +145,7 @@ defmodule PolicrMiniBot.HandleAdminPermissionsChangeChain do
       {:error, reason} ->
         send_text(
           chat_id,
-          commands_text("检测到用户 %{mention} 的管理权限变化，但由于某些原因同步到后台权限失败了。",
+          commands_text("检测到用户 %{mention} 的管理权限变化，但由于某些原因同步到控制台权限失败了。",
             mention: mention(user, anonymization: false)
           ),
           parse_mode: "MarkdownV2",

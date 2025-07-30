@@ -113,12 +113,12 @@ defmodule PolicrMiniBot.HandleSelfJoinedChain do
         text = """
         *出现了一些异常*
 
-        由于未能发现一位群管理，这会导致无人可拥有此群的后台权限。一般来讲，看到此消息的原因有二：
+        由于未能发现一位群管理，这会导致无人可拥有此群的控制台权限。一般来讲，看到此消息的原因有二：
 
         1\\. 群组内不存在任何用户类型的管理员，包括群主。
         2\\. 群组内的管理员全部保持了匿名。
 
-        针对情况二，本机器人会将修改自身权限（把我提升或添加为管理员）的群成员自动添加到后台权限中，防止无人可操作机器人。
+        针对情况二，本机器人会将修改自身权限（把我提升或添加为管理员）的群成员自动添加到控制台权限中，防止无人可操作机器人。
 
         _注意：此设计只是为了避免在所有管理员匿名的情况下无法启用本机器人功能，并非解决管理员匿名所致的权限问题的最终方案。_
         """
@@ -137,7 +137,7 @@ defmodule PolicrMiniBot.HandleSelfJoinedChain do
     end
   end
 
-  # 退出普通群。
+  # 退出普通群
   defp exits("group", chat_id) do
     {parse_mode, text} = non_super_group_message()
 
@@ -146,67 +146,44 @@ defmodule PolicrMiniBot.HandleSelfJoinedChain do
     Telegex.leave_chat(chat_id)
   end
 
-  # 退出频道。附加：目前测试被邀请进频道时并不会产生消息。
+  # 退出频道。附加：目前测试被邀请进频道时并不会产生消息
   defp exits("channel", message) do
     chat_id = message.chat.id
 
     Telegex.leave_chat(chat_id)
   end
 
-  # 发送响应消息。
+  # 发送响应消息
   defp response_success(chat_id, context) when is_integer(chat_id) do
-    ttitle = commands_text("欢迎使用")
-    tdesc = commands_text("已成功登记本群信息，所有管理员皆可登入后台。")
-
-    tsteps =
-      commands_text("""
-      功能启用流程：
-      1. 将本机器人提升为管理员。
-      2. 操作一完成后将自动提供的功能启用按钮，或进入后台操作。
-      """)
-
-    tcloses =
-      commands_text("""
-      功能关闭方法（标准流程）：
-      - 进入后台操作。
-
-      功能自动关闭（非标准流程）：
-      - 将机器人的管理员身份撤销。
-      - 将机器人的任一必要管理权限关闭。
-
-      以下非正常操作会导致机器人自动退出：
-      - 关闭机器人的发消息权限。
-      """)
-
-    tadmin =
-      commands_text(
-        """
-        进入后台方法：
-        - 私聊发送 %{command} 命令
-        """,
-        command: "<code>/login</code>"
-      )
-
-    tcomment1 = commands_text("注意：当前后台网页仅支持桌面浏览器访问，手机尚未兼容。")
-    tcomment2 = commands_text("撤销机器人的管理员或必要管理权限并不会导致机器人退群，也是被认可的取消接管方式。但将机器人禁言是毫无意义的，机器人只能选择退出。")
-    tcomment3 = commands_text("为了避免误解，附加一些有关用户自行测试的说明：当退群重进的用户身份是群主时是不会产生验证的，请使用小号或拜托其他人测试。")
-
     text = """
-    <b>#{ttitle}</b>
+    <b>🎉 欢迎使用</b>
 
-    #{tdesc}
+    已成功同步本群信息，所有管理员皆可登入控制台。
 
-    #{tsteps}
+    功能启用流程：
+    1. 将本机器人提升为管理员。
+    2. 操作 1 完成后将自动提供的功能启用按钮，或进入控制台操作。
 
-    #{tcloses}
+    功能关闭方法（标准流程）：
+    - 进入控制台操作。
 
-    #{tadmin}
+    功能自动关闭（非标准流程）：
+    - 将机器人的管理员身份撤销。
+    - 将机器人的任一必要管理权限关闭。
 
-    <i>#{tcomment1}</i>
+    以下非正常操作会导致机器人自动退出：
+    - 关闭机器人的发消息权限。
 
-    <i>#{tcomment2}</i>
+    进入控制台方法：
+      - 点击机器人资料页的 Open App 按钮。
+      - 点击机器人私聊窗口左侧的「控制台」按钮。
+      - 亦可手动<a href="https://t.me/#{PolicrMiniBot.username()}/console">点此链接</a>打开控制台。
 
-    <i>#{tcomment3}</i>
+    <i>注意：当前控制台仅支持从 Mini Apps 入口访问。</i>
+
+    <i>撤销机器人的管理员或必要管理权限并不会导致机器人退群，也是被认可的取消接管方式。但将机器人禁言是毫无意义的，机器人只能选择退出。</i>
+
+    <i>为了避免误解，附加一些有关用户自行测试的说明：当退群重进的用户身份是群主时是不会产生验证的，请使用小号或拜托其他人测试。</i>
     """
 
     markup = %InlineKeyboardMarkup{

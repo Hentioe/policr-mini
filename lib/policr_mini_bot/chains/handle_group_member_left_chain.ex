@@ -98,7 +98,7 @@ defmodule PolicrMiniBot.HandleGroupMemberLeftChain do
         PermissionBusiness.delete(chat_id, left_user_id)
 
         theader =
-          commands_text("已将曾经的管理员 %{mention} 的后台权限移除。",
+          commands_text("已将曾经的管理员 %{mention} 的控制台权限移除。",
             mention: mention(user, anonymization: false)
           )
 

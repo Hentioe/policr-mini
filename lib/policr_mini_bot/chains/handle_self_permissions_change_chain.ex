@@ -231,14 +231,10 @@ defmodule PolicrMiniBot.HandleSelfPermissionsChangeChain do
     case rights_change_action(my_chat_member) do
       :restore_rights ->
         # 重新启用必要的权限
-
-        ttitle = commands_text("我已经具备必要管理权限了，是否重新接管新成员验证？")
-        tcomment = commands_text("提示：群管理可直接通过按钮启用，亦可随时进入后台页面操作。")
-
         text = """
-        #{ttitle}
+        👋 嗨，我已经具备必要管理权限了，是否重新接管新成员验证？
 
-        <i>#{tcomment}</i>
+        <i>提示：群管理可直接通过按钮启用，亦可随时进入控制台操作。</i>
         """
 
         markup = make_enable_markup(chat_id)
@@ -259,7 +255,7 @@ defmodule PolicrMiniBot.HandleSelfPermissionsChangeChain do
           若想重新启用，请至少赋予以下权限：
           #{trequired_permissions}
 
-          <i>提示：权限修改后会自动提供启用功能的按钮，亦可随时进入后台页面操作。</i>
+          <i>提示：权限修改后会自动提供启用功能的按钮，亦可随时进入控制台操作。</i>
           """
 
           Telegex.send_message(chat_id, text, parse_mode: "HTML")
@@ -398,18 +394,15 @@ defmodule PolicrMiniBot.HandleSelfPermissionsChangeChain do
       请至少赋予以下权限：
       #{trequired_permissions}
 
-      <i>提示：权限修改后会自动提供启用功能的按钮，亦可随时进入后台页面操作。</i>
+      <i>提示：权限修改后会自动提供启用功能的按钮，亦可随时进入控制台操作。</i>
       """
 
       Telegex.send_message(chat_id, text, parse_mode: "HTML")
     else
-      ttitle = commands_text("我已经具备必要管理权限了，是否立即接管新成员验证？")
-      tcomment = commands_text("提示：群管理可直接通过按钮启用，亦可随时进入后台页面操作。")
-
       text = """
-      #{ttitle}
+      👋 嗨，我已经具备必要管理权限了，是否立即接管新成员验证？
 
-      <i>#{tcomment}</i>
+      <i>提示：群管理可直接通过按钮启用，亦可随时进入控制台操作。</i>
       """
 
       markup = make_enable_markup(chat_id)

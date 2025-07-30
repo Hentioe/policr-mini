@@ -90,7 +90,7 @@ defmodule PolicrMiniBot.HandlePrivateAttachmentChain do
            """, audio.file_size}
       end
 
-    text = text <> "\n<i>用法提示：请直接将附件字符串复制到后台相对应的编辑框中。</i>"
+    text = text <> "\n<i>用法提示：请直接将附件字符串复制到控制台相对应的编辑框中。</i>"
 
     text =
       if file_size > @max_size_hint do
