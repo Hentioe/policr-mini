@@ -191,7 +191,7 @@ defmodule PolicrMiniBot.HandleSelfJoinedChain do
         [
           %InlineKeyboardButton{
             text: commands_text("📜 最近更新"),
-            url: "https://blog.hentioe.dev/posts/policr-mini-updates-2025-07-30.html"
+            url: "https://blog.hentioe.dev/posts/policr-mini-updates-2025-07-31.html"
           },
           %InlineKeyboardButton{
             text: commands_text("🔔 订阅更新"),

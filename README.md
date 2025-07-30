@@ -25,7 +25,7 @@ _最初时本项目是作为 Policr 机器人的最小化替代品而诞生，�
 
 从我们的博客文章了解最近的更新：
 
-- [2025-07-30](https://blog.hentioe.dev/posts/policr-mini-updates-2025-07-30.html)
+- [2025-07-30](https://blog.hentioe.dev/posts/policr-mini-updates-2025-07-31.html)
 - [2024-04-05](https://blog.gramlabs.org/posts/policr-mini-updates-2024-04-05.html)
 - [2024-01-01](https://blog.gramlabs.org/posts/policr-mini-updates-2024-01-01.html)
 
