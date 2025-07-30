@@ -4,7 +4,7 @@ defmodule PolicrMini.MixProject do
   def project do
     [
       app: :policr_mini,
-      version: "0.1.20250731",
+      version: "0.1.20250814-dev",
       elixir: "~> 1.18",
       elixirc_paths: elixirc_paths(Mix.env()),
       compilers: [:gettext] ++ Mix.compilers(),
