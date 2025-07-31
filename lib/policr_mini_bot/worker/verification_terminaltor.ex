@@ -49,7 +49,7 @@ defmodule PolicrMiniBot.Worker.VerificationTerminator do
     # 读取最新的验证数据，因为用户参与验证可能会同时发生
     v = Repo.reload(v)
     # 为等待状态才实施操作（超时处理）
-    with :waiting <- v.status,
+    with :pending <- v.status,
          {:ok, v} <- Chats.update_verification(v, %{status: :timeout}) do
       Chats.update_verification(v, %{status: :timeout})
       # 写入验证数据点（超时）
@@ -95,7 +95,7 @@ defmodule PolicrMiniBot.Worker.VerificationTerminator do
     )
 
     # 为等待状态才实施操作
-    with :waiting <- v.status,
+    with :pending <- v.status,
          {:ok, v} <- Chats.update_verification(v, %{status: status}) do
       # 写入验证数据点（其它）
       Stats.write(v)

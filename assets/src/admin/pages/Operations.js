@@ -132,10 +132,10 @@ function actionUI(action) {
 }
 
 const STATUS_BG_COLOR_MAPPING = {
-  waiting: "#FFFFEB",
-  passed: "#EFFFEE",
+  pending: "#FFFFEB",
+  approved: "#EFFFEE",
   timeout: "#FFF1F1",
-  wronged: "#FFF1F1",
+  incorrect: "#FFF1F1",
 };
 
 const dateTimeFormat = "yyyy-MM-dd HH:mm:ss";

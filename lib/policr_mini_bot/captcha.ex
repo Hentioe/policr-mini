@@ -24,7 +24,7 @@ defmodule PolicrMiniBot.Captcha do
     grid: GridCAPTCHA,
     classic: ClassicCAPTCHA,
     # 当前的备用验证就是主动验证
-    initiative: FallbackCaptcha
+    fallback: FallbackCaptcha
   ]
 
   defmodule Data do

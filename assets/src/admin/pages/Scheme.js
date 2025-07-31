@@ -60,7 +60,7 @@ const modeMapping = {
   image: 0,
   custom: 1,
   arithmetic: 2,
-  initiative: 3,
+  fallback: 3,
   grid: 4,
   classic: 5,
 };
@@ -115,7 +115,7 @@ const modeValueMapping = {
   image: "图片验证",
   custom: "定制验证（自定义）",
   arithmetic: "算数验证",
-  initiative: "主动验证",
+  fallback: "主动验证",
   grid: "网格验证",
 };
 
@@ -272,7 +272,7 @@ export default () => {
       // 绑定服务消息清理。注意：必须保证默认状态都是 false。
       if (serviceMessageCleanup != null) {
         setEditingJoinedCleared(serviceMessageCleanup.includes("joined"));
-        setEditingLeftedCleared(serviceMessageCleanup.includes("lefted"));
+        setEditingLeftedCleared(serviceMessageCleanup.includes("left"));
         setEditingServiceMessageCleanupDefaulted(false);
       } else {
         setEditingJoinedCleared(false);
@@ -705,7 +705,7 @@ export default () => {
                         <span tw="ml-1">
                           {(
                             profileData.scheme.serviceMessageCleanup || []
-                          ).includes("lefted")
+                          ).includes("left")
                             ? "✓"
                             : "✕"}
                         </span>

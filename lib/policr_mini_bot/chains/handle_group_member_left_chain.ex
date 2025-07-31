@@ -86,7 +86,7 @@ defmodule PolicrMiniBot.HandleGroupMemberLeftChain do
     else
       # 删除离开消息（此调用委托给 `PolicrMiniBot.HandleGroupMemberLeftMessagePlug` 处理）
       {_, context} = delete_left_message(update.message, context)
-      context = action(context, :user_lefted)
+      context = action(context, :user_left)
 
       # 判断是否为管理员退出
       perm = PermissionBusiness.find(chat_id, left_user_id)

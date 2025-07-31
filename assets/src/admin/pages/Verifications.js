@@ -41,8 +41,8 @@ const TimeLink = styled(RouteLink)`
 const defaultStatusOption = { value: "all", label: "不限" };
 const statusOptions = [
   defaultStatusOption,
-  { value: "not_passed", label: "未通过" },
-  { value: "passed", label: "已通过" },
+  { value: "not_approved", label: "未通过" },
+  { value: "approved", label: "已通过" },
 ];
 
 function findStatusOption(value) {
@@ -67,7 +67,7 @@ function parseTimeRange(timeRange) {
   else return "1d";
 }
 function parseStatus(status) {
-  if (["all", "not_passed", "passed"].includes(status)) return status;
+  if (["all", "not_approved", "approved"].includes(status)) return status;
   else return "all";
 }
 
@@ -86,11 +86,11 @@ function statusUI(status) {
   let color;
   let text;
   switch (status) {
-    case "waiting":
+    case "pending":
       color = "khaki";
       text = "等待";
       break;
-    case "passed":
+    case "approved":
       color = "green";
       text = "通过";
       break;
@@ -98,7 +98,7 @@ function statusUI(status) {
       color = "red";
       text = "超时";
       break;
-    case "wronged":
+    case "incorrect":
       color = "red";
       text = "错误";
       break;
@@ -123,10 +123,10 @@ function statusUI(status) {
 }
 
 const STATUS_BG_COLOR_MAPPING = {
-  waiting: "#FFFFEB",
-  passed: "#EFFFEE",
+  pending: "#FFFFEB",
+  approved: "#EFFFEE",
   timeout: "#FFF1F1",
-  wronged: "#FFF1F1",
+  incorrect: "#FFF1F1",
 };
 
 async function killByVerification(id, action) {

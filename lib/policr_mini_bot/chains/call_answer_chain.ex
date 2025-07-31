@@ -141,9 +141,9 @@ defmodule PolicrMiniBot.CallAnswerChain do
           {:ok, Verification.t()} | {:error, any()}
   def handle_correct_answer(v, message_id, from_user) do
     # 计数器自增（通过的总数）
-    Counter.increment(:verification_passed_total)
+    Counter.increment(:verification_approved_total)
 
-    case Chats.update_verification(v, %{status: :passed}) do
+    case Chats.update_verification(v, %{status: :approved}) do
       {:ok, v} = ok_r ->
         # 写入验证数据点（通过）
         Stats.write(v)
@@ -263,7 +263,7 @@ defmodule PolicrMiniBot.CallAnswerChain do
     # 获取方案中的配置项
     wkmethod = scheme.wrong_killing_method || default!(:wkmethod)
 
-    case Chats.update_verification(v, %{status: :wronged}) do
+    case Chats.update_verification(v, %{status: :incorrect}) do
       {:ok, v} ->
         # 写入验证数据点（错误）
         Stats.write(v)
@@ -275,7 +275,7 @@ defmodule PolicrMiniBot.CallAnswerChain do
         async_clean_with_notify(message_id, v, wkmethod)
 
         # 击杀用户
-        kill(v, scheme, :wronged)
+        kill(v, scheme, :incorrect)
 
         {:ok, v}
 
@@ -377,7 +377,7 @@ defmodule PolicrMiniBot.CallAnswerChain do
     # 3. 验证是否未完成
     with {:ok, verification} <- Verification.get(verification_id, preload: [:chat]),
          {:check_user, true} <- {:check_user, verification.target_user_id == user_id},
-         {:check_status, true} <- {:check_status, verification.status == :waiting} do
+         {:check_status, true} <- {:check_status, verification.status == :pending} do
       # 返回验证记录
       {:ok, verification}
     else

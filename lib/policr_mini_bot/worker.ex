@@ -67,9 +67,9 @@ defmodule PolicrMiniBot.Worker do
   @doc """
   手动终止验证。
 
-  手动终止验证会取消超时处理任务，并更新验证入口消息。若验证的状态不是 `waiting` 则忽略处理。
+  手动终止验证会取消超时处理任务，并更新验证入口消息。若验证的状态不是 `pending` 则忽略处理。
   """
-  defdelegate manual_terminate_validation(veri, status),
+  defdelegate manual_terminate_verification(veri, status),
     to: __MODULE__.VerificationTerminator,
     as: :manual_terminate
 

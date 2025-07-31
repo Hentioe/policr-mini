@@ -20,7 +20,7 @@ defmodule PolicrMini.Chats do
   @type custom_kit_change_result :: {:ok, CustomKit.t()} | {:error, Ecto.Changeset.t()}
   @type verification_change_result :: {:ok, Verification.t()} | {:error, Ecto.Changeset.t()}
 
-  @type stat_status :: :passed | :timeout | :wronged | :other
+  @type stat_status :: :approved | :timeout | :incorrect | :other
 
   @spec load_scheme(integer() | binary()) :: {:ok, Scheme.t()} | {:error, :not_found}
   def load_scheme(id) when is_integer(id) or is_binary(id) do
@@ -378,7 +378,7 @@ defmodule PolicrMini.Chats do
           params
           |> Map.put(:chat_id, chat_id)
           |> Map.put(:target_user_id, target_user_id)
-          |> Map.put(:status, :waiting)
+          |> Map.put(:status, :pending)
 
         create_verification(params)
 
@@ -393,7 +393,7 @@ defmodule PolicrMini.Chats do
     from(p in Verification,
       where: p.chat_id == ^chat_id,
       where: p.target_user_id == ^target_user_id,
-      where: p.status == :waiting,
+      where: p.status == :pending,
       order_by: [asc: p.inserted_at],
       limit: 1
     )
@@ -416,7 +416,7 @@ defmodule PolicrMini.Chats do
   def find_last_pending_verification(chat_id) do
     from(p in Verification,
       where: p.chat_id == ^chat_id,
-      where: p.status == :waiting,
+      where: p.status == :pending,
       order_by: [desc: p.message_id],
       limit: 1
     )
@@ -431,7 +431,7 @@ defmodule PolicrMini.Chats do
     from(p in Verification,
       select: count(p.id),
       where: p.chat_id == ^chat_id,
-      where: p.status == :waiting,
+      where: p.status == :pending,
       where: p.source == ^source
     )
     |> Repo.one()
@@ -459,13 +459,13 @@ defmodule PolicrMini.Chats do
   @spec find_all_pending_verifications :: [Verification.t()]
   def find_all_pending_verifications do
     from(p in Verification,
-      where: p.status == :waiting,
+      where: p.status == :pending,
       order_by: [asc: p.inserted_at]
     )
     |> Repo.all()
   end
 
-  @type find_verifications_total_cont_status :: :passed | :timeout
+  @type find_verifications_total_cont_status :: :approved | :timeout
   @type find_verifications_total_cont :: [{:status, find_verifications_total_cont_status}]
 
   @doc """
@@ -672,7 +672,7 @@ defmodule PolicrMini.Chats do
       where: v.chat_id == ^chat_id,
       where: v.inserted_at >= ^start,
       where: v.inserted_at <= ^stop,
-      where: v.status != :waiting
+      where: v.status != :pending
     )
     |> Repo.all()
   end

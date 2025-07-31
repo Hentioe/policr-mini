@@ -71,7 +71,7 @@ defmodule PolicrMiniBot.HandleSelfLeftChain do
 
     Logger.info("Bot (@#{context.bot.username}) left group", chat_id: chat_id)
 
-    context = action(context, :self_lefted)
+    context = action(context, :self_left)
 
     case Chat.get(chat_id) do
       {:ok, chat} ->

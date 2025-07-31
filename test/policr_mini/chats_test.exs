@@ -39,7 +39,7 @@ defmodule PolicrMini.ChatsTest do
       updated_verification_mode = 1
       updated_seconds = 120
       updated_timeout_killing_method = :ban
-      updated_service_message_cleanup = [:joined, :lefted]
+      updated_service_message_cleanup = [:joined, :left]
       updated_delay_unban_secs = 120
 
       {:ok, scheme2} =
@@ -236,7 +236,7 @@ defmodule PolicrMini.ChatsTest do
       assert verification.message_id == verification_params.message_id
       assert verification.indices == verification_params.indices
       assert verification.seconds == verification_params.seconds
-      assert verification.status == :waiting
+      assert verification.status == :pending
       assert verification.chosen == verification_params.chosen
     end
 
@@ -263,7 +263,7 @@ defmodule PolicrMini.ChatsTest do
       assert verification2.message_id == updated_message_id
       assert verification2.indices == updated_indices
       assert verification2.seconds == updated_seconds
-      assert verification2.status == :passed
+      assert verification2.status == :approved
       assert verification2.chosen == updated_chosen
     end
 

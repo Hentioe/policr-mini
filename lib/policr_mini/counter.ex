@@ -10,11 +10,11 @@ defmodule PolicrMini.Counter do
   defmodule State do
     @moduledoc false
 
-    defstruct [:verification_total, :verification_passed_total, :verification_timeout_total]
+    defstruct [:verification_total, :verification_approved_total, :verification_timeout_total]
 
     @type t :: %__MODULE__{
             verification_total: integer,
-            verification_passed_total: integer,
+            verification_approved_total: integer,
             verification_timeout_total: integer
           }
 
@@ -48,7 +48,7 @@ defmodule PolicrMini.Counter do
   def start_link(_opts) do
     state = %State{
       verification_total: Chats.find_verifications_total(),
-      verification_passed_total: Chats.find_verifications_total(status: :passed),
+      verification_approved_total: Chats.find_verifications_total(status: :approved),
       verification_timeout_total: Chats.find_verifications_total(status: :timeout)
     }
 
@@ -59,18 +59,18 @@ defmodule PolicrMini.Counter do
   def init(state) do
     %{
       verification_total: verification_total,
-      verification_passed_total: verification_passed_total,
+      verification_approved_total: verification_approved_total,
       verification_timeout_total: verification_timeout_total
     } = state[:init]
 
     :ok = State.update(:verification_total, verification_total)
-    :ok = State.update(:verification_passed_total, verification_passed_total)
+    :ok = State.update(:verification_approved_total, verification_approved_total)
     :ok = State.update(:verification_timeout_total, verification_timeout_total)
 
     {:ok, state}
   end
 
-  @type key :: :verification_total | :verification_passed_total | :verification_timeout_total
+  @type key :: :verification_total | :verification_approved_total | :verification_timeout_total
   @spec get(key) :: integer
   def get(key) do
     GenServer.call(__MODULE__, {:get_value, key})

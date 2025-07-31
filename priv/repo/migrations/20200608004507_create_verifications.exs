@@ -1,6 +1,6 @@
 defmodule PolicrMini.Repo.Migrations.CreateVerifications do
   use PolicrMini.Migration
-  alias PolicrMini.EctoEnums.VerificationStatusEnum
+  alias PolicrMini.EctoEnums.VerificationStatus
 
   import EctoEnum
 
@@ -17,7 +17,7 @@ defmodule PolicrMini.Repo.Migrations.CreateVerifications do
       add :message_id, :integer, comment: "消息编号"
       add :indices, {:array, :integer}, comment: "正确索引（多个）"
       add :seconds, :integer, comment: "剩余时间"
-      add :status, VerificationStatusEnum.type(), comment: "验证状态"
+      add :status, VerificationStatus.type(), comment: "验证状态"
       add :chosen, :integer, comment: "被选中索引"
 
       timestamps()

@@ -96,8 +96,8 @@ defmodule PolicrMini.Stats do
   def write(v) when is_struct(v, Verification) do
     status =
       case v.status do
-        :passed -> :approved
-        :wronged -> :incorrect
+        :approved -> :approved
+        :incorrect -> :incorrect
         :timeout -> :timeout
         _ -> :other
       end

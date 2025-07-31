@@ -22,14 +22,14 @@ type QueryResult = {
 type RangeType = "7d" | "30d";
 
 type Dailies = {
-  passed: number;
+  approved: number;
   rejected: number;
   timeout: number;
   other: number;
 };
 
 const colors = {
-  passed: "#80FF97",
+  approved: "#80FF97",
   rejected: "#FF8080",
   timeout: "#FFCB80",
   other: "#BBBBBB",
@@ -46,7 +46,7 @@ function findMaxCount(points: Point[]): number {
 
 function findFirstCategorizedPoints(points: Point[]): Point[] {
   const existsP = points.find((p) =>
-    p.status === "passed" || p.status === "rejected" || p.status === "timeout" || p.status === "other"
+    p.status === "approved" || p.status === "rejected" || p.status === "timeout" || p.status === "other"
   );
 
   if (existsP != null) {
@@ -66,7 +66,7 @@ export default () => {
   const [statsRejectedSeriesData, setStatsRejectedSeriesData] = createSignal<number[]>([]);
   const [statsTimeoutSeriesData, setStatsTimeoutSeriesData] = createSignal<number[]>([]);
   const [statsOtherSeriesData, setStatsOtherSeriesData] = createSignal<number[]>([]);
-  const [dailies, setDailies] = createStore<Dailies>({ passed: 0, rejected: 0, timeout: 0, other: 0 });
+  const [dailies, setDailies] = createStore<Dailies>({ approved: 0, rejected: 0, timeout: 0, other: 0 });
   const { data } = useSWR<QueryResult>(() => buildConsoleApiUrl(store.currentChat?.id, `/stats?range=${range()}`), {
     fetcher: getter,
   });
@@ -91,7 +91,7 @@ export default () => {
         });
 
         setStatsCategories(times);
-        setStatsPasssedSeriesData(statusCounts(data.v.points, "passed"));
+        setStatsPasssedSeriesData(statusCounts(data.v.points, "approved"));
         setStatsRejectedSeriesData(statusCounts(data.v.points, "rejected"));
         setStatsTimeoutSeriesData(statusCounts(data.v.points, "timeout"));
         setStatsOtherSeriesData(statusCounts(data.v.points, "other"));
@@ -103,7 +103,7 @@ export default () => {
 
   createEffect(() => {
     if (daily.v != null) {
-      setDailies("passed", _.sum(statusCounts(daily.v.points, "passed")));
+      setDailies("approved", _.sum(statusCounts(daily.v.points, "approved")));
       setDailies("rejected", _.sum(statusCounts(daily.v.points, "rejected")));
       setDailies("timeout", _.sum(statusCounts(daily.v.points, "timeout")));
       setDailies("other", _.sum(statusCounts(daily.v.points, "other")));
@@ -141,7 +141,7 @@ export default () => {
           format: "yyyy/MM/dd HH:mm:ss",
         },
       },
-      colors: [colors.passed, colors.rejected, colors.timeout, colors.other],
+      colors: [colors.approved, colors.rejected, colors.timeout, colors.other],
     };
   };
 
@@ -187,7 +187,7 @@ export default () => {
     <GeneralFrameBox>
       <div tw="h-full flex flex-col">
         <div tw="h-[50%] lg:h-[30%] flex flex-wrap justify-between">
-          <TodayCard baseColor={colors.passed} title="验证通过" value={dailies.passed} />
+          <TodayCard baseColor={colors.approved} title="验证通过" value={dailies.approved} />
           <TodayCard baseColor={colors.rejected} title="验证失败" value={dailies.rejected} />
           <TodayCard baseColor={colors.timeout} title="验证超时" value={dailies.timeout} />
           <TodayCard baseColor={colors.other} title="其它" value={dailies.other} />

@@ -19,7 +19,7 @@ type Range = InputData.StatsRange;
 
 const DEFAULT_RANGE: Range = "7d";
 const COLORS = {
-  passed: "#80FF97",
+  approved: "#80FF97",
   rejected: "#FF8080",
   timeout: "#FFCB80",
   other: "#BBBBBB",
@@ -97,7 +97,7 @@ export default () => {
           format: "yyyy/MM/dd HH:mm:ss",
         },
       },
-      colors: [COLORS.passed, COLORS.rejected, COLORS.timeout, COLORS.other],
+      colors: [COLORS.approved, COLORS.rejected, COLORS.timeout, COLORS.other],
     };
   };
 

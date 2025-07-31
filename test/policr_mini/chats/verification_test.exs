@@ -51,7 +51,7 @@ defmodule PolicrMini.Chats.VerificationTest do
       message_id: updated_message_id,
       indices: updated_indices,
       seconds: updated_seconds,
-      status: :wronged,
+      status: :incorrect,
       chosen: updated_chosen
     }
 

@@ -25,7 +25,7 @@ defmodule PolicrMiniWeb.Admin.API.VerificationController do
       action = if status == :manual_ban, do: :ban, else: :kick
 
       # 手动终止验证
-      :ok = Worker.manual_terminate_validation(veri, status)
+      :ok = Worker.manual_terminate_verification(veri, status)
 
       # 添加操作记录（管理员）
       params = %{

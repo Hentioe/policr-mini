@@ -34,7 +34,7 @@ defmodule PolicrMiniBot.HandleLeftMessageChain do
     scheme = Chats.find_or_init_scheme!(chat.id)
     enabled_cleanup = scheme.service_message_cleanup || default!(:smc) || []
 
-    if Enum.member?(enabled_cleanup, :lefted) do
+    if Enum.member?(enabled_cleanup, :left) do
       Logger.debug(
         "Delete message that member has left: #{inspect(message_id: message_id)}",
         chat_id: chat.id

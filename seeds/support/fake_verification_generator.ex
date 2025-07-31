@@ -5,7 +5,7 @@ alias PolicrMini.Seeds.Support.FakeOperationGenerator
 defmodule PolicrMini.Seeds.Support.FakeVerificationGenerator do
   def generate(chat_id, user, stop_secs) when is_integer(stop_secs) and is_struct(user, User) do
     # 随机生成状态
-    status = Enum.random([:passed, :timeout, :wronged, :expired, :manual_kick, :manual_ban])
+    status = Enum.random([:approved, :timeout, :incorrect, :expired, :manual_kick, :manual_ban])
     # 随机创建截止时间前至今的时间戳
     timestamp =
       DateTime.utc_now() |> DateTime.add(-:rand.uniform(stop_secs), :second)

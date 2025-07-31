@@ -5,7 +5,7 @@ import Loading from "../../components/Loading";
 import { calculateTotals, findFirstCategorizedPoints, findMaxCount, statusCount } from "./helper";
 
 const COLORS = {
-  passed: "#80FF97",
+  approved: "#80FF97",
   rejected: "#FF8080",
   timeout: "#FFCB80",
   other: "#BBBBBB",
@@ -81,7 +81,7 @@ export default (props: { range: InputData.StatsRange; stats: ServerData.Stats | 
         },
       },
       dataLabels: { enabled: false },
-      colors: [COLORS.passed, COLORS.rejected, COLORS.timeout, COLORS.other],
+      colors: [COLORS.approved, COLORS.rejected, COLORS.timeout, COLORS.other],
     };
   };
 

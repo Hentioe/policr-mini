@@ -9,7 +9,7 @@ alias PolicrMini.Chats.Verification
 # 生成 10,000 个验证记录
 for i <- 1..10_000 do
   # 随机生成状态
-  status = Enum.random([:passed, :timeout, :wronged, :expired, :manual_kick, :manual_ban])
+  status = Enum.random([:approved, :timeout, :incorrect, :expired, :manual_kick, :manual_ban])
   # 随机创建 4 年前至今的时间戳
   timestamp = DateTime.utc_now() |> DateTime.add(-:rand.uniform(4 * 365 * 24 * 60 * 60), :second)
 

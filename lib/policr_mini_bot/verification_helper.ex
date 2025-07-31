@@ -20,7 +20,7 @@ defmodule PolicrMiniBot.VerificationHelper do
   @type captcha_data :: Captcha.Data.t()
   @type send_opts :: MessageCaller.call_opts()
   @type source :: :joined | :join_request
-  @type kreason :: :wronged | :timeout | :kick | :ban | :manual_ban | :manual_kick
+  @type kreason :: :incorrect | :timeout | :kick | :ban | :manual_ban | :manual_kick
   @type kmethod :: :ban | :kick
 
   @cant_initiate_conversation "Forbidden: bot can't initiate conversation with a user"
@@ -664,7 +664,7 @@ defmodule PolicrMiniBot.VerificationHelper do
     end
   end
 
-  defp knotifition_text(:joined, :wronged, method, mention, time_text) do
+  defp knotifition_text(:joined, :incorrect, method, mention, time_text) do
     case method do
       :ban ->
         commands_text("刚刚 %{mention} 验证错误，已被封禁。", mention: mention)
@@ -700,7 +700,7 @@ defmodule PolicrMiniBot.VerificationHelper do
     end
   end
 
-  defp knotifition_text(:join_request, :wronged, method, mention, time_text) do
+  defp knotifition_text(:join_request, :incorrect, method, mention, time_text) do
     case method do
       :ban ->
         commands_text("刚刚 %{mention} 验证错误，已拒绝其加入请求并实施封禁。", mention: mention)

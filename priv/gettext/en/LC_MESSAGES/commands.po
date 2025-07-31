@@ -329,12 +329,12 @@ msgstr "The backend permissions of former administrator %{mention} have been rem
 #: lib/policr_mini_bot/plugs/call_answer_plug.ex:211
 #, elixir-autogen, elixir-format
 msgid "恭喜您通过了『%{chat_title}』的加群验证，已批准加入请求。"
-msgstr "Congratulations, you have passed the verification to join '%{chat_title}', and your request has been approved."
+msgstr "Congratulations, you have approved the verification to join '%{chat_title}', and your request has been approved."
 
 #: lib/policr_mini_bot/plugs/call_answer_plug.ex:188
 #, elixir-autogen, elixir-format
 msgid "恭喜您通过了『%{chat_title}』的加群验证，权限已恢复。"
-msgstr "Congratulations, you have passed the verification to join '%{chat_title}', and your permissions have been restored."
+msgstr "Congratulations, you have approved the verification to join '%{chat_title}', and your permissions have been restored."
 
 #: lib/policr_mini_bot/plugs/resp_start_cmd_plug.ex:54
 #, elixir-autogen, elixir-format
@@ -537,7 +537,7 @@ msgstr "Please proactively complete the verification to lift the restriction, an
 #: lib/policr_mini_bot/plugs/call_answer_plug.ex:237
 #, elixir-autogen, elixir-format
 msgid "刚刚 %{mention} 通过了验证，用时 %{sec_count} 秒。"
-msgstr "Just now, %{mention} passed the verification in %{sec_count} seconds."
+msgstr "Just now, %{mention} approved the verification in %{sec_count} seconds."
 
 #: lib/policr_mini_bot/verification_helper.ex:427
 #: lib/policr_mini_bot/verification_helper.ex:443

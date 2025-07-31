@@ -5,7 +5,7 @@ defmodule PolicrMini.Chats.Verification do
 
   use PolicrMini.Schema
 
-  alias PolicrMini.EctoEnums.{VerificationStatusEnum, VerificationSource}
+  alias PolicrMini.EctoEnums.{VerificationStatus, VerificationSource}
   alias PolicrMini.Instances.Chat
 
   @required_fields ~w(chat_id target_user_id seconds status source)a
@@ -20,7 +20,7 @@ defmodule PolicrMini.Chats.Verification do
     field :message_id, :integer
     field :indices, {:array, :integer}
     field :seconds, :integer
-    field :status, VerificationStatusEnum
+    field :status, VerificationStatus
     field :chosen, :integer
     field :source, VerificationSource
     field :send_times, :integer, default: 0
