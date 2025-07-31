@@ -9,6 +9,8 @@
 
 一个不断改进核心的验证/审核机器人。
 
+![截图](design/admin-console-screenshots.webp)
+
 ## 介绍
 
 本项目是以验证功能为主的 Telegram 机器人，主要功能包括：
