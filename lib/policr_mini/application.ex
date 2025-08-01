@@ -39,8 +39,8 @@ defmodule PolicrMini.Application do
         PolicrMini.Cache,
         # Start the Counter
         PolicrMini.Counter,
-        # Start the defaults server
-        PolicrMini.DefaultsServer,
+        # Start the default provider
+        PolicrMini.DefaultProvider,
         # Start the Web telemetry
         PolicrMiniWeb.Telemetry,
         # Start the PubSub system

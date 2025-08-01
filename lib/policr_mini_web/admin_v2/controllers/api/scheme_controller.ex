@@ -2,7 +2,7 @@ defmodule PolicrMiniWeb.AdminV2.API.SchemeController do
   use PolicrMiniWeb, :controller
 
   alias PolicrMini.Chats.Scheme
-  alias PolicrMini.DefaultsServer
+  alias PolicrMini.DefaultProvider
 
   action_fallback PolicrMiniWeb.AdminV2.API.FallbackController
 
@@ -10,7 +10,7 @@ defmodule PolicrMiniWeb.AdminV2.API.SchemeController do
     # 接收新版本参数并转换到旧版本
     params = Scheme.cast_from_new_params(params)
 
-    with {:ok, scheme} <- DefaultsServer.update_scheme_sync(params) do
+    with {:ok, scheme} <- DefaultProvider.scheme_update_sync(params) do
       render(conn, "show.json", %{scheme: scheme})
     end
   end

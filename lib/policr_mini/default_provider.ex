@@ -1,10 +1,9 @@
-defmodule PolicrMini.DefaultsServer do
-  @moduledoc """
-  获取并维护全局默认值的服务。
-  """
+defmodule PolicrMini.DefaultProvider do
+  @moduledoc false
 
   use GenServer
 
+  alias Ecto.Changeset
   alias PolicrMini.Chats
   alias PolicrMini.Chats.Scheme
 
@@ -21,37 +20,24 @@ defmodule PolicrMini.DefaultsServer do
     {:ok, state}
   end
 
-  @spec get_scheme_value(atom) :: any
-  def get_scheme_value(field) do
-    GenServer.call(__MODULE__, {:get_scheme_value, field})
+  @spec scheme :: PolicrMini.Chats.Scheme.t()
+  def scheme do
+    GenServer.call(__MODULE__, :get_scheme)
   end
 
-  @spec get_scheme :: PolicrMini.Chats.Scheme.t()
-  def get_scheme do
-    GenServer.call(__MODULE__, {:get_scheme})
-  end
-
-  @spec update_scheme(PolicrMini.Schema.params()) :: :ok
-  def update_scheme(params) do
+  @spec scheme_update(PolicrMini.Schema.params()) :: :ok
+  def scheme_update(params) do
     GenServer.cast(__MODULE__, {:update_scheme, params})
   end
 
-  @spec update_scheme_sync(PolicrMini.Schema.params()) :: {:ok, Scheme.t()} | {:error, any}
-  def update_scheme_sync(params) do
+  @spec scheme_update_sync(PolicrMini.Schema.params()) ::
+          {:ok, Scheme.t()} | {:error, Changeset.t()}
+  def scheme_update_sync(params) do
     GenServer.call(__MODULE__, {:update_scheme, params})
   end
 
-  def handle_call({:get_scheme_value, field}, _from, state) do
-    value =
-      state
-      |> Map.get(:scheme)
-      |> Map.get(field)
-
-    {:reply, value, state}
-  end
-
   @impl true
-  def handle_call({:get_scheme}, _from, state) do
+  def handle_call(:get_scheme, _from, state) do
     {:reply, Map.get(state, :scheme), state}
   end
 

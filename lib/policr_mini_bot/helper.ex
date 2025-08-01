@@ -6,6 +6,7 @@ defmodule PolicrMiniBot.Helper do
   """
 
   alias PolicrMini.Accounts
+  alias PolicrMiniBot.Exceptions.InvalidDefaultKey
 
   alias __MODULE__.{
     CheckRequiredPermissions
@@ -213,7 +214,7 @@ defmodule PolicrMiniBot.Helper do
         }
 
   @type mention_user :: raw_user | fullname_user
-  @type mention_scheme :: :user_id | :full_name | :mosaic_full_name
+  @type mention_text :: :user_id | :full_name | :mosaic_full_name
 
   @doc """
   根据方案提及用户。
@@ -226,7 +227,7 @@ defmodule PolicrMiniBot.Helper do
       iex>PolicrMiniBot.Helper.scheme_mention(%{id: 101, first_name: "小红在上海鬼混", last_name: nil}, :mosaic_full_name)
       "[小||红在上海鬼||混](tg://user?id=101)"
   """
-  @spec scheme_mention(mention_user, mention_scheme) :: String.t()
+  @spec scheme_mention(mention_user, mention_text) :: String.t()
   def scheme_mention(user, scheme) do
     id = user[:id]
 
@@ -329,61 +330,63 @@ defmodule PolicrMiniBot.Helper do
   end
 
   @defaults_key_mapping [
-    vmode: :verification_mode,
-    vseconds: :seconds,
-    tkmethod: :timeout_killing_method,
-    wkmethod: :wrong_killing_method,
-    delay_unban_secs: :delay_unban_secs,
-    mention_scheme: :mention_text,
-    acimage: :image_answers_count,
-    smc: :service_message_cleanup
+    type: :verification_mode,
+    timeout: :seconds,
+    strategy: :wrong_killing_method,
+    fallback_strategy: :timeout_killing_method,
+    delay_unban: :delay_unban_secs,
+    image_choices: :image_answers_count,
+    mention: :mention_text,
+    cleanup: :service_message_cleanup
   ]
 
   @type default_keys ::
-          :vmode
-          | :vseconds
-          | :tkmethod
-          | :wkmethod
-          | :delay_unban_secs
-          | :mention_scheme
-          | :acimage
-          | :smc
+          :type
+          | :timeout
+          | :strategy
+          | :fallback_strategy
+          | :delay_unban
+          | :image_choices
+          | :mention
+          | :cleanup
 
   @doc """
   获取默认配置。
 
   ## 当前 `key` 可以是以下值
-  - `:vmode`: 验证方式。
-  - `:vseconds`: 验证超时时间。
-  - `:tkmethod`: 超时击杀方法。
-  - `:wkmethod`: 错误击杀方法。
-  - `:delay_unban_secs`: 延时解封秒数。
-  - `:mention_scheme`: 提及方案。
-  - `:smc`: 服务消息清理。
+  - `:type`: 验证类型
+  - `:timeout`: 验证超时时间
+  - `:strategy`: 错误击杀方法
+  - `:fallback_strategy`: 超时击杀方法
+  - `:delay_unban`: 延时解封秒数
+  - `:image_choices`: 图片选择数量
+  - `:mention`: 提及文本
+  - `:cleanup`: 服务消息清理
 
   ## 例子
-      iex> PolicrMiniBot.Helper.default!(:vmode)
+      iex> PolicrMiniBot.Helper.default!(:type)
       :grid
-      iex> PolicrMiniBot.Helper.default!(:vseconds)
+      iex> PolicrMiniBot.Helper.default!(:timeout)
       300
-      iex> PolicrMiniBot.Helper.default!(:tkmethod)
+      iex> PolicrMiniBot.Helper.default!(:strategy)
       :kick
-      iex> PolicrMiniBot.Helper.default!(:wkmethod)
+      iex> PolicrMiniBot.Helper.default!(:fallback_strategy)
       :kick
-      iex> PolicrMiniBot.Helper.default!(:delay_unban_secs)
+      iex> PolicrMiniBot.Helper.default!(:delay_unban)
       300
-      iex> PolicrMiniBot.Helper.default!(:mention_scheme)
-      :mosaic_full_name
-      iex> PolicrMiniBot.Helper.default!(:acimage)
+      iex> PolicrMiniBot.Helper.default!(:image_choices)
       4
-      iex> PolicrMiniBot.Helper.default!(:smc)
+      iex> PolicrMiniBot.Helper.default!(:mention)
+      :mosaic_full_name
+      iex> PolicrMiniBot.Helper.default!(:cleanup)
       [:joined]
   """
-  @spec default!(default_keys) :: any
+  @spec default!(default_keys) :: any()
   def default!(key) when is_atom(key) do
-    field = @defaults_key_mapping[key] || raise "Default field name without key `#{key}` mapping"
+    field = @defaults_key_mapping[key] || raise InvalidDefaultKey.exception(key)
+    scheme = PolicrMini.DefaultProvider.scheme()
 
-    PolicrMini.DefaultsServer.get_scheme_value(field)
+    Map.get(scheme, field)
   end
 
   @spec async_run(function, delay_secs: integer) :: Honeydew.Job.t() | no_return

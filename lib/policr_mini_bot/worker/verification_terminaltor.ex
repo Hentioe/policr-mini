@@ -55,7 +55,7 @@ defmodule PolicrMiniBot.Worker.VerificationTerminator do
       # 写入验证数据点（超时）
       Stats.write(v)
       # 添加操作记录
-      kmethod = scheme.timeout_killing_method || default!(:tkmethod)
+      kmethod = scheme.timeout_killing_method || default!(:strategy)
       create_operation(v, kmethod, :system)
       # 计数器自增（超时总数）
       PolicrMini.Counter.increment(:verification_timeout_total)

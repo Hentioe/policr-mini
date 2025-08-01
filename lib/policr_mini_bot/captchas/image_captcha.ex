@@ -5,6 +5,8 @@ defmodule PolicrMiniBot.ImageCAPTCHA do
 
   use PolicrMiniBot.Captcha
 
+  import PolicrMiniBot.Helper, only: [default!: 1]
+
   alias Capinde.Generation.Input
 
   defmodule Error do
@@ -13,7 +15,7 @@ defmodule PolicrMiniBot.ImageCAPTCHA do
 
   @impl true
   def make!(_chat_id, scheme) do
-    choices_count = scheme.image_answers_count || PolicrMiniBot.Helper.default!(:acimage)
+    choices_count = scheme.image_answers_count || default!(:image_choices)
 
     input =
       %Input{

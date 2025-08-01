@@ -32,7 +32,7 @@ defmodule PolicrMiniBot.HandleLeftMessageChain do
     # TOD0: 将 scheme 的获取放在一个独立的 chain 中，通过上下文传递。
     # 检测并删除服务消息。
     scheme = Chats.find_or_init_scheme!(chat.id)
-    enabled_cleanup = scheme.service_message_cleanup || default!(:smc) || []
+    enabled_cleanup = scheme.service_message_cleanup || default!(:cleanup) || []
 
     if Enum.member?(enabled_cleanup, :left) do
       Logger.debug(

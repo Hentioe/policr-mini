@@ -261,7 +261,7 @@ defmodule PolicrMiniBot.CallAnswerChain do
           {:ok, Verification.t()} | {:error, any}
   def handle_wrong_answer(v, scheme, message_id) do
     # 获取方案中的配置项
-    wkmethod = scheme.wrong_killing_method || default!(:wkmethod)
+    wkmethod = scheme.wrong_killing_method || default!(:fallback_strategy)
 
     case Chats.update_verification(v, %{status: :incorrect}) do
       {:ok, v} ->

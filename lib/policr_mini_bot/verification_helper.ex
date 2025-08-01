@@ -89,7 +89,7 @@ defmodule PolicrMiniBot.VerificationHelper do
       params = %{
         target_user_name: fullname(user),
         target_user_language_code: user.language_code,
-        seconds: scheme.seconds || default!(:vseconds),
+        seconds: scheme.seconds || default!(:timeout),
         source: :joined
       }
 
@@ -182,7 +182,7 @@ defmodule PolicrMiniBot.VerificationHelper do
       params = %{
         target_user_name: fullname(user),
         target_user_language_code: user.language_code,
-        seconds: scheme.seconds || default!(:vseconds),
+        seconds: scheme.seconds || default!(:timeout),
         source: :join_request
       }
 
@@ -358,7 +358,7 @@ defmodule PolicrMiniBot.VerificationHelper do
       Keyword.get(opts, :pending_count) || Chats.get_pending_verification_count(chat_id, :joined)
 
     # 读取等待验证的人数并根据人数分别响应不同的文本内容
-    mention_scheme = scheme.mention_text || default!(:mention_scheme)
+    mention_scheme = scheme.mention_text || default!(:mention)
 
     text =
       if pending_count == 1 do
@@ -436,7 +436,7 @@ defmodule PolicrMiniBot.VerificationHelper do
         Chats.get_pending_verification_count(chat_id, :join_request)
 
     # 读取等待验证的人数并根据人数分别响应不同的文本内容
-    mention_scheme = scheme.mention_text || default!(:mention_scheme)
+    mention_scheme = scheme.mention_text || default!(:mention)
 
     text =
       if pending_count == 1 do
@@ -499,7 +499,7 @@ defmodule PolicrMiniBot.VerificationHelper do
   """
   @spec send_verification(Verification.t(), Scheme.t()) :: {:ok, Verification.t()} | {:error, any}
   def send_verification(v, scheme) do
-    mode = scheme.verification_mode || default!(:vmode)
+    mode = scheme.verification_mode || default!(:type)
     data = Captcha.make(mode, v.chat_id, scheme)
 
     ttitle =
@@ -587,8 +587,8 @@ defmodule PolicrMiniBot.VerificationHelper do
   """
   @spec kill(Verification.t(), Scheme.t(), kreason) :: :ok | {:error, map}
   def kill(v, scheme, reason) do
-    kmethod = scheme.timeout_killing_method || default!(:tkmethod)
-    delay_unban_secs = scheme.delay_unban_secs || default!(:delay_unban_secs)
+    kmethod = scheme.timeout_killing_method || default!(:strategy)
+    delay_unban_secs = scheme.delay_unban_secs || default!(:delay_unban)
 
     # 击杀用户
     kill_user(v, kmethod, delay_unban_secs)

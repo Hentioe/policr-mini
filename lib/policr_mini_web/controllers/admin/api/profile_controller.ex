@@ -5,7 +5,7 @@ defmodule PolicrMiniWeb.Admin.API.ProfileController do
 
   use PolicrMiniWeb, :controller
 
-  alias PolicrMini.DefaultsServer
+  alias PolicrMini.DefaultProvider
 
   require Logger
 
@@ -14,7 +14,7 @@ defmodule PolicrMiniWeb.Admin.API.ProfileController do
   # 注意：此后台仍被旧用户后台「方案定制」页面使用，可检索代码 `/admin/api/profile` 判断是否移除。
   def index(conn, _params) do
     # 此 API 调用无需系统权限
-    scheme = DefaultsServer.get_scheme()
+    scheme = DefaultProvider.scheme()
 
     render(conn, "index.json", %{
       scheme: scheme

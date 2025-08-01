@@ -32,7 +32,7 @@ defmodule PolicrMiniBot.HandleJoinedMessageChain do
     # TOD0: 将 scheme 的获取放在一个独立的 chain 中，通过上下文传递。
     case Chats.find_or_init_scheme(chat.id) do
       {:ok, scheme} ->
-        service_message_cleanup = scheme.service_message_cleanup || default!(:smc) || []
+        service_message_cleanup = scheme.service_message_cleanup || default!(:cleanup) || []
 
         if Enum.member?(service_message_cleanup, :joined) do
           # 删除服务消息。
