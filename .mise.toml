@@ -1,6 +1,6 @@
 [tools]
-erlang = "28.0.2"
-elixir = "1.18.4-otp-28"
+erlang = "28.4.2"
+elixir = "1.19.5-otp-28"
 "npm:pnpm" = "10"
 "cargo:dprint" = "latest"
 
